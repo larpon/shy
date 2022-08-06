@@ -1,0 +1,15 @@
+[solid]
+	debug = false
+
+[solid.window]
+	title = 'Hello'
+
+[solid.render]
+	vsync = 'on' # 'off' or 'adaptive'
+	msaa = 4 # 0 for disabling MSAA
+
+[solid.run]
+	update_rate = 'auto' # 60.0
+	lock_framerate      = false
+	update_multiplicity = 1
+	time_history_count  = 4
