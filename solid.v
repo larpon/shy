@@ -5,6 +5,7 @@ module solid
 
 import time
 import utils
+import solid.log { Log }
 
 pub const null = unsafe { nil }
 

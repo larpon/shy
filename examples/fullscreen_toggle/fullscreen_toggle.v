@@ -4,6 +4,7 @@
 module main
 
 import solid
+import solid.log
 
 fn main() {
 	mut app := &App{}
@@ -14,7 +15,7 @@ fn main() {
 [heap]
 struct App {
 mut:
-	log   solid.Log
+	log   log.Log
 	solid &solid.Solid = unsafe { nil } // Initialized by solid.run<T>(...)
 }
 
