@@ -33,9 +33,7 @@ pub mut:
 	paused   bool
 	shutdown bool
 mut:
-	log Log = Log{
-		flags: .log | .std_err | .info | .warn | .error | .critical | .debug
-	}
+	log     Log
 	ready   bool
 	running bool
 	resync  bool
@@ -54,9 +52,6 @@ mut:
 pub fn new(config Config) &Solid {
 	mut s := &Solid{
 		config: config
-	}
-	$if prod {
-		s.log.clear_and_set(.log | .std_err | .error | .critical)
 	}
 	s.init()
 	return s
@@ -335,6 +330,11 @@ fn (mut s Solid) process_events<T>(mut ctx T) {
 			}
 		}
 	}
+}
+
+[inline]
+pub fn (s Solid) fps() u32 {
+	return s.fps_snapshot
 }
 
 pub fn (s Solid) ticks() u64 {
