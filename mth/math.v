@@ -7,3 +7,11 @@ pub const (
 	deg2rad = f32((pi * 2) / 360)
 	rad2deg = f32(360 / (pi * 2))
 )
+
+[inline]
+pub fn abs<U>(x U) U {
+	if x > 0 {
+		return x
+	}
+	return -x
+}

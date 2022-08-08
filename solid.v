@@ -4,7 +4,7 @@
 module solid
 
 import time
-import utils
+import solid.mth
 import solid.log { Log }
 
 pub const null = unsafe { nil }
@@ -151,7 +151,7 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 
 		// vsync time snapping
 		for snap in snap_frequencies {
-			if utils.abs(delta_time - snap) < vsync_maxerror {
+			if mth.abs(delta_time - snap) < vsync_maxerror {
 				// eprintln('Snaping at $i')
 				delta_time = snap
 				break

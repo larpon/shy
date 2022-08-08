@@ -12,14 +12,6 @@ pub const (
 )
 
 [inline]
-pub fn abs<U>(x U) U {
-	if x > 0 {
-		return x
-	}
-	return -x
-}
-
-[inline]
 pub fn remap(value f32, min f32, max f32, new_min f32, new_max f32) f32 {
 	return (((value - min) * (new_max - new_min)) / (max - min)) + new_min
 }

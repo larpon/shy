@@ -52,8 +52,8 @@ pub fn (l Log) buffer() string {
 }
 
 pub fn (l Log) print_status(prefix string) {
-	l.redirect(term.colorize(term.blue, prefix + ' ') +
-		term.colorize(term.white, 'solid.Log.flags ') + l.status_string())
+	l.redirect(term.colorize(term.blue, prefix + ' ') + term.colorize(term.white, 'Log.flags ') +
+		l.status_string())
 }
 
 pub fn (l Log) status_string() string {
