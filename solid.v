@@ -6,7 +6,7 @@ module solid
 import time
 import utils
 
-pub const null = voidptr(0)
+pub const null = unsafe { nil }
 
 pub const (
 	pi      = 3.14159265358979323846264338327950288419716939937510582097494459
@@ -62,6 +62,7 @@ pub fn new(config Config) &Solid {
 	return s
 }
 
+// run runs the application instance `T`.
 pub fn run<T>(mut ctx T, config Config) {
 	mut solid_instance := new(config)
 	ctx.solid = solid_instance

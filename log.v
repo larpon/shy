@@ -7,11 +7,16 @@ import term
 import strings
 
 const (
-	log_label_info     =  'INFO'
-	log_label_warn     =  'WARN'
-	log_label_error    =  'ERROR'
-	log_label_debug    =  'DEBUG'
-	log_label_critical =  'CRITICAL'
+	log_label_info     = 'INFO'
+	log_label_warn     = 'WARN'
+	log_label_error    = 'ERROR'
+	log_label_debug    = 'DEBUG'
+	log_label_critical = 'CRITICAL'
+	log_defaults       = $if prod {
+		solid.LogFlag.log | .std_err | .error | .critical
+	} $else {
+		solid.LogFlag.log | .std_err | .info | .warn | .error | .critical
+	}
 )
 
 [flag]
@@ -38,7 +43,7 @@ fn (lf LogFlag) clean_str() string {
 // Log makes it possible to categorize and color log entries
 pub struct Log {
 mut:
-	flags  LogFlag = .log | .std_err | .info | .warn | .error | .critical
+	flags  LogFlag = solid.log_defaults
 	buffer strings.Builder = strings.new_builder(4096)
 }
 
@@ -125,9 +130,9 @@ fn (l Log) changes(flag LogFlag) string {
 pub fn (mut l Log) info(str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_info+' ' + str)
+			l.buffer.writeln(solid.log_label_info + ' ' + str)
 		}
-		maybe_colored := term.colorize(term.blue, solid.log_label_info+' ')
+		maybe_colored := term.colorize(term.blue, solid.log_label_info + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -136,9 +141,9 @@ pub fn (mut l Log) info(str string) {
 pub fn (mut l Log) warn(str string) {
 	if l.flags.has(.warn) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_warn+' ' + str)
+			l.buffer.writeln(solid.log_label_warn + ' ' + str)
 		}
-		maybe_colored := term.colorize(term.yellow, solid.log_label_warn+' ')
+		maybe_colored := term.colorize(term.yellow, solid.log_label_warn + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -147,9 +152,9 @@ pub fn (mut l Log) warn(str string) {
 pub fn (mut l Log) error(str string) {
 	if l.flags.has(.error) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_error+' ' + str)
+			l.buffer.writeln(solid.log_label_error + ' ' + str)
 		}
-		maybe_colored := term.colorize(term.bright_red, solid.log_label_error+' ')
+		maybe_colored := term.colorize(term.bright_red, solid.log_label_error + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -158,9 +163,9 @@ pub fn (mut l Log) error(str string) {
 pub fn (mut l Log) critical(str string) {
 	if l.flags.has(.critical) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_critical+' ' + str)
+			l.buffer.writeln(solid.log_label_critical + ' ' + str)
 		}
-		maybe_colored := term.colorize(term.red, solid.log_label_critical+' ')
+		maybe_colored := term.colorize(term.red, solid.log_label_critical + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -169,9 +174,9 @@ pub fn (mut l Log) critical(str string) {
 pub fn (mut l Log) debug(str string) {
 	if l.flags.has(.debug) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_debug+' ' + str)
+			l.buffer.writeln(solid.log_label_debug + ' ' + str)
 		}
-		maybe_colored := term.colorize(term.bright_magenta, solid.log_label_debug+' ')
+		maybe_colored := term.colorize(term.bright_magenta, solid.log_label_debug + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -182,9 +187,10 @@ pub fn (mut l Log) debug(str string) {
 pub fn (mut l Log) ginfo(group string, str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_info+' $group ' + str)
+			l.buffer.writeln(solid.log_label_info + ' $group ' + str)
 		}
-		maybe_colored := term.colorize(term.blue, solid.log_label_info+' ') + term.colorize(term.white, '$group ')
+		maybe_colored := term.colorize(term.blue, solid.log_label_info + ' ') +
+			term.colorize(term.white, '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -193,9 +199,10 @@ pub fn (mut l Log) ginfo(group string, str string) {
 pub fn (mut l Log) gwarn(group string, str string) {
 	if l.flags.has(.warn) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_warn+' $group ' + str)
+			l.buffer.writeln(solid.log_label_warn + ' $group ' + str)
 		}
-		maybe_colored := term.colorize(term.yellow, solid.log_label_warn+' ') + term.colorize(term.white, '$group ')
+		maybe_colored := term.colorize(term.yellow, solid.log_label_warn + ' ') +
+			term.colorize(term.white, '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -204,9 +211,9 @@ pub fn (mut l Log) gwarn(group string, str string) {
 pub fn (mut l Log) gerror(group string, str string) {
 	if l.flags.has(.error) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_error+' $group ' + str)
+			l.buffer.writeln(solid.log_label_error + ' $group ' + str)
 		}
-		maybe_colored := term.colorize(term.bright_red, solid.log_label_error+' ') +
+		maybe_colored := term.colorize(term.bright_red, solid.log_label_error + ' ') +
 			term.colorize(term.white, '$group ')
 		l.redirect(maybe_colored + str)
 	}
@@ -216,9 +223,10 @@ pub fn (mut l Log) gerror(group string, str string) {
 pub fn (mut l Log) gcritical(group string, str string) {
 	if l.flags.has(.critical) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_critical+' $group ' + str)
+			l.buffer.writeln(solid.log_label_critical + ' $group ' + str)
 		}
-		maybe_colored := term.colorize(term.red, solid.log_label_critical+' ') + term.colorize(term.white, '$group ')
+		maybe_colored := term.colorize(term.red, solid.log_label_critical + ' ') +
+			term.colorize(term.white, '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -227,9 +235,9 @@ pub fn (mut l Log) gcritical(group string, str string) {
 pub fn (mut l Log) gdebug(group string, str string) {
 	if l.flags.has(.debug) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(solid.log_label_debug+' $group ' + str)
+			l.buffer.writeln(solid.log_label_debug + ' $group ' + str)
 		}
-		maybe_colored := term.colorize(term.bright_magenta, solid.log_label_debug+' ') +
+		maybe_colored := term.colorize(term.bright_magenta, solid.log_label_debug + ' ') +
 			term.colorize(term.white, '$group ')
 		l.redirect(maybe_colored + str)
 	}

@@ -61,7 +61,7 @@ pub fn config_from_toml_file(path string) ?Config {
 }
 
 pub fn config_from_toml_text(toml_text string) ?Config {
-	toml_doc := toml.parse_text(toml_text) ?
+	toml_doc := toml.parse_text(toml_text)?
 	toml_wc := toml_doc.value('solid.window')
 	wc := WindowConfig{
 		title: toml_wc.value('title').default_to('Solid window').string()
