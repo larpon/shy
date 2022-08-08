@@ -7,11 +7,7 @@ import solid
 
 fn main() {
 	mut app := &App{}
-	config := solid.Config{
-		window: solid.WindowConfig{
-			title: 'Hello Solid World'
-		}
-	}
+	config := solid.Config{}
 	solid.run<App>(mut app, config)
 }
 
