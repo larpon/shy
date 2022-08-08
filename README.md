@@ -1,3 +1,4 @@
 # Introduction
 
-Solid is a game engine written in V
+Solid is a foundation for creative coding and game development written in V.
+

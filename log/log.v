@@ -13,9 +13,9 @@ const (
 	label_debug    = 'DEBUG'
 	label_critical = 'CRITICAL'
 	default_flags  = $if prod {
-		log.Flag.log | .std_err | .error | .critical
+		Flag.log | .std_err | .error | .critical
 	} $else {
-		log.Flag.log | .std_err | .info | .warn | .error | .critical
+		Flag.log | .std_err | .info | .warn | .error | .critical
 	}
 )
 

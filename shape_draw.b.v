@@ -4,6 +4,7 @@
 module solid
 
 import math
+import solid.mth
 import sgp
 
 pub fn (s Solid) shape_draw() ShapeDraw {
@@ -201,7 +202,7 @@ fn (sd ShapeDraw) anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	vp_x := ip_x
 	vp_y := ip_y
 
-	vpp_x, vpp_y := rotate_point(x2, y2, vp_x, vp_y, 180 * solid.deg2rad)
+	vpp_x, vpp_y := rotate_point(x2, y2, vp_x, vp_y, 180 * mth.deg2rad)
 
 	// ---
 
@@ -217,8 +218,8 @@ fn (sd ShapeDraw) anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	bt_x := t2_x - x3 + x2
 	bt_y := t2_y - y3 + y2
 
-	t0r_x, t0r_y := rotate_point(x1, y1, t0_x, t0_y, 180 * solid.deg2rad)
-	t2r_x, t2r_y := rotate_point(x3, y3, t2_x, t2_y, 180 * solid.deg2rad)
+	t0r_x, t0r_y := rotate_point(x1, y1, t0_x, t0_y, 180 * mth.deg2rad)
+	t2r_x, t2r_y := rotate_point(x3, y3, t2_x, t2_y, 180 * mth.deg2rad)
 
 	// println('T0: $t0_x, $t0_y vP: $vp_x, $vp_y -vP: $vpp_x, $vpp_y')
 
@@ -288,7 +289,7 @@ fn (sd ShapeDraw) anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 
 		if arc_angle < 0 {
 			if flip {
-				arc_angle = arc_angle + 2.0 * solid.pi
+				arc_angle = arc_angle + 2.0 * mth.pi
 			}
 		}
 
@@ -336,7 +337,7 @@ fn (sd ShapeDraw) anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 
 [inline]
 fn line_segment_angle(x1 f32, y1 f32, x2 f32, y2 f32) f32 {
-	return solid.pi + f32(math.atan2(y1 - y2, x1 - x2))
+	return mth.pi + f32(math.atan2(y1 - y2, x1 - x2))
 }
 
 [inline]

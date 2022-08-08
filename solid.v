@@ -9,12 +9,6 @@ import solid.log { Log }
 
 pub const null = unsafe { nil }
 
-pub const (
-	pi      = 3.14159265358979323846264338327950288419716939937510582097494459
-	deg2rad = f32((pi * 2) / 360)
-	rad2deg = f32(360 / (pi * 2))
-)
-
 pub enum Scope {
 	shape_draw
 	text_draw
