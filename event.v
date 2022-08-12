@@ -34,7 +34,7 @@ pub struct WindowEvent {
 pub:
 	timestamp u64
 	kind      WindowEventKind
-	window    Window
+	window    &Window
 }
 
 pub enum WindowEventKind {

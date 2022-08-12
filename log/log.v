@@ -19,6 +19,12 @@ const (
 	}
 )
 
+// TODO
+[markused]
+fn todo_() {
+	_ := log.default_flags
+}
+
 [flag]
 pub enum Flag {
 	log // On / off switch
@@ -127,10 +133,12 @@ fn (l Log) changes(flag Flag) string {
 //
 
 [if !no_log ?]
-pub fn (mut l Log) info(str string) {
+pub fn (l &Log) info(str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_info + ' ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_info + ' ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.blue, log.label_info + ' ')
 		l.redirect(maybe_colored + str)
@@ -138,10 +146,12 @@ pub fn (mut l Log) info(str string) {
 }
 
 [if !no_log ?]
-pub fn (mut l Log) warn(str string) {
+pub fn (l &Log) warn(str string) {
 	if l.flags.has(.warn) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_warn + ' ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_warn + ' ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.yellow, log.label_warn + ' ')
 		l.redirect(maybe_colored + str)
@@ -149,10 +159,12 @@ pub fn (mut l Log) warn(str string) {
 }
 
 [if !no_log ?]
-pub fn (mut l Log) error(str string) {
+pub fn (l &Log) error(str string) {
 	if l.flags.has(.error) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_error + ' ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_error + ' ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.bright_red, log.label_error + ' ')
 		l.redirect(maybe_colored + str)
@@ -160,10 +172,12 @@ pub fn (mut l Log) error(str string) {
 }
 
 [if !no_log ?]
-pub fn (mut l Log) critical(str string) {
+pub fn (l &Log) critical(str string) {
 	if l.flags.has(.critical) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_critical + ' ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_critical + ' ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.red, log.label_critical + ' ')
 		l.redirect(maybe_colored + str)
@@ -171,10 +185,12 @@ pub fn (mut l Log) critical(str string) {
 }
 
 [if debug && !no_log ?]
-pub fn (mut l Log) debug(str string) {
+pub fn (l &Log) debug(str string) {
 	if l.flags.has(.debug) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_debug + ' ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_debug + ' ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.bright_magenta, log.label_debug + ' ')
 		l.redirect(maybe_colored + str)
@@ -184,10 +200,12 @@ pub fn (mut l Log) debug(str string) {
 // Group
 
 [if !no_log ?]
-pub fn (mut l Log) ginfo(group string, str string) {
+pub fn (l &Log) ginfo(group string, str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_info + ' $group ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_info + ' $group ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.blue, log.label_info + ' ') +
 			term.colorize(term.white, '$group ')
@@ -196,10 +214,12 @@ pub fn (mut l Log) ginfo(group string, str string) {
 }
 
 [if !no_log ?]
-pub fn (mut l Log) gwarn(group string, str string) {
+pub fn (l &Log) gwarn(group string, str string) {
 	if l.flags.has(.warn) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_warn + ' $group ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_warn + ' $group ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.yellow, log.label_warn + ' ') +
 			term.colorize(term.white, '$group ')
@@ -208,10 +228,12 @@ pub fn (mut l Log) gwarn(group string, str string) {
 }
 
 [if !no_log ?]
-pub fn (mut l Log) gerror(group string, str string) {
+pub fn (l &Log) gerror(group string, str string) {
 	if l.flags.has(.error) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_error + ' $group ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_error + ' $group ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.bright_red, log.label_error + ' ') +
 			term.colorize(term.white, '$group ')
@@ -220,10 +242,12 @@ pub fn (mut l Log) gerror(group string, str string) {
 }
 
 [if !no_log ?]
-pub fn (mut l Log) gcritical(group string, str string) {
+pub fn (l &Log) gcritical(group string, str string) {
 	if l.flags.has(.critical) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_critical + ' $group ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_critical + ' $group ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.red, log.label_critical + ' ') +
 			term.colorize(term.white, '$group ')
@@ -232,10 +256,12 @@ pub fn (mut l Log) gcritical(group string, str string) {
 }
 
 [if debug && !no_log ?]
-pub fn (mut l Log) gdebug(group string, str string) {
+pub fn (l &Log) gdebug(group string, str string) {
 	if l.flags.has(.debug) {
 		if l.flags.has(.buffer) {
-			l.buffer.writeln(log.label_debug + ' $group ' + str)
+			unsafe {
+				l.buffer.writeln(log.label_debug + ' $group ' + str)
+			}
 		}
 		maybe_colored := term.colorize(term.bright_magenta, log.label_debug + ' ') +
 			term.colorize(term.white, '$group ')
@@ -244,7 +270,7 @@ pub fn (mut l Log) gdebug(group string, str string) {
 }
 
 //
-pub fn (mut l Log) free() {
+pub fn (l &Log) free() {
 	// l.gdebug(@STRUCT+'.'+@FN,'freeing buffer...')
 	unsafe { l.buffer.free() }
 }

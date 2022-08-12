@@ -3,12 +3,10 @@
 // that can be found in the LICENSE file.
 module solid
 
-pub enum MousePositionType {
-	global
-	window
-}
-
-pub struct Mouse {
-mut:
-	solid &Solid = unsafe { nil }
+pub struct Rect {
+pub mut:
+	x f32
+	y f32
+	w f32 = 100
+	h f32 = 100
 }

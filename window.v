@@ -3,8 +3,12 @@
 // that can be found in the LICENSE file.
 module solid
 
-pub struct Window {
-	ref voidptr // &sdl.Window
-pub:
-	id u32
+pub struct Boot {
+	solid &Solid
+}
+
+pub struct WM {
+mut:
+	solid &Solid
+	root  &Window = unsafe { nil }
 }

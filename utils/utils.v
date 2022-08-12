@@ -12,7 +12,7 @@ pub const (
 )
 
 [inline]
-pub fn remap(value f32, min f32, max f32, new_min f32, new_max f32) f32 {
+pub fn remap<T>(value T, min T, max T, new_min T, new_max T) T {
 	return (((value - min) * (new_max - new_min)) / (max - min)) + new_min
 }
 
@@ -27,12 +27,12 @@ pub fn remap_f32_to_u8(value f32, min f32, max f32, new_min u8, new_max u8) u8 {
 }
 
 [inline]
-pub fn lerp(x f64, y f64, s f64) f64 {
+pub fn lerp<T>(x T, y T, s T) T {
 	return x + s * (y - x)
 }
 
 // loopf loops a continious `value` in the range `from`,`to`
-pub fn loopf(value f32, from f32, to f32) f32 {
+pub fn loop_f32(value f32, from f32, to f32) f32 {
 	range := to - from
 	offset_value := value - from // value relative to 0
 	// + `from` to reset back to start of original range
@@ -40,7 +40,7 @@ pub fn loopf(value f32, from f32, to f32) f32 {
 }
 
 // loop loops a continious `value` in the range `from`,`to`
-pub fn loop(value int, from int, to int) int {
+pub fn loop_int(value int, from int, to int) int {
 	range := to - from
 	offset_value := value - from // value relative to 0
 	// + `from` to reset back to start of original range
@@ -48,13 +48,13 @@ pub fn loop(value int, from int, to int) int {
 }
 
 // oscillate e.g. "wave" or "ping-pong" `value` between `min` and `max`
-pub fn oscillate(value int, min int, max int) int {
+pub fn oscillate_int(value int, min int, max int) int {
 	range := max - min
 	return min + math.abs(((value + range) % (range * 2)) - range)
 }
 
 // oscillatef e.g. "wave" or "ping-pong" `value` between `min` and `max`
-pub fn oscillatef(value f32, min f32, max f32) f32 {
+pub fn oscillate_f32(value f32, min f32, max f32) f32 {
 	range := max - min
 	return f32(min + math.abs(math.fmod((value + range), (range * 2)) - range))
 }
