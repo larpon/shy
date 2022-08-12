@@ -12,8 +12,8 @@ pub struct Draw2D {
 pub mut:
 	render_text_first bool
 mut:
-	solid        &Solid       = unsafe { nil }
-	font_context &FontContext = unsafe { nil }
+	solid        &Solid       = solid.null
+	font_context &FontContext = solid.null
 }
 
 fn (mut d2d Draw2D) init(solid &Solid) {
@@ -82,7 +82,7 @@ fn (mut d2d Draw2D) end_text() {
 	if !isnil(fc) {
 		//¤ FLOOD d2d.solid.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
 		fc.end()
-		d2d.font_context = unsafe { nil }
+		d2d.font_context = solid.null
 	}
 }
 

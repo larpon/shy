@@ -6,7 +6,7 @@ module solid
 // Base app skeleton for easy embedding in examples
 struct App {
 mut:
-	solid &Solid = unsafe { nil } // Initialized by solid.run<T>(...)
+	solid &Solid = solid.null // Initialized by solid.run<T>(...)
 }
 
 pub fn (mut a App) init() ! {}
@@ -24,6 +24,12 @@ pub fn (mut a App) event(e Event) {}
 // Simple app skeleton for easy embedding in examples
 struct BasicApp {
 	App
+mut:
+	mouse &Mouse = solid.null
+}
+
+pub fn (mut a BasicApp) init() ! {
+	a.mouse = a.solid.input.mouse(0)!
 }
 
 pub fn (mut a BasicApp) event(e Event) {
@@ -45,7 +51,8 @@ fn (mut a BasicApp) on_event(e Event) {
 					a.solid.shutdown = true
 				}
 				else {
-					alt_is_held := (a.solid.key_is_down(.lalt) || a.solid.key_is_down(.ralt))
+					kb := a.solid.input.keyboard(0) or { return }
+					alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
 						mut win := a.solid.wm.active_window()
 						win.toggle_fullscreen()
@@ -81,7 +88,8 @@ pub fn (mut a DevApp) on_event(e Event) {
 	if e is KeyEvent {
 		key_code := e.key_code
 		if e.state == .down {
-			if s.key_is_down(.comma) {
+			kb := s.input.keyboard(0) or { return }
+			if kb.is_key_down(.comma) {
 				if key_code == .s {
 					s.log.print_status('STATUS')
 					return
@@ -103,14 +111,14 @@ pub fn (mut a DevApp) on_event(e Event) {
 				}
 
 				// Log print control
-				if s.key_is_down(.l) {
+				if kb.is_key_down(.l) {
 					s.log.on(.log)
 
 					if key_code == .f {
 						s.log.toggle(.flood)
 						return
 					}
-					if key_code == .minus || s.key_is_down(.minus) {
+					if key_code == .minus || kb.is_key_down(.minus) {
 						s.log.off(.log)
 					} else if key_code == ._0 {
 						s.log.toggle(.debug)

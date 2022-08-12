@@ -18,7 +18,7 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	mx, my := a.solid.mouse.position(.window)
+	mx, my := a.mouse.position(.window)
 
 	mut draw := a.solid.draw2d()
 	draw.begin()

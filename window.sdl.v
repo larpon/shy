@@ -82,7 +82,6 @@ pub fn (wm WM) root() &Window {
 }
 
 pub fn (mut wm WM) init_root_window() !&Window {
-	// If no root window we initialize one
 	s := wm.solid
 
 	mut mx := 0
@@ -190,6 +189,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 }
 
 pub fn (mut wm WM) shutdown() ! {
+	wm.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	wm.root.close()!
 	// TODO test unsafe { free(wm) }
 
@@ -230,8 +230,12 @@ pub fn (mut w Window) init() ! {
 }
 
 pub fn (mut w Window) close() ! {
-	// s := w.solid
+	w.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	w.shutdown() !
+}
 
+pub fn (mut w Window) shutdown() ! {
+	w.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	for mut window in w.children {
 		window.close()!
 	}

@@ -10,19 +10,14 @@ import solid.log { Log }
 
 pub const null = unsafe { nil }
 
-pub enum Scope {
-	shape_draw
-}
-
-pub enum ScopeAction {
-	open
-	close
+//
+pub enum ButtonState {
+	up
+	down
 }
 
 struct State {
 mut:
-	keys   map[int]bool
-	mb     map[int]bool
 	resync bool
 	//
 	fps_frame    u32
@@ -40,9 +35,9 @@ pub struct Solid {
 pub mut:
 	paused   bool
 	shutdown bool
-	wm       &WM    = unsafe { nil }
-	gfx      &GFX   = unsafe { nil }
-	mouse    &Mouse = unsafe { nil }
+	wm       &WM    = solid.null
+	gfx      &GFX   = solid.null
+	input    &Input = solid.null
 mut:
 	log     Log
 	ready   bool
@@ -59,9 +54,9 @@ pub fn (mut s Solid) init() ! {
 		s.log.set(.debug)
 	}
 	s.api.init(s)!
-	s.wm = s.api.wm
-	s.gfx = s.api.gfx
-	s.mouse = s.api.mouse
+	if isnil(s.wm) || isnil(s.gfx) || isnil(s.input) {
+		return error('not all api systems where set')
+	}
 	s.ready = true
 }
 
@@ -283,26 +278,14 @@ fn (mut s Solid) process_events<T>(mut ctx T) {
 		event := s.poll_event() or { break }
 
 		if event is MouseButtonEvent {
-			solid_mouse_id := int(event.button)
-			match event.state {
-				.down {
-					s.state.mb[solid_mouse_id] = true
-				}
-				.up {
-					s.state.mb[solid_mouse_id] = false
-				}
-			}
+			// mouse := TODO multi-mouse support
+			mut mouse := s.input.mouse(0) or { return }
+			mouse.set_button_state(event.button, event.state)
 		}
 		if event is KeyEvent {
-			solid_key_id := int(event.key_code)
-			match event.state {
-				.down {
-					s.state.keys[solid_key_id] = true
-				}
-				.up {
-					s.state.keys[solid_key_id] = false
-				}
-			}
+			// kb := TODO multi-keyboard support
+			mut kb := s.input.keyboard(0) or { return }
+			kb.set_key_state(event.key_code, event.state)
 		}
 
 		ctx.event(event)
@@ -317,20 +300,4 @@ pub fn (s Solid) fps() u32 {
 [inline]
 pub fn (s Solid) ticks() u64 {
 	return u64(s.timer.elapsed().milliseconds())
-}
-
-[inline]
-pub fn (s Solid) key_is_down(keycode KeyCode) bool {
-	if key_state := s.state.keys[int(keycode)] {
-		return key_state
-	}
-	return false
-}
-
-[inline]
-pub fn (s Solid) is_mouse_button_held(button MouseButton) bool {
-	if state := s.state.mb[int(button)] {
-		return state
-	}
-	return false
 }
