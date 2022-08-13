@@ -3,19 +3,54 @@
 // that can be found in the LICENSE file.
 module solid
 
+pub enum MouseButton {
+	left
+	right
+	middle
+	x1
+	x2
+}
+
+[flag]
+pub enum MouseButtons {
+	left
+	right
+	middle
+	x1
+	x2
+}
+
 pub enum MousePositionType {
 	global
 	window
 }
 
-// mouse_position
-pub fn (s Solid) mouse_position(typ MousePositionType) (int, int) {
-	match typ {
-		.global {
-			return s.global_mouse_position()
+pub enum MouseWheelDirection {
+	normal
+	flipped
+}
+
+pub struct Mouse {
+mut:
+	solid &Solid
+	bs    map[int]bool // button states
+}
+
+pub fn (mut m Mouse) set_button_state(button MouseButton, button_state ButtonState) {
+	match button_state {
+		.up {
+			m.bs[int(button)] = false
 		}
-		.window {
-			return s.window_mouse_position()
+		.down {
+			m.bs[int(button)] = true
 		}
 	}
+}
+
+[inline]
+pub fn (m Mouse) is_button_down(button MouseButton) bool {
+	if state := m.bs[int(button)] {
+		return state
+	}
+	return false
 }

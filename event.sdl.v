@@ -18,11 +18,12 @@ fn (mut s Solid) poll_event() ?Event {
 				//	s.shutdown = true
 				//}
 				wevid := sdl.WindowEventID(int(evt.window.event))
+				win := s.wm.active_window()
 				if wevid == .resized {
 					return WindowEvent{
 						timestamp: s.ticks()
 						kind: .resized
-						window: s.window() // TODO multi-window support
+						window: win // TODO multi-window support
 					}
 				}
 			}
@@ -49,9 +50,10 @@ fn (mut s Solid) poll_event() ?Event {
 			}
 			.mousemotion {
 				buttons := map_sdl_button_mask_to_solid_mouse_buttons(evt.motion.state)
+				win := s.wm.active_window()
 				return MouseMotionEvent{
 					timestamp: s.ticks()
-					window_id: s.window().id // TODO
+					window_id: win.id // TODO multi-window support
 					which: evt.motion.which // TODO use own ID system??
 					buttons: buttons
 					x: evt.motion.x
@@ -64,9 +66,10 @@ fn (mut s Solid) poll_event() ?Event {
 				mut state := ButtonState.down
 				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
 				button := map_sdl_button_to_solid_mouse_button(evt.button.button)
+				win := s.wm.active_window()
 				return MouseButtonEvent{
 					timestamp: s.ticks()
-					window_id: s.window().id // TODO
+					window_id: win.id // TODO
 					which: evt.button.which // TODO use own ID system??
 					button: button
 					state: state
@@ -82,9 +85,10 @@ fn (mut s Solid) poll_event() ?Event {
 				} else {
 					.flipped
 				}
+				win := s.wm.active_window()
 				return MouseWheelEvent{
 					timestamp: s.ticks()
-					window_id: s.window().id // TODO
+					window_id: win.id // TODO
 					which: evt.wheel.which // TODO use own ID system??
 					x: evt.wheel.x
 					y: evt.wheel.y

@@ -47,24 +47,24 @@ pub fn (s Solid) performance_frequency() u64 {
 }
 
 pub fn (s Solid) clear_screen() {
-	// sdl.set_render_draw_color(s.backend.renderer, 49, 54, 59, 255)
-	// sdl.render_clear(s.backend.renderer)
+	// sdl.set_render_draw_color(s.api.renderer, 49, 54, 59, 255)
+	// sdl.render_clear(s.api.renderer)
 	pass_action := gfx.create_clear_pass(0.0, 0.0, 0.0, 1.0) // This will create a black color as a default pass (window background color)
 	// gfx.PassAction{}
-	w, h := s.backend.get_drawable_size()
+	w, h := s.api.get_drawable_size()
 	gfx.begin_default_pass(&pass_action, w, h)
 }
 
 pub fn (s Solid) display() {
-	gfx.apply_pipeline(s.backend.shader_pipeline)
-	gfx.apply_bindings(&s.backend.bind)
+	gfx.apply_pipeline(s.api.shader_pipeline)
+	gfx.apply_bindings(&s.api.bind)
 
 	gfx.draw(0, 3, 1)
 	gfx.end_pass()
 	gfx.commit()
 
-	sdl.gl_swap_window(s.backend.window)
-	// sdl.render_present(s.backend.renderer)
+	sdl.gl_swap_window(s.api.window)
+	// sdl.render_present(s.api.renderer)
 }
 
 pub fn (mut s Solid) init() {
@@ -113,11 +113,11 @@ pub fn (mut s Solid) init() {
 	}
 
 	font_size := 14
-	s.backend.font = ttf.open_font(font.get_path_variant(font.default(), .mono).str, font_size)
+	s.api.font = ttf.open_font(font.get_path_variant(font.default(), .mono).str, font_size)
 	mut txt_w, mut txt_h := 0, 0
-	ttf.size_utf8(s.backend.font, 'Åjƒ'.str, &txt_w, &txt_h)
+	ttf.size_utf8(s.api.font, 'Åjƒ'.str, &txt_w, &txt_h)
 
-	s.backend.text_input.text_height = txt_h
+	s.api.text_input.text_height = txt_h
 
 	// $if opengl ? {
 	// SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, HARDWARE_RENDERING);
@@ -150,15 +150,15 @@ pub fn (mut s Solid) init() {
 		error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		panic('Could not create SDL window, SDL says:\n$error_msg')
 	}
-	s.backend.window = window
+	s.api.window = window
 
 	// $if opengl ? {
-	s.backend.gl_context = sdl.gl_create_context(window)
-	if s.backend.gl_context == sdl.null {
+	s.api.gl_context = sdl.gl_create_context(window)
+	if s.api.gl_context == sdl.null {
 		error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		panic('Could not create OpenGL context, SDL says:\n$error_msg')
 	}
-	sdl.gl_make_current(window, s.backend.gl_context)
+	sdl.gl_make_current(window, s.api.gl_context)
 	if sdl.gl_set_swap_interval(1) < 0 {
 		error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		panic('Could not set OpenGL swap interval to VSYNC:\n$error_msg')
@@ -194,7 +194,7 @@ pub fn (mut s Solid) init() {
 				}
 				controller_name := unsafe { cstring_to_vstring(sdl.game_controller_name_for_index(i)) }
 				s.log.ginfo(@STRUCT + '.' + 'input', 'detected controller $i as "$controller_name"')
-				s.backend.controllers[i] = controller
+				s.api.controllers[i] = controller
 			} else {
 				// sdl.joystick_close(i)
 				// eprintln('Warning: Not adding controller $i - not a game controller' )
@@ -205,7 +205,7 @@ pub fn (mut s Solid) init() {
 
 	// sdl.set_render_draw_blend_mode(renderer, .blend)
 
-	// s.backend.renderer = renderer
+	// s.api.renderer = renderer
 
 	// `vertices` defines a vertex buffer with 3 vertices
 	// with 3 position fields XYZ and 4 color components RGBA -
@@ -239,7 +239,7 @@ pub fn (mut s Solid) init() {
 		size: vertex_buffer_desc.size
 	}
 
-	s.backend.bind.vertex_buffers[0] = gfx.make_buffer(&vertex_buffer_desc)
+	s.api.bind.vertex_buffers[0] = gfx.make_buffer(&vertex_buffer_desc)
 
 	// Create shader from the code-generated sg_shader_desc (gfx.ShaderDesc in V).
 	// Note the function `C.simple_shader_desc()` (also defined above) - this is
@@ -268,20 +268,20 @@ pub fn (mut s Solid) init() {
 	// When things get complex - and you get tired :)
 	pipeline_desc.label = c'triangle-pipeline'
 
-	s.backend.shader_pipeline = gfx.make_pipeline(&pipeline_desc)
+	s.api.shader_pipeline = gfx.make_pipeline(&pipeline_desc)
 
 	s.ready = true
 }
 
 pub fn (mut s Solid) deinit() {
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
-	// sdl.destroy_renderer(s.backend.renderer)
+	// sdl.destroy_renderer(s.api.renderer)
 	gfx.shutdown()
 	// $if opengl ? {
-	sdl.gl_delete_context(s.backend.gl_context)
+	sdl.gl_delete_context(s.api.gl_context)
 	// }
-	sdl.destroy_window(s.backend.window)
-	ttf.close_font(s.backend.font)
+	sdl.destroy_window(s.api.window)
+	ttf.close_font(s.api.font)
 	sdl.quit()
 	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
 }
@@ -295,7 +295,7 @@ pub fn (mut s Solid) deinit() {
 // 	return s.active_window
 // }
 
-struct Backend {
+struct API {
 pub mut:
 	window   &sdl.Window
 	renderer &sdl.Renderer
@@ -318,7 +318,7 @@ pub mut:
 	text_cache map[string]&sdl.Texture
 }
 
-fn (b &Backend) get_drawable_size() (int, int) {
+fn (b &API) get_drawable_size() (int, int) {
 	mut w := 0
 	mut h := 0
 	// $if opengl ? {
@@ -327,7 +327,7 @@ fn (b &Backend) get_drawable_size() (int, int) {
 	return w, h
 }
 
-pub fn (b Backend) global_mouse_pos() (int, int) {
+pub fn (b API) global_mouse_pos() (int, int) {
 	mut mx := 0
 	mut my := 0
 	sdl.get_global_mouse_state(&mx, &my)

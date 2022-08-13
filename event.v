@@ -16,12 +16,6 @@ pub:
 	timestamp u64 // Value of Solid.ticks()
 }
 
-//
-pub enum ButtonState {
-	up
-	down
-}
-
 pub struct KeyEvent {
 pub:
 	timestamp u64
@@ -34,7 +28,7 @@ pub struct WindowEvent {
 pub:
 	timestamp u64
 	kind      WindowEventKind
-	window    Window
+	window    &Window
 }
 
 pub enum WindowEventKind {
@@ -70,23 +64,6 @@ pub:
 	rel_y     int // The relative motion in the Y direction
 }
 
-pub enum MouseButton {
-	left
-	right
-	middle
-	x1
-	x2
-}
-
-[flag]
-pub enum MouseButtons {
-	left
-	right
-	middle
-	x1
-	x2
-}
-
 pub struct MouseButtonEvent {
 pub:
 	timestamp u64
@@ -97,11 +74,6 @@ pub:
 	clicks    u8  // 1 for single-click, 2 for double-click, etc.
 	x         int // X coordinate, relative to window
 	y         int // Y coordinate, relative to window
-}
-
-pub enum MouseWheelDirection {
-	normal
-	flipped
 }
 
 pub struct MouseWheelEvent {

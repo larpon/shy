@@ -4,67 +4,91 @@
 module solid
 
 import time
+// import solid.api
 import solid.mth
 import solid.log { Log }
 
 pub const null = unsafe { nil }
 
-pub enum Scope {
-	shape_draw
-	text_draw
+//
+pub enum ButtonState {
+	up
+	down
 }
 
-pub enum ScopeAction {
-	open
-	close
-}
-
-// Solid carries all of solid's internal state.
-[heap]
-pub struct Solid {
-	config    Config
-	stopwatch time.StopWatch = time.new_stopwatch(auto_start: true)
-pub mut:
-	paused   bool
-	shutdown bool
+struct State {
 mut:
-	log     Log
-	ready   bool
-	running bool
-	resync  bool
+	resync bool
 	//
 	fps_frame    u32
 	fps_snapshot u32
 	frame        u64
 	//
-	keys_state map[int]bool
-	mb_state   map[int]bool
-	// The backend blackbox - the implementation specific struct
-	backend Backend
+	in_frame_call bool
+}
+
+// Solid carries all of solid's internal state.
+[heap]
+pub struct Solid {
+	config Config
+	timer  time.StopWatch = time.new_stopwatch(auto_start: true)
+pub mut:
+	paused   bool
+	shutdown bool
+	wm       &WM    = solid.null
+	gfx      &GFX   = solid.null
+	input    &Input = solid.null
+mut:
+	log     Log
+	ready   bool
+	running bool
+	//
+	state State
+	// The "blackbox" api implementation specific struct
+	api API
+}
+
+[inline]
+pub fn (mut s Solid) init() ! {
+	$if debug ? {
+		s.log.set(.debug)
+	}
+	s.log.gdebug(@STRUCT + '.' + @FN, 'called')
+	s.api.init(s)!
+	s.check_api()!
+	s.ready = true
+}
+
+[inline]
+pub fn (mut s Solid) shutdown() ! {
+	s.ready = false
+	s.api.shutdown()!
+	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
+	s.log.free()
 }
 
 // new returns a new, initialized, `Solid` struct allocated in heap memory.
-pub fn new(config Config) &Solid {
+pub fn new(config Config) !&Solid {
 	mut s := &Solid{
 		config: config
 	}
-	s.init()
+	s.init()!
 	return s
 }
 
 // run runs the application instance `T`.
-pub fn run<T>(mut ctx T, config Config) {
-	mut solid_instance := new(config)
+pub fn run<T>(mut ctx T, config Config) ! {
+	mut solid_instance := new(config)!
 	ctx.solid = solid_instance
-	ctx.init()
+	ctx.init()!
 
-	main_loop<T>(mut ctx, mut solid_instance)
+	main_loop<T>(mut ctx, mut solid_instance)!
 
 	ctx.quit()
-	solid_instance.deinit()
+	solid_instance.shutdown()!
 }
 
-fn main_loop<T>(mut ctx T, mut s Solid) {
+fn main_loop<T>(mut ctx T, mut s Solid) ! {
 	s.log.gdebug(@MOD + '.' + @FN, 'entering main loop.\nConfig:\n$s.config')
 	mut fps_timer := u64(0)
 
@@ -80,7 +104,7 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 	// https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
 	// https://gafferongames.com/post/fix_your_timestep/
 	// compute how many ticks one update should be
-	performance_frequency := s.performance_frequency()
+	performance_frequency := s.api.performance_frequency()
 	fixed_deltatime := f64(1.0) / update_rate
 	desired_frametime := i64(performance_frequency / update_rate)
 
@@ -109,8 +133,8 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 	mut time_averager := []i64{len: int(time_history_count), cap: int(time_history_count), init: desired_frametime}
 
 	s.running = true
-	s.resync = true
-	mut prev_frame_time := i64(s.performance_counter())
+	s.state.resync = true
+	mut prev_frame_time := i64(s.api.performance_counter())
 	mut frame_accumulator := i64(0)
 
 	for s.running {
@@ -120,23 +144,23 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 			continue
 		}
 
-		s.fps_frame++
-		s.frame++
+		s.state.fps_frame++
+		s.state.frame++
 
 		now := s.ticks()
 
 		// count fps in 1 sec (1000 ms)
 		if now >= fps_timer + 1000 {
 			fps_timer = now
-			s.fps_snapshot = s.fps_frame // - 1
-			s.fps_frame = 0
+			s.state.fps_snapshot = s.state.fps_frame // - 1
+			s.state.fps_frame = 0
 		}
 
-		// Ask backend to clear the screen
-		s.clear_screen()
+		// Ask gfx backend to clear the screen
+		s.gfx.clear_screen()
 
 		// frame timer
-		current_frame_time := i64(s.performance_counter())
+		current_frame_time := i64(s.api.performance_counter())
 		mut delta_time := current_frame_time - prev_frame_time
 		prev_frame_time = current_frame_time
 
@@ -175,15 +199,15 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 
 		// spiral of death protection
 		if frame_accumulator > desired_frametime * 8 {
-			s.resync = true
+			s.state.resync = true
 		}
 
 		// Timer resync if requested
 		// Typical good after level load or similar
-		if s.resync {
+		if s.state.resync {
 			frame_accumulator = 0
 			delta_time = desired_frametime
-			s.resync = false
+			s.state.resync = false
 		}
 
 		// Process system events at this point
@@ -214,15 +238,18 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 				frame_accumulator -= desired_frametime
 			}
 
-			c_dt := f64(consumed_delta_time) / s.performance_frequency()
+			c_dt := f64(consumed_delta_time) / s.api.performance_frequency()
 			// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
 			ctx.variable_update(c_dt)
 
 			f_dt := f64(frame_accumulator) / desired_frametime
 			// eprintln('(unlocked) ctx.frame( $f_dt )')
+			s.state.in_frame_call = true
 			ctx.frame(f_dt)
+			s.state.in_frame_call = false
+			unsafe { s.api.on_end_of_frame() }
 			// display() / swap buffers
-			s.display()
+			s.gfx.swap()
 		} else { // LOCKED FRAMERATE, NO INTERPOLATION
 			for frame_accumulator >= desired_frametime * update_multiplicity {
 				for i := 0; i < update_multiplicity; i++ {
@@ -236,9 +263,12 @@ fn main_loop<T>(mut ctx T, mut s Solid) {
 			}
 
 			// eprintln('(locked) ctx.frame( 1.0 )')
+			s.state.in_frame_call = true
 			ctx.frame(1.0)
+			s.state.in_frame_call = false
+			unsafe { s.api.on_end_of_frame() }
 			// display() / swap buffers
-			s.display()
+			s.gfx.swap()
 		}
 	}
 }
@@ -249,112 +279,35 @@ fn (mut s Solid) process_events<T>(mut ctx T) {
 		event := s.poll_event() or { break }
 
 		if event is MouseButtonEvent {
-			solid_mouse_id := int(event.button)
-			match event.state {
-				.down {
-					s.mb_state[solid_mouse_id] = true
-				}
-				.up {
-					s.mb_state[solid_mouse_id] = false
-				}
-			}
+			// mouse := TODO multi-mouse support
+			mut mouse := s.input.mouse(0) or { return }
+			mouse.set_button_state(event.button, event.state)
 		}
 		if event is KeyEvent {
-			solid_key_id := int(event.key_code)
-			match event.state {
-				.down {
-					s.keys_state[solid_key_id] = true
-				}
-				.up {
-					s.keys_state[solid_key_id] = false
-				}
-			}
+			// kb := TODO multi-keyboard support
+			mut kb := s.input.keyboard(0) or { return }
+			kb.set_key_state(event.key_code, event.state)
 		}
 
 		ctx.event(event)
+	}
+}
 
-		// Handle debug output control here
-		if event is KeyEvent {
-			key_code := event.key_code
-			if event.state == .down {
-				if s.key_is_down(.comma) {
-					if key_code == .s {
-						s.log.print_status('STATUS')
-						return
-					}
-
-					if key_code == .f1 {
-						s.log.ginfo(@STRUCT + '.' + 'performance', 'Current FPS $s.fps_snapshot')
-						return
-					}
-
-					if key_code == .f2 {
-						s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Count $s.performance_counter()')
-						return
-					}
-
-					if key_code == .f3 {
-						s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Frequency $s.performance_frequency()')
-						return
-					}
-
-					// Log print control
-					if s.key_is_down(.l) {
-						s.log.on(.log)
-
-						if key_code == .f {
-							s.log.toggle(.flood)
-							return
-						}
-						if key_code == .minus || s.key_is_down(.minus) {
-							s.log.off(.log)
-						} else if key_code == ._1 {
-							s.log.toggle(.info)
-						} else if key_code == ._2 {
-							s.log.toggle(.warn)
-						} else if key_code == ._3 {
-							s.log.toggle(.error)
-						} else if key_code == ._4 {
-							s.log.toggle(.debug)
-						} else if key_code == ._5 {
-							s.log.toggle(.critical)
-						}
-						return
-					}
-				}
-			}
-		}
+pub fn (s Solid) check_api() ! {
+	if isnil(s.wm) || isnil(s.gfx) || isnil(s.input) {
+		return error('not all essential api systems where set')
+	}
+	if isnil(s.input.mouse) || isnil(s.input.keyboard) {
+		return error('not all input api systems where set')
 	}
 }
 
 [inline]
 pub fn (s Solid) fps() u32 {
-	return s.fps_snapshot
+	return s.state.fps_snapshot
 }
 
+[inline]
 pub fn (s Solid) ticks() u64 {
-	return u64(s.stopwatch.elapsed().milliseconds())
-}
-
-pub fn (s Solid) key_is_down(keycode KeyCode) bool {
-	if key_state := s.keys_state[int(keycode)] {
-		return key_state
-	}
-	return false
-}
-
-pub fn (s Solid) is_mouse_button_held(button MouseButton) bool {
-	if state := s.mb_state[int(button)] {
-		return state
-	}
-	return false
-}
-
-pub fn (s Solid) window() Window {
-	// TODO
-	win := Window{
-		ref: s.backend.window
-		id: 0
-	}
-	return win
+	return u64(s.timer.elapsed().milliseconds())
 }

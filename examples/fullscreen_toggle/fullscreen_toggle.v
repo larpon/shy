@@ -14,17 +14,15 @@ fn main() {
 
 [heap]
 struct App {
+	solid.App
 mut:
-	log   log.Log
-	solid &solid.Solid = unsafe { nil } // Initialized by solid.run<T>(...)
+	log log.Log
 }
 
 pub fn (mut a App) init() {
 	a.log.info(@STRUCT + '.' + @FN + ' log status: ' + a.log.status_string())
 }
 
-// TODO
-[markused]
 pub fn (mut a App) frame(f_dt f64) {
 	mx, my := a.solid.mouse_position(.window)
 
@@ -39,21 +37,12 @@ pub fn (mut a App) frame(f_dt f64) {
 
 	a.solid.scope(.close, .shape_draw)
 
-	a.solid.scope(.open, .text_draw)
-	mut text_draw := a.solid.text_draw()
-	text_draw.text_at('$mx,$my', 10, 20)
-
-	a.solid.scope(.close, .text_draw)
+	mut tdraw := a.solid.draw2d()
+	tdraw.begin()
+	tdraw.text_at('Press F11, "f" or Alt+Return to toggle fullscreen', 10, 20)
+	tdraw.end()
 }
 
-[markused]
-pub fn (mut a App) fixed_update(dt f64) {}
-
-[markused]
-pub fn (mut a App) variable_update(dt f64) {}
-
-// TODO
-[markused]
 pub fn (mut a App) event(e solid.Event) {
 	match e {
 		solid.QuitEvent {
@@ -73,8 +62,6 @@ pub fn (mut a App) event(e solid.Event) {
 	}
 }
 
-// TODO
-[markused]
 pub fn (mut a App) quit() {
 	a.log.debug(@STRUCT + '.' + @FN + ' called')
 	a.log.free()
@@ -92,7 +79,7 @@ pub fn (mut a App) on_key_event(e solid.KeyEvent) {
 				}
 				else {
 					a.log.info(@STRUCT + '.' + @FN + ' key down: $key')
-					if key == .f || key == .f11 || key == .f || (key == .@return && alt_is_held) {
+					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
 						mut win := a.solid.window()
 						win.toggle_fullscreen()
 					}

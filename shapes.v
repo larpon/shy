@@ -3,12 +3,10 @@
 // that can be found in the LICENSE file.
 module solid
 
-pub struct Boot {
-	solid &Solid
-}
-
-pub struct WM {
-mut:
-	solid &Solid
-	root  &Window = solid.null
+pub struct Rect {
+pub mut:
+	x f32
+	y f32
+	w f32 = 100
+	h f32 = 100
 }
