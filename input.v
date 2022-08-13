@@ -9,6 +9,7 @@ mut:
 	solid     &Solid
 	mice      []&Mouse
 	keyboards []&Keyboard
+	pads      []&Gamepad
 }
 
 pub fn (mut ip Input) mouse(n int) !&Mouse {

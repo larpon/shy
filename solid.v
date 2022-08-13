@@ -53,10 +53,9 @@ pub fn (mut s Solid) init() ! {
 	$if debug ? {
 		s.log.set(.debug)
 	}
+	s.log.gdebug(@STRUCT + '.' + @FN, 'called')
 	s.api.init(s)!
-	if isnil(s.wm) || isnil(s.gfx) || isnil(s.input) {
-		return error('not all api systems where set')
-	}
+	s.check_api()!
 	s.ready = true
 }
 
@@ -64,6 +63,8 @@ pub fn (mut s Solid) init() ! {
 pub fn (mut s Solid) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
+	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
+	s.log.free()
 }
 
 // new returns a new, initialized, `Solid` struct allocated in heap memory.
@@ -289,6 +290,15 @@ fn (mut s Solid) process_events<T>(mut ctx T) {
 		}
 
 		ctx.event(event)
+	}
+}
+
+pub fn (s Solid) check_api() ! {
+	if isnil(s.wm) || isnil(s.gfx) || isnil(s.input) {
+		return error('not all essential api systems where set')
+	}
+	if isnil(s.input.mouse) || isnil(s.input.keyboard) {
+		return error('not all input api systems where set')
 	}
 }
 

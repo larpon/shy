@@ -45,7 +45,7 @@ fn (mut fs FontSystem) load_font(name string, path string) ! {
 fn (mut fs FontSystem) init(config FontSystemConfig) {
 	fs.solid = config.solid
 	mut s := fs.solid
-	s.log.ginfo(@STRUCT + '.' + 'font', 'initializing...')
+	s.log.gdebug(@STRUCT + '.' + 'font', 'initializing...')
 
 	sgl_desc := &sgl.Desc{
 		context_pool_size: 2 * 512 // default 4, NOTE this number affects the prealloc_contexts in font_system.b.v...
@@ -90,7 +90,7 @@ fn (mut fs FontSystem) init(config FontSystemConfig) {
 
 fn (mut fs FontSystem) shutdown() {
 	mut s := fs.solid
-	s.log.ginfo(@STRUCT + '.' + 'font', 'shutting down...')
+	s.log.gdebug(@STRUCT + '.' + 'font', 'shutting down...')
 	for context in fs.contexts {
 		if !isnil(context.fsc) {
 			s.log.gdebug(@STRUCT + '.' + 'font', 'destroying font context ${ptr_str(context.fsc)}...')
@@ -118,6 +118,7 @@ fn (mut fs FontSystem) get_context() &FontContext {
 		}
 	}
 	assert false, @STRUCT + '.' + @FN + ': no available font contexts'
+	fs.solid.log.gcritical(@STRUCT + '.' + 'font', 'no available font contexts, expect crash and burn...')
 	return &FontContext{
 		fsc: unsafe { nil }
 	} // NOTE dummy return to please the V compiler...

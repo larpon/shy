@@ -231,7 +231,7 @@ pub fn (mut w Window) init() ! {
 
 pub fn (mut w Window) close() ! {
 	w.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
-	w.shutdown() !
+	w.shutdown()!
 }
 
 pub fn (mut w Window) shutdown() ! {

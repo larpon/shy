@@ -52,16 +52,13 @@ pub fn (mut a API) shutdown() ! {
 	s := a.solid
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 
-	a.font_system.shutdown()
-
 	a.shape_draw_system.shutdown()
+
+	a.font_system.shutdown()
 
 	a.gfx.shutdown()!
 
 	a.wm.shutdown()!
-
-	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
-	s.log.free()
 }
 
 pub fn (s &Solid) draw2d() Draw2D {
@@ -81,8 +78,6 @@ pub mut:
 	font_system FontSystem
 	//
 	shape_draw_system ShapeDrawSystem
-	//
-	controllers map[int]&sdl.GameController
 }
 
 fn (mut a API) on_end_of_frame() {

@@ -5,7 +5,9 @@ module solid
 
 import sdl
 
-pub fn (mut m Mouse) init() ! {}
+pub fn (mut m Mouse) init() ! {
+	m.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+}
 
 pub fn (mut m Mouse) show() {
 	sdl.show_cursor(sdl.enable)
