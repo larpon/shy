@@ -134,7 +134,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	sdl.gl_set_attribute(.stencil_size, 8)
 	//
 	if s.config.render.msaa > 0 {
-		s.log.ginfo(@STRUCT + '.' + 'render', 'enabling $s.config.render.msaa x MSAA (Multi-Sample AntiAliasing)')
+		s.log.ginfo(@STRUCT + '.' + 'window', 'enabling $s.config.render.msaa x MSAA (Multi-Sample AntiAliasing)')
 		sdl.gl_set_attribute(.multisamplebuffers, 1)
 		sdl.gl_set_attribute(.multisamplesamples, s.config.render.msaa)
 	}
@@ -225,7 +225,7 @@ pub fn (mut w Window) init() ! {
 			}
 		}
 	}
-	s.log.ginfo(@STRUCT + '.' + 'render', 'vsync=$s.config.render.vsync')
+	s.log.ginfo(@STRUCT + '.' + 'window', 'vsync=$s.config.render.vsync')
 	// }
 }
 

@@ -13,7 +13,7 @@ mut:
 }
 
 pub fn (mut g GFX) init() ! {
-	s := g.shy
+	mut s := g.shy
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	mut gfx_desc := gfx.Desc{
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in font_system.b.v...
@@ -28,9 +28,14 @@ pub fn (mut g GFX) init() ! {
 	color := s.config.window.color.as_f32()
 	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
 	g.pass_action = pass_action
+
+	// Initialize drawing sub system
+	s.api.shape_draw_system.init(s) // shape_draw_system.b.v
 }
 
 pub fn (mut g GFX) shutdown() ! {
+	g.shy.api.shape_draw_system.shutdown()
+
 	gfx.shutdown()
 }
 

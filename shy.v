@@ -10,6 +10,15 @@ import shy.log { Log }
 
 pub const null = unsafe { nil }
 
+pub const (
+	defaults = Defaults{}
+)
+
+struct Defaults {
+	font struct {
+		name string = 'default'
+	}
+}
 //
 pub enum ButtonState {
 	up

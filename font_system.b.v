@@ -55,8 +55,8 @@ fn (mut fs FontSystem) init(config FontSystemConfig) {
 
 	// Load the Shy default font
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
-	fs.font_data['shy'] = default_font.to_bytes()
-	fs.shy.log.ginfo(@STRUCT + '.' + 'font', 'loaded shy: "$default_font.path"')
+	fs.font_data[shy.defaults.font.name] = default_font.to_bytes()
+	fs.shy.log.ginfo(@STRUCT + '.' + 'font', 'loaded default: "$default_font.path"')
 
 	for font_name, font_path in config.preload {
 		fs.load_font(font_name, font_path) or {
@@ -136,7 +136,7 @@ fn (mut fs FontSystem) on_end_of_frame() {
 fn (fc &FontContext) set_defaults() {
 	font_context := fc.fsc
 
-	font_id := fc.fonts['shy']
+	font_id := fc.fonts[shy.defaults.font.name]
 
 	white := sfons.rgba(255, 255, 255, 255)
 

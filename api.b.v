@@ -40,9 +40,6 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 		}
 	}) // font_system.b.v
 
-	// Initialize drawing sub system
-	a.shape_draw_system.init(&s) // shape_draw_system.b.v
-
 	s.wm = a.wm
 	s.gfx = a.gfx
 	s.input = a.input
@@ -52,7 +49,7 @@ pub fn (mut a API) shutdown() ! {
 	s := a.shy
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 
-	a.shape_draw_system.shutdown()
+	a.input.shutdown()!
 
 	a.font_system.shutdown()
 

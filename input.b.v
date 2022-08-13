@@ -78,6 +78,8 @@ pub fn (mut ip Input) init() ! {
 	ip.init_input()!
 }
 
+pub fn (mut ip Input) shutdown() ! {}
+
 fn (mut ip Input) init_input() ! {
 	mut s := ip.shy
 	// Check for joysticks/game controllers

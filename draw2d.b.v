@@ -113,7 +113,7 @@ pub struct Draw2DText {
 	fc &FontContext
 pub mut:
 	text   string
-	font   string = 'shy'
+	font   string = shy.defaults.font.name
 	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
 	size   f32  = 19.0
@@ -132,7 +132,7 @@ pub fn (t Draw2DText) draw() {
 	}
 
 	// color := sfons.rgba(255, 255, 255, 255)
-	if t.font != 'shy' {
+	if t.font != shy.defaults.font.name {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
 	}
