@@ -1,19 +1,19 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import sokol.gfx
 
 pub struct GFX {
 mut:
-	solid &Solid
+	shy &Shy
 	// sokol
 	pass_action gfx.PassAction
 }
 
 pub fn (mut g GFX) init() ! {
-	s := g.solid
+	s := g.shy
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	mut gfx_desc := gfx.Desc{
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in font_system.b.v...
@@ -40,7 +40,7 @@ pub fn (g GFX) commit() {
 }
 
 pub fn (mut g GFX) clear_screen() {
-	s := g.solid
+	s := g.shy
 	mut win := s.wm.active_window()
 	// TODO multi window support
 	w, h := win.drawable_size()
@@ -49,6 +49,6 @@ pub fn (mut g GFX) clear_screen() {
 
 pub fn (g GFX) swap() {
 	g.commit()
-	mut win := g.solid.wm.active_window()
+	mut win := g.shy.wm.active_window()
 	win.swap()
 }

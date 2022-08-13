@@ -1,15 +1,15 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import os
 import toml
 
 /*
 const (
-	const_default_config_text = $embed_file('solid.default.config.toml', .zlib).to_string()
-	const_default_config = config_from_toml_text(solid.const_default_config_text) or { Config{} }
+	const_default_config_text = $embed_file('shy.default.config.toml', .zlib).to_string()
+	const_default_config = config_from_toml_text(shy.const_default_config_text) or { Config{} }
 )
 */
 pub enum VSync {
@@ -36,7 +36,7 @@ pub struct Config {
 }
 
 pub struct WindowConfig {
-	title     string = 'Solid window'
+	title     string = 'Shy window'
 	resizable bool   = true
 	color     Color  = Color{0, 0, 0, 255}
 }
@@ -62,12 +62,12 @@ pub fn config_from_toml_file(path string) ?Config {
 
 pub fn config_from_toml_text(toml_text string) ?Config {
 	toml_doc := toml.parse_text(toml_text)?
-	toml_wc := toml_doc.value('solid.window')
+	toml_wc := toml_doc.value('shy.window')
 	wc := WindowConfig{
-		title: toml_wc.value('title').default_to('Solid window').string()
+		title: toml_wc.value('title').default_to('Shy window').string()
 	}
 	//
-	toml_rc := toml_doc.value('solid.run')
+	toml_rc := toml_doc.value('shy.run')
 	rc := RunConfig{
 		update_rate: toml_rc.value('update_rate').default_to(60.0).f64()
 		update_multiplicity: u16(toml_rc.value('update_multiplicity').default_to(1).int())
@@ -75,7 +75,7 @@ pub fn config_from_toml_text(toml_text string) ?Config {
 		time_history_count: u16(toml_rc.value('time_history_count').default_to(4).int())
 	}
 	//
-	toml_rend_c := toml_doc.value('solid.render')
+	toml_rend_c := toml_doc.value('shy.render')
 	rend_c := RenderConfig{
 		vsync: vsynctype_from_string(toml_rend_c.value('vsync').default_to('on').string())
 		msaa: toml_rend_c.value('msaa').default_to(4).int()

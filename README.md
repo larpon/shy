@@ -1,4 +1,4 @@
 # Introduction
 
-Solid is a foundation for creative coding and game development written in V.
+Shy is a foundation for creative coding and game development written in V.
 

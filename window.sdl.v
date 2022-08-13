@@ -1,7 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import sdl
 
@@ -9,23 +9,23 @@ pub struct Window {
 pub:
 	id u32
 mut:
-	solid    &Solid
+	shy    &Shy
 	handle   &sdl.Window
 	context  sdl.GLContext
 	children []&Window
 }
 
 pub fn (b Boot) init() !&WM {
-	s := b.solid
+	s := b.shy
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	wm := &WM{
-		solid: s
+		shy: s
 	}
 	return wm
 }
 
 pub fn (mut wm WM) init() ! {
-	mut s := wm.solid
+	mut s := wm.shy
 
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 
@@ -82,7 +82,7 @@ pub fn (wm WM) root() &Window {
 }
 
 pub fn (mut wm WM) init_root_window() !&Window {
-	s := wm.solid
+	s := wm.shy
 
 	mut mx := 0
 	mut my := 0
@@ -90,7 +90,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	mut display_index := 0
 
-	displays := solid.display_count()
+	displays := shy.display_count()
 
 	s.log.ginfo(@STRUCT + '.' + 'window', '$displays displays available')
 
@@ -178,7 +178,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	// }
 	mut win := &Window{
-		solid: s
+		shy: s
 		id: 0
 		handle: window
 		context: gl_context
@@ -189,7 +189,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 }
 
 pub fn (mut wm WM) shutdown() ! {
-	wm.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	wm.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	wm.root.close()!
 	// TODO test unsafe { free(wm) }
 
@@ -197,8 +197,8 @@ pub fn (mut wm WM) shutdown() ! {
 }
 
 pub fn (mut w Window) init() ! {
-	w.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
-	s := w.solid
+	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s := w.shy
 
 	// $if opengl ? {
 	sdl.gl_make_current(w.handle, w.context)
@@ -230,12 +230,12 @@ pub fn (mut w Window) init() ! {
 }
 
 pub fn (mut w Window) close() ! {
-	w.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	w.shutdown()!
 }
 
 pub fn (mut w Window) shutdown() ! {
-	w.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	for mut window in w.children {
 		window.close()!
 	}
@@ -288,6 +288,6 @@ pub fn (w &Window) drawable_size() (int, int) {
 }
 
 pub fn (w &Window) swap() {
-	// w.solid.gfx.commit()
+	// w.shy.gfx.commit()
 	sdl.gl_swap_window(w.handle)
 }

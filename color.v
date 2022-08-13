@@ -1,9 +1,9 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
-import solid.utils
+import shy.utils
 
 const color_target_size = 2 // TODO a V bug prevent this to be moved to e.g. draw.v
 
@@ -38,28 +38,28 @@ pub fn (c Color) r_as<T>() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.r, 0, 255, 0.0, 1.0)
 	}
-	panic('A solid TODO :)')
+	panic('A shy TODO :)')
 }
 
 pub fn (c Color) g_as<T>() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.g, 0, 255, 0.0, 1.0)
 	}
-	panic('A solid TODO :)')
+	panic('A shy TODO :)')
 }
 
 pub fn (c Color) b_as<T>() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.b, 0, 255, 0.0, 1.0)
 	}
-	panic('A solid TODO :)')
+	panic('A shy TODO :)')
 }
 
 pub fn (c Color) a_as<T>() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.a, 0, 255, 0.0, 1.0)
 	}
-	panic('A solid TODO :)')
+	panic('A shy TODO :)')
 }
 
 [inline]

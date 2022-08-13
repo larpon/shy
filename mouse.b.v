@@ -1,12 +1,12 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import sdl
 
 pub fn (mut m Mouse) init() ! {
-	m.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	m.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 }
 
 pub fn (mut m Mouse) show() {

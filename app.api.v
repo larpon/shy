@@ -1,12 +1,12 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 // Base app skeleton for easy embedding in examples
 struct App {
 mut:
-	solid &Solid = solid.null // Initialized by solid.run<T>(...)
+	shy &Shy = shy.null // Initialized by shy.run<T>(...)
 }
 
 pub fn (mut a App) init() ! {}
@@ -25,11 +25,11 @@ pub fn (mut a App) event(e Event) {}
 struct BasicApp {
 	App
 mut:
-	mouse &Mouse = solid.null
+	mouse &Mouse = shy.null
 }
 
 pub fn (mut a BasicApp) init() ! {
-	a.mouse = a.solid.input.mouse(0)!
+	a.mouse = a.shy.input.mouse(0)!
 }
 
 pub fn (mut a BasicApp) event(e Event) {
@@ -39,7 +39,7 @@ pub fn (mut a BasicApp) event(e Event) {
 fn (mut a BasicApp) on_event(e Event) {
 	match e {
 		QuitEvent {
-			a.solid.shutdown = true
+			a.shy.shutdown = true
 		}
 		KeyEvent {
 			if e.state == .up {
@@ -48,20 +48,20 @@ fn (mut a BasicApp) on_event(e Event) {
 			key := e.key_code
 			match key {
 				.escape {
-					a.solid.shutdown = true
+					a.shy.shutdown = true
 				}
 				else {
-					kb := a.solid.input.keyboard(0) or { return }
+					kb := a.shy.input.keyboard(0) or { return }
 					alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
-						mut win := a.solid.wm.active_window()
+						mut win := a.shy.wm.active_window()
 						win.toggle_fullscreen()
 					}
 				}
 			}
 		}
 		// MouseMotionEvent {
-		// 	a.solid.api.mouse.show()
+		// 	a.shy.api.mouse.show()
 		// }
 		else {}
 	}
@@ -83,7 +83,7 @@ pub fn (mut a DevApp) event(e Event) {
 }
 
 pub fn (mut a DevApp) on_event(e Event) {
-	mut s := a.solid
+	mut s := a.shy
 	// Handle debug output control here
 	if e is KeyEvent {
 		key_code := e.key_code

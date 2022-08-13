@@ -6,6 +6,6 @@ module api
 /*
 struct Api {
 mut:
-	solid &Solid
+	shy &Shy
 }
 */

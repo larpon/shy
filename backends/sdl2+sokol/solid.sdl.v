@@ -1,7 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 // Some code found from
 // "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
@@ -38,15 +38,15 @@ struct Vertex_t {
 	a f32
 }
 
-pub fn (s Solid) performance_counter() u64 {
+pub fn (s Shy) performance_counter() u64 {
 	return sdl.get_performance_counter()
 }
 
-pub fn (s Solid) performance_frequency() u64 {
+pub fn (s Shy) performance_frequency() u64 {
 	return sdl.get_performance_frequency()
 }
 
-pub fn (s Solid) clear_screen() {
+pub fn (s Shy) clear_screen() {
 	// sdl.set_render_draw_color(s.api.renderer, 49, 54, 59, 255)
 	// sdl.render_clear(s.api.renderer)
 	pass_action := gfx.create_clear_pass(0.0, 0.0, 0.0, 1.0) // This will create a black color as a default pass (window background color)
@@ -55,7 +55,7 @@ pub fn (s Solid) clear_screen() {
 	gfx.begin_default_pass(&pass_action, w, h)
 }
 
-pub fn (s Solid) display() {
+pub fn (s Shy) display() {
 	gfx.apply_pipeline(s.api.shader_pipeline)
 	gfx.apply_bindings(&s.api.bind)
 
@@ -67,7 +67,7 @@ pub fn (s Solid) display() {
 	// sdl.render_present(s.api.renderer)
 }
 
-pub fn (mut s Solid) init() {
+pub fn (mut s Shy) init() {
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	$if linux {
 		// Experiments
@@ -87,7 +87,7 @@ pub fn (mut s Solid) init() {
 
 	mut display_index := 0
 
-	displays := solid.display_count()
+	displays := shy.display_count()
 
 	// eprintln('Displays: $displays')
 	// get display bounds for all displays
@@ -273,7 +273,7 @@ pub fn (mut s Solid) init() {
 	s.ready = true
 }
 
-pub fn (mut s Solid) deinit() {
+pub fn (mut s Shy) deinit() {
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	// sdl.destroy_renderer(s.api.renderer)
 	gfx.shutdown()
@@ -286,7 +286,7 @@ pub fn (mut s Solid) deinit() {
 	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
 }
 
-// pub fn (mut s Solid) new_window() int {
+// pub fn (mut s Shy) new_window() int {
 // 	s.active_window++
 // 	window := Window {
 // 		id: u32(s.active_window)

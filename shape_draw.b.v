@@ -1,21 +1,21 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
-import solid.mth
+import shy.mth
 import sgp
 
-pub fn (s &Solid) shape_draw() ShapeDraw {
+pub fn (s &Shy) shape_draw() ShapeDraw {
 	return ShapeDraw{
-		solid: s
+		shy: s
 	}
 }
 
 pub struct ShapeDraw {
 pub mut:
-	solid  &Solid
-	colors [solid.color_target_size]Color = [rgb(0, 0, 0), rgb(255, 255, 255)]!
+	shy  &Shy
+	colors [shy.color_target_size]Color = [rgb(0, 0, 0), rgb(255, 255, 255)]!
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
 	radius   f32     = 1.0
 	scale    f32     = 1.0

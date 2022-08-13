@@ -1,12 +1,12 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 [heap]
 pub struct Input {
 mut:
-	solid     &Solid
+	shy     &Shy
 	mice      []&Mouse
 	keyboards []&Keyboard
 	pads      []&Gamepad
@@ -22,7 +22,7 @@ pub fn (mut ip Input) keyboard(n int) !&Keyboard {
 
 pub struct Keyboard {
 mut:
-	solid &Solid
+	shy &Shy
 	keys  map[int]bool // key states
 }
 
@@ -46,5 +46,5 @@ pub fn (mut k Keyboard) set_key_state(key_code KeyCode, button_state ButtonState
 }
 
 pub fn (mut k Keyboard) init() ! {
-	k.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	k.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 }

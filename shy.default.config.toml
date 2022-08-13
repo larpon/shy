@@ -1,14 +1,14 @@
-[solid]
+[shy]
 	debug = false
 
-[solid.window]
+[shy.window]
 	title = 'Hello'
 
-[solid.render]
+[shy.render]
 	vsync = 'on' # 'off' or 'adaptive'
 	msaa = 4 # 0 for disabling MSAA
 
-[solid.run]
+[shy.run]
 	update_rate = 'auto' # 60.0
 	lock_framerate      = false
 	update_multiplicity = 1

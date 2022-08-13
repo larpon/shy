@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 //
 //
-module solid
+module shy
 
 import os
 import fontstash
@@ -13,13 +13,13 @@ import sokol.sgl
 struct FontSystem {
 mut:
 	ready     bool
-	solid     &Solid
+	shy     &Shy
 	contexts  []&FontContext
 	font_data map[string][]u8
 }
 
 struct FontSystemConfig {
-	solid             &Solid
+	shy             &Shy
 	prealloc_contexts u16 = 8 // > 8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
 	preload           map[string]string // preload[font_name] = path_to_font
 }
@@ -36,15 +36,15 @@ mut:
 fn (mut fs FontSystem) load_font(name string, path string) ! {
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
-		fs.solid.log.ginfo(@STRUCT + '.' + 'font', 'loaded $name: "$path"')
+		fs.shy.log.ginfo(@STRUCT + '.' + 'font', 'loaded $name: "$path"')
 	} else {
 		return error(@STRUCT + '.' + @FN + ': could not load $name "$path"')
 	}
 }
 
 fn (mut fs FontSystem) init(config FontSystemConfig) {
-	fs.solid = config.solid
-	mut s := fs.solid
+	fs.shy = config.shy
+	mut s := fs.shy
 	s.log.gdebug(@STRUCT + '.' + 'font', 'initializing...')
 
 	sgl_desc := &sgl.Desc{
@@ -53,10 +53,10 @@ fn (mut fs FontSystem) init(config FontSystemConfig) {
 	}
 	sgl.setup(sgl_desc)
 
-	// Load the Solid default font
+	// Load the Shy default font
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
-	fs.font_data['solid'] = default_font.to_bytes()
-	fs.solid.log.ginfo(@STRUCT + '.' + 'font', 'loaded solid: "$default_font.path"')
+	fs.font_data['shy'] = default_font.to_bytes()
+	fs.shy.log.ginfo(@STRUCT + '.' + 'font', 'loaded shy: "$default_font.path"')
 
 	for font_name, font_path in config.preload {
 		fs.load_font(font_name, font_path) or {
@@ -89,7 +89,7 @@ fn (mut fs FontSystem) init(config FontSystemConfig) {
 }
 
 fn (mut fs FontSystem) shutdown() {
-	mut s := fs.solid
+	mut s := fs.shy
 	s.log.gdebug(@STRUCT + '.' + 'font', 'shutting down...')
 	for context in fs.contexts {
 		if !isnil(context.fsc) {
@@ -118,7 +118,7 @@ fn (mut fs FontSystem) get_context() &FontContext {
 		}
 	}
 	assert false, @STRUCT + '.' + @FN + ': no available font contexts'
-	fs.solid.log.gcritical(@STRUCT + '.' + 'font', 'no available font contexts, expect crash and burn...')
+	fs.shy.log.gcritical(@STRUCT + '.' + 'font', 'no available font contexts, expect crash and burn...')
 	return &FontContext{
 		fsc: unsafe { nil }
 	} // NOTE dummy return to please the V compiler...
@@ -128,7 +128,7 @@ fn (mut fs FontSystem) on_end_of_frame() {
 	for mut fc in fs.contexts {
 		if fc.in_use {
 			fc.in_use = false
-			// FLOOD fs.solid.log.gdebug(@STRUCT + '.' + 'font', 'handing out ${ptr_str(fc.fsc)}...')
+			// FLOOD fs.shy.log.gdebug(@STRUCT + '.' + 'font', 'handing out ${ptr_str(fc.fsc)}...')
 		}
 	}
 }
@@ -136,7 +136,7 @@ fn (mut fs FontSystem) on_end_of_frame() {
 fn (fc &FontContext) set_defaults() {
 	font_context := fc.fsc
 
-	font_id := fc.fonts['solid']
+	font_id := fc.fonts['shy']
 
 	white := sfons.rgba(255, 255, 255, 255)
 

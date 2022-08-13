@@ -1,16 +1,16 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import sgp
 
 struct ShapeDrawSystem {
 mut:
-	solid &Solid
+	shy &Shy
 }
 
-fn (mut sds ShapeDrawSystem) init(solid &Solid) {
+fn (mut sds ShapeDrawSystem) init(shy &Shy) {
 	// Initialize Sokol GP, adjust the size of command buffers for your own use.
 	sgp_desc := sgp.Desc{
 		// max_vertices: 1_000_000
@@ -22,7 +22,7 @@ fn (mut sds ShapeDrawSystem) init(solid &Solid) {
 		panic('Failed to create Sokol GP context:\n$error_msg')
 	}
 
-	sds.solid = solid
+	sds.shy = shy
 }
 
 fn (mut sds ShapeDrawSystem) shutdown() {

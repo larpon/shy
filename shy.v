@@ -1,12 +1,12 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import time
-// import solid.api
-import solid.mth
-import solid.log { Log }
+// import shy.api
+import shy.mth
+import shy.log { Log }
 
 pub const null = unsafe { nil }
 
@@ -27,17 +27,17 @@ mut:
 	in_frame_call bool
 }
 
-// Solid carries all of solid's internal state.
+// Shy carries all of shy's internal state.
 [heap]
-pub struct Solid {
+pub struct Shy {
 	config Config
 	timer  time.StopWatch = time.new_stopwatch(auto_start: true)
 pub mut:
 	paused   bool
 	shutdown bool
-	wm       &WM    = solid.null
-	gfx      &GFX   = solid.null
-	input    &Input = solid.null
+	wm       &WM    = shy.null
+	gfx      &GFX   = shy.null
+	input    &Input = shy.null
 mut:
 	log     Log
 	ready   bool
@@ -49,7 +49,7 @@ mut:
 }
 
 [inline]
-pub fn (mut s Solid) init() ! {
+pub fn (mut s Shy) init() ! {
 	$if debug ? {
 		s.log.set(.debug)
 	}
@@ -60,16 +60,16 @@ pub fn (mut s Solid) init() ! {
 }
 
 [inline]
-pub fn (mut s Solid) shutdown() ! {
+pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
 	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
 	s.log.free()
 }
 
-// new returns a new, initialized, `Solid` struct allocated in heap memory.
-pub fn new(config Config) !&Solid {
-	mut s := &Solid{
+// new returns a new, initialized, `Shy` struct allocated in heap memory.
+pub fn new(config Config) !&Shy {
+	mut s := &Shy{
 		config: config
 	}
 	s.init()!
@@ -78,17 +78,17 @@ pub fn new(config Config) !&Solid {
 
 // run runs the application instance `T`.
 pub fn run<T>(mut ctx T, config Config) ! {
-	mut solid_instance := new(config)!
-	ctx.solid = solid_instance
+	mut shy_instance := new(config)!
+	ctx.shy = shy_instance
 	ctx.init()!
 
-	main_loop<T>(mut ctx, mut solid_instance)!
+	main_loop<T>(mut ctx, mut shy_instance)!
 
 	ctx.quit()
-	solid_instance.shutdown()!
+	shy_instance.shutdown()!
 }
 
-fn main_loop<T>(mut ctx T, mut s Solid) ! {
+fn main_loop<T>(mut ctx T, mut s Shy) ! {
 	s.log.gdebug(@MOD + '.' + @FN, 'entering main loop.\nConfig:\n$s.config')
 	mut fps_timer := u64(0)
 
@@ -183,16 +183,16 @@ fn main_loop<T>(mut ctx T, mut s Solid) ! {
 		}
 		// Delta time averaging
 		// for i := 0; i < time_history_count - 1; i++ {
-		for i in 0 .. solid.time_history_count - 1 {
+		for i in 0 .. shy.time_history_count - 1 {
 			time_averager[i] = time_averager[i + 1]
 		}
-		time_averager[solid.time_history_count - 1] = delta_time
+		time_averager[shy.time_history_count - 1] = delta_time
 		delta_time = 0
 		// for i := 0; i < time_history_count; i++ {
-		for i in 0 .. solid.time_history_count {
+		for i in 0 .. shy.time_history_count {
 			delta_time += time_averager[i]
 		}
-		delta_time /= solid.time_history_count
+		delta_time /= shy.time_history_count
 
 		// add to the accumulator
 		frame_accumulator += delta_time
@@ -274,7 +274,7 @@ fn main_loop<T>(mut ctx T, mut s Solid) ! {
 }
 
 // process_events processes all events and delegate them to T
-fn (mut s Solid) process_events<T>(mut ctx T) {
+fn (mut s Shy) process_events<T>(mut ctx T) {
 	for {
 		event := s.poll_event() or { break }
 
@@ -293,7 +293,7 @@ fn (mut s Solid) process_events<T>(mut ctx T) {
 	}
 }
 
-pub fn (s Solid) check_api() ! {
+pub fn (s Shy) check_api() ! {
 	if isnil(s.wm) || isnil(s.gfx) || isnil(s.input) {
 		return error('not all essential api systems where set')
 	}
@@ -303,11 +303,11 @@ pub fn (s Solid) check_api() ! {
 }
 
 [inline]
-pub fn (s Solid) fps() u32 {
+pub fn (s Shy) fps() u32 {
 	return s.state.fps_snapshot
 }
 
 [inline]
-pub fn (s Solid) ticks() u64 {
+pub fn (s Shy) ticks() u64 {
 	return u64(s.timer.elapsed().milliseconds())
 }

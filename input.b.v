@@ -1,7 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import sdl
 
@@ -9,14 +9,14 @@ import sdl
 pub struct Gamepad {
 	id int
 mut:
-	solid     &Solid
+	shy     &Shy
 	name      string
 	handle    &sdl.GameController
 	is_haptic bool
 }
 
 pub fn (mut gp Gamepad) init() ! {
-	s := gp.solid
+	s := gp.shy
 	// Open the device
 	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
 	if haptic == sdl.null {
@@ -62,16 +62,16 @@ pub fn (mut gp Gamepad) init() ! {
 
 // init initializes input systems (keyboard, mouse etc.)
 pub fn (mut ip Input) init() ! {
-	ip.solid.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
-	s := ip.solid
+	ip.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s := ip.shy
 	mut mouse := &Mouse{
-		solid: s
+		shy: s
 	}
 	mouse.init()!
 	ip.mice << mouse
 
 	mut keyboard := &Keyboard{
-		solid: s
+		shy: s
 	}
 	keyboard.init()!
 	ip.keyboards << keyboard
@@ -79,7 +79,7 @@ pub fn (mut ip Input) init() ! {
 }
 
 fn (mut ip Input) init_input() ! {
-	mut s := ip.solid
+	mut s := ip.shy
 	// Check for joysticks/game controllers
 	if sdl.num_joysticks() < 1 {
 		s.log.ginfo(@STRUCT + '.' + 'input', 'no joysticks or game controllers connected')
@@ -105,7 +105,7 @@ fn (mut ip Input) init_input() ! {
 
 				mut pad := &Gamepad{
 					id: i
-					solid: s
+					shy: s
 					name: controller_name
 					handle: controller
 				}

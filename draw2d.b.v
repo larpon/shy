@@ -1,10 +1,10 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
-import solid.vec { Vec2 }
-import solid.mth
+import shy.vec { Vec2 }
+import shy.mth
 import sgp
 import sokol.sgl // Required for font rendering
 
@@ -12,22 +12,22 @@ pub struct Draw2D {
 pub mut:
 	render_text_first bool
 mut:
-	solid        &Solid       = solid.null
-	font_context &FontContext = solid.null
+	shy        &Shy       = shy.null
+	font_context &FontContext = shy.null
 }
 
-fn (mut d2d Draw2D) init(solid &Solid) {
-	d2d.solid = solid
+fn (mut d2d Draw2D) init(shy &Shy) {
+	d2d.shy = shy
 }
 
 fn (mut d2d Draw2D) shutdown() {
 }
 
 pub fn (mut d2d Draw2D) begin() {
-	assert d2d.solid.state.in_frame_call, @STRUCT + '.' + @FN +
+	assert d2d.shy.state.in_frame_call, @STRUCT + '.' + @FN +
 		' can only be called inside a .frame() call'
 
-	win := d2d.solid.wm.active_window()
+	win := d2d.shy.wm.active_window()
 	w, h := win.drawable_size()
 	// ratio := f32(w)/f32(h)
 
@@ -44,7 +44,7 @@ pub fn (mut d2d Draw2D) begin() {
 }
 
 pub fn (mut d2d Draw2D) end() {
-	assert d2d.solid.state.in_frame_call, @STRUCT + '.' + @FN +
+	assert d2d.shy.state.in_frame_call, @STRUCT + '.' + @FN +
 		' can only be called inside a .frame() call'
 
 	if !isnil(d2d.font_context) && d2d.render_text_first {
@@ -62,17 +62,17 @@ pub fn (mut d2d Draw2D) end() {
 }
 
 fn (mut d2d Draw2D) begin_text() {
-	win := d2d.solid.wm.active_window()
+	win := d2d.shy.wm.active_window()
 	w, h := win.drawable_size()
 
 	sgl.defaults()
 
-	fc := d2d.solid.api.font_system.get_context()
+	fc := d2d.shy.api.font_system.get_context()
 	sgl.set_context(fc.sgl)
 	sgl.matrix_mode_projection()
 	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 
-	//¤ FLOOD d2d.solid.log.gdebug(@STRUCT + '.' + 'draw', 'begin ${ptr_str(fc.fsc)}...')
+	//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'begin ${ptr_str(fc.fsc)}...')
 	fc.begin()
 	d2d.font_context = fc
 }
@@ -80,9 +80,9 @@ fn (mut d2d Draw2D) begin_text() {
 fn (mut d2d Draw2D) end_text() {
 	fc := d2d.font_context
 	if !isnil(fc) {
-		//¤ FLOOD d2d.solid.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
+		//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
 		fc.end()
-		d2d.font_context = solid.null
+		d2d.font_context = shy.null
 	}
 }
 
@@ -113,8 +113,8 @@ pub struct Draw2DText {
 	fc &FontContext
 pub mut:
 	text   string
-	font   string = 'solid'
-	colors [solid.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	font   string = 'shy'
+	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
 	size   f32  = 19.0
 	scale  f32  = 1.0
@@ -124,7 +124,7 @@ pub mut:
 
 [inline]
 pub fn (t Draw2DText) draw() {
-	//¤ FLOOD d2d.solid.log.gdebug(@STRUCT + '.' + 'draw', 'using ${ptr_str(fc.fsc)}...')
+	//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'using ${ptr_str(fc.fsc)}...')
 	fc := t.fc
 	font_context := fc.fsc
 	if isnil(font_context) {
@@ -132,7 +132,7 @@ pub fn (t Draw2DText) draw() {
 	}
 
 	// color := sfons.rgba(255, 255, 255, 255)
-	if t.font != 'solid' {
+	if t.font != 'shy' {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
 	}
@@ -147,7 +147,7 @@ pub struct Draw2DRect {
 	Rect
 pub mut:
 	// visible bool = true
-	colors [solid.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
 	// TODO clear up this mess
 	radius  f32     = 1.0
 	scale   f32     = 1.0

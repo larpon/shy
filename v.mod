@@ -1,5 +1,5 @@
 Module {
-	name:    'Solid'
+	name:    'Shy'
 	version: '0.0.1'
 	deps:    []
 }

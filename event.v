@@ -1,7 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 pub type Event = KeyEvent
 	| MouseButtonEvent
@@ -13,7 +13,7 @@ pub type Event = KeyEvent
 
 pub struct UnkownEvent {
 pub:
-	timestamp u64 // Value of Solid.ticks()
+	timestamp u64 // Value of Shy.ticks()
 }
 
 pub struct KeyEvent {

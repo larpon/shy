@@ -1,15 +1,15 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import sdl
 
-fn (mut s Solid) quit_requested() bool {
+fn (mut s Shy) quit_requested() bool {
 	return sdl.quit_requested()
 }
 
-fn (mut s Solid) poll_event() ?Event {
+fn (mut s Shy) poll_event() ?Event {
 	evt := sdl.Event{}
 	if 0 < sdl.poll_event(&evt) {
 		match evt.@type {
@@ -33,23 +33,23 @@ fn (mut s Solid) poll_event() ?Event {
 				}
 			}
 			.keyup {
-				solid_key_code := map_sdl_to_solid_keycode(evt.key.keysym.sym)
+				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
 				return KeyEvent{
 					timestamp: s.ticks()
 					state: .up
-					key_code: solid_key_code
+					key_code: shy_key_code
 				}
 			}
 			.keydown {
-				solid_key_code := map_sdl_to_solid_keycode(evt.key.keysym.sym)
+				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
 				return KeyEvent{
 					timestamp: s.ticks()
 					state: .down
-					key_code: KeyCode(int(solid_key_code))
+					key_code: KeyCode(int(shy_key_code))
 				}
 			}
 			.mousemotion {
-				buttons := map_sdl_button_mask_to_solid_mouse_buttons(evt.motion.state)
+				buttons := map_sdl_button_mask_to_shy_mouse_buttons(evt.motion.state)
 				win := s.wm.active_window()
 				return MouseMotionEvent{
 					timestamp: s.ticks()
@@ -65,7 +65,7 @@ fn (mut s Solid) poll_event() ?Event {
 			.mousebuttonup, .mousebuttondown {
 				mut state := ButtonState.down
 				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
-				button := map_sdl_button_to_solid_mouse_button(evt.button.button)
+				button := map_sdl_button_to_shy_mouse_button(evt.button.button)
 				win := s.wm.active_window()
 				return MouseButtonEvent{
 					timestamp: s.ticks()
@@ -110,8 +110,8 @@ fn (mut s Solid) poll_event() ?Event {
 					s.log.gln(.event | .flood, 'passing $t')
 				}
 				.keyup, .keydown {
-					solid_key_code := sdl.KeyCode(evt.key.keysym.sym)
-					s.log.gln(.event | .input, 'passing $t ($solid_key_code)')
+					shy_key_code := sdl.KeyCode(evt.key.keysym.sym)
+					s.log.gln(.event | .input, 'passing $t ($shy_key_code)')
 				}
 				else {
 					s.log.pln(.event, 'passing $t')
@@ -124,7 +124,7 @@ fn (mut s Solid) poll_event() ?Event {
 	return none
 }
 
-fn map_sdl_to_solid_keycode(kc sdl.Keycode) KeyCode {
+fn map_sdl_to_shy_keycode(kc sdl.Keycode) KeyCode {
 	return match sdl.KeyCode(int(kc)) {
 		.unknown { .unknown }
 		.@return { .@return }
@@ -379,7 +379,7 @@ fn map_sdl_to_solid_keycode(kc sdl.Keycode) KeyCode {
 	}
 }
 
-fn map_sdl_button_mask_to_solid_mouse_buttons(mask u32) MouseButtons {
+fn map_sdl_button_mask_to_shy_mouse_buttons(mask u32) MouseButtons {
 	mut buttons := MouseButtons{}
 
 	if mask & u32(sdl.button(sdl.button_left)) == sdl.button_lmask {
@@ -400,7 +400,7 @@ fn map_sdl_button_mask_to_solid_mouse_buttons(mask u32) MouseButtons {
 	return buttons
 }
 
-fn map_sdl_button_to_solid_mouse_button(sdl_button byte) MouseButton {
+fn map_sdl_button_to_shy_mouse_button(sdl_button byte) MouseButton {
 	mut button := MouseButton{}
 
 	if sdl_button == sdl.button_left {

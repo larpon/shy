@@ -1,7 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module solid
+module shy
 
 import os.font
 // Some code found from
@@ -9,23 +9,23 @@ import os.font
 // https://gist.github.com/sherjilozair/c0fa81250c1b8f5e4234b1588e755bca
 import sdl
 
-pub fn (mut a API) init(solid_instance &Solid) ! {
-	mut s := unsafe { solid_instance }
-	a.solid = s
+pub fn (mut a API) init(shy_instance &Shy) ! {
+	mut s := unsafe { shy_instance }
+	a.shy = s
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	boot := Boot{
-		solid: s
+		shy: s
 	}
 	a.wm = boot.init()!
 
 	a.wm.init()!
 
 	a.gfx = &GFX{
-		solid: s
+		shy: s
 	}
 
 	a.input = &Input{
-		solid: s
+		shy: s
 	}
 
 	a.gfx.init()!
@@ -33,7 +33,7 @@ pub fn (mut a API) init(solid_instance &Solid) ! {
 
 	// Initialize font drawing sub system
 	a.font_system.init(FontSystemConfig{
-		solid: s
+		shy: s
 		// prealloc_contexts: 8
 		preload: {
 			'system': font.default()
@@ -49,7 +49,7 @@ pub fn (mut a API) init(solid_instance &Solid) ! {
 }
 
 pub fn (mut a API) shutdown() ! {
-	s := a.solid
+	s := a.shy
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 
 	a.shape_draw_system.shutdown()
@@ -61,7 +61,7 @@ pub fn (mut a API) shutdown() ! {
 	a.wm.shutdown()!
 }
 
-pub fn (s &Solid) draw2d() Draw2D {
+pub fn (s &Shy) draw2d() Draw2D {
 	mut d2d := Draw2D{}
 	d2d.init(s)
 	return d2d
@@ -69,7 +69,7 @@ pub fn (s &Solid) draw2d() Draw2D {
 
 struct API {
 mut:
-	solid &Solid = solid.null
+	shy &Shy = shy.null
 pub mut:
 	wm    &WM
 	gfx   &GFX
