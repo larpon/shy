@@ -5,8 +5,7 @@ module shy
 
 // Base app skeleton for easy embedding in examples
 struct App {
-mut:
-	shy &Shy = shy.null // Initialized by shy.run<T>(...)
+	ShyBase // Initialized by shy.run<T>(...)
 }
 
 pub fn (mut a App) init() ! {}
@@ -25,11 +24,13 @@ pub fn (mut a App) event(e Event) {}
 struct BasicApp {
 	App
 mut:
-	mouse &Mouse = shy.null
+	mouse &Mouse    = shy.null
+	kbd   &Keyboard = shy.null
 }
 
 pub fn (mut a BasicApp) init() ! {
-	a.mouse = a.shy.input.mouse(0)!
+	a.mouse = a.shy.api.input.mouse(0)!
+	a.kbd = a.shy.api.input.keyboard(0)!
 }
 
 pub fn (mut a BasicApp) event(e Event) {
@@ -51,10 +52,10 @@ fn (mut a BasicApp) on_event(e Event) {
 					a.shy.shutdown = true
 				}
 				else {
-					kb := a.shy.input.keyboard(0) or { return }
+					kb := a.kbd
 					alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
-						mut win := a.shy.wm.active_window()
+						mut win := a.shy.api.wm.active_window()
 						win.toggle_fullscreen()
 					}
 				}
@@ -88,7 +89,7 @@ pub fn (mut a DevApp) on_event(e Event) {
 	if e is KeyEvent {
 		key_code := e.key_code
 		if e.state == .down {
-			kb := s.input.keyboard(0) or { return }
+			kb := a.kbd
 			if kb.is_key_down(.comma) {
 				if key_code == .s {
 					s.log.print_status('STATUS')

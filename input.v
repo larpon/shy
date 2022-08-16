@@ -5,25 +5,25 @@ module shy
 
 [heap]
 pub struct Input {
+	ShyBase
 mut:
-	shy     &Shy
-	mice      []&Mouse
-	keyboards []&Keyboard
+	mice      map[u32]&Mouse
+	keyboards map[u32]&Keyboard
 	pads      []&Gamepad
 }
 
-pub fn (mut ip Input) mouse(n int) !&Mouse {
-	return ip.mice[0]
+pub fn (ip Input) mouse(n u32) !&Mouse {
+	return ip.mice[n]
 }
 
-pub fn (mut ip Input) keyboard(n int) !&Keyboard {
+pub fn (ip Input) keyboard(n u32) !&Keyboard {
 	return ip.keyboards[n]
 }
 
 pub struct Keyboard {
+	ShyBase
 mut:
-	shy &Shy
-	keys  map[int]bool // key states
+	keys map[int]bool // key states
 }
 
 [inline]

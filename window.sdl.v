@@ -6,10 +6,10 @@ module shy
 import sdl
 
 pub struct Window {
+	ShyBase
 pub:
 	id u32
 mut:
-	shy    &Shy
 	handle   &sdl.Window
 	context  sdl.GLContext
 	children []&Window
@@ -134,8 +134,10 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	sdl.gl_set_attribute(.stencil_size, 8)
 	//
 	if s.config.render.msaa > 0 {
-		s.log.ginfo(@STRUCT + '.' + 'window', 'enabling $s.config.render.msaa x MSAA (Multi-Sample AntiAliasing)')
+		s.log.ginfo(@STRUCT + '.' + 'window', 'enabling MSAA (Multi-Sample AntiAliasing)')
 		sdl.gl_set_attribute(.multisamplebuffers, 1)
+
+		// Setting multi-samples here will result in SDL applying yet another pass of anti-aliasing...
 		sdl.gl_set_attribute(.multisamplesamples, s.config.render.msaa)
 	}
 	// } // end $if opengl

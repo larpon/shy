@@ -13,8 +13,8 @@ pub fn (s &Shy) shape_draw() ShapeDraw {
 }
 
 pub struct ShapeDraw {
+	ShyBase
 pub mut:
-	shy  &Shy
 	colors [shy.color_target_size]Color = [rgb(0, 0, 0), rgb(255, 255, 255)]!
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
 	radius   f32     = 1.0

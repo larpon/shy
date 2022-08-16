@@ -4,12 +4,24 @@
 module shy
 
 import sokol.gfx
+import sgp
 
 pub struct GFX {
+	ShyBase
 mut:
-	shy &Shy
 	// sokol
 	pass_action gfx.PassAction
+
+	is_drawing_shapes bool
+	is_drawing_text   bool
+}
+
+pub fn (mut g GFX) draw2d() Draw2D {
+	mut d2d := Draw2D{
+		shy: g.shy
+	}
+	d2d.init()
+	return d2d
 }
 
 pub fn (mut g GFX) init() ! {
@@ -29,31 +41,42 @@ pub fn (mut g GFX) init() ! {
 	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
 	g.pass_action = pass_action
 
-	// Initialize drawing sub system
-	s.api.shape_draw_system.init(s) // shape_draw_system.b.v
+	// Initialize Sokol GP which is used for shape drawing.
+	// TODO Adjust the size of command buffers.
+	sgp_desc := sgp.Desc{
+		// max_vertices: 1_000_000
+		// max_commands: 100_000
+	}
+	sgp.setup(&sgp_desc)
+	if !sgp.is_valid() {
+		error_msg := unsafe { cstring_to_vstring(sgp.get_error_message(sgp.get_last_error())) }
+		panic('Failed to create Sokol GP context:\n$error_msg')
+	}
 }
 
 pub fn (mut g GFX) shutdown() ! {
-	g.shy.api.shape_draw_system.shutdown()
+	sgp.shutdown()
 
 	gfx.shutdown()
 }
 
 pub fn (g GFX) commit() {
-	gfx.end_pass()
 	gfx.commit()
 }
 
-pub fn (mut g GFX) clear_screen() {
+pub fn (g GFX) end() {
+	gfx.end_pass()
+}
+
+pub fn (mut g GFX) begin() {
 	s := g.shy
-	mut win := s.wm.active_window()
+	mut win := s.active_window()
 	// TODO multi window support
 	w, h := win.drawable_size()
 	gfx.begin_default_pass(&g.pass_action, w, h)
 }
 
 pub fn (g GFX) swap() {
-	g.commit()
-	mut win := g.shy.wm.active_window()
+	mut win := g.shy.active_window()
 	win.swap()
 }

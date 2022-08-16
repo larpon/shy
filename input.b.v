@@ -7,9 +7,9 @@ import sdl
 
 // TODO move
 pub struct Gamepad {
+	ShyBase
 	id int
 mut:
-	shy     &Shy
 	name      string
 	handle    &sdl.GameController
 	is_haptic bool
@@ -64,17 +64,21 @@ pub fn (mut gp Gamepad) init() ! {
 pub fn (mut ip Input) init() ! {
 	ip.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	s := ip.shy
+	// NOTE multiple mice and/or keyboards is apparently a near impossible thing.
+	// It's problems rooted deep in the underlying OS layers and device driver levels:
+	// https://discourse.libsdl.org/t/sdl-x-org-and-multiple-mice/12298/15
 	mut mouse := &Mouse{
 		shy: s
 	}
 	mouse.init()!
-	ip.mice << mouse
+	ip.mice[0] = mouse // TODO NOTE see process_events also
 
 	mut keyboard := &Keyboard{
 		shy: s
 	}
 	keyboard.init()!
-	ip.keyboards << keyboard
+	ip.keyboards[0] = keyboard // TODO NOTE see process_events also
+
 	ip.init_input()!
 }
 

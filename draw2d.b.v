@@ -9,16 +9,14 @@ import sgp
 import sokol.sgl // Required for font rendering
 
 pub struct Draw2D {
+	ShyBase
 pub mut:
 	render_text_first bool
 mut:
-	shy        &Shy       = shy.null
 	font_context &FontContext = shy.null
 }
 
-fn (mut d2d Draw2D) init(shy &Shy) {
-	d2d.shy = shy
-}
+fn (mut d2d Draw2D) init() {}
 
 fn (mut d2d Draw2D) shutdown() {
 }
@@ -27,7 +25,7 @@ pub fn (mut d2d Draw2D) begin() {
 	assert d2d.shy.state.in_frame_call, @STRUCT + '.' + @FN +
 		' can only be called inside a .frame() call'
 
-	win := d2d.shy.wm.active_window()
+	win := d2d.shy.api.wm.active_window()
 	w, h := win.drawable_size()
 	// ratio := f32(w)/f32(h)
 
@@ -61,8 +59,8 @@ pub fn (mut d2d Draw2D) end() {
 	}
 }
 
-fn (mut d2d Draw2D) begin_text() {
-	win := d2d.shy.wm.active_window()
+pub fn (mut d2d Draw2D) begin_text() {
+	win := d2d.shy.active_window()
 	w, h := win.drawable_size()
 
 	sgl.defaults()
@@ -77,7 +75,7 @@ fn (mut d2d Draw2D) begin_text() {
 	d2d.font_context = fc
 }
 
-fn (mut d2d Draw2D) end_text() {
+pub fn (mut d2d Draw2D) end_text() {
 	fc := d2d.font_context
 	if !isnil(fc) {
 		//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
@@ -116,7 +114,7 @@ pub mut:
 	font   string = shy.defaults.font.name
 	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
-	size   f32  = 19.0
+	size   f32  = shy.defaults.font.size
 	scale  f32  = 1.0
 	fills  Fill = .solid | .outline
 	offset Vec2<f32>

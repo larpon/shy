@@ -11,15 +11,15 @@ import sokol.sfons
 import sokol.sgl
 
 struct FontSystem {
+	ShyBase
 mut:
 	ready     bool
-	shy     &Shy
 	contexts  []&FontContext
 	font_data map[string][]u8
 }
 
 struct FontSystemConfig {
-	shy             &Shy
+	ShyBase
 	prealloc_contexts u16 = 8 // > 8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
 	preload           map[string]string // preload[font_name] = path_to_font
 }
@@ -42,14 +42,16 @@ fn (mut fs FontSystem) load_font(name string, path string) ! {
 	}
 }
 
-fn (mut fs FontSystem) init(config FontSystemConfig) {
+fn (mut fs FontSystem) init(config FontSystemConfig) ! {
 	fs.shy = config.shy
 	mut s := fs.shy
 	s.log.gdebug(@STRUCT + '.' + 'font', 'initializing...')
 
+	sample_count := fs.shy.config.render.msaa
 	sgl_desc := &sgl.Desc{
 		context_pool_size: 2 * 512 // default 4, NOTE this number affects the prealloc_contexts in font_system.b.v...
 		pipeline_pool_size: 2 * 1024 // default 4, NOTE this number affects the prealloc_contexts in font_system.b.v...
+		sample_count: sample_count
 	}
 	sgl.setup(sgl_desc)
 
@@ -64,11 +66,13 @@ fn (mut fs FontSystem) init(config FontSystemConfig) {
 		}
 	}
 
-	sgl_context_desc := sgl.ContextDesc{} // TODO apply values for max_vertices etc.
+	sgl_context_desc := sgl.ContextDesc{
+		sample_count: sample_count
+	} // TODO apply values for max_vertices etc.
 
 	s.log.gdebug(@STRUCT + '.' + 'font', 'pre-allocating $config.prealloc_contexts contexts...')
 	for _ in 0 .. config.prealloc_contexts {
-		fons_context := sfons.create(512, 512, 1)
+		fons_context := sfons.create(2 * 512, 2 * 512, 1)
 		sgl_context := sgl.make_context(&sgl_context_desc)
 		// Default context
 		mut context := &FontContext{
@@ -88,7 +92,7 @@ fn (mut fs FontSystem) init(config FontSystemConfig) {
 	fs.ready = true
 }
 
-fn (mut fs FontSystem) shutdown() {
+fn (mut fs FontSystem) shutdown() ! {
 	mut s := fs.shy
 	s.log.gdebug(@STRUCT + '.' + 'font', 'shutting down...')
 	for context in fs.contexts {
@@ -142,7 +146,7 @@ fn (fc &FontContext) set_defaults() {
 
 	font_context.set_font(font_id)
 	font_context.set_color(white)
-	font_context.set_size(19.0)
+	font_context.set_size(shy.defaults.font.size)
 }
 
 fn (fc &FontContext) begin() {

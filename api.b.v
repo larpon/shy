@@ -38,11 +38,7 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 		preload: {
 			'system': font.default()
 		}
-	}) // font_system.b.v
-
-	s.wm = a.wm
-	s.gfx = a.gfx
-	s.input = a.input
+	})! // font_system.b.v
 }
 
 pub fn (mut a API) shutdown() ! {
@@ -51,30 +47,20 @@ pub fn (mut a API) shutdown() ! {
 
 	a.input.shutdown()!
 
-	a.font_system.shutdown()
+	a.font_system.shutdown()!
 
 	a.gfx.shutdown()!
 
 	a.wm.shutdown()!
 }
 
-pub fn (s &Shy) draw2d() Draw2D {
-	mut d2d := Draw2D{}
-	d2d.init(s)
-	return d2d
-}
-
 struct API {
+	ShyBase
 mut:
-	shy &Shy = shy.null
-pub mut:
-	wm    &WM
-	gfx   &GFX
-	input &Input
-	// Font backend
+	wm          &WM
+	gfx         &GFX
+	input       &Input
 	font_system FontSystem
-	//
-	shape_draw_system ShapeDrawSystem
 }
 
 fn (mut a API) on_end_of_frame() {

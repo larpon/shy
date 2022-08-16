@@ -4,11 +4,11 @@
 module shy
 
 pub struct Boot {
-	shy &Shy
+	ShyBase
 }
 
 pub struct WM {
+	ShyBase
 mut:
-	shy &Shy
-	root  &Window = shy.null
+	root &Window = shy.null
 }

@@ -15,10 +15,12 @@ pub const (
 )
 
 struct Defaults {
-	font struct {
+	font struct  {
 		name string = 'default'
+		size f32    = 20
 	}
 }
+
 //
 pub enum ButtonState {
 	up
@@ -36,6 +38,11 @@ mut:
 	in_frame_call bool
 }
 
+struct ShyBase {
+mut:
+	shy &Shy = shy.null
+}
+
 // Shy carries all of shy's internal state.
 [heap]
 pub struct Shy {
@@ -44,9 +51,6 @@ pub struct Shy {
 pub mut:
 	paused   bool
 	shutdown bool
-	wm       &WM    = shy.null
-	gfx      &GFX   = shy.null
-	input    &Input = shy.null
 mut:
 	log     Log
 	ready   bool
@@ -166,7 +170,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		}
 
 		// Ask gfx backend to clear the screen
-		s.gfx.clear_screen()
+		s.api.gfx.begin()
 
 		// frame timer
 		current_frame_time := i64(s.api.performance_counter())
@@ -255,10 +259,6 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			// eprintln('(unlocked) ctx.frame( $f_dt )')
 			s.state.in_frame_call = true
 			ctx.frame(f_dt)
-			s.state.in_frame_call = false
-			unsafe { s.api.on_end_of_frame() }
-			// display() / swap buffers
-			s.gfx.swap()
 		} else { // LOCKED FRAMERATE, NO INTERPOLATION
 			for frame_accumulator >= desired_frametime * update_multiplicity {
 				for i := 0; i < update_multiplicity; i++ {
@@ -274,11 +274,13 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			// eprintln('(locked) ctx.frame( 1.0 )')
 			s.state.in_frame_call = true
 			ctx.frame(1.0)
-			s.state.in_frame_call = false
-			unsafe { s.api.on_end_of_frame() }
-			// display() / swap buffers
-			s.gfx.swap()
 		}
+		s.state.in_frame_call = false
+		unsafe { s.api.on_end_of_frame() }
+		s.api.gfx.end()
+		s.api.gfx.commit()
+		// display() / swap buffers
+		s.api.gfx.swap()
 	}
 }
 
@@ -288,13 +290,13 @@ fn (mut s Shy) process_events<T>(mut ctx T) {
 		event := s.poll_event() or { break }
 
 		if event is MouseButtonEvent {
-			// mouse := TODO multi-mouse support
-			mut mouse := s.input.mouse(0) or { return }
+			m_id := u32(0) // event.which // TODO see input handling
+			mut mouse := s.api.input.mouse(m_id) or { return }
 			mouse.set_button_state(event.button, event.state)
 		}
 		if event is KeyEvent {
-			// kb := TODO multi-keyboard support
-			mut kb := s.input.keyboard(0) or { return }
+			k_id := u32(0) // event.which // TODO see input handling
+			mut kb := s.api.input.keyboard(k_id) or { return }
 			kb.set_key_state(event.key_code, event.state)
 		}
 
@@ -303,20 +305,10 @@ fn (mut s Shy) process_events<T>(mut ctx T) {
 }
 
 pub fn (s Shy) check_api() ! {
-	if isnil(s.wm) || isnil(s.gfx) || isnil(s.input) {
+	if isnil(s.api.wm) || isnil(s.api.gfx) || isnil(s.api.input) {
 		return error('not all essential api systems where set')
 	}
-	if isnil(s.input.mouse) || isnil(s.input.keyboard) {
+	if isnil(s.api.input.mouse) || isnil(s.api.input.keyboard) {
 		return error('not all input api systems where set')
 	}
-}
-
-[inline]
-pub fn (s Shy) fps() u32 {
-	return s.state.fps_snapshot
-}
-
-[inline]
-pub fn (s Shy) ticks() u64 {
-	return u64(s.timer.elapsed().milliseconds())
 }

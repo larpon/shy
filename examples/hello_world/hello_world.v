@@ -19,10 +19,9 @@ struct App {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	mx, my := a.mouse.position(.window)
-
 	mut draw := a.shy.draw2d()
-	draw.begin()
+	draw.begin_text()
 	draw.text_at('Hello Shy World!', 10, 20)
 	draw.text_at('$mx,$my', mx - 10, my + 35)
-	draw.end()
+	draw.end_text()
 }

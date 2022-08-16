@@ -18,7 +18,7 @@ fn (mut s Shy) poll_event() ?Event {
 				//	s.shutdown = true
 				//}
 				wevid := sdl.WindowEventID(int(evt.window.event))
-				win := s.wm.active_window()
+				win := s.active_window()
 				if wevid == .resized {
 					return WindowEvent{
 						timestamp: s.ticks()
@@ -50,7 +50,7 @@ fn (mut s Shy) poll_event() ?Event {
 			}
 			.mousemotion {
 				buttons := map_sdl_button_mask_to_shy_mouse_buttons(evt.motion.state)
-				win := s.wm.active_window()
+				win := s.active_window()
 				return MouseMotionEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO multi-window support
@@ -66,7 +66,7 @@ fn (mut s Shy) poll_event() ?Event {
 				mut state := ButtonState.down
 				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
 				button := map_sdl_button_to_shy_mouse_button(evt.button.button)
-				win := s.wm.active_window()
+				win := s.active_window()
 				return MouseButtonEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
@@ -85,7 +85,7 @@ fn (mut s Shy) poll_event() ?Event {
 				} else {
 					.flipped
 				}
-				win := s.wm.active_window()
+				win := s.active_window()
 				return MouseWheelEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
