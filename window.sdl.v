@@ -5,15 +5,9 @@ module shy
 
 import sdl
 
-pub struct Window {
-	ShyBase
-pub:
-	id u32
-mut:
-	handle   &sdl.Window
-	context  sdl.GLContext
-	children []&Window
-}
+// Some code found from
+// "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
+// https://gist.github.com/sherjilozair/c0fa81250c1b8f5e4234b1588e755bca
 
 pub fn (b Boot) init() !&WM {
 	s := b.shy
@@ -198,6 +192,17 @@ pub fn (mut wm WM) shutdown() ! {
 	sdl.quit()
 }
 
+// Window
+pub struct Window {
+	ShyApp
+pub:
+	id u32
+mut:
+	handle   &sdl.Window
+	context  sdl.GLContext
+	children []&Window
+}
+
 pub fn (mut w Window) init() ! {
 	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 	s := w.shy
@@ -278,6 +283,18 @@ pub fn (w &Window) size() (int, int) {
 	mut width, mut height := 0, 0
 	sdl.get_window_size(w.handle, &width, &height)
 	return width, height
+}
+
+pub fn (w &Window) height() int {
+	mut height := 0
+	sdl.get_window_size(w.handle, sdl.null, &height)
+	return height
+}
+
+pub fn (w &Window) width() int {
+	mut width := 0
+	sdl.get_window_size(w.handle, &width, sdl.null)
+	return width
 }
 
 pub fn (w &Window) drawable_size() (int, int) {

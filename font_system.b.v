@@ -11,7 +11,7 @@ import sokol.sfons
 import sokol.sgl
 
 struct FontSystem {
-	ShyBase
+	ShyApp
 mut:
 	ready     bool
 	contexts  []&FontContext
@@ -19,7 +19,7 @@ mut:
 }
 
 struct FontSystemConfig {
-	ShyBase
+	ShyApp
 	prealloc_contexts u16 = 8 // > 8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
 	preload           map[string]string // preload[font_name] = path_to_font
 }

@@ -7,21 +7,11 @@ import sokol.gfx
 import sgp
 
 pub struct GFX {
-	ShyBase
+	ShyApp
 mut:
+	draw &Draw = shy.null
 	// sokol
 	pass_action gfx.PassAction
-
-	is_drawing_shapes bool
-	is_drawing_text   bool
-}
-
-pub fn (mut g GFX) draw2d() Draw2D {
-	mut d2d := Draw2D{
-		shy: g.shy
-	}
-	d2d.init()
-	return d2d
 }
 
 pub fn (mut g GFX) init() ! {
@@ -52,6 +42,10 @@ pub fn (mut g GFX) init() ! {
 		error_msg := unsafe { cstring_to_vstring(sgp.get_error_message(sgp.get_last_error())) }
 		panic('Failed to create Sokol GP context:\n$error_msg')
 	}
+
+	g.draw = &Draw{
+		shy: s
+	}
 }
 
 pub fn (mut g GFX) shutdown() ! {
@@ -64,16 +58,16 @@ pub fn (g GFX) commit() {
 	gfx.commit()
 }
 
-pub fn (g GFX) end() {
-	gfx.end_pass()
-}
-
 pub fn (mut g GFX) begin() {
 	s := g.shy
 	mut win := s.active_window()
 	// TODO multi window support
 	w, h := win.drawable_size()
 	gfx.begin_default_pass(&g.pass_action, w, h)
+}
+
+pub fn (g GFX) end() {
+	gfx.end_pass()
 }
 
 pub fn (g GFX) swap() {

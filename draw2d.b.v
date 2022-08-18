@@ -9,21 +9,11 @@ import sgp
 import sokol.sgl // Required for font rendering
 
 pub struct Draw2D {
-	ShyBase
-pub mut:
-	render_text_first bool
-mut:
-	font_context &FontContext = shy.null
-}
-
-fn (mut d2d Draw2D) init() {}
-
-fn (mut d2d Draw2D) shutdown() {
+	ShyFrame
 }
 
 pub fn (mut d2d Draw2D) begin() {
-	assert d2d.shy.state.in_frame_call, @STRUCT + '.' + @FN +
-		' can only be called inside a .frame() call'
+	d2d.ShyFrame.begin()
 
 	win := d2d.shy.api.wm.active_window()
 	w, h := win.drawable_size()
@@ -42,70 +32,59 @@ pub fn (mut d2d Draw2D) begin() {
 }
 
 pub fn (mut d2d Draw2D) end() {
-	assert d2d.shy.state.in_frame_call, @STRUCT + '.' + @FN +
-		' can only be called inside a .frame() call'
-
-	if !isnil(d2d.font_context) && d2d.render_text_first {
-		d2d.end_text()
-	}
-
+	d2d.ShyFrame.end()
 	// Dispatch all draw commands to Sokol GFX.
 	sgp.flush()
 	// Finish a draw command queue, clearing it.
 	sgp.end()
-
-	if !isnil(d2d.font_context) && !d2d.render_text_first {
-		d2d.end_text()
-	}
-}
-
-pub fn (mut d2d Draw2D) begin_text() {
-	win := d2d.shy.active_window()
-	w, h := win.drawable_size()
-
-	sgl.defaults()
-
-	fc := d2d.shy.api.font_system.get_context()
-	sgl.set_context(fc.sgl)
-	sgl.matrix_mode_projection()
-	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
-
-	//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'begin ${ptr_str(fc.fsc)}...')
-	fc.begin()
-	d2d.font_context = fc
-}
-
-pub fn (mut d2d Draw2D) end_text() {
-	fc := d2d.font_context
-	if !isnil(fc) {
-		//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
-		fc.end()
-		d2d.font_context = shy.null
-	}
-}
-
-pub fn (mut d2d Draw2D) new_text() Draw2DText {
-	if isnil(d2d.font_context) {
-		d2d.begin_text()
-	}
-	return Draw2DText{
-		fc: d2d.font_context
-	}
 }
 
 pub fn (d2d &Draw2D) new_rect(config Draw2DRect) Draw2DRect {
 	return config
 }
 
-pub fn (mut d2d Draw2D) text_at(text string, x int, y int) {
-	mut t := d2d.new_text()
-	t.x = x
-	t.y = y
-	t.text = text
-	t.draw()
+// DrawText
+pub struct DrawText {
+	ShyFrame
+mut:
+	font_context &FontContext = shy.null
 }
 
-// Draw2DText
+pub fn (mut dt DrawText) begin() {
+	dt.ShyFrame.begin()
+	win := dt.shy.active_window()
+	w, h := win.drawable_size()
+
+	sgl.defaults()
+
+	fc := dt.shy.api.font_system.get_context()
+
+	sgl.set_context(fc.sgl)
+	sgl.matrix_mode_projection()
+	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+
+	//¤ FLOOD dt.shy.log.gdebug(@STRUCT + '.' + 'draw', 'begin ${ptr_str(fc.fsc)}...')
+	dt.font_context = fc
+	fc.begin()
+}
+
+pub fn (mut dt DrawText) end() {
+	dt.ShyFrame.end()
+	fc := dt.font_context
+	if !isnil(fc) {
+		//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
+		fc.end()
+		dt.font_context = shy.null
+	}
+}
+
+pub fn (mut dt DrawText) new() Draw2DText {
+	assert !isnil(dt.font_context), 'DrawText.font_context is null'
+	return Draw2DText{
+		fc: dt.font_context
+	}
+}
+
 pub struct Draw2DText {
 	Vec2<f32>
 	fc &FontContext
@@ -113,6 +92,7 @@ pub mut:
 	text   string
 	font   string = shy.defaults.font.name
 	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	origin Origin
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
 	size   f32  = shy.defaults.font.size
 	scale  f32  = 1.0
@@ -125,9 +105,8 @@ pub fn (t Draw2DText) draw() {
 	//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'using ${ptr_str(fc.fsc)}...')
 	fc := t.fc
 	font_context := fc.fsc
-	if isnil(font_context) {
-		assert false, @STRUCT + '.' + @FN + ': no font context'
-	}
+
+	assert !isnil(font_context), @STRUCT + '.' + @FN + ': no font context'
 
 	// color := sfons.rgba(255, 255, 255, 255)
 	if t.font != shy.defaults.font.name {
@@ -136,7 +115,31 @@ pub fn (t Draw2DText) draw() {
 	}
 	// font_context.set_color(color)
 	font_context.set_size(t.size)
-	font_context.draw_text(t.x, t.y, t.text)
+	mut off_x := f32(0)
+	mut off_y := f32(0)
+	if t.origin != .bottom_left {
+		mut buf := [4]f32{}
+		font_context.text_bounds(t.x, t.y, t.text, &buf[0])
+		match t.origin {
+			.top_left {
+				off_y = buf[3] - buf[1]
+			}
+			.top_center {
+				off_y = buf[3] - buf[1]
+				off_x = (buf[0] - buf[2]) / 2
+			}
+			.top_right {
+				off_y = buf[3] - buf[1]
+				off_x = (buf[0] - buf[2])
+			}
+			else {
+				// TODO
+			}
+		}
+	}
+	x := t.offset.x + t.x + off_x
+	y := t.offset.y + t.y + off_y
+	font_context.draw_text(x, y, t.text)
 }
 
 // Draw2DRect
@@ -145,7 +148,7 @@ pub struct Draw2DRect {
 	Rect
 pub mut:
 	// visible bool = true
-	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	colors [shy.color_target_size]Color = [rgb(255, 5, 5), rgb(255, 255, 255)]!
 	// TODO clear up this mess
 	radius  f32     = 1.0
 	scale   f32     = 1.0
@@ -157,9 +160,6 @@ pub mut:
 
 pub fn (mut r Draw2DRect) set(config Draw2DRect) {
 	r.Rect = config.Rect
-	//	r.y = config.Rect.y
-	//	r.w = config.Rect.w
-	//	r.h = config.Rect.h
 	r.colors = config.colors
 	r.radius = config.radius
 	r.scale = config.scale

@@ -7,8 +7,7 @@ import shy
 
 fn main() {
 	mut app := &App{}
-	config := shy.Config{}
-	shy.run<App>(mut app, config)!
+	shy.run<App>(mut app)!
 }
 
 [heap]
@@ -18,11 +17,10 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	mx, my := a.mouse.position(.window)
-
-	mut draw := a.shy.draw2d()
-	draw.begin()
-	draw.text_at('Hello Shy World!', 11, 20)
-	draw.text_at('$mx,$my', mx - 10, my + 35)
-	draw.end()
+	a.easy.rect(
+		x: (a.window.width() / 2) - 50
+		y: (a.window.height() / 2) - 50
+		w: 100
+		h: 100
+	)
 }

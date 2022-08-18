@@ -7,7 +7,7 @@ import sdl
 
 // TODO move
 pub struct Gamepad {
-	ShyBase
+	ShyApp
 	id int
 mut:
 	name      string

@@ -38,9 +38,27 @@ mut:
 	in_frame_call bool
 }
 
-struct ShyBase {
+struct ShyApp {
 mut:
-	shy &Shy = shy.null
+	shy &Shy // = shy.null
+}
+
+fn (sb ShyApp) init() ! {}
+
+fn (sb ShyApp) shutdown() ! {}
+
+struct ShyFrame {
+	ShyApp
+}
+
+fn (mut sf ShyFrame) begin() {
+	assert sf.shy.state.in_frame_call, @STRUCT + '.' + @FN +
+		' can only be called inside a .frame() call'
+}
+
+fn (mut sf ShyFrame) end() {
+	assert sf.shy.state.in_frame_call, @STRUCT + '.' + @FN +
+		' can only be called inside a .frame() call'
 }
 
 // Shy carries all of shy's internal state.
@@ -117,7 +135,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 	// https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
 	// https://gafferongames.com/post/fix_your_timestep/
 	// compute how many ticks one update should be
-	performance_frequency := s.api.performance_frequency()
+	performance_frequency := s.performance_frequency()
 	fixed_deltatime := f64(1.0) / update_rate
 	desired_frametime := i64(performance_frequency / update_rate)
 
@@ -147,7 +165,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 
 	s.running = true
 	s.state.resync = true
-	mut prev_frame_time := i64(s.api.performance_counter())
+	mut prev_frame_time := i64(s.performance_counter())
 	mut frame_accumulator := i64(0)
 
 	for s.running {
@@ -173,7 +191,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		s.api.gfx.begin()
 
 		// frame timer
-		current_frame_time := i64(s.api.performance_counter())
+		current_frame_time := i64(s.performance_counter())
 		mut delta_time := current_frame_time - prev_frame_time
 		prev_frame_time = current_frame_time
 
@@ -251,7 +269,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 				frame_accumulator -= desired_frametime
 			}
 
-			c_dt := f64(consumed_delta_time) / s.api.performance_frequency()
+			c_dt := f64(consumed_delta_time) / s.performance_frequency()
 			// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
 			ctx.variable_update(c_dt)
 

@@ -31,7 +31,7 @@ pub enum MouseWheelDirection {
 }
 
 pub struct Mouse {
-	ShyBase
+	ShyApp
 mut:
 	bs map[int]bool // button states
 }

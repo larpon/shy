@@ -5,7 +5,7 @@ module shy
 
 [heap]
 pub struct Input {
-	ShyBase
+	ShyApp
 mut:
 	mice      map[u32]&Mouse
 	keyboards map[u32]&Keyboard
@@ -21,7 +21,7 @@ pub fn (ip Input) keyboard(n u32) !&Keyboard {
 }
 
 pub struct Keyboard {
-	ShyBase
+	ShyApp
 mut:
 	keys map[int]bool // key states
 }

@@ -4,10 +4,16 @@
 module shy
 
 import os.font
-// Some code found from
-// "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
-// https://gist.github.com/sherjilozair/c0fa81250c1b8f5e4234b1588e755bca
-import sdl
+
+struct API {
+	ShyApp
+mut:
+	wm          &WM
+	gfx         &GFX
+	input       &Input
+	system      &System
+	font_system FontSystem
+}
 
 pub fn (mut a API) init(shy_instance &Shy) ! {
 	mut s := unsafe { shy_instance }
@@ -17,6 +23,10 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 		shy: s
 	}
 	a.wm = boot.init()!
+
+	a.system = &System{
+		shy: s
+	}
 
 	a.wm.init()!
 
@@ -54,23 +64,6 @@ pub fn (mut a API) shutdown() ! {
 	a.wm.shutdown()!
 }
 
-struct API {
-	ShyBase
-mut:
-	wm          &WM
-	gfx         &GFX
-	input       &Input
-	font_system FontSystem
-}
-
 fn (mut a API) on_end_of_frame() {
 	a.font_system.on_end_of_frame()
-}
-
-pub fn (a API) performance_counter() u64 {
-	return sdl.get_performance_counter()
-}
-
-pub fn (a API) performance_frequency() u64 {
-	return sdl.get_performance_frequency()
 }

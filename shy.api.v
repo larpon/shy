@@ -16,11 +16,21 @@ pub fn (s Shy) ticks() u64 {
 }
 
 [inline]
-pub fn (mut s Shy) draw2d() Draw2D {
-	return s.api.gfx.draw2d()
+pub fn (s Shy) active_window() &Window {
+	return s.api.wm.active_window()
 }
 
 [inline]
-pub fn (s Shy) active_window() &Window {
-	return s.api.wm.active_window()
+pub fn (s Shy) performance_counter() u64 {
+	return s.api.system.performance_counter()
+}
+
+[inline]
+pub fn (s Shy) performance_frequency() u64 {
+	return s.api.system.performance_frequency()
+}
+
+[inline]
+pub fn (s Shy) draw() &Draw {
+	return s.api.gfx.draw
 }

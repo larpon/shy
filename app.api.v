@@ -5,7 +5,7 @@ module shy
 
 // Base app skeleton for easy embedding in examples
 struct App {
-	ShyBase // Initialized by shy.run<T>(...)
+	ShyApp // Initialized by shy.run<T>(...)
 }
 
 pub fn (mut a App) init() ! {}
@@ -21,23 +21,29 @@ pub fn (mut a App) frame(dt f64) {}
 pub fn (mut a App) event(e Event) {}
 
 // Simple app skeleton for easy embedding in examples
-struct BasicApp {
+struct EasyApp {
 	App
 mut:
-	mouse &Mouse    = shy.null
-	kbd   &Keyboard = shy.null
+	easy   &Easy     = shy.null
+	mouse  &Mouse    = shy.null
+	kbd    &Keyboard = shy.null
+	window &Window   = shy.null
 }
 
-pub fn (mut a BasicApp) init() ! {
+pub fn (mut a EasyApp) init() ! {
+	a.easy = &Easy{
+		shy: a.shy
+	}
 	a.mouse = a.shy.api.input.mouse(0)!
 	a.kbd = a.shy.api.input.keyboard(0)!
+	a.window = a.shy.api.wm.active_window()
 }
 
-pub fn (mut a BasicApp) event(e Event) {
+pub fn (mut a EasyApp) event(e Event) {
 	a.on_event(e)
 }
 
-fn (mut a BasicApp) on_event(e Event) {
+fn (mut a EasyApp) on_event(e Event) {
 	match e {
 		QuitEvent {
 			a.shy.shutdown = true
@@ -55,8 +61,7 @@ fn (mut a BasicApp) on_event(e Event) {
 					kb := a.kbd
 					alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
-						mut win := a.shy.api.wm.active_window()
-						win.toggle_fullscreen()
+						a.window.toggle_fullscreen()
 					}
 				}
 			}
@@ -70,17 +75,17 @@ fn (mut a BasicApp) on_event(e Event) {
 
 // Example app skeleton for all the examples
 struct ExampleApp {
-	BasicApp
+	EasyApp
 }
 
 // Developer app skeleton
 struct DevApp {
-	BasicApp
+	EasyApp
 }
 
 pub fn (mut a DevApp) event(e Event) {
 	a.on_event(e)
-	a.BasicApp.on_event(e)
+	a.EasyApp.on_event(e)
 }
 
 pub fn (mut a DevApp) on_event(e Event) {
@@ -102,12 +107,12 @@ pub fn (mut a DevApp) on_event(e Event) {
 				}
 
 				if key_code == .f2 {
-					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Count $s.api.performance_counter()')
+					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Count $s.performance_counter()')
 					return
 				}
 
 				if key_code == .f3 {
-					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Frequency $s.api.performance_frequency()')
+					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Frequency $s.performance_frequency()')
 					return
 				}
 
