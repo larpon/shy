@@ -7,7 +7,7 @@ import sokol.gfx
 import sgp
 
 pub struct GFX {
-	ShyApp
+	ShyStruct
 mut:
 	draw &Draw = shy.null
 	// sokol
@@ -24,7 +24,7 @@ pub fn (mut g GFX) init() ! {
 	}
 	gfx_desc.context.sample_count = s.config.render.msaa
 	gfx.setup(&gfx_desc)
-	assert gfx.is_valid() == true
+	assert gfx.is_valid()
 
 	// Create a black color as a default pass (default window background color)
 	color := s.config.window.color.as_f32()

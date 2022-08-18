@@ -194,7 +194,7 @@ pub fn (mut wm WM) shutdown() ! {
 
 // Window
 pub struct Window {
-	ShyApp
+	ShyStruct
 pub:
 	id u32
 mut:

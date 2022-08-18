@@ -6,7 +6,7 @@ module shy
 import os.font
 
 struct API {
-	ShyApp
+	ShyStruct
 mut:
 	wm          &WM
 	gfx         &GFX

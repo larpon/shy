@@ -4,7 +4,7 @@
 module shy
 
 pub struct Draw {
-	ShyApp
+	ShyStruct
 }
 
 pub fn (d &Draw) new_2d() Draw2D {

@@ -38,17 +38,17 @@ mut:
 	in_frame_call bool
 }
 
-struct ShyApp {
+struct ShyStruct {
 mut:
 	shy &Shy // = shy.null
 }
 
-fn (sb ShyApp) init() ! {}
+fn (sb ShyStruct) init() ! {}
 
-fn (sb ShyApp) shutdown() ! {}
+fn (sb ShyStruct) shutdown() ! {}
 
 struct ShyFrame {
-	ShyApp
+	ShyStruct
 }
 
 fn (mut sf ShyFrame) begin() {
@@ -322,9 +322,12 @@ fn (mut s Shy) process_events<T>(mut ctx T) {
 	}
 }
 
-pub fn (s Shy) check_api() ! {
+fn (s Shy) check_api() ! {
 	if isnil(s.api.wm) || isnil(s.api.gfx) || isnil(s.api.input) {
 		return error('not all essential api systems where set')
+	}
+	if isnil(s.api.gfx.draw) {
+		return error('not all graphics api systems where set')
 	}
 	if isnil(s.api.input.mouse) || isnil(s.api.input.keyboard) {
 		return error('not all input api systems where set')

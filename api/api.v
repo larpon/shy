@@ -6,6 +6,6 @@ module api
 /*
 struct Api {
 mut:
-	ShyApp
+	ShyStruct
 }
 */

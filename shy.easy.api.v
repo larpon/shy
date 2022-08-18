@@ -9,7 +9,7 @@ module shy
 // High-level API
 
 pub struct Easy {
-	ShyApp
+	ShyStruct
 }
 
 [params]

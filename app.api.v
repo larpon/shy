@@ -5,7 +5,7 @@ module shy
 
 // Base app skeleton for easy embedding in examples
 struct App {
-	ShyApp // Initialized by shy.run<T>(...)
+	ShyStruct // Initialized by shy.run<T>(...)
 }
 
 pub fn (mut a App) init() ! {}
@@ -25,6 +25,7 @@ struct EasyApp {
 	App
 mut:
 	easy   &Easy     = shy.null
+	draw   &Draw     = shy.null
 	mouse  &Mouse    = shy.null
 	kbd    &Keyboard = shy.null
 	window &Window   = shy.null
@@ -34,6 +35,7 @@ pub fn (mut a EasyApp) init() ! {
 	a.easy = &Easy{
 		shy: a.shy
 	}
+	a.draw = a.shy.api.gfx.draw
 	a.mouse = a.shy.api.input.mouse(0)!
 	a.kbd = a.shy.api.input.keyboard(0)!
 	a.window = a.shy.api.wm.active_window()
@@ -77,6 +79,10 @@ fn (mut a EasyApp) on_event(e Event) {
 struct ExampleApp {
 	EasyApp
 }
+
+// pub fn (mut ea ExampleApp) init()! {
+// 	ea.EasyApp.init() !
+// }
 
 // Developer app skeleton
 struct DevApp {
