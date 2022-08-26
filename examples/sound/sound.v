@@ -24,7 +24,7 @@ pub fn (mut a App) init() ! {
 	a.easy.load_audio('sound 1', sound)!
 }
 
-[live; markused]
+[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.easy.text(
 		text: 'Press a key or click in window to play a sound'
