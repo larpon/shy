@@ -3,8 +3,10 @@
 // that can be found in the LICENSE file.
 module shy
 
+import os
+
 // Base app skeleton for easy embedding in examples
-struct App {
+pub struct App {
 	ShyStruct // Initialized by shy.run<T>(...)
 }
 
@@ -21,7 +23,7 @@ pub fn (mut a App) frame(dt f64) {}
 pub fn (mut a App) event(e Event) {}
 
 // Simple app skeleton for easy embedding in examples
-struct EasyApp {
+pub struct EasyApp {
 	App
 mut:
 	easy   &Easy     = shy.null
@@ -78,6 +80,10 @@ fn (mut a EasyApp) on_event(e Event) {
 // Example app skeleton for all the examples
 struct ExampleApp {
 	EasyApp
+}
+
+pub fn (ea ExampleApp) asset_path(path string) string {
+	return os.resource_abs_path(os.join_path('..', 'assets', path))
 }
 
 // pub fn (mut ea ExampleApp) init()! {

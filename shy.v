@@ -39,7 +39,7 @@ mut:
 }
 
 struct ShyStruct {
-mut:
+pub mut: // TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
 	shy &Shy // = shy.null
 }
 
@@ -95,7 +95,7 @@ pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
 	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
-	s.log.free()
+	unsafe { s.log.free() }
 }
 
 // new returns a new, initialized, `Shy` struct allocated in heap memory.
@@ -325,6 +325,9 @@ fn (mut s Shy) process_events<T>(mut ctx T) {
 fn (s Shy) check_api() ! {
 	if isnil(s.api.wm) || isnil(s.api.gfx) || isnil(s.api.input) {
 		return error('not all essential api systems where set')
+	}
+	if isnil(s.api.audio) {
+		return error('not all audio api systems where set')
 	}
 	if isnil(s.api.gfx.draw) {
 		return error('not all graphics api systems where set')

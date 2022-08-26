@@ -10,6 +10,7 @@ struct API {
 mut:
 	wm          &WM
 	gfx         &GFX
+	audio       &Audio
 	input       &Input
 	system      &System
 	font_system FontSystem
@@ -28,6 +29,10 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 		shy: s
 	}
 
+	a.audio = &Audio{
+		shy: s
+	}
+
 	a.wm.init()!
 
 	a.gfx = &GFX{
@@ -38,6 +43,7 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 		shy: s
 	}
 
+	a.audio.init()!
 	a.gfx.init()!
 	a.input.init()!
 
@@ -56,10 +62,9 @@ pub fn (mut a API) shutdown() ! {
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 
 	a.input.shutdown()!
-
 	a.font_system.shutdown()!
-
 	a.gfx.shutdown()!
+	a.audio.shutdown()!
 
 	a.wm.shutdown()!
 }

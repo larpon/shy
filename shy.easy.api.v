@@ -17,7 +17,12 @@ pub struct EasyText {
 	x      f32
 	y      f32
 	text   string
-	origin Origin
+	anchor Anchor
+}
+
+[params]
+pub struct EasyAudio {
+	id string
 }
 
 [inline]
@@ -51,4 +56,20 @@ pub fn (e Easy) rect(er EasyRect) {
 	r.h = er.h
 	r.draw()
 	d.end()
+}
+
+[inline]
+pub fn (e Easy) load_audio(id string, path string) ! {
+	audio := e.shy.api.audio
+	audio.load(id, path)!
+}
+
+pub fn (e Easy) play_audio(ea EasyAudio) {
+	audio := e.shy.api.audio
+	audio.play(ea.id)
+}
+
+pub fn (e Easy) stop_audio(ea EasyAudio) {
+	audio := e.shy.api.audio
+	audio.stop(ea.id)
 }

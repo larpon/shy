@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module shy
 
-pub enum Origin {
+pub enum Anchor {
 	top_left
 	top_center
 	top_right

@@ -92,7 +92,7 @@ pub mut:
 	text   string
 	font   string = shy.defaults.font.name
 	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
-	origin Origin
+	anchor Anchor
 	// TODO clear up this mess, try using just shapes that can draw themselves instead
 	size   f32  = shy.defaults.font.size
 	scale  f32  = 1.0
@@ -117,10 +117,10 @@ pub fn (t Draw2DText) draw() {
 	font_context.set_size(t.size)
 	mut off_x := f32(0)
 	mut off_y := f32(0)
-	if t.origin != .bottom_left {
+	if t.anchor != .bottom_left {
 		mut buf := [4]f32{}
 		font_context.text_bounds(t.x, t.y, t.text, &buf[0])
-		match t.origin {
+		match t.anchor {
 			.top_left {
 				off_y = buf[3] - buf[1]
 			}
@@ -130,6 +130,17 @@ pub fn (t Draw2DText) draw() {
 			}
 			.top_right {
 				off_y = buf[3] - buf[1]
+				off_x = (buf[0] - buf[2])
+			}
+			.center_left {
+				off_y = (buf[3] - buf[1]) / 2
+			}
+			.center {
+				off_y = (buf[3] - buf[1]) / 2
+				off_x = (buf[0] - buf[2]) / 2
+			}
+			.center_right {
+				off_y = (buf[3] - buf[1]) / 2
 				off_x = (buf[0] - buf[2])
 			}
 			else {
