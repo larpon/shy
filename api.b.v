@@ -8,12 +8,12 @@ import os.font
 struct API {
 	ShyStruct
 mut:
-	wm          &WM
-	gfx         &GFX
-	audio       &Audio
-	input       &Input
-	system      &System
-	font_system FontSystem
+	wm     &WM
+	gfx    &GFX
+	audio  &Audio
+	input  &Input
+	system &System
+	fonts  Fonts
 }
 
 pub fn (mut a API) init(shy_instance &Shy) ! {
@@ -48,13 +48,13 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	a.input.init()!
 
 	// Initialize font drawing sub system
-	a.font_system.init(FontSystemConfig{
+	a.fonts.init(FontsConfig{
 		shy: s
 		// prealloc_contexts: 8
 		preload: {
 			'system': font.default()
 		}
-	})! // font_system.b.v
+	})! // fonts.b.v
 }
 
 pub fn (mut a API) shutdown() ! {
@@ -62,7 +62,7 @@ pub fn (mut a API) shutdown() ! {
 	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
 
 	a.input.shutdown()!
-	a.font_system.shutdown()!
+	a.fonts.shutdown()!
 	a.gfx.shutdown()!
 	a.audio.shutdown()!
 
@@ -70,5 +70,5 @@ pub fn (mut a API) shutdown() ! {
 }
 
 fn (mut a API) on_end_of_frame() {
-	a.font_system.on_end_of_frame()
+	a.fonts.on_end_of_frame()
 }

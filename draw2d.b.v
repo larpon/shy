@@ -57,7 +57,7 @@ pub fn (mut dt DrawText) begin() {
 
 	sgl.defaults()
 
-	fc := dt.shy.api.font_system.get_context()
+	fc := dt.shy.api.fonts.get_context()
 
 	sgl.set_context(fc.sgl)
 	sgl.matrix_mode_projection()
