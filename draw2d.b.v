@@ -115,42 +115,49 @@ pub fn (t Draw2DText) draw() {
 	}
 	// font_context.set_color(color)
 	font_context.set_size(t.size)
-	mut off_x := f32(0)
-	mut off_y := f32(0)
-	if t.anchor != .bottom_left {
-		mut buf := [4]f32{}
-		font_context.text_bounds(t.x, t.y, t.text, &buf[0])
-		match t.anchor {
-			.top_left {
-				off_y = buf[3] - buf[1]
+
+	lines := t.text.split('\n')
+
+	mut y_accu := f32(0)
+	for line in lines {
+		mut off_x := f32(0)
+		mut off_y := f32(0)
+		if t.anchor != .bottom_left {
+			mut buf := [4]f32{}
+			font_context.text_bounds(t.x, t.y, line, &buf[0])
+			match t.anchor {
+				.top_left {
+					off_y = buf[3] - buf[1]
+				}
+				.top_center {
+					off_y = buf[3] - buf[1]
+					off_x = (buf[0] - buf[2]) / 2
+				}
+				.top_right {
+					off_y = buf[3] - buf[1]
+					off_x = (buf[0] - buf[2])
+				}
+				.center_left {
+					off_y = (buf[3] - buf[1]) / 2
+				}
+				.center {
+					off_y = (buf[3] - buf[1]) / 2
+					off_x = (buf[0] - buf[2]) / 2
+				}
+				.center_right {
+					off_y = (buf[3] - buf[1]) / 2
+					off_x = (buf[0] - buf[2])
+				}
+				else {
+					// TODO
+				}
 			}
-			.top_center {
-				off_y = buf[3] - buf[1]
-				off_x = (buf[0] - buf[2]) / 2
-			}
-			.top_right {
-				off_y = buf[3] - buf[1]
-				off_x = (buf[0] - buf[2])
-			}
-			.center_left {
-				off_y = (buf[3] - buf[1]) / 2
-			}
-			.center {
-				off_y = (buf[3] - buf[1]) / 2
-				off_x = (buf[0] - buf[2]) / 2
-			}
-			.center_right {
-				off_y = (buf[3] - buf[1]) / 2
-				off_x = (buf[0] - buf[2])
-			}
-			else {
-				// TODO
-			}
+			y_accu += off_y
 		}
+		x := t.offset.x + t.x + off_x
+		y := t.offset.y + t.y + y_accu
+		font_context.draw_text(x, y, line)
 	}
-	x := t.offset.x + t.x + off_x
-	y := t.offset.y + t.y + off_y
-	font_context.draw_text(x, y, t.text)
 }
 
 // Draw2DRect

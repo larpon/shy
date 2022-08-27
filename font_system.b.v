@@ -34,6 +34,9 @@ mut:
 }
 
 fn (mut fs FontSystem) load_font(name string, path string) ! {
+	fs.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN +
+		'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
 		fs.shy.log.ginfo(@STRUCT + '.' + 'font', 'loaded $name: "$path"')
@@ -58,11 +61,11 @@ fn (mut fs FontSystem) init(config FontSystemConfig) ! {
 	// Load the Shy default font
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
 	fs.font_data[shy.defaults.font.name] = default_font.to_bytes()
-	fs.shy.log.ginfo(@STRUCT + '.' + 'font', 'loaded default: "$default_font.path"')
+	fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
 
 	for font_name, font_path in config.preload {
 		fs.load_font(font_name, font_path) or {
-			s.log.gerror(@STRUCT + '.' + 'font', ' pre-loading failed: $err.msg()')
+			s.log.gerror(@STRUCT, ' pre-loading failed: $err.msg()')
 		}
 	}
 
@@ -70,9 +73,15 @@ fn (mut fs FontSystem) init(config FontSystemConfig) ! {
 		sample_count: sample_count
 	} // TODO apply values for max_vertices etc.
 
-	s.log.gdebug(@STRUCT + '.' + 'font', 'pre-allocating $config.prealloc_contexts contexts...')
+	s.log.gdebug(@STRUCT, 'pre-allocating $config.prealloc_contexts contexts...')
+	$if shy_vet ? {
+		if config.prealloc_contexts > shy.defaults.fonts.preallocate {
+			s.vet_issue(.warn, .misc, @STRUCT + '.' + @FN +
+				' keep in mind that pre-allocating many font contexts is quite memory consuming')
+		}
+	}
 	for _ in 0 .. config.prealloc_contexts {
-		fons_context := sfons.create(2 * 512, 2 * 512, 1)
+		fons_context := sfons.create(1024, 1024, 1)
 		sgl_context := sgl.make_context(&sgl_context_desc)
 		// Default context
 		mut context := &FontContext{

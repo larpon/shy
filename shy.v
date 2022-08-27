@@ -14,10 +14,20 @@ pub const (
 	defaults = Defaults{}
 )
 
+const vet_tag = 'VET'
+
 struct Defaults {
+	fonts struct  {
+		preallocate u8 = 8
+	}
+
 	font struct  {
 		name string = 'default'
 		size f32    = 20
+	}
+
+	audio struct  {
+		engines u8 = 1
 	}
 }
 
@@ -35,6 +45,7 @@ mut:
 	fps_snapshot u32
 	frame        u64
 	//
+	in_hot_code   bool
 	in_frame_call bool
 }
 
@@ -51,11 +62,13 @@ struct ShyFrame {
 	ShyStruct
 }
 
+[if !prod]
 fn (mut sf ShyFrame) begin() {
 	assert sf.shy.state.in_frame_call, @STRUCT + '.' + @FN +
 		' can only be called inside a .frame() call'
 }
 
+[if !prod]
 fn (mut sf ShyFrame) end() {
 	assert sf.shy.state.in_frame_call, @STRUCT + '.' + @FN +
 		' can only be called inside a .frame() call'
@@ -94,7 +107,7 @@ pub fn (mut s Shy) init() ! {
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
-	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'bye bye')
 	unsafe { s.log.free() }
 }
 
@@ -168,6 +181,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 	mut prev_frame_time := i64(s.performance_counter())
 	mut frame_accumulator := i64(0)
 
+	s.state.in_hot_code = true
 	for s.running {
 		if !s.ready {
 			s.log.gwarn(@MOD + '.' + @FN + '.' + 'lifecycle', 'not ready. Waiting 1 second...')
@@ -300,6 +314,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		// display() / swap buffers
 		s.api.gfx.swap()
 	}
+	s.state.in_hot_code = false
 }
 
 // process_events processes all events and delegate them to T
@@ -334,5 +349,36 @@ fn (s Shy) check_api() ! {
 	}
 	if isnil(s.api.input.mouse) || isnil(s.api.input.keyboard) {
 		return error('not all input api systems where set')
+	}
+}
+
+enum VetCategory {
+	warn
+}
+
+enum VetArea {
+	misc
+	hot_code
+}
+
+[if shy_vet ?]
+fn (s &Shy) vet_issue(c VetCategory, area VetArea, msg string) {
+	mut area_str := match area {
+		.misc { 'misc' }
+		.hot_code { 'hot_code' }
+	}
+	match c {
+		.warn {
+			match area {
+				.hot_code {
+					if s.state.in_hot_code {
+						s.log.gwarn('$shy.vet_tag ' + area_str, msg)
+					}
+				}
+				else {
+					s.log.gwarn('$shy.vet_tag ' + area_str, msg)
+				}
+			}
+		}
 	}
 }

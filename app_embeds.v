@@ -37,6 +37,7 @@ pub fn (mut a EasyApp) init() ! {
 	a.easy = &Easy{
 		shy: a.shy
 	}
+	a.easy.init()!
 	a.draw = a.shy.api.gfx.draw
 	a.mouse = a.shy.api.input.mouse(0)!
 	a.kbd = a.shy.api.input.keyboard(0)!
@@ -44,10 +45,6 @@ pub fn (mut a EasyApp) init() ! {
 }
 
 pub fn (mut a EasyApp) event(e Event) {
-	a.on_event(e)
-}
-
-fn (mut a EasyApp) on_event(e Event) {
 	match e {
 		QuitEvent {
 			a.shy.shutdown = true
@@ -82,7 +79,8 @@ struct ExampleApp {
 	EasyApp
 }
 
-pub fn (ea ExampleApp) asset_path(path string) string {
+// asset unifies locating example assets
+pub fn (ea ExampleApp) asset(path string) string {
 	return os.resource_abs_path(os.join_path('..', 'assets', path))
 }
 
@@ -96,11 +94,7 @@ struct DevApp {
 }
 
 pub fn (mut a DevApp) event(e Event) {
-	a.on_event(e)
-	a.EasyApp.on_event(e)
-}
-
-pub fn (mut a DevApp) on_event(e Event) {
+	a.EasyApp.event(e)
 	mut s := a.shy
 	// Handle debug output control here
 	if e is KeyEvent {
