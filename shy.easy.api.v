@@ -75,20 +75,19 @@ pub mut:
 
 [params]
 pub struct EasySoundConfig {
-	path      string
-	loop      bool
-	instances u8 // number of copies of the sound, needed to support repeated playback of the same sound
+	path        string
+	loop        bool
+	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
 }
 
 pub fn (e Easy) new_sound(esc EasySoundConfig) !&EasySound {
-	e.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN +
-		'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	e.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	mut audio := e.audio_engine
 
 	mut id := u16(0)
 	mut id_end := u16(0)
-	if esc.instances > 1 {
-		id, id_end = audio.load_instanced(esc.path, esc.instances)!
+	if esc.max_repeats > 1 {
+		id, id_end = audio.load_instanced(esc.path, esc.max_repeats)!
 	} else {
 		id = audio.load(esc.path)!
 	}

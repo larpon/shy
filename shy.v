@@ -362,8 +362,9 @@ enum VetArea {
 }
 
 [if shy_vet ?]
-fn (s &Shy) vet_issue(c VetCategory, area VetArea, msg string) {
-	mut area_str := match area {
+fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string) {
+	mut prefix := caller + ' '
+	prefix += match area {
 		.misc { 'misc' }
 		.hot_code { 'hot_code' }
 	}
@@ -372,11 +373,11 @@ fn (s &Shy) vet_issue(c VetCategory, area VetArea, msg string) {
 			match area {
 				.hot_code {
 					if s.state.in_hot_code {
-						s.log.gwarn('$shy.vet_tag ' + area_str, msg)
+						s.log.gwarn('$shy.vet_tag ' + prefix, msg)
 					}
 				}
 				else {
-					s.log.gwarn('$shy.vet_tag ' + area_str, msg)
+					s.log.gwarn('$shy.vet_tag ' + prefix, msg)
 				}
 			}
 		}

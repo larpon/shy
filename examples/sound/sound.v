@@ -21,12 +21,11 @@ mut:
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()! // Important to let the embed initialize before us
 
-	path := a.ExampleApp.asset('sfx/shy_sound_01.wav')
 	a.sound = a.easy.new_sound(
-		path: path
-		// Allows for repeating the sound on top of itself at max `instances` amount of times,
-		// NOTE consumes memory for each `instances`.
-		instances: 4
+		path: a.ExampleApp.asset('sfx/shy_sound_01.wav')
+		// Allows for repeating the sound on top of itself `max_repeats` amount of times.
+		// NOTE consumes memory for each repeat instance.
+		max_repeats: 4
 	)!
 }
 
