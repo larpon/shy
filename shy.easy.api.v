@@ -87,7 +87,7 @@ pub fn (e Easy) new_sound(esc EasySoundConfig) !&EasySound {
 	mut id := u16(0)
 	mut id_end := u16(0)
 	if esc.max_repeats > 1 {
-		id, id_end = audio.load_instanced(esc.path, esc.max_repeats)!
+		id, id_end = audio.load_copies(esc.path, esc.max_repeats)!
 	} else {
 		id = audio.load(esc.path)!
 	}

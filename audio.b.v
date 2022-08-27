@@ -100,7 +100,7 @@ pub fn (mut ae AudioEngine) load(path string) !u16 {
 	return ae.sound_id
 }
 
-pub fn (mut ae AudioEngine) load_instanced(path string, copies u16) !(u16, u16) {
+pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 	ae.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	// See https://github.com/mackron/miniaudio/issues/517i
 	s := ae.load_file(path)!
