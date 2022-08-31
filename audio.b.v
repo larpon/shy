@@ -108,13 +108,9 @@ pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 	id_start := ae.sound_id
 	ae.sounds[id_start] = s
 	if copies > 1 {
-		$if shy_vet ? {
-			if copies > 8 {
-				ae.shy.vet_issue(.warn, .misc, @STRUCT + '.' + @FN, 'keep in mind that instancing the same sound ($path) $copies times, also duplicate the memory for the sound $copies times')
-			}
-		}
+		ae.shy.vet_issue(.warn, .misc, @STRUCT + '.' + @FN, 'keep in mind that instancing the same sound ($path) $copies times, also duplicate the memory for the sound $copies times')
 		for _ in 0 .. copies {
-			ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'doublicating "$path"')
+			ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'duplicating "$path"')
 			copy_sound := &ma.Sound{}
 			ma.sound_init_copy(ae.e, s, 0, ma.null, copy_sound)
 			ae.sound_id++

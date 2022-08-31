@@ -283,7 +283,7 @@ pub fn (mut s Shy) deinit() {
 	sdl.destroy_window(s.api.window)
 	ttf.close_font(s.api.font)
 	sdl.quit()
-	s.log.gdebug(@STRUCT + '.' + 'death', 'bye bye')
+	s.log.gdebug(@STRUCT + '.' + 'death', 'bye')
 }
 
 // pub fn (mut s Shy) new_window() int {

@@ -8,11 +8,11 @@ import shy.mth
 import sgp
 import sokol.sgl // Required for font rendering
 
-pub struct Draw2D {
+pub struct DrawShape2D {
 	ShyFrame
 }
 
-pub fn (mut d2d Draw2D) begin() {
+pub fn (mut d2d DrawShape2D) begin() {
 	d2d.ShyFrame.begin()
 
 	win := d2d.shy.api.wm.active_window()
@@ -31,7 +31,7 @@ pub fn (mut d2d Draw2D) begin() {
 	sgp.reset_project()
 }
 
-pub fn (mut d2d Draw2D) end() {
+pub fn (mut d2d DrawShape2D) end() {
 	d2d.ShyFrame.end()
 	// Dispatch all draw commands to Sokol GFX.
 	sgp.flush()
@@ -39,7 +39,7 @@ pub fn (mut d2d Draw2D) end() {
 	sgp.end()
 }
 
-pub fn (d2d &Draw2D) new_rect(config Draw2DRect) Draw2DRect {
+pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
 	return config
 }
 
@@ -78,7 +78,7 @@ pub fn (mut dt DrawText) end() {
 	}
 }
 
-pub fn (mut dt DrawText) new() Draw2DText {
+pub fn (mut dt DrawText) text_2d() Draw2DText {
 	assert !isnil(dt.font_context), 'DrawText.font_context is null'
 	return Draw2DText{
 		fc: dt.font_context
@@ -93,7 +93,7 @@ pub mut:
 	font   string = shy.defaults.font.name
 	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
 	anchor Anchor
-	// TODO clear up this mess, try using just shapes that can draw themselves instead
+	// TODO clear up this mess
 	size   f32  = shy.defaults.font.size
 	scale  f32  = 1.0
 	fills  Fill = .solid | .outline
@@ -160,9 +160,9 @@ pub fn (t Draw2DText) draw() {
 	}
 }
 
-// Draw2DRect
+// DrawShape2DRect
 [params]
-pub struct Draw2DRect {
+pub struct DrawShape2DRect {
 	Rect
 pub mut:
 	// visible bool = true
@@ -176,7 +176,7 @@ pub mut:
 	offset  Vec2<f32>
 }
 
-pub fn (mut r Draw2DRect) set(config Draw2DRect) {
+pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 	r.Rect = config.Rect
 	r.colors = config.colors
 	r.radius = config.radius
@@ -187,16 +187,16 @@ pub fn (mut r Draw2DRect) set(config Draw2DRect) {
 	r.offset = config.offset
 }
 
-pub fn (r Draw2DRect) fill_color() Color {
+pub fn (r DrawShape2DRect) fill_color() Color {
 	return r.colors[0]
 }
 
-pub fn (r Draw2DRect) outline_color() Color {
+pub fn (r DrawShape2DRect) outline_color() Color {
 	return r.colors[1]
 }
 
 [inline]
-fn (r Draw2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	// Original author Chris H.F. Tsang / CPOL License
 	// https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
 	// http://artgrammer.blogspot.com/search/label/opengl
@@ -349,7 +349,7 @@ fn (r Draw2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 }
 
 [inline]
-pub fn (r Draw2DRect) draw() {
+pub fn (r DrawShape2DRect) draw() {
 	x := r.x
 	y := r.y
 	w := r.w

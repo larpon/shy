@@ -11,7 +11,7 @@ import sdl
 
 pub fn (b Boot) init() !&WM {
 	s := b.shy
-	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	wm := &WM{
 		shy: s
 	}
@@ -21,7 +21,7 @@ pub fn (b Boot) init() !&WM {
 pub fn (mut wm WM) init() ! {
 	mut s := wm.shy
 
-	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 
 	$if linux {
 		// Experiments
@@ -185,7 +185,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 }
 
 pub fn (mut wm WM) shutdown() ! {
-	wm.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	wm.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 	wm.root.close()!
 	// TODO test unsafe { free(wm) }
 
@@ -204,7 +204,7 @@ mut:
 }
 
 pub fn (mut w Window) init() ! {
-	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	w.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	s := w.shy
 
 	// $if opengl ? {
@@ -237,12 +237,12 @@ pub fn (mut w Window) init() ! {
 }
 
 pub fn (mut w Window) close() ! {
-	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	w.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 	w.shutdown()!
 }
 
 pub fn (mut w Window) shutdown() ! {
-	w.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	w.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 	for mut window in w.children {
 		window.close()!
 	}

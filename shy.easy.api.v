@@ -1,8 +1,6 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-//
-// This file defines (most of) Shy's public API
 module shy
 
 // import shy.vec
@@ -30,9 +28,9 @@ pub struct EasyText {
 pub fn (e Easy) text(et EasyText) {
 	gfx := e.shy.api.gfx
 
-	mut dt := gfx.draw.new_text()
+	mut dt := gfx.draw.text()
 	dt.begin()
-	mut t := dt.new()
+	mut t := dt.text_2d()
 	t.text = et.text
 	t.x = et.x
 	t.y = et.y
@@ -50,9 +48,9 @@ pub struct EasyRect {
 [inline]
 pub fn (e Easy) rect(er EasyRect) {
 	gfx := e.shy.api.gfx
-	mut d := gfx.draw.new_2d()
+	mut d := gfx.draw.shape_2d()
 	d.begin()
-	mut r := d.new_rect()
+	mut r := d.rect()
 	r.x = er.x
 	r.y = er.y
 	r.w = er.w

@@ -16,6 +16,7 @@ mut:
 }
 
 pub fn (mut gp Gamepad) init() ! {
+	gp.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	s := gp.shy
 	// Open the device
 	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
@@ -62,7 +63,7 @@ pub fn (mut gp Gamepad) init() ! {
 
 // init initializes input systems (keyboard, mouse etc.)
 pub fn (mut ip Input) init() ! {
-	ip.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	ip.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	s := ip.shy
 	// NOTE multiple mice and/or keyboards is apparently a near impossible thing.
 	// It's problems rooted deep in the underlying OS layers and device driver levels:
@@ -82,7 +83,9 @@ pub fn (mut ip Input) init() ! {
 	ip.init_input()!
 }
 
-pub fn (mut ip Input) shutdown() ! {}
+pub fn (mut ip Input) shutdown() ! {
+	ip.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+}
 
 fn (mut ip Input) init_input() ! {
 	mut s := ip.shy

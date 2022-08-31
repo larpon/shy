@@ -19,7 +19,7 @@ mut:
 pub fn (mut a API) init(shy_instance &Shy) ! {
 	mut s := unsafe { shy_instance }
 	a.shy = s
-	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	boot := Boot{
 		shy: s
 	}
@@ -28,6 +28,7 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	a.system = &System{
 		shy: s
 	}
+	a.system.init()!
 
 	a.audio = &Audio{
 		shy: s
@@ -45,7 +46,6 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 
 	a.audio.init()!
 	a.gfx.init()!
-	a.input.init()!
 
 	// Initialize font drawing sub system
 	a.fonts.init(FontsConfig{
@@ -55,20 +55,24 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 			'system': font.default()
 		}
 	})! // fonts.b.v
+
+	a.input.init()!
 }
 
 pub fn (mut a API) shutdown() ! {
 	s := a.shy
-	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 
 	a.input.shutdown()!
 	a.fonts.shutdown()!
 	a.gfx.shutdown()!
 	a.audio.shutdown()!
-
+	a.system.shutdown()!
 	a.wm.shutdown()!
 }
 
-fn (mut a API) on_end_of_frame() {
-	a.fonts.on_end_of_frame()
+fn (mut a API) on_frame_begin() {}
+
+fn (mut a API) on_frame_end() {
+	a.fonts.on_frame_end()
 }

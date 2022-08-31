@@ -18,7 +18,7 @@ const vet_tag = 'VET'
 
 struct Defaults {
 	fonts struct  {
-		preallocate u8 = 8
+		preallocate u8 = 4
 	}
 
 	font struct  {
@@ -97,7 +97,7 @@ pub fn (mut s Shy) init() ! {
 	$if debug ? {
 		s.log.set(.debug)
 	}
-	s.log.gdebug(@STRUCT + '.' + @FN, 'called')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	s.api.init(s)!
 	s.check_api()!
 	s.ready = true
@@ -107,7 +107,7 @@ pub fn (mut s Shy) init() ! {
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
-	s.log.gdebug(@STRUCT + '.' + @FN, 'bye bye')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 	unsafe { s.log.free() }
 }
 
@@ -308,7 +308,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			ctx.frame(1.0)
 		}
 		s.state.in_frame_call = false
-		unsafe { s.api.on_end_of_frame() }
+		s.api.on_frame_end()
 		s.api.gfx.end()
 		s.api.gfx.commit()
 		// display() / swap buffers

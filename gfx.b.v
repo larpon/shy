@@ -16,7 +16,7 @@ mut:
 
 pub fn (mut g GFX) init() ! {
 	mut s := g.shy
-	s.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	mut gfx_desc := gfx.Desc{
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		context_pool_size: 4 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
@@ -54,16 +54,16 @@ pub fn (mut g GFX) shutdown() ! {
 	gfx.shutdown()
 }
 
-pub fn (g GFX) commit() {
-	gfx.commit()
-}
-
 pub fn (mut g GFX) begin() {
 	s := g.shy
 	mut win := s.active_window()
 	// TODO multi window support
 	w, h := win.drawable_size()
 	gfx.begin_default_pass(&g.pass_action, w, h)
+}
+
+pub fn (g GFX) commit() {
+	gfx.commit()
 }
 
 pub fn (g GFX) end() {
