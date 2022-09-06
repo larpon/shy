@@ -4,12 +4,36 @@
 module shy
 
 import sdl
+// import manymouse as mm
 
 fn (mut s Shy) quit_requested() bool {
 	return sdl.quit_requested()
 }
 
 fn (mut s Shy) poll_event() ?Event {
+	// TODO set mouse positions in each mouse in input.mice
+	// is_multi_mice := s.api.input.mice.len > 1
+	/*
+	match event {
+			MouseMotionEvent {
+				m_id := u8(event.which) // TODO see input handling
+				mut mouse := s.api.input.mouse(m_id) or { return }
+				mouse.x = event.x
+			}
+			MouseButtonEvent {
+				m_id := u8(event.which) // TODO see input handling
+				mut mouse := s.api.input.mouse(m_id) or { return }
+				mouse.set_button_state(event.button, event.state)
+			}
+			KeyEvent {
+				k_id := u8(event.which) // TODO see input handling
+				mut kb := s.api.input.keyboard(k_id) or { return }
+				kb.set_key_state(event.key_code, event.state)
+			}
+			else{}
+		}
+	*/
+
 	evt := sdl.Event{}
 	if 0 < sdl.poll_event(&evt) {
 		match evt.@type {
@@ -49,20 +73,30 @@ fn (mut s Shy) poll_event() ?Event {
 				}
 			}
 			.mousemotion {
+				// if !is_multi_mice {
 				buttons := map_sdl_button_mask_to_shy_mouse_buttons(evt.motion.state)
 				win := s.active_window()
+
+				which := shy.default_mouse_id
+				mut mouse := s.api.input.mouse(which) or { panic(err) }
+				mouse.x = evt.motion.x
+				mouse.y = evt.motion.y
+				// mouse.set_button_state(event.button, event.state)
+
 				return MouseMotionEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO multi-window support
-					which: evt.motion.which // TODO use own ID system??
+					which: which // evt.motion.which // TODO use own ID system??
 					buttons: buttons
 					x: evt.motion.x
 					y: evt.motion.y
 					rel_x: evt.motion.xrel
 					rel_y: evt.motion.yrel
 				}
+				// }
 			}
 			.mousebuttonup, .mousebuttondown {
+				// if !is_multi_mice {
 				mut state := ButtonState.down
 				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
 				button := map_sdl_button_to_shy_mouse_button(evt.button.button)
@@ -70,15 +104,17 @@ fn (mut s Shy) poll_event() ?Event {
 				return MouseButtonEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
-					which: evt.button.which // TODO use own ID system??
+					which: shy.default_mouse_id // evt.button.which // TODO use own ID system??
 					button: button
 					state: state
 					clicks: evt.button.clicks
 					x: evt.button.x
 					y: evt.button.y
 				}
+				// }
 			}
 			.mousewheel {
+				// if !is_multi_mice {
 				mut dir := MouseWheelDirection.normal
 				dir = if evt.wheel.direction == u32(sdl.MouseWheelDirection.normal) {
 					.normal
@@ -89,11 +125,12 @@ fn (mut s Shy) poll_event() ?Event {
 				return MouseWheelEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
-					which: evt.wheel.which // TODO use own ID system??
+					which: shy.default_mouse_id // evt.wheel.which // TODO use own ID system??
 					x: evt.wheel.x
 					y: evt.wheel.y
 					direction: dir
 				}
+				// }
 			}
 			else {
 				return UnkownEvent{
@@ -101,26 +138,114 @@ fn (mut s Shy) poll_event() ?Event {
 				}
 			}
 		}
+	}
 
-		/*
-		$if debug {
-			t := evt.@type
-			match t {
-				.mousemotion {
-					s.log.gln(.event | .flood, 'passing $t')
+	// TODO find out what coordinate positions that ManyMouse actually uses?
+	/*
+	if is_multi_mice {
+		mut event := mm.Event{}
+		if mm.poll_event(&event) > 0 {
+			// xy := if event.item == 0 { 'x' } else { 'y' }
+			match event.@type {
+				.relmotion {
+					// println('Mouse #$event.device relative motion $xy $event.value')
+					which := u8(event.device)
+					mut mouse := s.api.input.mouse(which) or { panic(err) }
+					match event.item {
+						0 {
+							mouse.x += event.value
+						}
+						1 {
+							mouse.y += event.value
+						}
+						else{}
+					}
+					win := s.active_window()
+					return MouseMotionEvent{
+						timestamp: s.ticks()
+						window_id: win.id // TODO multi-window support
+						which: which
+						// buttons: buttons
+						x: mouse.x
+						y: mouse.y
+						rel_x: if event.item == 0 {event.value } else {0}
+						rel_y: if event.item != 0 {event.value } else {0}
+					}
 				}
-				.keyup, .keydown {
-					shy_key_code := sdl.KeyCode(evt.key.keysym.sym)
-					s.log.gln(.event | .input, 'passing $t ($shy_key_code)')
+				.absmotion {
+					// println('Mouse #$event.device absolute motion $xy $event.value')
+					win := s.active_window()
+					which := u8(event.device)
+
+					val := f32(event.value - event.minval)
+					max_val := f32(event.maxval - event.minval)
+					mut mouse := s.api.input.mouse(which) or { panic(err) }
+					match event.item {
+						0 {
+							mouse.x = int(val / max_val) //event.value
+						}
+						1 {
+							mouse.y = int(val / max_val) //event.value
+						}
+						else{}
+					}
+					return MouseMotionEvent{
+						timestamp: s.ticks()
+						window_id: win.id // TODO multi-window support
+						which: which // evt.motion.which // TODO use own ID system??
+						// buttons: buttons
+						x: mouse.x //if event.item == 0 {event.value } else {0}
+						y: mouse.y //if event.item != 0 {event.value } else {0}
+
+						//rel_x: evt.motion.xrel
+						//rel_y: evt.motion.yrel
+					}
+				}
+				.button {
+					// direction := if event.value == 0 { 'up' } else { 'down' }
+					//println('Mouse #$event.device button $event.item $direction')
+					mut state := ButtonState.down
+					state = if event.value == 0 { .up } else { .down }
+					//button := map_sdl_button_to_shy_mouse_button(evt.button.button)
+					win := s.active_window()
+					return MouseButtonEvent{
+						timestamp: s.ticks()
+						window_id: win.id // TODO
+						which: u16(event.device) // evt.button.which // TODO use own ID system??
+						// button: button
+						state: state
+						//clicks: evt.button.clicks
+						//x: evt.button.x
+						//y: evt.button.y
+					}
+				}
+				.scroll {
+					wheel := if event.item == 0 { 'vertical' } else { 'horizontal' }
+					mut direction := if event.value < 0 { 'down' } else { 'up' }
+					if event.item != 0 {
+						direction = if event.value < 0 { 'right' } else { 'left' }
+					}
+					return UnkownEvent{
+						timestamp: s.ticks()
+					}
+					// println('Mouse #$event.device wheel $wheel $direction')
+				}
+				.disconnect {
+					// println('Mouse #$event.device disconnected')
+					return UnkownEvent{
+						timestamp: s.ticks()
+					}
 				}
 				else {
-					s.log.pln(.event, 'passing $t')
+					// println('Mouse #$event.device unhandled event type $event.value')
+					return UnkownEvent{
+						timestamp: s.ticks()
+					}
 				}
 			}
-		}*/
-
-		return none // Event(evt)
+		}
 	}
+	*/
 	return none
 }
 

@@ -10,26 +10,7 @@ import shy.log { Log }
 
 pub const null = unsafe { nil }
 
-pub const (
-	defaults = Defaults{}
-)
-
 const vet_tag = 'VET'
-
-struct Defaults {
-	fonts struct  {
-		preallocate u8 = 4
-	}
-
-	font struct  {
-		name string = 'default'
-		size f32    = 20
-	}
-
-	audio struct  {
-		engines u8 = 1
-	}
-}
 
 //
 pub enum ButtonState {
@@ -107,8 +88,7 @@ pub fn (mut s Shy) init() ! {
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
-	s.log.gdebug(@STRUCT + '.' + @FN, 'bye')
-	unsafe { s.log.free() }
+	s.log.shutdown()!
 }
 
 // new returns a new, initialized, `Shy` struct allocated in heap memory.
@@ -130,6 +110,7 @@ pub fn run<T>(mut ctx T, config Config) ! {
 
 	ctx.quit()
 	shy_instance.shutdown()!
+	unsafe { free(shy_instance) }
 }
 
 fn main_loop<T>(mut ctx T, mut s Shy) ! {
@@ -321,18 +302,6 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 fn (mut s Shy) process_events<T>(mut ctx T) {
 	for {
 		event := s.poll_event() or { break }
-
-		if event is MouseButtonEvent {
-			m_id := u32(0) // event.which // TODO see input handling
-			mut mouse := s.api.input.mouse(m_id) or { return }
-			mouse.set_button_state(event.button, event.state)
-		}
-		if event is KeyEvent {
-			k_id := u32(0) // event.which // TODO see input handling
-			mut kb := s.api.input.keyboard(k_id) or { return }
-			kb.set_key_state(event.key_code, event.state)
-		}
-
 		ctx.event(event)
 	}
 }

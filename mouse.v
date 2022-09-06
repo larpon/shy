@@ -3,6 +3,8 @@
 // that can be found in the LICENSE file.
 module shy
 
+pub const default_mouse_id = u8(0)
+
 pub enum MouseButton {
 	left
 	right
@@ -32,7 +34,10 @@ pub enum MouseWheelDirection {
 
 pub struct Mouse {
 	ShyStruct
+	id u8
 mut:
+	x  int
+	y  int
 	bs map[int]bool // button states
 }
 
@@ -48,7 +53,7 @@ pub fn (mut m Mouse) set_button_state(button MouseButton, button_state ButtonSta
 }
 
 [inline]
-pub fn (m Mouse) is_button_down(button MouseButton) bool {
+pub fn (m &Mouse) is_button_down(button MouseButton) bool {
 	if state := m.bs[int(button)] {
 		return state
 	}

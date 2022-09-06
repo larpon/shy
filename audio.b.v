@@ -34,8 +34,7 @@ pub fn (mut a Audio) init() ! {
 }
 
 pub fn (mut a Audio) new_engine() !&AudioEngine {
-	a.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
-	// Initialize default playback engine
+	a.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data')
 	ma_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
@@ -61,7 +60,9 @@ pub fn (mut a Audio) shutdown() ! {
 }
 
 pub fn (a &Audio) engine(id u8) !&AudioEngine {
-	return a.engines[id]
+	return a.engines[id] or {
+		return error(@STRUCT + '.' + @FN + ': engine with id $id does not exist')
+	}
 }
 
 // AudioEngine implementation

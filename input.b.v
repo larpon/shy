@@ -4,6 +4,7 @@
 module shy
 
 import sdl
+import manymouse as mm
 
 // TODO move
 pub struct Gamepad {
@@ -61,19 +62,56 @@ pub fn (mut gp Gamepad) init() ! {
 	sdl.haptic_close(haptic)
 }
 
+// scan scans for new input devices.
+pub fn (mut ip Input) scan() ! {
+	// TODO
+}
+
 // init initializes input systems (keyboard, mouse etc.)
 pub fn (mut ip Input) init() ! {
 	ip.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
 	s := ip.shy
-	// NOTE multiple mice and/or keyboards is apparently a near impossible thing.
+
+	mut mice_support := s.config.input.mice
+	if mice_support {
+		available_mice := mm.reinit()
+		s.log.ginfo(@STRUCT + '.' + @FN, 'enabling support for multiple mice. $available_mice is currently available')
+		if available_mice < 0 {
+			mm.quit()
+			s.log.gerror(@STRUCT + '.' + @FN, 'error initializing ManyMouse. Falling back to unified mouse input')
+		} else {
+			driver_name := unsafe { cstring_to_vstring(mm.driver_name()) }
+			s.log.gdebug(@STRUCT + '.' + @FN, 'ManyMouse driver: $driver_name')
+
+			if available_mice == 0 {
+				mm.quit()
+				s.log.gerror(@STRUCT + '.' + @FN, 'no mice detected.')
+			} else {
+				// TODO expose ManyMouse max (default is 256)!
+				for i := u8(0); i < available_mice; i++ {
+					device_name := unsafe { cstring_to_vstring(mm.device_name(i)) }
+					s.log.gdebug(@STRUCT + '.' + @FN, 'ManyMouse device $i / $device_name')
+					mut mouse := &Mouse{
+						shy: s
+						id: i
+					}
+					mouse.init()!
+					ip.mice[i] = mouse // TODO NOTE see process_events also
+				}
+			}
+		}
+	} else {
+		mut mouse := &Mouse{
+			shy: s
+			id: shy.default_mouse_id
+		}
+		mouse.init()!
+		ip.mice[shy.default_mouse_id] = mouse // TODO NOTE see process_events also
+	}
+
+	// NOTE multiple keyboards is apparently a near impossible thing??
 	// It's problems rooted deep in the underlying OS layers and device driver levels:
 	// https://discourse.libsdl.org/t/sdl-x-org-and-multiple-mice/12298/15
-	mut mouse := &Mouse{
-		shy: s
-	}
-	mouse.init()!
-	ip.mice[0] = mouse // TODO NOTE see process_events also
-
 	mut keyboard := &Keyboard{
 		shy: s
 	}

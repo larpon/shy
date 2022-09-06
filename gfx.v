@@ -33,7 +33,6 @@ pub fn (d &Draw) text() DrawText {
 	return dt
 }
 
-/*
 pub fn (d &Draw) image() DrawImage {
 	s := d.shy
 	mut di := DrawImage{
@@ -46,4 +45,3 @@ pub fn (d &Draw) image() DrawImage {
 	}
 	return di
 }
-*/

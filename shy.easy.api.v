@@ -140,3 +140,28 @@ pub fn (es &EasySound) stop() {
 	es.engine.stop(es.id)
 	es.engine.set_looping(es.id, es.loop)
 }
+
+// Image drawing sub-system
+
+[params]
+pub struct EasyImage {
+	Rect
+pub:
+	path string
+}
+
+[inline]
+pub fn (e Easy) image(ei EasyImage) {
+	gfx := e.shy.api.gfx
+	mut d := gfx.draw.image()
+	d.begin()
+	/*
+	mut r := d.rect()
+	r.x = ei.x
+	r.y = ei.y
+	r.w = ei.w
+	r.h = ei.h
+	r.draw()
+	*/
+	d.end()
+}

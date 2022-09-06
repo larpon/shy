@@ -7,16 +7,16 @@ module shy
 pub struct Input {
 	ShyStruct
 mut:
-	mice      map[u32]&Mouse
-	keyboards map[u32]&Keyboard
+	mice      map[u8]&Mouse
+	keyboards map[u8]&Keyboard
 	pads      []&Gamepad
 }
 
-pub fn (ip Input) mouse(n u32) !&Mouse {
+pub fn (ip Input) mouse(n u8) !&Mouse {
 	return ip.mice[n]
 }
 
-pub fn (ip Input) keyboard(n u32) !&Keyboard {
+pub fn (ip Input) keyboard(n u8) !&Keyboard {
 	return ip.keyboards[n]
 }
 
@@ -37,10 +37,10 @@ pub fn (k Keyboard) is_key_down(keycode KeyCode) bool {
 pub fn (mut k Keyboard) set_key_state(key_code KeyCode, button_state ButtonState) {
 	match button_state {
 		.up {
-			k.keys[int(key_code)] = false
+			k.keys[i32(key_code)] = false
 		}
 		.down {
-			k.keys[int(key_code)] = true
+			k.keys[i32(key_code)] = true
 		}
 	}
 }

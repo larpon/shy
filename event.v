@@ -56,7 +56,7 @@ pub struct MouseMotionEvent {
 pub:
 	timestamp u64
 	window_id u32 // The window with mouse focus, if any
-	which     u32 // The mouse id
+	which     u16 // The mouse id
 	buttons   MouseButtons // The current button state
 	x         int // X coordinate, relative to window
 	y         int // Y coordinate, relative to window
@@ -68,7 +68,7 @@ pub struct MouseButtonEvent {
 pub:
 	timestamp u64
 	window_id u32 // The window with mouse focus, if any
-	which     u32 // The mouse id
+	which     u16 // The mouse id
 	button    MouseButton // The mouse button index
 	state     ButtonState
 	clicks    u8  // 1 for single-click, 2 for double-click, etc.
@@ -80,7 +80,7 @@ pub struct MouseWheelEvent {
 pub:
 	timestamp u64
 	window_id u32 // The window with mouse focus, if any
-	which     u32 // The mouse id
+	which     u16 // The mouse id
 	x         int // The amount scrolled horizontally, positive to the right and negative to the left
 	y         int // The amount scrolled vertically, positive away from the user and negative toward the user
 	direction MouseWheelDirection // When .flipped the values in .x and .y will be opposite. Multiply by -1 to change them back

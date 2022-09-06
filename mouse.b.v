@@ -6,7 +6,7 @@ module shy
 import sdl
 
 pub fn (mut m Mouse) init() ! {
-	m.shy.log.gdebug(@STRUCT + '.' + 'lifecycle', @FN + ' called')
+	m.shy.log.gdebug(@STRUCT + '.' + @FN, '$m.id hi')
 }
 
 pub fn (mut m Mouse) show() {
@@ -24,6 +24,7 @@ pub fn (m Mouse) position(position_type MousePositionType) (int, int) {
 			mut mx := 0
 			mut my := 0
 			sdl.get_global_mouse_state(&mx, &my)
+			// println('global sdl: $mx,$my mouse: $m.x,$m.y')
 			return mx, my
 		}
 		.window {

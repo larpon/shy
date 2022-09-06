@@ -10,6 +10,7 @@ struct API {
 mut:
 	wm     &WM
 	gfx    &GFX
+	assets &Assets
 	audio  &Audio
 	input  &Input
 	system &System
@@ -35,6 +36,11 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	}
 
 	a.wm.init()!
+
+	a.assets = &Assets{
+		shy: s
+	}
+	a.assets.init()!
 
 	a.gfx = &GFX{
 		shy: s
@@ -64,11 +70,27 @@ pub fn (mut a API) shutdown() ! {
 	s.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 
 	a.input.shutdown()!
+	a.assets.shutdown()!
 	a.fonts.shutdown()!
 	a.gfx.shutdown()!
 	a.audio.shutdown()!
 	a.system.shutdown()!
 	a.wm.shutdown()!
+	unsafe { a.free() }
+}
+
+[unsafe]
+fn (mut a API) free() {
+	a.shy.log.gdebug(@STRUCT + '.' + @FN, '')
+	unsafe {
+		free(a.input)
+		free(a.assets)
+		free(a.fonts)
+		free(a.gfx)
+		free(a.audio)
+		free(a.system)
+		free(a.wm)
+	}
 }
 
 fn (mut a API) on_frame_begin() {}

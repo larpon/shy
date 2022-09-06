@@ -394,3 +394,34 @@ pub fn (r DrawShape2DRect) draw() {
 
 	sgp.flush()
 }
+
+pub struct DrawImage {
+	ShyFrame
+}
+
+pub fn (mut di DrawImage) begin() {
+	di.ShyFrame.begin()
+
+	win := di.shy.api.wm.active_window()
+	w, h := win.drawable_size()
+	// ratio := f32(w)/f32(h)
+
+	// Begin recording draw commands for a frame buffer of size (width, height).
+	sgp.begin(w, h)
+
+	// Set frame buffer drawing region to (0,0,width,height).
+	sgp.viewport(0, 0, w, h)
+	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
+	// sgp.project(-ratio, ratio, 1.0, -1.0)
+	// sgp.project(0, 0, w, h)
+
+	sgp.reset_project()
+}
+
+pub fn (mut di DrawImage) end() {
+	di.ShyFrame.end()
+	// Dispatch all draw commands to Sokol GFX.
+	sgp.flush()
+	// Finish a draw command queue, clearing it.
+	sgp.end()
+}

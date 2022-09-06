@@ -22,7 +22,7 @@ pub fn (mut a App) frame(dt f64) {}
 
 pub fn (mut a App) event(e Event) {}
 
-// Simple app skeleton for easy embedding in examples
+// Simple app skeleton for easy embedding in e.g. examples
 pub struct EasyApp {
 	App
 mut:

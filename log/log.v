@@ -270,7 +270,7 @@ pub fn (l &Log) gdebug(group string, str string) {
 }
 
 //
-pub fn (l &Log) free() {
-	// l.gdebug(@STRUCT+'.'+@FN,'freeing buffer...')
+pub fn (l &Log) shutdown() ! {
+	l.gdebug(@STRUCT + '.' + @FN, 'bye')
 	unsafe { l.buffer.free() }
 }
