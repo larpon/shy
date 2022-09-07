@@ -4,6 +4,7 @@
 module shy
 
 import sokol.gfx
+import sokol.sgl
 import sgp
 
 pub struct GFX {
@@ -12,6 +13,7 @@ mut:
 	draw &Draw = shy.null
 	// sokol
 	pass_action gfx.PassAction
+	image_cache map[string]Image
 }
 
 pub fn (mut g GFX) init() ! {
@@ -30,6 +32,15 @@ pub fn (mut g GFX) init() ! {
 	color := s.config.window.color.as_f32()
 	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
 	g.pass_action = pass_action
+
+	// sokol_gl is used by the font and image system
+	sample_count := s.config.render.msaa
+	sgl_desc := &sgl.Desc{
+		context_pool_size: 2 * 512 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		pipeline_pool_size: 2 * 1024 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		sample_count: sample_count
+	}
+	sgl.setup(sgl_desc)
 
 	// Initialize Sokol GP which is used for shape drawing.
 	// TODO Adjust the size of command buffers.

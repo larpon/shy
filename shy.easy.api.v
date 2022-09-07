@@ -147,7 +147,7 @@ pub fn (es &EasySound) stop() {
 pub struct EasyImage {
 	Rect
 pub:
-	path string
+	uri string
 }
 
 [inline]
@@ -164,4 +164,15 @@ pub fn (e Easy) image(ei EasyImage) {
 	r.draw()
 	*/
 	d.end()
+}
+
+// Assets
+pub fn (e &Easy) load(ao AssetOptions) ! {
+	mut gfx := unsafe { e.shy.api.gfx }
+	if _ := gfx.image_cache[ao.uri] {
+		return
+	}
+	mut assets := e.shy.assets()
+	mut asset := assets.load(ao)!
+	gfx.image_cache[ao.uri] = asset.to_image()!
 }

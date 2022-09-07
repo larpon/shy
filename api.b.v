@@ -31,11 +31,12 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	}
 	a.system.init()!
 
+	a.wm.init()!
+
 	a.audio = &Audio{
 		shy: s
 	}
-
-	a.wm.init()!
+	a.audio.init()!
 
 	a.assets = &Assets{
 		shy: s
@@ -45,12 +46,6 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	a.gfx = &GFX{
 		shy: s
 	}
-
-	a.input = &Input{
-		shy: s
-	}
-
-	a.audio.init()!
 	a.gfx.init()!
 
 	// Initialize font drawing sub system
@@ -62,16 +57,18 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 		}
 	})! // fonts.b.v
 
+	a.input = &Input{
+		shy: s
+	}
 	a.input.init()!
 }
 
 pub fn (mut a API) shutdown() ! {
-	s := a.shy
-	s.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	a.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
 
 	a.input.shutdown()!
-	a.assets.shutdown()!
 	a.fonts.shutdown()!
+	a.assets.shutdown()!
 	a.gfx.shutdown()!
 	a.audio.shutdown()!
 	a.system.shutdown()!

@@ -45,13 +45,13 @@ struct ShyFrame {
 
 [if !prod]
 fn (mut sf ShyFrame) begin() {
-	assert sf.shy.state.in_frame_call, @STRUCT + '.' + @FN +
+	assert sf.shy.state.in_frame_call, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 
 [if !prod]
 fn (mut sf ShyFrame) end() {
-	assert sf.shy.state.in_frame_call, @STRUCT + '.' + @FN +
+	assert sf.shy.state.in_frame_call, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 

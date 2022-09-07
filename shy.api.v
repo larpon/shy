@@ -31,6 +31,11 @@ pub fn (s Shy) performance_frequency() u64 {
 }
 
 [inline]
+pub fn (s Shy) assets() &Assets {
+	return s.api.assets
+}
+
+[inline]
 pub fn (s Shy) draw() &Draw {
 	return s.api.gfx.draw
 }

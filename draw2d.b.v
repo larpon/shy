@@ -106,7 +106,7 @@ pub fn (t Draw2DText) draw() {
 	fc := t.fc
 	font_context := fc.fsc
 
-	assert !isnil(font_context), @STRUCT + '.' + @FN + ': no font context'
+	assert !isnil(font_context), '${@STRUCT}.${@FN}' + ': no font context'
 
 	// color := sfons.rgba(255, 255, 255, 255)
 	if t.font != shy.defaults.font.name {
@@ -425,3 +425,37 @@ pub fn (mut di DrawImage) end() {
 	// Finish a draw command queue, clearing it.
 	sgp.end()
 }
+
+/*
+pub fn (di DrawImage) {
+
+	u0 := f32(0.0)
+	v0 := f32(0.0)
+	u1 := f32(1.0)
+	v1 := f32(1.0)
+	x0 := f32(0)
+	y0 := f32(0)
+	x1 := f32(w)
+	y1 := f32(h)
+
+	sgl.push_matrix()
+
+	sgl.enable_texture()
+	sgl.texture(img.sg_image)
+	sgl.translate(f32(sx), f32(sy), 0)
+	// sgl.c4b(p.color.r, p.color.g, p.color.b, p.color.a)
+	sgl.c4b(255, 255, 255, 255)
+
+	sgl.begin_quads()
+	sgl.v2f_t2f(x0, y0, u0, v0)
+	sgl.v2f_t2f(x1, y0, u1, v0)
+	sgl.v2f_t2f(x1, y1, u1, v1)
+	sgl.v2f_t2f(x0, y1, u0, v1)
+	sgl.end()
+
+	sgl.translate(-f32(sx), -f32(sy), 0)
+	sgl.disable_texture()
+
+	sgl.pop_matrix()
+}
+*/

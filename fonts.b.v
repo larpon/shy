@@ -40,7 +40,7 @@ fn (mut fs Fonts) load_font(name string, path string) ! {
 		fs.font_data[name] = bytes
 		fs.shy.log.ginfo(@STRUCT + '.' + @FN, 'loaded $name: "$path"')
 	} else {
-		return error(@STRUCT + '.' + @FN + ': could not load $name "$path"')
+		return error('${@STRUCT}.${@FN}' + ': could not load $name "$path"')
 	}
 }
 
@@ -48,14 +48,6 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	fs.shy = config.shy
 	mut s := fs.shy
 	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
-
-	sample_count := fs.shy.config.render.msaa
-	sgl_desc := &sgl.Desc{
-		context_pool_size: 2 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		pipeline_pool_size: 2 * 1024 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		sample_count: sample_count
-	}
-	sgl.setup(sgl_desc)
 
 	// Load the Shy default font
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
@@ -68,16 +60,18 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 		}
 	}
 
-	sgl_context_desc := sgl.ContextDesc{
-		sample_count: sample_count
-	} // TODO apply values for max_vertices etc.
-
 	s.log.gdebug(@STRUCT, 'pre-allocating $config.prealloc_contexts contexts...')
 	$if shy_vet ? {
 		if config.prealloc_contexts > shy.defaults.fonts.preallocate {
 			s.vet_issue(.warn, .misc, @STRUCT + '.' + @FN, ' keep in mind that pre-allocating many font contexts is quite memory consuming')
 		}
 	}
+
+	sample_count := fs.shy.config.render.msaa
+	sgl_context_desc := sgl.ContextDesc{
+		sample_count: sample_count
+	} // TODO apply values for max_vertices etc.
+
 	for _ in 0 .. config.prealloc_contexts {
 		fons_context := sfons.create(1024, 1024, 1)
 		sgl_context := sgl.make_context(&sgl_context_desc)
@@ -128,7 +122,7 @@ fn (mut fs Fonts) get_context() &FontContext {
 			return fc
 		}
 	}
-	assert false, @STRUCT + '.' + @FN + ': no available font contexts'
+	assert false, '${@STRUCT}.${@FN}' + ': no available font contexts'
 	fs.shy.log.gcritical(@STRUCT + '.' + @FN, 'no available font contexts, expect crash and burn...')
 	return &FontContext{
 		fsc: unsafe { nil }

@@ -27,6 +27,7 @@ pub struct EasyApp {
 	App
 mut:
 	easy   &Easy     = shy.null
+	assets &Assets   = shy.null
 	draw   &Draw     = shy.null
 	mouse  &Mouse    = shy.null
 	kbd    &Keyboard = shy.null
@@ -38,7 +39,8 @@ pub fn (mut a EasyApp) init() ! {
 		shy: a.shy
 	}
 	a.easy.init()!
-	a.draw = a.shy.api.gfx.draw
+	a.assets = a.shy.assets()
+	a.draw = a.shy.draw()
 	a.mouse = a.shy.api.input.mouse(0)!
 	a.kbd = a.shy.api.input.keyboard(0)!
 	a.window = a.shy.api.wm.active_window()

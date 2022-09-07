@@ -61,7 +61,7 @@ pub fn (mut a Audio) shutdown() ! {
 
 pub fn (a &Audio) engine(id u8) !&AudioEngine {
 	return a.engines[id] or {
-		return error(@STRUCT + '.' + @FN + ': engine with id $id does not exist')
+		return error('${@STRUCT}.${@FN}' + ': engine with id $id does not exist')
 	}
 }
 
@@ -87,7 +87,7 @@ pub fn (mut e AudioEngine) shutdown() ! {
 fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
 	sound := &ma.Sound{}
 	if ma.sound_init_from_file(ae.e, path.str, 0, ma.null, ma.null, sound) != .success {
-		return error(@STRUCT + '.' + @FN + ' failed to load sound "$path"')
+		return error('${@STRUCT}.${@FN}' + ' failed to load sound "$path"')
 	}
 	return sound
 }
