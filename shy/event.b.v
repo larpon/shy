@@ -61,9 +61,9 @@ fn (mut s Shy) poll_event() ?Event {
 				win := s.active_window()
 
 				which := default_mouse_id
-				mut mouse := s.api.input.mouse(which) or { panic(err) }
-				mouse.x = evt.motion.x
-				mouse.y = evt.motion.y
+				// mut mouse := s.api.input.mouse(which) or { panic(err) }
+				// mouse.x = evt.motion.x
+				// mouse.y = evt.motion.y
 				// mouse.set_button_state(event.button, event.state)
 
 				shy_event = MouseMotionEvent{
@@ -129,7 +129,6 @@ fn (mut s Shy) poll_event() ?Event {
 	}
 
 	match shy_event {
-		/*
 		MouseMotionEvent {
 			event := shy_event as MouseMotionEvent
 			m_id := u8(event.which) // TODO see input handling
@@ -144,7 +143,7 @@ fn (mut s Shy) poll_event() ?Event {
 			if mut mouse := s.api.input.mouse(m_id) {
 				mouse.set_button_state(event.button, event.state)
 			}
-		}*/
+		}
 		KeyEvent {
 			event := shy_event as KeyEvent
 			k_id := u8(event.which) // TODO see input handling

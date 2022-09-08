@@ -34,11 +34,13 @@ pub enum MouseWheelDirection {
 
 pub struct Mouse {
 	ShyStruct
+pub:
 	id u8
 mut:
-	x  int
-	y  int
 	bs map[int]bool // button states
+pub mut:
+	x int
+	y int
 }
 
 pub fn (mut m Mouse) set_button_state(button MouseButton, button_state ButtonState) {
