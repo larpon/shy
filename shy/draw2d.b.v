@@ -402,6 +402,7 @@ pub struct DrawImage {
 pub fn (mut di DrawImage) begin() {
 	di.ShyFrame.begin()
 
+	/*
 	win := di.shy.active_window()
 	w, h := win.drawable_size()
 
@@ -410,24 +411,49 @@ pub fn (mut di DrawImage) begin() {
 	// sgl.set_context(fc.sgl)
 	sgl.matrix_mode_projection()
 	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+	*/
+
+	win := di.shy.api.wm.active_window()
+	w, h := win.drawable_size()
+	// ratio := f32(w)/f32(h)
+
+	// Begin recording draw commands for a frame buffer of size (width, height).
+	sgp.begin(w, h)
+
+	// Set frame buffer drawing region to (0,0,width,height).
+	sgp.viewport(0, 0, w, h)
+	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
+	// sgp.project(-ratio, ratio, 1.0, -1.0)
+	// sgp.project(0, 0, w, h)
+
+	sgp.reset_project()
 }
 
 pub fn (mut di DrawImage) end() {
 	di.ShyFrame.end()
+
+	/*
 	// Finish a draw command queue, clearing it.
 	sgl.draw()
+	*/
+
+	// Dispatch all draw commands to Sokol GFX.
+	sgp.flush()
+	// Finish a draw command queue, clearing it.
+	sgp.end()
 }
 
-pub fn (di DrawImage) image_2d(uri string) Draw2DImage {
-	mut gfx := unsafe { di.shy.api.gfx }
-	if image := gfx.image_cache[uri] {
-		return Draw2DImage{
-			image: image
-		}
+pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
+	return Draw2DImage{
+		w: image.width
+		h: image.height
+		image: image
 	}
+	/*
 	// TODO return small default image?
 	panic('${@STRUCT}.${@FN}: TODO use stand-in Image here instead of panicing (image $uri was not loaded/cached)')
 	return Draw2DImage{}
+	*/
 }
 
 pub struct Draw2DImage {
@@ -441,6 +467,37 @@ pub mut:
 	offset vec.Vec2<f32>
 }
 
+[inline]
+pub fn (i Draw2DImage) draw() {
+	// sgp.set_blend_mode(sgp.BlendMode)
+	// sgp.reset_blend_mode()
+
+	col := i.color.as_f32()
+
+	sgp.set_color(col.r, col.g, col.b, col.a)
+	sgp.set_image(0, i.image.gfx_image)
+
+	/*
+	dst := sgp.Rect{
+		x: i.x
+		y: i.y
+		w: i.w
+		h: i.h
+	}
+	src := sgp.Rect{
+		x: 0
+		y: 0
+		w: 512/2
+		h: 512/2
+	}
+    sgp.draw_textured_rect_ex(0, dst, src)
+	*/
+
+	sgp.draw_textured_rect(i.x, i.y, i.w, i.h)
+	sgp.reset_image(0)
+}
+
+/*
 [inline]
 pub fn (i Draw2DImage) draw() {
 	u0 := f32(0.0)
@@ -471,3 +528,4 @@ pub fn (i Draw2DImage) draw() {
 
 	sgl.pop_matrix()
 }
+*/
