@@ -19,6 +19,7 @@ pub:
 pub struct KeyEvent {
 pub:
 	timestamp u64
+	which     u16 // The keyboard id
 	state     ButtonState
 	key_code  KeyCode
 }

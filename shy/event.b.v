@@ -13,26 +13,9 @@ fn (mut s Shy) quit_requested() bool {
 fn (mut s Shy) poll_event() ?Event {
 	// TODO set mouse positions in each mouse in input.mice
 	// is_multi_mice := s.api.input.mice.len > 1
-	/*
-	match event {
-			MouseMotionEvent {
-				m_id := u8(event.which) // TODO see input handling
-				mut mouse := s.api.input.mouse(m_id) or { return }
-				mouse.x = event.x
-			}
-			MouseButtonEvent {
-				m_id := u8(event.which) // TODO see input handling
-				mut mouse := s.api.input.mouse(m_id) or { return }
-				mouse.set_button_state(event.button, event.state)
-			}
-			KeyEvent {
-				k_id := u8(event.which) // TODO see input handling
-				mut kb := s.api.input.keyboard(k_id) or { return }
-				kb.set_key_state(event.key_code, event.state)
-			}
-			else{}
-		}
-	*/
+	mut shy_event := Event(UnkownEvent{
+		timestamp: s.ticks()
+	})
 
 	evt := sdl.Event{}
 	if 0 < sdl.poll_event(&evt) {
@@ -44,7 +27,7 @@ fn (mut s Shy) poll_event() ?Event {
 				wevid := sdl.WindowEventID(int(evt.window.event))
 				win := s.active_window()
 				if wevid == .resized {
-					return WindowEvent{
+					shy_event = WindowEvent{
 						timestamp: s.ticks()
 						kind: .resized
 						window: win // TODO multi-window support
@@ -52,13 +35,13 @@ fn (mut s Shy) poll_event() ?Event {
 				}
 			}
 			.quit {
-				return QuitEvent{
+				shy_event = QuitEvent{
 					timestamp: s.ticks()
 				}
 			}
 			.keyup {
 				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
-				return KeyEvent{
+				shy_event = KeyEvent{
 					timestamp: s.ticks()
 					state: .up
 					key_code: shy_key_code
@@ -66,7 +49,7 @@ fn (mut s Shy) poll_event() ?Event {
 			}
 			.keydown {
 				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
-				return KeyEvent{
+				shy_event = KeyEvent{
 					timestamp: s.ticks()
 					state: .down
 					key_code: KeyCode(int(shy_key_code))
@@ -83,7 +66,7 @@ fn (mut s Shy) poll_event() ?Event {
 				mouse.y = evt.motion.y
 				// mouse.set_button_state(event.button, event.state)
 
-				return MouseMotionEvent{
+				shy_event = MouseMotionEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO multi-window support
 					which: which // evt.motion.which // TODO use own ID system??
@@ -101,7 +84,7 @@ fn (mut s Shy) poll_event() ?Event {
 				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
 				button := map_sdl_button_to_shy_mouse_button(evt.button.button)
 				win := s.active_window()
-				return MouseButtonEvent{
+				shy_event = MouseButtonEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
 					which: default_mouse_id // evt.button.which // TODO use own ID system??
@@ -122,7 +105,7 @@ fn (mut s Shy) poll_event() ?Event {
 					.flipped
 				}
 				win := s.active_window()
-				return MouseWheelEvent{
+				shy_event = MouseWheelEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
 					which: default_mouse_id // evt.wheel.which // TODO use own ID system??
@@ -133,11 +116,43 @@ fn (mut s Shy) poll_event() ?Event {
 				// }
 			}
 			else {
-				return UnkownEvent{
+				shy_event = UnkownEvent{
 					timestamp: s.ticks()
 				}
 			}
 		}
+	}
+
+	// Important
+	if shy_event is UnkownEvent {
+		return none
+	}
+
+	match shy_event {
+		/*
+		MouseMotionEvent {
+			event := shy_event as MouseMotionEvent
+			m_id := u8(event.which) // TODO see input handling
+			if mut mouse := s.api.input.mouse(m_id) {
+				mouse.x = event.x
+				mouse.y = event.y
+			}
+		}
+		MouseButtonEvent {
+			event := shy_event as MouseButtonEvent
+			m_id := u8(event.which) // TODO see input handling
+			if mut mouse := s.api.input.mouse(m_id) {
+				mouse.set_button_state(event.button, event.state)
+			}
+		}*/
+		KeyEvent {
+			event := shy_event as KeyEvent
+			k_id := u8(event.which) // TODO see input handling
+			if mut kb := s.api.input.keyboard(k_id) {
+				kb.set_key_state(event.key_code, event.state)
+			}
+		}
+		else {}
 	}
 
 	// TODO find out what coordinate positions that ManyMouse actually uses?
@@ -246,7 +261,8 @@ fn (mut s Shy) poll_event() ?Event {
 		}
 	}
 	*/
-	return none
+	return shy_event
+	// return none
 }
 
 fn map_sdl_to_shy_keycode(kc sdl.Keycode) KeyCode {

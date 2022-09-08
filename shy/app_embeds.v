@@ -95,6 +95,16 @@ struct DevApp {
 	EasyApp
 }
 
+/*
+pub fn (mut a DevApp) init() ! {
+	a.EasyApp.init()!
+}
+
+pub fn (mut a DevApp) shutdown() ! {
+	a.EasyApp.shutdown()!
+}
+*/
+
 pub fn (mut a DevApp) event(e Event) {
 	a.EasyApp.event(e)
 	mut s := a.shy

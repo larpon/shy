@@ -82,7 +82,7 @@ fn (mut a API) free() {
 	unsafe {
 		free(a.input)
 		free(a.assets)
-		free(a.fonts)
+		// free(a.fonts) // Is currently on the stack
 		free(a.gfx)
 		free(a.audio)
 		free(a.system)
