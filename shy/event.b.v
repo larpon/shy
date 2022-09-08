@@ -77,7 +77,7 @@ fn (mut s Shy) poll_event() ?Event {
 				buttons := map_sdl_button_mask_to_shy_mouse_buttons(evt.motion.state)
 				win := s.active_window()
 
-				which := shy.default_mouse_id
+				which := default_mouse_id
 				mut mouse := s.api.input.mouse(which) or { panic(err) }
 				mouse.x = evt.motion.x
 				mouse.y = evt.motion.y
@@ -104,7 +104,7 @@ fn (mut s Shy) poll_event() ?Event {
 				return MouseButtonEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
-					which: shy.default_mouse_id // evt.button.which // TODO use own ID system??
+					which: default_mouse_id // evt.button.which // TODO use own ID system??
 					button: button
 					state: state
 					clicks: evt.button.clicks
@@ -125,7 +125,7 @@ fn (mut s Shy) poll_event() ?Event {
 				return MouseWheelEvent{
 					timestamp: s.ticks()
 					window_id: win.id // TODO
-					which: shy.default_mouse_id // evt.wheel.which // TODO use own ID system??
+					which: default_mouse_id // evt.wheel.which // TODO use own ID system??
 					x: evt.wheel.x
 					y: evt.wheel.y
 					direction: dir

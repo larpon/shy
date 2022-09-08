@@ -26,12 +26,12 @@ pub fn (mut a App) event(e Event) {}
 pub struct EasyApp {
 	App
 mut:
-	easy   &Easy     = shy.null
-	assets &Assets   = shy.null
-	draw   &Draw     = shy.null
-	mouse  &Mouse    = shy.null
-	kbd    &Keyboard = shy.null
-	window &Window   = shy.null
+	easy   &Easy     = null
+	assets &Assets   = null
+	draw   &Draw     = null
+	mouse  &Mouse    = null
+	kbd    &Keyboard = null
+	window &Window   = null
 }
 
 pub fn (mut a EasyApp) init() ! {

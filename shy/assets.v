@@ -44,6 +44,7 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		width: stb_img.width
 		height: stb_img.height
 		channels: stb_img.nr_channels
+		mipmaps: opt.mipmaps
 		// cache: opt.cache
 		ready: stb_img.ok
 		// data: stb_img.data
@@ -55,7 +56,7 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	mut img_desc := gfx.ImageDesc{
 		width: image.width
 		height: image.height
-		num_mipmaps: opt.mipmaps
+		num_mipmaps: 0 // TODO image.mipmaps
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		label: &u8(0)

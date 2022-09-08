@@ -1,7 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-import shy
+import shy.shy
 
 fn test_keycode_from_string() {
 	assert shy.keycode_from_string('Unknown') == .unknown

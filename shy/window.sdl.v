@@ -84,7 +84,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	mut display_index := 0
 
-	displays := shy.display_count()
+	displays := display_count()
 
 	s.log.ginfo(@STRUCT + '.' + 'window', '$displays displays available')
 

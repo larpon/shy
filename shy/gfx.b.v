@@ -10,7 +10,7 @@ import sgp
 pub struct GFX {
 	ShyStruct
 mut:
-	draw &Draw = shy.null
+	draw &Draw = null
 	// sokol
 	pass_action gfx.PassAction
 	image_cache map[string]Image
@@ -60,6 +60,9 @@ pub fn (mut g GFX) init() ! {
 }
 
 pub fn (mut g GFX) shutdown() ! {
+	for _, mut image in g.image_cache {
+		image.free()
+	}
 	sgp.shutdown()
 
 	gfx.shutdown()

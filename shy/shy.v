@@ -64,7 +64,7 @@ pub mut:
 	paused   bool
 	shutdown bool
 mut:
-	log     Log
+	log     log.Log
 	ready   bool
 	running bool
 	//
@@ -209,16 +209,16 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		}
 		// Delta time averaging
 		// for i := 0; i < time_history_count - 1; i++ {
-		for i in 0 .. shy.time_history_count - 1 {
+		for i in 0 .. time_history_count - 1 {
 			time_averager[i] = time_averager[i + 1]
 		}
-		time_averager[shy.time_history_count - 1] = delta_time
+		time_averager[time_history_count - 1] = delta_time
 		delta_time = 0
 		// for i := 0; i < time_history_count; i++ {
-		for i in 0 .. shy.time_history_count {
+		for i in 0 .. time_history_count {
 			delta_time += time_averager[i]
 		}
-		delta_time /= shy.time_history_count
+		delta_time /= time_history_count
 
 		// add to the accumulator
 		frame_accumulator += delta_time

@@ -20,7 +20,7 @@ mut:
 
 struct FontsConfig {
 	ShyStruct
-	prealloc_contexts u16 = shy.defaults.fonts.preallocate // > ~8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
+	prealloc_contexts u16 = defaults.fonts.preallocate // > ~8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
 	preload           map[string]string // preload[font_name] = path_to_font
 }
 
@@ -51,7 +51,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 
 	// Load the Shy default font
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
-	fs.font_data[shy.defaults.font.name] = default_font.to_bytes()
+	fs.font_data[defaults.font.name] = default_font.to_bytes()
 	fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
 
 	for font_name, font_path in config.preload {
@@ -62,7 +62,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 
 	s.log.gdebug(@STRUCT, 'pre-allocating $config.prealloc_contexts contexts...')
 	$if shy_vet ? {
-		if config.prealloc_contexts > shy.defaults.fonts.preallocate {
+		if config.prealloc_contexts > defaults.fonts.preallocate {
 			s.vet_issue(.warn, .misc, @STRUCT + '.' + @FN, ' keep in mind that pre-allocating many font contexts is quite memory consuming')
 		}
 	}
@@ -141,13 +141,13 @@ fn (mut fs Fonts) on_frame_end() {
 fn (fc &FontContext) set_defaults() {
 	font_context := fc.fsc
 
-	font_id := fc.fonts[shy.defaults.font.name]
+	font_id := fc.fonts[defaults.font.name]
 
 	white := sfons.rgba(255, 255, 255, 255)
 
 	font_context.set_font(font_id)
 	font_context.set_color(white)
-	font_context.set_size(shy.defaults.font.size)
+	font_context.set_size(defaults.font.size)
 }
 
 fn (fc &FontContext) begin() {

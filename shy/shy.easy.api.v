@@ -9,7 +9,7 @@ module shy
 pub struct Easy {
 	ShyStruct
 mut:
-	audio_engine &AudioEngine = shy.null
+	audio_engine &AudioEngine = null
 }
 
 pub fn (mut e Easy) init() ! {
@@ -147,7 +147,8 @@ pub fn (es &EasySound) stop() {
 pub struct EasyImage {
 	Rect
 pub:
-	uri string
+	uri   string
+	color Color = rgb(255, 255, 255)
 }
 
 [inline]
@@ -155,24 +156,26 @@ pub fn (e Easy) image(ei EasyImage) {
 	gfx := e.shy.api.gfx
 	mut d := gfx.draw.image()
 	d.begin()
-	/*
-	mut r := d.rect()
-	r.x = ei.x
-	r.y = ei.y
-	r.w = ei.w
-	r.h = ei.h
-	r.draw()
-	*/
+	mut i2d := d.image_2d(ei.uri)
+	i2d.color = ei.color
+	i2d.x = ei.x
+	i2d.y = ei.y
+	i2d.w = ei.w
+	i2d.h = ei.h
+	i2d.draw()
 	d.end()
 }
 
 // Assets
 pub fn (e &Easy) load(ao AssetOptions) ! {
+	e.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	mut gfx := unsafe { e.shy.api.gfx }
 	if _ := gfx.image_cache[ao.uri] {
 		return
 	}
 	mut assets := e.shy.assets()
 	mut asset := assets.load(ao)!
-	gfx.image_cache[ao.uri] = asset.to_image()!
+	gfx.image_cache[ao.uri] = asset.to_image(
+		mipmaps: 4
+	)!
 }

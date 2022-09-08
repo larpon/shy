@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module main
 
-import shy
+import shy.shy
 
 fn main() {
 	mut app := &App{}

@@ -8,14 +8,14 @@ import math // TODO
 import shy.mth
 
 struct AnchorResult {
-	t0   Vec2<f32>
-	t0r  Vec2<f32>
-	t2   Vec2<f32>
-	t2r  Vec2<f32>
-	vp   Vec2<f32>
-	vpp  Vec2<f32>
-	at   Vec2<f32>
-	bt   Vec2<f32>
+	t0   vec.Vec2<f32>
+	t0r  vec.Vec2<f32>
+	t2   vec.Vec2<f32>
+	t2r  vec.Vec2<f32>
+	vp   vec.Vec2<f32>
+	vpp  vec.Vec2<f32>
+	at   vec.Vec2<f32>
+	bt   vec.Vec2<f32>
 	flip bool
 }
 

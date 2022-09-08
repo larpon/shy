@@ -47,7 +47,7 @@ pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
 pub struct DrawText {
 	ShyFrame
 mut:
-	font_context &FontContext = shy.null
+	font_context &FontContext = null
 }
 
 pub fn (mut dt DrawText) begin() {
@@ -74,7 +74,7 @@ pub fn (mut dt DrawText) end() {
 	if !isnil(fc) {
 		//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
 		fc.end()
-		dt.font_context = shy.null
+		dt.font_context = null
 	}
 }
 
@@ -86,18 +86,18 @@ pub fn (mut dt DrawText) text_2d() Draw2DText {
 }
 
 pub struct Draw2DText {
-	Vec2<f32>
+	vec.Vec2<f32>
 	fc &FontContext
 pub mut:
 	text   string
-	font   string = shy.defaults.font.name
-	colors [shy.color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	font   string = defaults.font.name
+	colors [color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
 	anchor Anchor
 	// TODO clear up this mess
-	size   f32  = shy.defaults.font.size
+	size   f32  = defaults.font.size
 	scale  f32  = 1.0
 	fills  Fill = .solid | .outline
-	offset Vec2<f32>
+	offset vec.Vec2<f32>
 }
 
 [inline]
@@ -109,7 +109,7 @@ pub fn (t Draw2DText) draw() {
 	assert !isnil(font_context), '${@STRUCT}.${@FN}' + ': no font context'
 
 	// color := sfons.rgba(255, 255, 255, 255)
-	if t.font != shy.defaults.font.name {
+	if t.font != defaults.font.name {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
 	}
@@ -166,14 +166,14 @@ pub struct DrawShape2DRect {
 	Rect
 pub mut:
 	// visible bool = true
-	colors [shy.color_target_size]Color = [rgb(255, 5, 5), rgb(255, 255, 255)]!
+	colors [color_target_size]Color = [rgb(255, 5, 5), rgb(255, 255, 255)]!
 	// TODO clear up this mess
 	radius  f32     = 1.0
 	scale   f32     = 1.0
 	fills   Fill    = .solid | .outline
 	cap     Cap     = .butt
 	connect Connect = .bevel
-	offset  Vec2<f32>
+	offset  vec.Vec2<f32>
 }
 
 pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
@@ -402,49 +402,62 @@ pub struct DrawImage {
 pub fn (mut di DrawImage) begin() {
 	di.ShyFrame.begin()
 
-	win := di.shy.api.wm.active_window()
+	win := di.shy.active_window()
 	w, h := win.drawable_size()
-	// ratio := f32(w)/f32(h)
 
-	// Begin recording draw commands for a frame buffer of size (width, height).
-	sgp.begin(w, h)
+	sgl.defaults()
 
-	// Set frame buffer drawing region to (0,0,width,height).
-	sgp.viewport(0, 0, w, h)
-	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
-	// sgp.project(-ratio, ratio, 1.0, -1.0)
-	// sgp.project(0, 0, w, h)
-
-	sgp.reset_project()
+	// sgl.set_context(fc.sgl)
+	sgl.matrix_mode_projection()
+	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 }
 
 pub fn (mut di DrawImage) end() {
 	di.ShyFrame.end()
-	// Dispatch all draw commands to Sokol GFX.
-	sgp.flush()
 	// Finish a draw command queue, clearing it.
-	sgp.end()
+	sgl.draw()
 }
 
-/*
-pub fn (di DrawImage) {
+pub fn (di DrawImage) image_2d(uri string) Draw2DImage {
+	mut gfx := unsafe { di.shy.api.gfx }
+	if image := gfx.image_cache[uri] {
+		return Draw2DImage{
+			image: image
+		}
+	}
+	// TODO return small default image?
+	panic('${@STRUCT}.${@FN}: TODO use stand-in Image here instead of panicing (image $uri was not loaded/cached)')
+	return Draw2DImage{}
+}
 
+pub struct Draw2DImage {
+	Rect
+	image Image
+pub mut:
+	color  Color = rgb(255, 255, 255)
+	anchor Anchor
+	// TODO clear up this mess
+	scale  f32 = 1.0
+	offset vec.Vec2<f32>
+}
+
+[inline]
+pub fn (i Draw2DImage) draw() {
 	u0 := f32(0.0)
 	v0 := f32(0.0)
 	u1 := f32(1.0)
 	v1 := f32(1.0)
 	x0 := f32(0)
 	y0 := f32(0)
-	x1 := f32(w)
-	y1 := f32(h)
+	x1 := f32(i.w)
+	y1 := f32(i.h)
 
 	sgl.push_matrix()
 
 	sgl.enable_texture()
-	sgl.texture(img.sg_image)
-	sgl.translate(f32(sx), f32(sy), 0)
-	// sgl.c4b(p.color.r, p.color.g, p.color.b, p.color.a)
-	sgl.c4b(255, 255, 255, 255)
+	sgl.texture(i.image.gfx_image)
+	sgl.translate(f32(i.x), f32(i.y), 0)
+	sgl.c4b(i.color.r, i.color.g, i.color.b, i.color.a)
 
 	sgl.begin_quads()
 	sgl.v2f_t2f(x0, y0, u0, v0)
@@ -453,9 +466,8 @@ pub fn (di DrawImage) {
 	sgl.v2f_t2f(x0, y1, u0, v1)
 	sgl.end()
 
-	sgl.translate(-f32(sx), -f32(sy), 0)
+	sgl.translate(-f32(i.x), -f32(i.y), 0)
 	sgl.disable_texture()
 
 	sgl.pop_matrix()
 }
-*/

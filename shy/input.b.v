@@ -103,10 +103,10 @@ pub fn (mut ip Input) init() ! {
 	} else {
 		mut mouse := &Mouse{
 			shy: s
-			id: shy.default_mouse_id
+			id: default_mouse_id
 		}
 		mouse.init()!
-		ip.mice[shy.default_mouse_id] = mouse // TODO NOTE see process_events also
+		ip.mice[default_mouse_id] = mouse // TODO NOTE see process_events also
 	}
 
 	// NOTE multiple keyboards is apparently a near impossible thing??
