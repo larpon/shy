@@ -192,11 +192,17 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 		return error('Could not create SDL window "$config.title", SDL says:\n$sdl_error_msg')
 	}
 
+	// Create a black color as a default pass (default window background color)
+	color := s.config.window.color.as_f32()
+	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
+	// g.pass_action = pass_action
+
 	// }
 	mut win := &Window{
 		shy: s
 		id: wm.w_id
 		handle: window
+		pass_action: pass_action
 	}
 	win.init()!
 	wm.w_id++
@@ -212,10 +218,21 @@ mut:
 	ready    bool
 	parent   &Window = null
 	children []&Window
-	//
-	handle      &sdl.Window
-	gl_context  sdl.GLContext
+	// SDL / GL
+	handle     &sdl.Window
+	gl_context sdl.GLContext
+	// sokol
+	pass_action gfx.PassAction
 	gfx_context gfx.Context
+}
+
+pub fn (w &Window) begin() {
+	// TODO multi window support
+	width, height := w.drawable_size()
+	gfx.begin_default_pass(&w.pass_action, width, height)
+}
+
+pub fn (w &Window) end() {
 }
 
 pub fn (w Window) is_root() bool {

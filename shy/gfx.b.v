@@ -11,8 +11,6 @@ pub struct GFX {
 	ShyStruct
 mut:
 	draw &Draw = null
-	// sokol
-	pass_action gfx.PassAction
 }
 
 pub fn (mut g GFX) init() ! {
@@ -27,11 +25,6 @@ pub fn (mut g GFX) init() ! {
 	gfx.setup(&gfx_desc)
 	assert gfx.is_valid()
 
-	// Create a black color as a default pass (default window background color)
-	color := s.config.window.color.as_f32()
-	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
-	g.pass_action = pass_action
-
 	// NOTE Init subsystems was here
 
 	g.draw = &Draw{
@@ -42,6 +35,7 @@ pub fn (mut g GFX) init() ! {
 pub fn (mut g GFX) init_subsystems() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+
 	// sokol_gl is used by the font and image system
 	sample_count := s.config.render.msaa
 	sgl_desc := &sgl.Desc{
@@ -77,9 +71,7 @@ pub fn (mut g GFX) shutdown() ! {
 pub fn (mut g GFX) begin() {
 	s := g.shy
 	win := s.active_window()
-	// TODO multi window support
-	w, h := win.drawable_size()
-	gfx.begin_default_pass(&g.pass_action, w, h)
+	win.begin()
 }
 
 pub fn (g GFX) commit() {
