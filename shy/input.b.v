@@ -23,11 +23,11 @@ pub fn (mut gp Gamepad) init() ! {
 	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
 	if haptic == sdl.null {
 		// error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.ginfo(@STRUCT + '.' + 'input', 'controller $gp.id ($gp.name) does not seem to have haptic features')
+		s.log.ginfo('${@STRUCT}.${@FN}', 'controller $gp.id ($gp.name) does not seem to have haptic features')
 	} else {
 		// See if it can do sine waves
 		if (sdl.haptic_query(haptic) & u32(sdl.haptic_sine)) == 0 {
-			s.log.gdebug(@STRUCT + '.' + 'input', 'controller $gp.id ($gp.name) does not seem to support haptic SINE effects')
+			s.log.gdebug('${@STRUCT}.${@FN}', 'controller $gp.id ($gp.name) does not seem to support haptic SINE effects')
 		} else {
 			gp.is_haptic = true
 			/*
@@ -129,7 +129,7 @@ fn (mut ip Input) init_input() ! {
 	mut s := ip.shy
 	// Check for joysticks/game controllers
 	if sdl.num_joysticks() < 1 {
-		s.log.ginfo(@STRUCT + '.' + 'input', 'no joysticks or game controllers connected')
+		s.log.ginfo('${@STRUCT}.${@FN}', 'no joysticks or game controllers connected')
 	} else {
 		// Load joystick(s) / controller(s)
 		for i in 0 .. 5 {
@@ -144,11 +144,11 @@ fn (mut ip Input) init_input() ! {
 				controller := sdl.game_controller_open(i)
 				if controller == sdl.null {
 					error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-					s.log.gerror(@STRUCT + '.' + 'input', 'unable to open controller $i:\n$error_msg')
+					s.log.gerror('${@STRUCT}.${@FN}', 'unable to open controller $i:\n$error_msg')
 					continue
 				}
 				controller_name := unsafe { cstring_to_vstring(sdl.game_controller_name_for_index(i)) }
-				s.log.ginfo(@STRUCT + '.' + 'input', 'detected controller $i as "$controller_name"')
+				s.log.ginfo('${@STRUCT}.${@FN}', 'detected controller $i as "$controller_name"')
 
 				mut pad := &Gamepad{
 					id: i

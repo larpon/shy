@@ -120,17 +120,17 @@ pub fn (mut a DevApp) event(e Event) {
 				}
 
 				if key_code == .f1 {
-					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current FPS $s.fps()')
+					s.log.ginfo('${@STRUCT}.${@FN}', 'Current FPS $s.fps()')
 					return
 				}
 
 				if key_code == .f2 {
-					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Count $s.performance_counter()')
+					s.log.ginfo('${@STRUCT}.${@FN}', 'Current Performance Count $s.performance_counter()')
 					return
 				}
 
 				if key_code == .f3 {
-					s.log.ginfo(@STRUCT + '.' + 'performance', 'Current Performance Frequency $s.performance_frequency()')
+					s.log.ginfo('${@STRUCT}.${@FN}', 'Current Performance Frequency $s.performance_frequency()')
 					return
 				}
 

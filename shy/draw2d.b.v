@@ -63,7 +63,7 @@ pub fn (mut dt DrawText) begin() {
 	sgl.matrix_mode_projection()
 	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 
-	//¤ FLOOD dt.shy.log.gdebug(@STRUCT + '.' + 'draw', 'begin ${ptr_str(fc.fsc)}...')
+	//¤ FLOOD dt.shy.log.gdebug('${@STRUCT}.${@FN}', 'begin ${ptr_str(fc.fsc)}...')
 	dt.font_context = fc
 	fc.begin()
 }
@@ -72,7 +72,7 @@ pub fn (mut dt DrawText) end() {
 	dt.ShyFrame.end()
 	fc := dt.font_context
 	if !isnil(fc) {
-		//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'end   ${ptr_str(fc.fsc)}...')
+		//¤ FLOOD d2d.shy.log.gdebug('${@STRUCT}.${@FN}', 'end   ${ptr_str(fc.fsc)}...')
 		fc.end()
 		dt.font_context = null
 	}
@@ -102,7 +102,7 @@ pub mut:
 
 [inline]
 pub fn (t Draw2DText) draw() {
-	//¤ FLOOD d2d.shy.log.gdebug(@STRUCT + '.' + 'draw', 'using ${ptr_str(fc.fsc)}...')
+	//¤ FLOOD d2d.shy.log.gdebug('${@STRUCT}.${@FN}', 'using ${ptr_str(fc.fsc)}...')
 	fc := t.fc
 	font_context := fc.fsc
 
