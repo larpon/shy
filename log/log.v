@@ -271,6 +271,6 @@ pub fn (l &Log) gdebug(group string, str string) {
 
 //
 pub fn (l &Log) shutdown() ! {
-	l.gdebug(@STRUCT + '.' + @FN, 'bye')
+	l.gdebug('${@STRUCT}.${@FN}', 'bye')
 	unsafe { l.buffer.free() }
 }

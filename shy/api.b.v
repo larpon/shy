@@ -20,7 +20,7 @@ mut:
 pub fn (mut a API) init(shy_instance &Shy) ! {
 	mut s := unsafe { shy_instance }
 	a.shy = s
-	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	boot := Boot{
 		shy: s
 	}
@@ -64,7 +64,7 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 }
 
 pub fn (mut a API) shutdown() ! {
-	a.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 
 	a.input.shutdown()!
 	a.fonts.shutdown()!
@@ -78,7 +78,7 @@ pub fn (mut a API) shutdown() ! {
 
 [unsafe]
 fn (mut a API) free() {
-	a.shy.log.gdebug(@STRUCT + '.' + @FN, '')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	unsafe {
 		free(a.input)
 		free(a.assets)

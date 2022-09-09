@@ -46,5 +46,5 @@ pub fn (mut k Keyboard) set_key_state(key_code KeyCode, button_state ButtonState
 }
 
 pub fn (mut k Keyboard) init() ! {
-	k.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	k.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 }

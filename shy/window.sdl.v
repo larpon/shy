@@ -11,7 +11,7 @@ import sdl
 
 pub fn (b Boot) init() !&WM {
 	s := b.shy
-	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	wm := &WM{
 		shy: s
 	}
@@ -21,7 +21,7 @@ pub fn (b Boot) init() !&WM {
 pub fn (mut wm WM) init() ! {
 	mut s := wm.shy
 
-	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 
 	$if linux {
 		// Experiments
@@ -51,12 +51,16 @@ pub fn (mut wm WM) init() ! {
 	res := sdl.init(init_flags)
 	if res < 0 {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror(@STRUCT + '.' + @FN, 'SDL: $sdl_error_msg')
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
 		return error('Could not initialize SDL window, SDL says:\n$sdl_error_msg')
 	}
 
 	root_win := wm.init_root_window()!
 	wm.root = root_win
+}
+
+pub fn (wm WM) display_count() u16 {
+	return u16(sdl.get_num_video_displays())
 }
 
 pub fn (wm WM) active_window() &Window {
@@ -84,7 +88,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	mut display_index := 0
 
-	displays := display_count()
+	displays := wm.display_count()
 
 	s.log.ginfo(@STRUCT + '.' + 'window', '$displays displays available')
 
@@ -160,7 +164,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	window := sdl.create_window(window_config.title.str, x, y, win_w, win_h, window_flags)
 	if window == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror(@STRUCT + '.' + @FN, 'SDL: $sdl_error_msg')
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
 		return error('Could not create SDL window, SDL says:\n$sdl_error_msg')
 	}
 
@@ -168,7 +172,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	gl_context := sdl.gl_create_context(window)
 	if gl_context == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror(@STRUCT + '.' + @FN, 'SDL: $sdl_error_msg')
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
 		return error('Could not create OpenGL context, SDL says:\n$sdl_error_msg')
 	}
 
@@ -185,7 +189,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 }
 
 pub fn (mut wm WM) shutdown() ! {
-	wm.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	wm.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	wm.root.close()!
 	// TODO test unsafe { free(wm) }
 
@@ -204,7 +208,7 @@ mut:
 }
 
 pub fn (mut w Window) init() ! {
-	w.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	s := w.shy
 
 	// $if opengl ? {
@@ -213,21 +217,21 @@ pub fn (mut w Window) init() ! {
 		.off {
 			if sdl.gl_set_swap_interval(0) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror(@STRUCT + '.' + @FN, 'SDL: $sdl_error_msg')
+				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
 				return error('Could not set OpenGL swap interval:\n$sdl_error_msg')
 			}
 		}
 		.on {
 			if sdl.gl_set_swap_interval(1) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror(@STRUCT + '.' + @FN, 'SDL: $sdl_error_msg')
+				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
 				return error('Could not set OpenGL swap interval:\n$sdl_error_msg')
 			}
 		}
 		.adaptive {
 			if sdl.gl_set_swap_interval(-1) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror(@STRUCT + '.' + @FN, 'SDL: $sdl_error_msg')
+				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
 				return error('Could not set OpenGL swap interval:\n$sdl_error_msg')
 			}
 		}
@@ -237,12 +241,12 @@ pub fn (mut w Window) init() ! {
 }
 
 pub fn (mut w Window) close() ! {
-	w.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	w.shutdown()!
 }
 
 pub fn (mut w Window) shutdown() ! {
-	w.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	for mut window in w.children {
 		window.close()!
 	}

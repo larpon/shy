@@ -6,7 +6,7 @@ module shy
 import sdl
 
 pub fn (mut m Mouse) init() ! {
-	m.shy.log.gdebug(@STRUCT + '.' + @FN, '$m.id hi')
+	m.shy.log.gdebug('${@STRUCT}.${@FN}', '$m.id hi')
 }
 
 pub fn (mut m Mouse) show() {

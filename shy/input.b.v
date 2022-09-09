@@ -17,7 +17,7 @@ mut:
 }
 
 pub fn (mut gp Gamepad) init() ! {
-	gp.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	gp.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	s := gp.shy
 	// Open the device
 	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
@@ -69,28 +69,28 @@ pub fn (mut ip Input) scan() ! {
 
 // init initializes input systems (keyboard, mouse etc.)
 pub fn (mut ip Input) init() ! {
-	ip.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	s := ip.shy
 
 	mut mice_support := s.config.input.mice
 	if mice_support {
 		available_mice := mm.reinit()
-		s.log.ginfo(@STRUCT + '.' + @FN, 'enabling support for multiple mice. $available_mice is currently available')
+		s.log.ginfo('${@STRUCT}.${@FN}', 'enabling support for multiple mice. $available_mice is currently available')
 		if available_mice < 0 {
 			mm.quit()
-			s.log.gerror(@STRUCT + '.' + @FN, 'error initializing ManyMouse. Falling back to unified mouse input')
+			s.log.gerror('${@STRUCT}.${@FN}', 'error initializing ManyMouse. Falling back to unified mouse input')
 		} else {
 			driver_name := unsafe { cstring_to_vstring(mm.driver_name()) }
-			s.log.gdebug(@STRUCT + '.' + @FN, 'ManyMouse driver: $driver_name')
+			s.log.gdebug('${@STRUCT}.${@FN}', 'ManyMouse driver: $driver_name')
 
 			if available_mice == 0 {
 				mm.quit()
-				s.log.gerror(@STRUCT + '.' + @FN, 'no mice detected.')
+				s.log.gerror('${@STRUCT}.${@FN}', 'no mice detected.')
 			} else {
 				// TODO expose ManyMouse max (default is 256)!
 				for i := u8(0); i < available_mice; i++ {
 					device_name := unsafe { cstring_to_vstring(mm.device_name(i)) }
-					s.log.gdebug(@STRUCT + '.' + @FN, 'ManyMouse device $i / $device_name')
+					s.log.gdebug('${@STRUCT}.${@FN}', 'ManyMouse device $i / $device_name')
 					mut mouse := &Mouse{
 						shy: s
 						id: i
@@ -122,7 +122,7 @@ pub fn (mut ip Input) init() ! {
 }
 
 pub fn (mut ip Input) shutdown() ! {
-	ip.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 }
 
 fn (mut ip Input) init_input() ! {

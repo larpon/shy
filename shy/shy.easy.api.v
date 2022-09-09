@@ -86,7 +86,7 @@ pub struct EasySoundConfig {
 }
 
 pub fn (e Easy) new_sound(esc EasySoundConfig) !&EasySound {
-	e.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	mut audio := e.audio_engine
 
 	mut id := u16(0)

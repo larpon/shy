@@ -17,7 +17,7 @@ mut:
 
 // init initializes the audio system.
 pub fn (mut a Audio) init() ! {
-	a.shy.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	// Initialize default playback engine
 	ma_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
@@ -34,7 +34,7 @@ pub fn (mut a Audio) init() ! {
 }
 
 pub fn (mut a Audio) new_engine() !&AudioEngine {
-	a.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data')
+	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data')
 	ma_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
@@ -53,7 +53,7 @@ pub fn (mut a Audio) new_engine() !&AudioEngine {
 }
 
 pub fn (mut a Audio) shutdown() ! {
-	a.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	for _, mut engine in a.engines {
 		engine.shutdown()!
 	}
@@ -93,8 +93,8 @@ fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
 }
 
 pub fn (mut ae AudioEngine) load(path string) !u16 {
-	ae.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
-	ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'loading "$path"')
+	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "$path"')
 	s := ae.load_file(path)!
 	ae.sound_id++
 	ae.sounds[ae.sound_id] = s
@@ -102,16 +102,16 @@ pub fn (mut ae AudioEngine) load(path string) !u16 {
 }
 
 pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
-	ae.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	// See https://github.com/mackron/miniaudio/issues/517i
 	s := ae.load_file(path)!
 	ae.sound_id++
 	id_start := ae.sound_id
 	ae.sounds[id_start] = s
 	if copies > 1 {
-		ae.shy.vet_issue(.warn, .misc, @STRUCT + '.' + @FN, 'keep in mind that instancing the same sound ($path) $copies times, also duplicate the memory for the sound $copies times')
+		ae.shy.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', 'keep in mind that instancing the same sound ($path) $copies times, also duplicate the memory for the sound $copies times')
 		for _ in 0 .. copies {
-			ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'duplicating "$path"')
+			ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'duplicating "$path"')
 			copy_sound := &ma.Sound{}
 			ma.sound_init_copy(ae.e, s, 0, ma.null, copy_sound)
 			ae.sound_id++
@@ -124,7 +124,7 @@ pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 pub fn (ae &AudioEngine) play(id u16) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
-		ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'playing sound $sound_id via engine $ae.id')
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'playing sound $sound_id via engine $ae.id')
 		ma.sound_start(sound)
 	}
 }
@@ -132,7 +132,7 @@ pub fn (ae &AudioEngine) play(id u16) {
 pub fn (ae &AudioEngine) stop(id u16) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
-		ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'stopping $sound_id in engine $ae.id')
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'stopping $sound_id in engine $ae.id')
 		ma.sound_stop(sound)
 	}
 }
@@ -160,7 +160,7 @@ pub fn (ae &AudioEngine) is_looping(id u16) bool {
 pub fn (ae &AudioEngine) set_looping(id u16, loop bool) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
-		ae.shy.log.gdebug(@STRUCT + '.' + @FN, 'set loop = $loop on sound $sound_id in engine $ae.id')
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'set loop = $loop on sound $sound_id in engine $ae.id')
 		b := if loop { ma.@true } else { ma.@false }
 		ma.sound_set_looping(sound, u32(b))
 	}

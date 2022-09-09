@@ -17,7 +17,7 @@ mut:
 
 pub fn (mut g GFX) init() ! {
 	mut s := g.shy
-	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	mut gfx_desc := gfx.Desc{
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		context_pool_size: 4 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...

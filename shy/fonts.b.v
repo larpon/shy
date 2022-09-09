@@ -34,11 +34,11 @@ mut:
 }
 
 fn (mut fs Fonts) load_font(name string, path string) ! {
-	fs.shy.vet_issue(.warn, .hot_code, @STRUCT + '.' + @FN, 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	fs.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
-		fs.shy.log.ginfo(@STRUCT + '.' + @FN, 'loaded $name: "$path"')
+		fs.shy.log.ginfo('${@STRUCT}.${@FN}', 'loaded $name: "$path"')
 	} else {
 		return error('${@STRUCT}.${@FN}' + ': could not load $name "$path"')
 	}
@@ -47,7 +47,7 @@ fn (mut fs Fonts) load_font(name string, path string) ! {
 fn (mut fs Fonts) init(config FontsConfig) ! {
 	fs.shy = config.shy
 	mut s := fs.shy
-	s.log.gdebug(@STRUCT + '.' + @FN, 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 
 	// Load the Shy default font
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
@@ -63,7 +63,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	s.log.gdebug(@STRUCT, 'pre-allocating $config.prealloc_contexts contexts...')
 	$if shy_vet ? {
 		if config.prealloc_contexts > defaults.fonts.preallocate {
-			s.vet_issue(.warn, .misc, @STRUCT + '.' + @FN, ' keep in mind that pre-allocating many font contexts is quite memory consuming')
+			s.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', ' keep in mind that pre-allocating many font contexts is quite memory consuming')
 		}
 	}
 
@@ -87,18 +87,18 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 					false)
 			}
 		}
-		s.log.gdebug(@STRUCT + '.' + @FN, 'adding font context ${ptr_str(context.fsc)}...')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'adding font context ${ptr_str(context.fsc)}...')
 		fs.contexts << context
 	}
 	fs.ready = true
 }
 
 fn (mut fs Fonts) shutdown() ! {
-	fs.shy.log.gdebug(@STRUCT + '.' + @FN, 'bye')
+	fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	mut s := fs.shy
 	for context in fs.contexts {
 		if !isnil(context.fsc) {
-			s.log.gdebug(@STRUCT + '.' + @FN, 'destroying font context ${ptr_str(context.fsc)}...')
+			s.log.gdebug('${@STRUCT}.${@FN}', 'destroying font context ${ptr_str(context.fsc)}...')
 			sfons.destroy(context.fsc)
 			unsafe {
 				context.fsc = nil
@@ -107,7 +107,7 @@ fn (mut fs Fonts) shutdown() ! {
 	}
 	for font_name, data in fs.font_data {
 		if data.len > 0 {
-			s.log.gdebug(@STRUCT + '.' + @FN, 'freeing font $font_name data...')
+			s.log.gdebug('${@STRUCT}.${@FN}', 'freeing font $font_name data...')
 			unsafe { data.free() }
 		}
 	}
@@ -123,7 +123,7 @@ fn (mut fs Fonts) get_context() &FontContext {
 		}
 	}
 	assert false, '${@STRUCT}.${@FN}' + ': no available font contexts'
-	fs.shy.log.gcritical(@STRUCT + '.' + @FN, 'no available font contexts, expect crash and burn...')
+	fs.shy.log.gcritical('${@STRUCT}.${@FN}', 'no available font contexts, expect crash and burn...')
 	return &FontContext{
 		fsc: unsafe { nil }
 	} // NOTE dummy return to please the V compiler...
@@ -133,7 +133,7 @@ fn (mut fs Fonts) on_frame_end() {
 	for mut fc in fs.contexts {
 		if fc.in_use {
 			fc.in_use = false
-			// FLOOD fs.shy.log.gdebug(@STRUCT + '.' + @FN, 'handing out ${ptr_str(fc.fsc)}...')
+			// FLOOD fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'handing out ${ptr_str(fc.fsc)}...')
 		}
 	}
 }
