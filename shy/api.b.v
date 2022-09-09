@@ -3,8 +3,6 @@
 // that can be found in the LICENSE file.
 module shy
 
-import os.font
-
 struct API {
 	ShyStruct
 mut:
@@ -31,13 +29,6 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	}
 	a.system.init()!
 
-	a.wm.init()!
-
-	a.audio = &Audio{
-		shy: s
-	}
-	a.audio.init()!
-
 	a.assets = &Assets{
 		shy: s
 	}
@@ -48,14 +39,14 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	}
 	a.gfx.init()!
 
-	// Initialize font drawing sub system
-	a.fonts.init(FontsConfig{
+	a.wm.init()!
+
+	// a.gfx.init_subsystems()!
+
+	a.audio = &Audio{
 		shy: s
-		// prealloc_contexts: 8
-		preload: {
-			'system': font.default()
-		}
-	})! // fonts.b.v
+	}
+	a.audio.init()!
 
 	a.input = &Input{
 		shy: s
@@ -69,10 +60,10 @@ pub fn (mut a API) shutdown() ! {
 	a.input.shutdown()!
 	a.fonts.shutdown()!
 	a.assets.shutdown()!
-	a.gfx.shutdown()!
 	a.audio.shutdown()!
 	a.system.shutdown()!
 	a.wm.shutdown()!
+	a.gfx.shutdown()!
 	unsafe { a.free() }
 }
 

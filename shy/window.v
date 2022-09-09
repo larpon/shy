@@ -10,5 +10,7 @@ pub struct Boot {
 pub struct WM {
 	ShyStruct
 mut:
-	root &Window = null
+	root   &Window = null
+	w_id   u32
+	active &Window = null
 }

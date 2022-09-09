@@ -77,10 +77,15 @@ pub struct Config {
 	run    RunConfig
 }
 
+[params]
 pub struct WindowConfig {
+	Rect
+pub:
 	title     string = shy.defaults.window.title
 	resizable bool   = shy.defaults.window.resizable
+	visible   bool   = true
 	color     Color  = shy.defaults.window.color
+	// TODO ? flags WindowFlag
 }
 
 pub struct RunConfig {

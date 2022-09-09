@@ -165,7 +165,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 	s.state.in_hot_code = true
 	for s.running {
 		if !s.ready {
-			s.log.gwarn(@MOD + '.' + @FN + '.' + 'lifecycle', 'not ready. Waiting 1 second...')
+			s.log.gwarn('${@MOD}.${@FN}', 'not ready. Waiting 1 second...')
 			time.sleep(1 * time.second)
 			continue
 		}
@@ -182,60 +182,6 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			s.state.fps_frame = 0
 		}
 
-		// Ask gfx backend to clear the screen
-		s.api.gfx.begin()
-
-		// frame timer
-		current_frame_time := i64(s.performance_counter())
-		mut delta_time := current_frame_time - prev_frame_time
-		prev_frame_time = current_frame_time
-
-		// handle unexpected timer anomalies (overflow, extra slow frames, etc)
-		// ignore extra-slow frames
-		if delta_time > desired_frametime * 8 {
-			delta_time = desired_frametime
-		}
-		if delta_time < 0 {
-			delta_time = 0
-		}
-
-		// vsync time snapping
-		for snap in snap_frequencies {
-			if mth.abs(delta_time - snap) < vsync_maxerror {
-				// eprintln('Snaping at $i')
-				delta_time = snap
-				break
-			}
-		}
-		// Delta time averaging
-		// for i := 0; i < time_history_count - 1; i++ {
-		for i in 0 .. time_history_count - 1 {
-			time_averager[i] = time_averager[i + 1]
-		}
-		time_averager[time_history_count - 1] = delta_time
-		delta_time = 0
-		// for i := 0; i < time_history_count; i++ {
-		for i in 0 .. time_history_count {
-			delta_time += time_averager[i]
-		}
-		delta_time /= time_history_count
-
-		// add to the accumulator
-		frame_accumulator += delta_time
-
-		// spiral of death protection
-		if frame_accumulator > desired_frametime * 8 {
-			s.state.resync = true
-		}
-
-		// Timer resync if requested
-		// Typical good after level load or similar
-		if s.state.resync {
-			frame_accumulator = 0
-			delta_time = desired_frametime
-			s.state.resync = false
-		}
-
 		// Process system events at this point
 		s.process_events<T>(mut ctx)
 
@@ -244,56 +190,123 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			break
 		}
 
-		// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
-		if !lock_framerate {
-			mut consumed_delta_time := delta_time
+		root := s.api.wm.root
+		mut windows := [root]
 
-			for frame_accumulator >= desired_frametime {
-				// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
-				ctx.fixed_update(fixed_deltatime)
+		if root.children.len > 0 {
+			windows << root.children
+		}
+		for win in windows {
+			if !win.ready {
+				continue
+			}
+			win.make_current()
 
-				if consumed_delta_time > desired_frametime {
-					// cap variable update's dt to not be larger than fixed update,
-					// and interleave it (so game state can always get animation frames it needs)
+			// Ask gfx backend to clear the screen
+			s.api.gfx.begin()
 
-					// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
-					ctx.variable_update(fixed_deltatime)
+			// frame timer
+			current_frame_time := i64(s.performance_counter())
+			mut delta_time := current_frame_time - prev_frame_time
+			prev_frame_time = current_frame_time
 
-					consumed_delta_time -= desired_frametime
-				}
-				frame_accumulator -= desired_frametime
+			// handle unexpected timer anomalies (overflow, extra slow frames, etc)
+			// ignore extra-slow frames
+			if delta_time > desired_frametime * 8 {
+				delta_time = desired_frametime
+			}
+			if delta_time < 0 {
+				delta_time = 0
 			}
 
-			c_dt := f64(consumed_delta_time) / s.performance_frequency()
-			// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
-			ctx.variable_update(c_dt)
+			// vsync time snapping
+			for snap in snap_frequencies {
+				if mth.abs(delta_time - snap) < vsync_maxerror {
+					// eprintln('Snaping at $i')
+					delta_time = snap
+					break
+				}
+			}
+			// Delta time averaging
+			// for i := 0; i < time_history_count - 1; i++ {
+			for i in 0 .. time_history_count - 1 {
+				time_averager[i] = time_averager[i + 1]
+			}
+			time_averager[time_history_count - 1] = delta_time
+			delta_time = 0
+			// for i := 0; i < time_history_count; i++ {
+			for i in 0 .. time_history_count {
+				delta_time += time_averager[i]
+			}
+			delta_time /= time_history_count
 
-			f_dt := f64(frame_accumulator) / desired_frametime
-			// eprintln('(unlocked) ctx.frame( $f_dt )')
-			s.state.in_frame_call = true
-			ctx.frame(f_dt)
-		} else { // LOCKED FRAMERATE, NO INTERPOLATION
-			for frame_accumulator >= desired_frametime * update_multiplicity {
-				for i := 0; i < update_multiplicity; i++ {
-					// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+			// add to the accumulator
+			frame_accumulator += delta_time
+
+			// spiral of death protection
+			if frame_accumulator > desired_frametime * 8 {
+				s.state.resync = true
+			}
+
+			// Timer resync if requested
+			// Typical good after level load or similar
+			if s.state.resync {
+				frame_accumulator = 0
+				delta_time = desired_frametime
+				s.state.resync = false
+			}
+
+			// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
+			if !lock_framerate {
+				mut consumed_delta_time := delta_time
+
+				for frame_accumulator >= desired_frametime {
+					// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
 					ctx.fixed_update(fixed_deltatime)
 
-					// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
-					ctx.variable_update(fixed_deltatime)
+					if consumed_delta_time > desired_frametime {
+						// cap variable update's dt to not be larger than fixed update,
+						// and interleave it (so game state can always get animation frames it needs)
+
+						// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
+						ctx.variable_update(fixed_deltatime)
+
+						consumed_delta_time -= desired_frametime
+					}
 					frame_accumulator -= desired_frametime
 				}
-			}
 
-			// eprintln('(locked) ctx.frame( 1.0 )')
-			s.state.in_frame_call = true
-			ctx.frame(1.0)
+				c_dt := f64(consumed_delta_time) / s.performance_frequency()
+				// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
+				ctx.variable_update(c_dt)
+
+				f_dt := f64(frame_accumulator) / desired_frametime
+				// eprintln('(unlocked) ctx.frame( $f_dt )')
+				s.state.in_frame_call = true
+				ctx.frame(f_dt)
+			} else { // LOCKED FRAMERATE, NO INTERPOLATION
+				for frame_accumulator >= desired_frametime * update_multiplicity {
+					for i := 0; i < update_multiplicity; i++ {
+						// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+						ctx.fixed_update(fixed_deltatime)
+
+						// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
+						ctx.variable_update(fixed_deltatime)
+						frame_accumulator -= desired_frametime
+					}
+				}
+
+				// eprintln('(locked) ctx.frame( 1.0 )')
+				s.state.in_frame_call = true
+				ctx.frame(1.0)
+			}
+			s.state.in_frame_call = false
+			s.api.on_frame_end()
+			s.api.gfx.end()
+			s.api.gfx.commit()
+			// display() / swap buffers
+			s.api.gfx.swap()
 		}
-		s.state.in_frame_call = false
-		s.api.on_frame_end()
-		s.api.gfx.end()
-		s.api.gfx.commit()
-		// display() / swap buffers
-		s.api.gfx.swap()
 	}
 	s.state.in_hot_code = false
 }

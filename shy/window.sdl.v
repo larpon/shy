@@ -4,7 +4,8 @@
 module shy
 
 import sdl
-
+import sokol.gfx
+import os.font
 // Some code found from
 // "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
 // https://gist.github.com/sherjilozair/c0fa81250c1b8f5e4234b1588e755bca
@@ -55,8 +56,7 @@ pub fn (mut wm WM) init() ! {
 		return error('Could not initialize SDL window, SDL says:\n$sdl_error_msg')
 	}
 
-	root_win := wm.init_root_window()!
-	wm.root = root_win
+	wm.init_root_window()!
 }
 
 pub fn (wm WM) display_count() u16 {
@@ -64,8 +64,8 @@ pub fn (wm WM) display_count() u16 {
 }
 
 pub fn (wm WM) active_window() &Window {
-	if !isnil(wm.root) {
-		return wm.root
+	if !isnil(wm.active) {
+		return wm.active
 	}
 	panic('WM: Error getting root window')
 	// return wm.root
@@ -140,50 +140,20 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	}
 	// } // end $if opengl
 
-	window_config := s.config.window
-
 	win_w := int(f32(display_bounds[display_index].w) * 0.75)
 	win_h := int(f32(display_bounds[display_index].h) * 0.60)
 
 	x := int(sdl.windowpos_centered_display(u32(display_index))) // display_bounds[display_index].x + display_bounds[display_index].w - win_w
 	y := int(sdl.windowpos_centered_display(u32(display_index))) // display_bounds[display_index].y
 
-	mut window_flags := u32(sdl.WindowFlags.shown)
-
-	if s.config.window.resizable {
-		s.log.ginfo('${@STRUCT}.${@FN}', 'is resizable')
-		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
+	window_config := WindowConfig{
+		...s.config.window
+		x: x
+		y: y
+		w: win_w
+		h: win_h
 	}
-
-	// $if opengl ? {
-	window_flags = window_flags | u32(sdl.WindowFlags.opengl) | u32(sdl.WindowFlags.allow_highdpi)
-	// }
-	// window_flags := u32(sdl.null)
-	// window_flags := u32(sdl.WindowFlags.fullscreen)
-
-	window := sdl.create_window(window_config.title.str, x, y, win_w, win_h, window_flags)
-	if window == sdl.null {
-		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-		return error('Could not create SDL window, SDL says:\n$sdl_error_msg')
-	}
-
-	// $if opengl ? {
-	gl_context := sdl.gl_create_context(window)
-	if gl_context == sdl.null {
-		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-		return error('Could not create OpenGL context, SDL says:\n$sdl_error_msg')
-	}
-
-	// }
-	mut win := &Window{
-		shy: s
-		id: 0
-		handle: window
-		context: gl_context
-	}
-	win.init()!
+	win := wm.new_window(window_config)!
 	wm.root = win
 	return wm.root
 }
@@ -196,15 +166,76 @@ pub fn (mut wm WM) shutdown() ! {
 	sdl.quit()
 }
 
+fn (mut wm WM) new_window(config WindowConfig) !&Window {
+	s := wm.shy
+	mut window_flags := u32(sdl.WindowFlags.hidden)
+	if config.visible {
+		window_flags = u32(sdl.WindowFlags.shown)
+	}
+
+	if config.resizable {
+		s.log.ginfo('${@STRUCT}.${@FN}', 'is resizable')
+		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
+	}
+
+	// $if opengl ? {
+	window_flags = window_flags | u32(sdl.WindowFlags.opengl) | u32(sdl.WindowFlags.allow_highdpi)
+	// }
+	// window_flags := u32(sdl.null)
+	// window_flags := u32(sdl.WindowFlags.fullscreen)
+
+	window := sdl.create_window(config.title.str, int(config.x), int(config.y), int(config.w),
+		int(config.h), window_flags)
+	if window == sdl.null {
+		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
+		return error('Could not create SDL window "$config.title", SDL says:\n$sdl_error_msg')
+	}
+
+	// }
+	mut win := &Window{
+		shy: s
+		id: wm.w_id
+		handle: window
+	}
+	win.init()!
+	wm.w_id++
+	return win
+}
+
 // Window
 pub struct Window {
 	ShyStruct
 pub:
 	id u32
 mut:
-	handle   &sdl.Window
-	context  sdl.GLContext
+	ready    bool
+	parent   &Window = null
 	children []&Window
+	//
+	handle      &sdl.Window
+	gl_context  sdl.GLContext
+	gfx_context gfx.Context
+}
+
+pub fn (w Window) is_root() bool {
+	return w.id == 0
+}
+
+pub fn (mut w Window) new_window(config WindowConfig) !&Window {
+	win := w.shy.api.wm.new_window(config)!
+	unsafe {
+		win.parent = w
+	}
+	return win
+}
+
+pub fn (w &Window) make_current() {
+	unsafe {
+		w.shy.api.wm.active = w
+	}
+	sdl.gl_make_current(w.handle, w.gl_context)
+	gfx.activate_context(w.gfx_context)
 }
 
 pub fn (mut w Window) init() ! {
@@ -212,7 +243,16 @@ pub fn (mut w Window) init() ! {
 	s := w.shy
 
 	// $if opengl ? {
-	sdl.gl_make_current(w.handle, w.context)
+	gl_context := sdl.gl_create_context(w.handle)
+	if gl_context == sdl.null {
+		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
+		return error('Could not create OpenGL context, SDL says:\n$sdl_error_msg')
+	}
+	w.gl_context = gl_context
+
+	sdl.gl_make_current(w.handle, w.gl_context)
+	// $if opengl ? {
 	match s.config.render.vsync {
 		.off {
 			if sdl.gl_set_swap_interval(0) < 0 {
@@ -238,9 +278,30 @@ pub fn (mut w Window) init() ! {
 	}
 	s.log.ginfo('${@STRUCT}.${@FN}', 'vsync=$s.config.render.vsync')
 	// }
+
+	w.gfx_context = gfx.setup_context()
+
+	// Change all contexts to this window's
+	w.make_current()
+
+	// Init subsystem's for this context setup
+	// TODO does this work ????
+	w.shy.api.gfx.init_subsystems()!
+
+	// TODO Initialize font drawing sub system
+	w.shy.api.fonts.init(FontsConfig{
+		shy: s
+		// prealloc_contexts: 8
+		preload: {
+			'system': font.default()
+		}
+	})! // fonts.b.v
+
+	w.ready = true
 }
 
 pub fn (mut w Window) close() ! {
+	w.ready = false
 	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	w.shutdown()!
 }
@@ -250,8 +311,14 @@ pub fn (mut w Window) shutdown() ! {
 	for mut window in w.children {
 		window.close()!
 	}
+
+	w.make_current()
+
+	w.shy.api.gfx.shutdown_subsystems()!
+
+	gfx.discard_context(w.gfx_context)
 	// $if opengl ? {
-	sdl.gl_delete_context(w.context)
+	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)
 }

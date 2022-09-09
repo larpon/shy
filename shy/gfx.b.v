@@ -32,6 +32,16 @@ pub fn (mut g GFX) init() ! {
 	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
 	g.pass_action = pass_action
 
+	// NOTE Init subsystems was here
+
+	g.draw = &Draw{
+		shy: s
+	}
+}
+
+pub fn (mut g GFX) init_subsystems() ! {
+	mut s := g.shy
+	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	// sokol_gl is used by the font and image system
 	sample_count := s.config.render.msaa
 	sgl_desc := &sgl.Desc{
@@ -52,21 +62,21 @@ pub fn (mut g GFX) init() ! {
 		error_msg := unsafe { cstring_to_vstring(sgp.get_error_message(sgp.get_last_error())) }
 		panic('Failed to create Sokol GP context:\n$error_msg')
 	}
+}
 
-	g.draw = &Draw{
-		shy: s
-	}
+pub fn (mut g GFX) shutdown_subsystems() ! {
+	mut s := g.shy
+	s.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	sgp.shutdown()
 }
 
 pub fn (mut g GFX) shutdown() ! {
-	sgp.shutdown()
-
 	gfx.shutdown()
 }
 
 pub fn (mut g GFX) begin() {
 	s := g.shy
-	mut win := s.active_window()
+	win := s.active_window()
 	// TODO multi window support
 	w, h := win.drawable_size()
 	gfx.begin_default_pass(&g.pass_action, w, h)
