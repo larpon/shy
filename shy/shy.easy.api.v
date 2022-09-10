@@ -3,8 +3,7 @@
 // that can be found in the LICENSE file.
 module shy
 
-// import shy.vec
-// High-level API
+// High-level as-easy-as-it-gets API
 
 pub struct Easy {
 	ShyStruct
@@ -50,6 +49,8 @@ pub fn (e Easy) text(et EasyText) {
 [params]
 pub struct EasyRect {
 	Rect
+pub mut:
+	colors ColorsSolidAndOutline
 }
 
 [inline]
@@ -62,6 +63,7 @@ pub fn (e Easy) rect(er EasyRect) {
 	r.y = er.y
 	r.w = er.w
 	r.h = er.h
+	r.colors = er.colors
 	r.draw()
 	d.end()
 }

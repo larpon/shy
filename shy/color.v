@@ -5,7 +5,12 @@ module shy
 
 import shy.utils
 
+// TODO outphase this
 const color_target_size = 2 // TODO a V bug prevent this to be moved to e.g. draw.v
+
+pub const (
+	colors = BaseColors{}
+)
 
 pub struct Color {
 	r u8
@@ -19,6 +24,28 @@ pub struct Colorf32 {
 	g f32
 	b f32
 	a f32
+}
+
+pub struct ShyColors {
+pub:
+	red   Color = Color{155, 25, 25, 255}
+	white Color = Color{211, 211, 211, 255}
+	blue  Color = Color{0, 0, 211, 255}
+}
+
+pub struct BaseColors {
+pub:
+	red   Color = Color{255, 0, 0, 255} // NOTE BUG using rgb(...) here triggers a C compiler error
+	green Color = Color{0, 255, 0, 255}
+	blue  Color = Color{0, 0, 255, 255}
+	white Color = Color{255, 255, 255, 255}
+	shy   ShyColors
+}
+
+pub struct ColorsSolidAndOutline {
+pub mut:
+	solid   Color = rgb(155, 25, 25)
+	outline Color = rgb(211, 211, 211)
 }
 
 pub fn (c Color) is_opaque() bool {

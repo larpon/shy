@@ -167,7 +167,7 @@ pub struct DrawShape2DRect {
 	Rect
 pub mut:
 	// visible bool = true
-	colors [color_target_size]Color = [rgb(255, 5, 5), rgb(255, 255, 255)]!
+	colors ColorsSolidAndOutline
 	// TODO clear up this mess
 	radius  f32     = 1.0
 	scale   f32     = 1.0
@@ -177,9 +177,10 @@ pub mut:
 	offset  vec.Vec2<f32>
 }
 
+/*
 pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 	r.Rect = config.Rect
-	r.colors = config.colors
+	r.color = config.color
 	r.radius = config.radius
 	r.scale = config.scale
 	r.fills = config.fills
@@ -187,14 +188,7 @@ pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 	r.connect = config.connect
 	r.offset = config.offset
 }
-
-pub fn (r DrawShape2DRect) fill_color() Color {
-	return r.colors[0]
-}
-
-pub fn (r DrawShape2DRect) outline_color() Color {
-	return r.colors[1]
-}
+*/
 
 [inline]
 fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
@@ -204,7 +198,7 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 
 	//!c := r.colors.outline
 	//!sgl.c4b(c.r, c.g, c.b, c.a)
-	color := r.outline_color()
+	color := r.colors.outline
 	if color.a < 255 {
 		sgp.set_blend_mode(.blend)
 	}
@@ -358,7 +352,7 @@ pub fn (r DrawShape2DRect) draw() {
 	sx := x //* scale_factor
 	sy := y //* scale_factor
 	if r.fills.has(.solid) {
-		color := r.fill_color()
+		color := r.colors.solid
 		if color.a < 255 {
 			sgp.set_blend_mode(.blend)
 		}
@@ -378,7 +372,7 @@ pub fn (r DrawShape2DRect) draw() {
 			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
 			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
 		} else {
-			color := r.outline_color()
+			color := r.colors.outline
 			if color.a < 255 {
 				sgp.set_blend_mode(.blend)
 			}
