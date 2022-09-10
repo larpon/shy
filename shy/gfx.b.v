@@ -68,12 +68,13 @@ pub fn (mut g GFX) shutdown() ! {
 	gfx.shutdown()
 }
 
+/*
 pub fn (mut g GFX) begin() {
 	s := g.shy
 	win := s.active_window()
 	win.begin()
 }
-
+*/
 pub fn (g GFX) commit() {
 	gfx.commit()
 }
@@ -82,7 +83,9 @@ pub fn (g GFX) end() {
 	gfx.end_pass()
 }
 
+/*
 pub fn (g GFX) swap() {
 	mut win := g.shy.active_window()
 	win.swap()
 }
+*/

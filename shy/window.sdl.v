@@ -232,7 +232,18 @@ pub fn (w &Window) begin() {
 	gfx.begin_default_pass(&w.pass_action, width, height)
 }
 
+/*
+pub fn (w &Window) commit() {
+	gfx.commit()
+}
+
 pub fn (w &Window) end() {
+	gfx.end_pass()
+}
+*/
+pub fn (w &Window) swap() {
+	// w.shy.gfx.commit()
+	sdl.gl_swap_window(w.handle)
 }
 
 pub fn (w Window) is_root() bool {
@@ -392,9 +403,4 @@ pub fn (w &Window) drawable_size() (int, int) {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
 	return width, height
-}
-
-pub fn (w &Window) swap() {
-	// w.shy.gfx.commit()
-	sdl.gl_swap_window(w.handle)
 }

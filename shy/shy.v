@@ -203,7 +203,8 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			win.make_current()
 
 			// Ask gfx backend to clear the screen
-			s.api.gfx.begin()
+			// s.api.gfx.begin()
+			win.begin()
 
 			// frame timer
 			current_frame_time := i64(s.performance_counter())
@@ -303,9 +304,12 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			s.state.in_frame_call = false
 			s.api.on_frame_end()
 			s.api.gfx.end()
+			// win.end()
 			s.api.gfx.commit()
+			// win.commit()
 			// display() / swap buffers
-			s.api.gfx.swap()
+			// s.api.gfx.swap()
+			win.swap()
 		}
 	}
 	s.state.in_hot_code = false
