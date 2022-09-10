@@ -32,7 +32,17 @@ pub struct AssetOptions {
 	stream bool
 }
 
+pub struct AssetOption {
+	cache bool
+}
+
 pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
+	if opt.cache {
+		if image := a.shy.assets().image_cache[a.ao.uri] {
+			return image
+		}
+	}
+
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "$a.ao.uri" to image')
 	stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
 		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "$a.ao.uri"')
@@ -74,6 +84,12 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 
 	stb_img.free()
 
+	if opt.cache {
+		unsafe {
+			a.shy.assets().image_cache[a.ao.uri] = image
+		}
+	}
+
 	return image
 }
 
@@ -83,6 +99,16 @@ pub struct Assets {
 	ShyStruct
 mut:
 	ass map[string]&Asset // Uuuh huh huh, hey Beavis... uhuh huh huh
+
+	image_cache map[string]Image
+}
+
+pub fn (mut a Assets) init() ! {}
+
+pub fn (mut a Assets) shutdown() ! {
+	for _, mut image in a.image_cache {
+		image.free()
+	}
 }
 
 pub fn (mut a Assets) load(ao AssetOptions) !&Asset {
@@ -144,6 +170,7 @@ mut:
 
 [params]
 pub struct ImageOptions {
+	AssetOption
 mut:
 	width  int
 	height int

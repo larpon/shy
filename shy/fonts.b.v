@@ -50,6 +50,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 
 	// Load the Shy default font
+	// TODO use *.shy.assets() to cache the data
 	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
 	fs.font_data[defaults.font.name] = default_font.to_bytes()
 	fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
@@ -81,6 +82,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 			sgl: sgl_context
 		}
 
+		// TODO use *.shy.assets() to cache the data
 		for font_name, _ in config.preload {
 			if bytes := fs.font_data[font_name] {
 				context.fonts[font_name] = fons_context.add_font_mem(font_name, bytes,

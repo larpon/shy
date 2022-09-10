@@ -9,18 +9,13 @@ pub struct Easy {
 	ShyStruct
 mut:
 	audio_engine &AudioEngine = null
-	image_cache  map[string]Image
 }
 
 pub fn (mut e Easy) init() ! {
 	e.audio_engine = e.shy.api.audio.engine(0)!
 }
 
-pub fn (mut e Easy) shutdown() ! {
-	for _, mut image in e.image_cache {
-		image.free()
-	}
-}
+pub fn (mut e Easy) shutdown() ! {}
 
 [params]
 pub struct EasyText {
@@ -162,7 +157,15 @@ pub:
 
 [inline]
 pub fn (e Easy) image(ei EasyImage) {
-	image := e.image_cache[ei.uri] or { return }
+	// TODO e.shy.assets.get_cached(...) ???
+	mut image := Image{
+		asset: null
+	}
+	if img := e.shy.assets().image_cache[ei.uri] {
+		image = img
+	} else {
+		return
+	}
 
 	gfx := e.shy.api.gfx
 	mut d := gfx.draw.image()
@@ -179,16 +182,15 @@ pub fn (e Easy) image(ei EasyImage) {
 
 // Assets
 pub fn (e &Easy) load(ao AssetOptions) ! {
-	if _ := e.image_cache[ao.uri] {
+	// TODO e.shy.assets.is_cached(...) ???
+	if _ := e.shy.assets().image_cache[ao.uri] {
 		return
 	}
 	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	mut assets := e.shy.assets()
 	mut asset := assets.load(ao)!
-	image := asset.to_image(
+	_ := asset.to_image(
+		cache: true
 		mipmaps: 4
 	)!
-	unsafe {
-		e.image_cache[ao.uri] = image
-	}
 }
