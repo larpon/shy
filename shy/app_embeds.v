@@ -120,7 +120,8 @@ pub fn (mut a DevApp) event(e Event) {
 				}
 
 				if key_code == .f1 {
-					s.log.ginfo('${@STRUCT}.${@FN}', 'Current FPS $s.fps()')
+					w := s.active_window()
+					s.log.ginfo('${@STRUCT}.${@FN}', 'Current FPS $w.fps()')
 					return
 				}
 

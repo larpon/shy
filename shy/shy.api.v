@@ -6,11 +6,6 @@
 module shy
 
 [inline]
-pub fn (s Shy) fps() u32 {
-	return s.state.fps_snapshot
-}
-
-[inline]
 pub fn (s Shy) ticks() u64 {
 	return u64(s.timer.elapsed().milliseconds())
 }

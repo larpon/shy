@@ -13,9 +13,9 @@ pub const (
 struct Defaults {
 	run struct  {
 		update_rate         f64 = 60.0
-		update_multiplicity u16 = 1
+		update_multiplicity u8  = 1
 		lock_framerate      bool
-		time_history_count  u16 = 4
+		time_history_count  u8 = 4
 	}
 
 	render struct  {
@@ -90,9 +90,9 @@ pub:
 
 pub struct RunConfig {
 	update_rate         f64  = shy.defaults.run.update_rate
-	update_multiplicity u16  = shy.defaults.run.update_multiplicity
+	update_multiplicity u8   = shy.defaults.run.update_multiplicity
 	lock_framerate      bool = shy.defaults.run.lock_framerate
-	time_history_count  u16  = shy.defaults.run.time_history_count
+	time_history_count  u8   = shy.defaults.run.time_history_count
 }
 
 pub struct RenderConfig {
@@ -122,9 +122,9 @@ pub fn config_from_toml_text(toml_text string) ?Config {
 	toml_rc := toml_doc.value('shy.run')
 	rc := RunConfig{
 		update_rate: toml_rc.value('update_rate').default_to(shy.defaults.run.update_rate).f64()
-		update_multiplicity: u16(toml_rc.value('update_multiplicity').default_to(int(shy.defaults.run.update_multiplicity)).int())
+		update_multiplicity: u8(toml_rc.value('update_multiplicity').default_to(int(shy.defaults.run.update_multiplicity)).int())
 		lock_framerate: toml_rc.value('lock_framerate').default_to(shy.defaults.run.lock_framerate).bool()
-		time_history_count: u16(toml_rc.value('time_history_count').default_to(int(shy.defaults.run.time_history_count)).int())
+		time_history_count: u8(toml_rc.value('time_history_count').default_to(int(shy.defaults.run.time_history_count)).int())
 	}
 	//
 	toml_rend_c := toml_doc.value('shy.render')

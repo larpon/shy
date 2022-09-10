@@ -3,9 +3,11 @@
 // that can be found in the LICENSE file.
 module shy
 
+import shy.mth
 import sdl
 import sokol.gfx
 import os.font
+
 // Some code found from
 // "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
 // https://gist.github.com/sherjilozair/c0fa81250c1b8f5e4234b1588e755bca
@@ -209,6 +211,37 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	return win
 }
 
+// RenderState
+struct RenderState {
+mut:
+	resync bool
+	//
+	fps_frame    u32
+	fps_snapshot u32
+	frame        u64
+	//
+	in_frame_call bool
+	//
+	fps_timer           u64
+	update_rate         f64 = 60.0
+	update_multiplicity u8
+	lock_framerate      bool
+
+	performance_frequency u64
+	fixed_deltatime       f64
+	desired_frametime     i64
+
+	vsync_maxerror i64
+	// time_60hz i64
+
+	snap_frequencies [5]i64
+
+	time_averager      [4]i64 // NOTE should be same cap as time_history_count
+	time_history_count u8 = 4
+	prev_frame_time    i64
+	frame_accumulator  i64
+}
+
 // Window
 pub struct Window {
 	ShyStruct
@@ -218,6 +251,8 @@ mut:
 	ready    bool
 	parent   &Window = null
 	children []&Window
+	state    RenderState
+	fonts    Fonts
 	// SDL / GL
 	handle     &sdl.Window
 	gl_context sdl.GLContext
@@ -232,15 +267,209 @@ pub fn (w &Window) begin() {
 	gfx.begin_default_pass(&w.pass_action, width, height)
 }
 
+[inline]
+pub fn (w Window) fps() u32 {
+	return w.state.fps_snapshot
+}
+
+pub fn (mut w Window) render_init() {
+	s := w.shy
+
+	w.state.fps_timer = u64(0)
+	run_config := s.config.run
+	// update_rate         = f64(59.95) // TODO
+	// update_rate         = f64(120)
+	update_rate := run_config.update_rate // f64(60)
+	w.state.update_rate = update_rate // f64(60)
+	w.state.update_multiplicity = run_config.update_multiplicity // int(1)
+	w.state.lock_framerate = run_config.lock_framerate // false
+	w.state.time_history_count = run_config.time_history_count // 4
+
+	// V implementation of:
+	// https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
+	// https://gafferongames.com/post/fix_your_timestep/
+	// compute how many ticks one update should be
+
+	performance_frequency := s.performance_frequency()
+	w.state.performance_frequency = performance_frequency
+	w.state.fixed_deltatime = f64(1.0) / update_rate
+	w.state.desired_frametime = i64(performance_frequency / update_rate)
+
+	// These are to snap deltaTime to vsync values if it's close enough
+	w.state.vsync_maxerror = i64(performance_frequency * f64(0.0002))
+	time_60hz := i64(performance_frequency / 60) // since this is about snapping to common vsync values
+	// time_60hz := i64(performance_frequency / update_rate)
+	w.state.snap_frequencies = [
+		time_60hz, /* 60fps */
+		time_60hz * 2, /* 30fps */
+		time_60hz * 3, /* 20fps */
+		time_60hz * 4, /* 15fps */
+		(time_60hz + 1) / 2, /* 120fps */
+		/*
+		//120hz, 240hz, or higher need to round up, so that adding 120hz twice guaranteed is at least the same as adding time_60hz once
+		// (time_60hz+2)/3,  //180fps //that's where the +1 and +2 come from in those equations
+		// (time_60hz+3)/4,  //240fps //I do not want to snap to anything higher than 120 in my engine, but I left the math in here anyway
+		*/
+	]!
+
+	// time_history_count := 4
+	// mut time_averager := [time_history_count]i64{init: desired_frametime}
+	//
+	// This is for delta time averaging
+	// Time averaging could, arguably, be done using a ring buffer.
+	// w.state.time_averager := []i64{len: int(time_history_count), cap: int(time_history_count), init: desired_frametime}
+
+	w.state.resync = true
+	w.state.prev_frame_time = i64(s.performance_counter())
+	w.state.frame_accumulator = 0
+}
+
+pub fn (mut w Window) render<T>(mut ctx T) {
+	if !w.ready {
+		return
+	}
+	s := w.shy
+
+	w.state.fps_frame++
+	w.state.frame++
+
+	now := s.ticks()
+
+	// count fps in 1 sec (1000 ms)
+	if now >= w.state.fps_timer + 1000 {
+		w.state.fps_timer = now
+		w.state.fps_snapshot = w.state.fps_frame // - 1
+		w.state.fps_frame = 0
+	}
+
+	// Make this window's context the current
+	w.make_current()
+
+	// Clear the window
+	w.begin()
+
+	// frame timer
+	current_frame_time := i64(s.performance_counter())
+	mut delta_time := current_frame_time - w.state.prev_frame_time
+	w.state.prev_frame_time = current_frame_time
+
+	desired_frametime := w.state.desired_frametime
+
+	// handle unexpected timer anomalies (overflow, extra slow frames, etc)
+	// ignore extra-slow frames
+	if delta_time > desired_frametime * 8 {
+		delta_time = desired_frametime
+	}
+	if delta_time < 0 {
+		delta_time = 0
+	}
+
+	// vsync time snapping
+	for snap in w.state.snap_frequencies {
+		if mth.abs(delta_time - snap) < w.state.vsync_maxerror {
+			// eprintln('Snaping at $i')
+			delta_time = snap
+			break
+		}
+	}
+	// Delta time averaging
+	// for i := 0; i < time_history_count - 1; i++ {
+	for i in 0 .. w.state.time_history_count - 1 {
+		w.state.time_averager[i] = w.state.time_averager[i + 1]
+	}
+	w.state.time_averager[w.state.time_history_count - 1] = delta_time
+	delta_time = 0
+	// for i := 0; i < time_history_count; i++ {
+	for i in 0 .. w.state.time_history_count {
+		delta_time += w.state.time_averager[i]
+	}
+	delta_time /= w.state.time_history_count
+
+	// add to the accumulator
+	w.state.frame_accumulator += delta_time
+
+	// spiral of death protection
+	if w.state.frame_accumulator > desired_frametime * 8 {
+		w.state.resync = true
+	}
+
+	// Timer resync if requested
+	// Typical good after level load or similar
+	if w.state.resync {
+		w.state.frame_accumulator = 0
+		delta_time = desired_frametime
+		w.state.resync = false
+	}
+
+	fixed_deltatime := w.state.fixed_deltatime
+	// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
+	if !w.state.lock_framerate {
+		mut consumed_delta_time := delta_time
+
+		for w.state.frame_accumulator >= desired_frametime {
+			// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
+			ctx.fixed_update(fixed_deltatime)
+
+			if consumed_delta_time > desired_frametime {
+				// cap variable update's dt to not be larger than fixed update,
+				// and interleave it (so game state can always get animation frames it needs)
+
+				// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
+				ctx.variable_update(fixed_deltatime)
+
+				consumed_delta_time -= desired_frametime
+			}
+			w.state.frame_accumulator -= desired_frametime
+		}
+
+		c_dt := f64(consumed_delta_time) / s.performance_frequency()
+		// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
+		ctx.variable_update(c_dt)
+
+		f_dt := f64(w.state.frame_accumulator) / desired_frametime
+		// eprintln('(unlocked) ctx.frame( $f_dt )')
+		w.state.in_frame_call = true
+		ctx.frame(f_dt)
+	} else { // LOCKED FRAMERATE, NO INTERPOLATION
+		for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
+			for i := 0; i < w.state.update_multiplicity; i++ {
+				// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+				ctx.fixed_update(fixed_deltatime)
+
+				// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
+				ctx.variable_update(fixed_deltatime)
+				w.state.frame_accumulator -= desired_frametime
+			}
+		}
+
+		// eprintln('(locked) ctx.frame( 1.0 )')
+		w.state.in_frame_call = true
+		ctx.frame(1.0)
+	}
+
+	w.end()
+	w.state.in_frame_call = false
+
+	s.api.gfx.end()
+	s.api.gfx.commit()
+
+	// display() / swap buffers
+	w.swap()
+
+	for mut cw in w.children {
+		cw.render<T>(mut ctx)
+	}
+}
+
 /*
 pub fn (w &Window) commit() {
 	gfx.commit()
 }
-
-pub fn (w &Window) end() {
-	gfx.end_pass()
-}
 */
+pub fn (mut w Window) end() {
+	w.fonts.on_frame_end()
+}
+
 pub fn (w &Window) swap() {
 	// w.shy.gfx.commit()
 	sdl.gl_swap_window(w.handle)
@@ -255,6 +484,7 @@ pub fn (mut w Window) new_window(config WindowConfig) !&Window {
 	unsafe {
 		win.parent = w
 	}
+	w.children << win
 	return win
 }
 
@@ -317,13 +547,15 @@ pub fn (mut w Window) init() ! {
 	w.shy.api.gfx.init_subsystems()!
 
 	// TODO Initialize font drawing sub system
-	w.shy.api.fonts.init(FontsConfig{
+	w.fonts.init(FontsConfig{
 		shy: s
 		// prealloc_contexts: 8
 		preload: {
 			'system': font.default()
 		}
 	})! // fonts.b.v
+
+	w.render_init()
 
 	w.ready = true
 }
@@ -341,6 +573,8 @@ pub fn (mut w Window) shutdown() ! {
 	}
 
 	w.make_current()
+
+	w.fonts.shutdown()!
 
 	w.shy.api.gfx.shutdown_subsystems()!
 

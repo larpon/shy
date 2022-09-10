@@ -12,7 +12,6 @@ mut:
 	audio  &Audio
 	input  &Input
 	system &System
-	fonts  Fonts
 }
 
 pub fn (mut a API) init(shy_instance &Shy) ! {
@@ -58,7 +57,6 @@ pub fn (mut a API) shutdown() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 
 	a.input.shutdown()!
-	a.fonts.shutdown()!
 	a.assets.shutdown()!
 	a.audio.shutdown()!
 	a.system.shutdown()!
@@ -73,16 +71,9 @@ fn (mut a API) free() {
 	unsafe {
 		free(a.input)
 		free(a.assets)
-		// free(a.fonts) // Is currently on the stack
 		free(a.gfx)
 		free(a.audio)
 		free(a.system)
 		free(a.wm)
 	}
-}
-
-fn (mut a API) on_frame_begin() {}
-
-fn (mut a API) on_frame_end() {
-	a.fonts.on_frame_end()
 }
