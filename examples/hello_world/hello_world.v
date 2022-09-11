@@ -19,5 +19,5 @@ struct App {
 pub fn (mut a App) frame(dt f64) {
 	a.easy.text(
 		text: 'Hello Shy World!'
-	)
+	).draw()
 }

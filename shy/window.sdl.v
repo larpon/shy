@@ -222,24 +222,19 @@ mut:
 	//
 	in_frame_call bool
 	//
-	fps_timer           u64
-	update_rate         f64 = 60.0
-	update_multiplicity u8
-	lock_framerate      bool
-
+	fps_timer             u64
+	update_rate           f64 = 60.0
+	update_multiplicity   u8  = 1
+	lock_framerate        bool
 	performance_frequency u64
+	snap_frequencies      [5]i64
 	fixed_deltatime       f64
 	desired_frametime     i64
-
-	vsync_maxerror i64
-	// time_60hz i64
-
-	snap_frequencies [5]i64
-
-	time_averager      [4]i64 // NOTE should be same cap as time_history_count
-	time_history_count u8 = 4
-	prev_frame_time    i64
-	frame_accumulator  i64
+	vsync_maxerror        i64
+	time_averager         [4]i64 // NOTE should be same cap as time_history_count
+	// time_history_count u8 = 4
+	prev_frame_time   i64
+	frame_accumulator i64
 }
 
 // Window
@@ -283,7 +278,7 @@ pub fn (mut w Window) render_init() {
 	w.state.update_rate = update_rate // f64(60)
 	w.state.update_multiplicity = run_config.update_multiplicity // int(1)
 	w.state.lock_framerate = run_config.lock_framerate // false
-	w.state.time_history_count = run_config.time_history_count // 4
+	// w.state.time_history_count = run_config.time_history_count // 4
 
 	// V implementation of:
 	// https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
@@ -373,17 +368,17 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 		}
 	}
 	// Delta time averaging
-	// for i := 0; i < time_history_count - 1; i++ {
-	for i in 0 .. w.state.time_history_count - 1 {
+	time_history_count := w.state.time_averager.len
+	for i in 0 .. time_history_count - 1 {
 		w.state.time_averager[i] = w.state.time_averager[i + 1]
 	}
-	w.state.time_averager[w.state.time_history_count - 1] = delta_time
+	w.state.time_averager[time_history_count - 1] = delta_time
 	delta_time = 0
 	// for i := 0; i < time_history_count; i++ {
-	for i in 0 .. w.state.time_history_count {
+	for i in 0 .. time_history_count {
 		delta_time += w.state.time_averager[i]
 	}
-	delta_time /= w.state.time_history_count
+	delta_time /= time_history_count
 
 	// add to the accumulator
 	w.state.frame_accumulator += delta_time

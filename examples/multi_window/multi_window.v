@@ -32,18 +32,20 @@ pub fn (mut a App) frame(dt f64) {
 	} else {
 		shy.ColorsSolidAndOutline{}
 	}
+
 	a.easy.rect(
 		x: (win.width() / 2) - 50
 		y: (win.height() / 2) - 50
 		w: 100
 		h: 100
 		colors: colors
-	)
+	).draw()
+
 	a.easy.text(
-		x: (win.width() / 6)
-		y: (win.height() / 6)
+		x: (win.width() / 10)
+		y: (win.height() / 10)
 		text: 'Window $win.id\n(press W to open a new child window)\nMouse: $mouse.x,$mouse.y'
-	)
+	).draw()
 }
 
 [markused]

@@ -153,7 +153,7 @@ pub enum ImageKind {
 
 [heap]
 pub struct Image {
-	asset &Asset
+	asset &Asset = null
 	opt   ImageOptions
 pub:
 	width  int

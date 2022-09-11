@@ -18,7 +18,18 @@ pub fn (mut e Easy) init() ! {
 pub fn (mut e Easy) shutdown() ! {}
 
 [params]
+pub struct EasyTextConfig {
+pub:
+	x      f32
+	y      f32
+	text   string
+	anchor Anchor
+}
+
+[noinit]
 pub struct EasyText {
+	ShyStruct
+pub:
 	x      f32
 	y      f32
 	text   string
@@ -26,9 +37,8 @@ pub struct EasyText {
 }
 
 [inline]
-pub fn (e Easy) text(et EasyText) {
-	gfx := e.shy.api.gfx
-
+pub fn (et &EasyText) draw() {
+	gfx := et.shy.api.gfx
 	mut dt := gfx.draw.text()
 	dt.begin()
 	mut t := dt.text_2d()
@@ -39,18 +49,34 @@ pub fn (e Easy) text(et EasyText) {
 	dt.end()
 }
 
+[inline]
+pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyText{
+		...etc
+		shy: e.shy
+	}
+}
+
 // Shape drawing sub-system
 
 [params]
-pub struct EasyRect {
+pub struct EasyRectConfig {
 	Rect
 pub mut:
 	colors ColorsSolidAndOutline
 }
 
-[inline]
-pub fn (e Easy) rect(er EasyRect) {
-	gfx := e.shy.api.gfx
+[noinit]
+pub struct EasyRect {
+	ShyStruct
+	Rect
+pub mut:
+	colors ColorsSolidAndOutline
+}
+
+pub fn (er &EasyRect) draw() {
+	gfx := er.shy.api.gfx
 	mut d := gfx.draw.shape_2d()
 	d.begin()
 	mut r := d.rect()
@@ -63,9 +89,17 @@ pub fn (e Easy) rect(er EasyRect) {
 	d.end()
 }
 
+pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyRect{
+		...erc
+		shy: e.shy
+	}
+}
+
 // Audio sub-system
 
-[params]
+[noinit]
 pub struct EasySound {
 	ShyStruct
 	engine &AudioEngine
@@ -82,7 +116,8 @@ pub struct EasySoundConfig {
 	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
 }
 
-pub fn (e Easy) new_sound(esc EasySoundConfig) !&EasySound {
+pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
 	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
 	mut audio := e.audio_engine
 
@@ -146,28 +181,33 @@ pub fn (es &EasySound) stop() {
 }
 
 // Image drawing sub-system
-
 [params]
-pub struct EasyImage {
+pub struct EasyImageConfig {
 	Rect
 pub:
 	uri   string
 	color Color = rgb(255, 255, 255)
 }
 
-[inline]
-pub fn (e Easy) image(ei EasyImage) {
+[noinit]
+pub struct EasyImage {
+	ShyStruct
+	Rect
+pub:
+	uri   string
+	color Color = rgb(255, 255, 255)
+}
+
+pub fn (ei &EasyImage) draw() {
 	// TODO e.shy.assets.get_cached(...) ???
-	mut image := Image{
-		asset: null
-	}
-	if img := e.shy.assets().image_cache[ei.uri] {
+	mut image := Image{}
+	if img := ei.shy.assets().image_cache[ei.uri] {
 		image = img
 	} else {
 		return
 	}
 
-	gfx := e.shy.api.gfx
+	gfx := ei.shy.api.gfx
 	mut d := gfx.draw.image()
 	d.begin()
 	mut i2d := d.image_2d(image)
@@ -178,6 +218,15 @@ pub fn (e Easy) image(ei EasyImage) {
 	i2d.h = ei.h
 	i2d.draw()
 	d.end()
+}
+
+[inline]
+pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyImage{
+		...eic
+		shy: e.shy
+	}
 }
 
 // Assets

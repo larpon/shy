@@ -22,5 +22,5 @@ pub fn (mut a App) frame(dt f64) {
 		y: (a.window.height() / 2) - 50
 		w: 100
 		h: 100
-	)
+	).draw()
 }

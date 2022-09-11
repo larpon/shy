@@ -29,9 +29,10 @@ pub fn (mut a App) frame(dt f64) {
 	if a.mouse.is_button_down(.right) {
 		buttons[2] = 'right'
 	}
+
 	a.easy.text(
 		x: mx + 10
 		y: my + 20
 		text: 'Shy Mouse at $mx,$my\n$buttons'
-	)
+	).draw()
 }
