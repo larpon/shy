@@ -167,7 +167,7 @@ pub struct DrawShape2DRect {
 	Rect
 pub mut:
 	// visible bool = true
-	colors ColorsSolidAndOutline
+	colors ShapeColors
 	// TODO clear up this mess
 	radius  f32     = 1.0
 	scale   f32     = 1.0

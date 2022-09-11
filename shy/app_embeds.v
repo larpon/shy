@@ -26,6 +26,7 @@ pub fn (mut a App) event(e Event) {}
 pub struct EasyApp {
 	App
 mut:
+	do     EasyDo
 	easy   &Easy     = null
 	assets &Assets   = null
 	draw   &Draw     = null
@@ -38,6 +39,7 @@ pub fn (mut a EasyApp) init() ! {
 	a.easy = &Easy{
 		shy: a.shy
 	}
+	a.do.easy = a.easy
 	a.easy.init()!
 	a.assets = a.shy.assets()
 	a.draw = a.shy.draw()

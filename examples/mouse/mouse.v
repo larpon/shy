@@ -30,9 +30,9 @@ pub fn (mut a App) frame(dt f64) {
 		buttons[2] = 'right'
 	}
 
-	a.easy.text(
+	a.do.text(
 		x: mx + 10
 		y: my + 20
-		text: 'Shy Mouse at $mx,$my\n$buttons'
-	).draw()
+		text: 'Shy Mouse at $mx,$my\nButtons pressed: $buttons'
+	)
 }

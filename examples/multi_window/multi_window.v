@@ -25,27 +25,25 @@ pub fn (mut a App) frame(dt f64) {
 	mut win := a.shy.active_window()
 	mouse := a.mouse
 
-	colors := if win.id == 0 {
-		shy.ColorsSolidAndOutline{
+	mut colors := shy.ShapeColors{}
+	if win.id == 0 {
+		colors = shy.ShapeColors{
 			solid: shy.colors.shy.blue
 		}
-	} else {
-		shy.ColorsSolidAndOutline{}
 	}
-
-	a.easy.rect(
+	a.do.rect(
 		x: (win.width() / 2) - 50
 		y: (win.height() / 2) - 50
 		w: 100
 		h: 100
 		colors: colors
-	).draw()
+	)
 
-	a.easy.text(
+	a.do.text(
 		x: (win.width() / 10)
 		y: (win.height() / 10)
 		text: 'Window $win.id\n(press W to open a new child window)\nMouse: $mouse.x,$mouse.y'
-	).draw()
+	)
 }
 
 [markused]

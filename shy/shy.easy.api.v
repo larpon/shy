@@ -5,13 +5,24 @@ module shy
 
 // High-level as-easy-as-it-gets API
 
+// EasyDo is an internal struct for fire-and-forget/instant calling of Easy methods.
+[noinit]
+struct EasyDo {
+mut:
+	easy &Easy = null
+}
+
+[heap]
 pub struct Easy {
 	ShyStruct
 mut:
+	do           EasyDo
 	audio_engine &AudioEngine = null
 }
 
 pub fn (mut e Easy) init() ! {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	e.do.easy = e
 	e.audio_engine = e.shy.api.audio.engine(0)!
 }
 
@@ -58,13 +69,19 @@ pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 	}
 }
 
+[inline]
+pub fn (ed &EasyDo) text(etc EasyTextConfig) {
+	assert !isnil(ed.easy), 'Easy struct is not initialized'
+	ed.easy.text(etc).draw()
+}
+
 // Shape drawing sub-system
 
 [params]
 pub struct EasyRectConfig {
 	Rect
 pub mut:
-	colors ColorsSolidAndOutline
+	colors ShapeColors
 }
 
 [noinit]
@@ -72,9 +89,10 @@ pub struct EasyRect {
 	ShyStruct
 	Rect
 pub mut:
-	colors ColorsSolidAndOutline
+	colors ShapeColors
 }
 
+[inline]
 pub fn (er &EasyRect) draw() {
 	gfx := er.shy.api.gfx
 	mut d := gfx.draw.shape_2d()
@@ -89,12 +107,19 @@ pub fn (er &EasyRect) draw() {
 	d.end()
 }
 
+[inline]
 pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyRect{
 		...erc
 		shy: e.shy
 	}
+}
+
+[inline]
+pub fn (ed &EasyDo) rect(erc EasyRectConfig) {
+	assert !isnil(ed.easy), 'Easy struct is not initialized'
+	ed.easy.rect(erc).draw()
 }
 
 // Audio sub-system
@@ -229,6 +254,12 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 	}
 }
 
+[inline]
+pub fn (ed &EasyDo) image(eic EasyImageConfig) {
+	assert !isnil(ed.easy), 'Easy struct is not initialized'
+	ed.easy.image(eic).draw()
+}
+
 // Assets
 pub fn (e &Easy) load(ao AssetOptions) ! {
 	// TODO e.shy.assets.is_cached(...) ???
@@ -242,4 +273,10 @@ pub fn (e &Easy) load(ao AssetOptions) ! {
 		cache: true
 		mipmaps: 4
 	)!
+}
+
+[inline]
+pub fn (ed &EasyDo) load(ao AssetOptions) ! {
+	assert !isnil(ed.easy), 'Easy struct is not initialized'
+	ed.easy.load(ao)!
 }

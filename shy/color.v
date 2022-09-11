@@ -42,7 +42,8 @@ pub:
 	shy   ShyColors
 }
 
-pub struct ColorsSolidAndOutline {
+[params]
+pub struct ShapeColors {
 pub mut:
 	solid   Color = rgb(155, 25, 25)
 	outline Color = rgb(211, 211, 211)

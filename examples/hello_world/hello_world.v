@@ -17,7 +17,7 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	a.easy.text(
+	a.do.text(
 		text: 'Hello Shy World!'
-	).draw()
+	)
 }
