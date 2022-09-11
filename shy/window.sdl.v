@@ -211,8 +211,8 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	return win
 }
 
-// RenderState
-struct RenderState {
+// FrameState
+struct FrameState {
 mut:
 	resync bool
 	//
@@ -251,7 +251,7 @@ mut:
 	ready    bool
 	parent   &Window = null
 	children []&Window
-	state    RenderState
+	state    FrameState
 	fonts    Fonts
 	// SDL / GL
 	handle     &sdl.Window
