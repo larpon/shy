@@ -15,10 +15,10 @@ pub enum Kind {
 	sine
 	quad
 	cubic
-	quartic
-	quintic
-	exponential
-	circular
+	quart
+	quint
+	expo
+	circ
 	back
 	elastic
 	bounce
@@ -60,17 +60,17 @@ pub fn (e &Ease) ease(time f64) f64 {
 		.quad {
 			quad(t, mode)
 		}
-		.quartic {
-			quartic(t, mode)
+		.quart {
+			quart(t, mode)
 		}
-		.quintic {
-			quintic(t, mode)
+		.quint {
+			quint(t, mode)
 		}
-		.exponential {
-			exponential(t, mode)
+		.expo {
+			expo(t, mode)
 		}
-		.circular {
-			circular(t, mode)
+		.circ {
+			circ(t, mode)
 		}
 		.back {
 			back(t, mode)
@@ -159,110 +159,217 @@ pub fn in_out_quad_blend(t f64) f64 {
 pub fn quad(t f64, mode Mode) f64 {
 	return match mode {
 		.@in {
-			t * t
+			in_quad(t)
 		}
 		.out {
-			1 - (1 - t) * (1 - t)
+			out_quad(t)
 		}
 		.in_out {
-			if t < 0.5 {
-				2 * t * t
-			} else {
-				2.0 * (t - 0.5) * (1.0 - (t - 0.5)) + 0.5
-			}
+			in_out_quad(t)
 		}
+	}
+}
+
+[inline]
+pub fn in_quad(t f64) f64 {
+	return t * t
+}
+
+[inline]
+pub fn out_quad(t f64) f64 {
+	return 1 - (1 - t) * (1 - t)
+}
+
+[inline]
+pub fn in_out_quad(t f64) f64 {
+	return if t < 0.5 {
+		2 * t * t
+	} else {
+		2.0 * (t - 0.5) * (1.0 - (t - 0.5)) + 0.5
 	}
 }
 
 pub fn cubic(t f64, mode Mode) f64 {
 	return match mode {
 		.@in {
-			t * t * t
+			in_cubic(t)
 		}
 		.out {
-			tm := -(1 - t)
-			tm * tm * tm + 1
+			out_cubic(t)
 		}
 		.in_out {
-			if t < 0.5 {
-				4 * t * t * t
-			} else {
-				(t - 1) * (2 * t - 2) * (2 * t - 2) + 1
-			}
+			in_out_cubic(t)
 		}
 	}
 }
 
-pub fn quartic(t f64, mode Mode) f64 {
+[inline]
+pub fn in_cubic(t f64) f64 {
+	return t * t * t
+}
+
+[inline]
+pub fn out_cubic(t f64) f64 {
+	tm := -(1 - t)
+	return tm * tm * tm + 1
+}
+
+[inline]
+pub fn in_out_cubic(t f64) f64 {
+	return if t < 0.5 {
+		4 * t * t * t
+	} else {
+		(t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+	}
+}
+
+pub fn quart(t f64, mode Mode) f64 {
 	return match mode {
 		.@in {
-			t * t * t * t
+			in_quart(t)
 		}
 		.out {
-			tm := -(1 - t)
-			1 - tm * tm * tm * tm
+			out_quart(t)
 		}
 		.in_out {
-			if t < 0.5 {
-				8 * t * t * t * t
-			} else {
-				tm := -(1 - t)
-				1 - 8 * tm * tm * tm * tm
-			}
+			in_out_quart(t)
 		}
 	}
 }
 
-pub fn quintic(t f64, mode Mode) f64 {
+[inline]
+pub fn in_quart(t f64) f64 {
+	return t * t * t * t
+}
+
+[inline]
+pub fn out_quart(t f64) f64 {
+	tm := -(1 - t)
+	return 1 - tm * tm * tm * tm
+}
+
+[inline]
+pub fn in_out_quart(t f64) f64 {
+	return if t < 0.5 {
+		8 * t * t * t * t
+	} else {
+		tm := -(1 - t)
+		1 - 8 * tm * tm * tm * tm
+	}
+}
+
+pub fn quint(t f64, mode Mode) f64 {
 	return match mode {
 		.@in {
-			t * t * t * t * t
+			in_quint(t)
 		}
 		.out {
-			tm := -(1 - t)
-			1 + tm * tm * tm * tm * tm
+			out_quint(t)
 		}
 		.in_out {
-			if t < 0.5 {
-				16 * t * t * t * t * t
-			} else {
-				tm := -(1 - t)
-				1 + 16 * tm * tm * tm * tm * tm
-			}
+			in_out_quint(t)
 		}
+	}
+}
+
+[inline]
+pub fn in_quint(t f64) f64 {
+	return t * t * t * t * t
+}
+
+[inline]
+pub fn out_quint(t f64) f64 {
+	tm := -(1 - t)
+
+	return 1 + tm * tm * tm * tm * tm
+}
+
+[inline]
+pub fn in_out_quint(t f64) f64 {
+	return if t < 0.5 {
+		16 * t * t * t * t * t
+	} else {
+		tm := -(1 - t)
+		1 + 16 * tm * tm * tm * tm * tm
 	}
 }
 
 pub fn sine(t f64, mode Mode) f64 {
 	return match mode {
-		.@in { 1.0 - math.cos((t * mth.pi) / 2) }
-		.out { math.sin((t * mth.pi) / 2) }
-		.in_out { -(math.cos(mth.pi * t) - 1) / 2 }
-	}
-}
-
-pub fn circular(t f64, mode Mode) f64 {
-	return match mode {
 		.@in {
-			-(math.sqrt(1 - t * t) - 1)
+			in_sine(t)
 		}
 		.out {
-			mt := t - 1
-			math.sqrt(1 - mt * mt)
+			out_sine(t)
 		}
 		.in_out {
-			mut mt := t * 2
-			if mt < 1 {
-				-0.5 * (math.sqrt(1 - mt * mt) - 1)
-			} else {
-				mt -= 2.0
-				0.5 * (math.sqrt(1 - mt * mt) + 1)
-			}
+			in_out_sine(t)
 		}
 	}
 }
 
-pub fn exponential(t f64, mode Mode) f64 {
+[inline]
+pub fn in_sine(t f64) f64 {
+	return 1.0 - math.cos((t * mth.pi) / 2)
+}
+
+[inline]
+pub fn out_sine(t f64) f64 {
+	return math.sin((t * mth.pi) / 2)
+}
+
+[inline]
+pub fn in_out_sine(t f64) f64 {
+	return -(math.cos(mth.pi * t) - 1) / 2
+}
+
+pub fn circ(t f64, mode Mode) f64 {
+	return match mode {
+		.@in {
+			in_circ(t)
+		}
+		.out {
+			out_circ(t)
+		}
+		.in_out {
+			in_out_circ(t)
+		}
+	}
+}
+
+[inline]
+pub fn in_circ(t f64) f64 {
+	return -(math.sqrt(1 - t * t) - 1)
+}
+
+[inline]
+pub fn out_circ(t f64) f64 {
+	mt := t - 1
+
+	return math.sqrt(1 - mt * mt)
+}
+
+[inline]
+pub fn in_out_circ(t f64) f64 {
+	mut mt := t * 2
+
+	return if mt < 1 {
+		-0.5 * (math.sqrt(1 - mt * mt) - 1)
+	} else {
+		mt -= 2.0
+		0.5 * (math.sqrt(1 - mt * mt) + 1)
+	}
+}
+
+const (
+	c1 = 1.70158
+	c2 = 1.70158 * 1.525
+	c3 = 1.70158 + 1.0
+	c4 = (2 * mth.pi) / 3
+	c5 = (2 * mth.pi) / 4.5
+)
+
+pub fn expo(t f64, mode Mode) f64 {
 	if t == 0.0 {
 		return 0.0
 	}
@@ -272,18 +379,33 @@ pub fn exponential(t f64, mode Mode) f64 {
 
 	return match mode {
 		.@in {
-			math.pow(2, 10 * t - 10)
+			in_expo(t)
 		}
 		.out {
-			1 - math.pow(2, -10 * t)
+			out_expo(t)
 		}
 		.in_out {
-			if t < 0.5 {
-				math.pow(2, 20 * t - 10) / 2
-			} else {
-				(2 - math.pow(2, -20 * t + 10)) / 2
-			}
+			in_out_expo(t)
 		}
+	}
+}
+
+[inline]
+pub fn in_expo(t f64) f64 {
+	return math.pow(2, 10 * t - 10)
+}
+
+[inline]
+pub fn out_expo(t f64) f64 {
+	return 1 - math.pow(2, -10 * t)
+}
+
+[inline]
+pub fn in_out_expo(t f64) f64 {
+	return if t < 0.5 {
+		math.pow(2, 20 * t - 10) / 2
+	} else {
+		(2 - math.pow(2, -20 * t + 10)) / 2
 	}
 }
 
@@ -295,79 +417,115 @@ pub fn elastic(t f64, mode Mode) f64 {
 		return 1.0
 	}
 
-	c4 := (2 * mth.pi) / 3
-
 	return match mode {
 		.@in {
-			-math.pow(2, 10 * t) * math.sin((t * 10 - 10.75) * c4)
+			in_elastic(t)
 		}
 		.out {
-			math.pow(2, -10 * t) * math.sin((t * 10 - 0.75) * c4) + 1
+			out_elastic(t)
 		}
 		.in_out {
-			c5 := (2 * mth.pi) / 4.5
-
-			if t < 0.5 {
-				-(math.pow(2, 20 * t - 10) * math.sin((20 * t - 11.125) * c5)) / 2
-			} else {
-				(math.pow(2, -20 * t + 10) * math.sin((20 * t - 11.125) * c5)) / 2 + 1
-			}
+			in_out_elastic(t)
 		}
 	}
 }
 
-pub fn back(t f64, mode Mode) f64 {
-	c1 := 1.70158
-	c3 := c1 + 1.0
+[inline]
+pub fn in_elastic(t f64) f64 {
+	return -math.pow(2, 10 * t) * math.sin((t * 10 - 10.75) * ease.c4)
+}
 
+[inline]
+pub fn out_elastic(t f64) f64 {
+	return math.pow(2, -10 * t) * math.sin((t * 10 - 0.75) * ease.c4) + 1
+}
+
+[inline]
+pub fn in_out_elastic(t f64) f64 {
+	return if t < 0.5 {
+		-(math.pow(2, 20 * t - 10) * math.sin((20 * t - 11.125) * ease.c5)) / 2
+	} else {
+		(math.pow(2, -20 * t + 10) * math.sin((20 * t - 11.125) * ease.c5)) / 2 + 1
+	}
+}
+
+pub fn back(t f64, mode Mode) f64 {
 	return match mode {
 		.@in {
-			c3 * t * t * t - c1 * t * t
+			in_back(t)
 		}
 		.out {
-			1.0 + c3 * math.pow(t - 1, 3) + c1 * math.pow(t - 1, 2)
+			out_back(t)
 		}
 		.in_out {
-			c2 := c1 * 1.525
-
-			if t < 0.5 {
-				(math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
-			} else {
-				(math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2
-			}
+			in_out_back(t)
 		}
+	}
+}
+
+[inline]
+pub fn in_back(t f64) f64 {
+	return ease.c3 * t * t * t - ease.c1 * t * t
+}
+
+[inline]
+pub fn out_back(t f64) f64 {
+	return 1.0 + ease.c3 * math.pow(t - 1, 3) + ease.c1 * math.pow(t - 1, 2)
+}
+
+[inline]
+pub fn in_out_back(t f64) f64 {
+	return if t < 0.5 {
+		(math.pow(2 * t, 2) * ((ease.c2 + 1) * 2 * t - ease.c2)) / 2
+	} else {
+		(math.pow(2 * t - 2, 2) * ((ease.c2 + 1) * (t * 2 - 2) + ease.c2) + 2) / 2
 	}
 }
 
 pub fn bounce(t f64, mode Mode) f64 {
 	return match mode {
 		.@in {
-			1 - bounce(1 - t, Mode.out)
+			in_bounce(t)
 		}
 		.out {
-			n1 := 7.5625
-			d1 := 2.75
-
-			if t < (1.0 / d1) {
-				n1 * t * t
-			} else if t < (2.0 / d1) {
-				t_ := t - (1.5 / d1)
-				n1 * t_ * t_ + 0.75
-			} else if t < (2.5 / d1) {
-				t_ := t - (2.25 / d1)
-				n1 * t_ * t_ + 0.9375
-			} else {
-				t_ := t - (2.625 / d1)
-				n1 * t_ * t_ + 0.984375
-			}
+			out_bounce(t)
 		}
 		.in_out {
-			if t < 0.5 {
-				(1 - bounce(1 - 2 * t, Mode.out)) / 2
-			} else {
-				(1 + bounce(2 * t - 1, Mode.out)) / 2
-			}
+			in_out_bounce(t)
 		}
+	}
+}
+
+[inline]
+pub fn in_bounce(t f64) f64 {
+	return 1 - out_bounce(1 - t)
+}
+
+[inline]
+pub fn out_bounce(t f64) f64 {
+	n1 := 7.5625
+	d1 := 2.75
+
+	return if t < (1.0 / d1) {
+		n1 * t * t
+	} else if t < (2.0 / d1) {
+		t_ := t - (1.5 / d1)
+		n1 * t_ * t_ + 0.75
+	} else if t < (2.5 / d1) {
+		t_ := t - (2.25 / d1)
+		n1 * t_ * t_ + 0.9375
+	} else {
+		t_ := t - (2.625 / d1)
+		n1 * t_ * t_ + 0.984375
+	}
+}
+
+[inline]
+pub fn in_out_bounce(t f64) f64 {
+	return if t < 0.5 {
+		(1 - out_bounce(1 - 2 * t)) / 2
+	} else {
+		(1 + out_bounce(2 * t - 1)) / 2
 	}
 }
 
