@@ -31,20 +31,22 @@ pub fn (mut e Easy) shutdown() ! {}
 [params]
 pub struct EasyTextConfig {
 pub mut:
-	x      f32
-	y      f32
-	text   string
-	anchor Anchor
+	x        f32
+	y        f32
+	rotation f32
+	text     string
+	anchor   Anchor
 }
 
 [noinit]
 pub struct EasyText {
 	ShyStruct
 pub mut:
-	x      f32
-	y      f32
-	text   string
-	anchor Anchor
+	x        f32
+	y        f32
+	rotation f32
+	text     string
+	anchor   Anchor
 }
 
 [inline]
@@ -56,6 +58,7 @@ pub fn (et &EasyText) draw() {
 	t.text = et.text
 	t.x = et.x
 	t.y = et.y
+	t.rotation = et.rotation
 	t.draw()
 	dt.end()
 }

@@ -161,7 +161,4 @@ fn (fc &FontContext) begin() {
 
 fn (fc &FontContext) end() {
 	sfons.flush(fc.fsc)
-	sgl.draw()
-	// TODO needs patching of sokol_gfx.h for more text drawing contexts to co-exist in same frame :(
-	// See https://github.com/floooh/sokol/issues/703 foor your own issue report and solution
 }

@@ -5,8 +5,14 @@ module shy
 
 import shy.utils
 import shy.ease
+import math // TODO
 
 pub const infinite = -1
+
+pub enum AnimatorKind {
+	animator
+	follow
+}
 
 type AnimEventFn = fn (voidptr, AnimEvent)
 
@@ -28,9 +34,23 @@ mut:
 	running bool
 	paused  bool
 	active  []&IAnimator
+	// bin     []&IAnimator
+	f32pool []&Animator<f32>
+	// f64_pool    []&Animator<f64>
 }
 
-pub fn (mut a Anims) init() ! {}
+pub fn (mut a Anims) init() ! {
+	// TODO make configurable
+	prealloc := 1000
+	// unsafe { a.active.flags.set(.noslices | .noshrink) }
+	// unsafe { a.bin.flags.set(.noslices | .noshrink) }
+	unsafe { a.f32pool.flags.set(.noslices | .noshrink) }
+	// unsafe { a.f64_pool.flags.set(.noslices | .noshrink) }
+	for i := 0; i < prealloc; i++ {
+		a.f32pool << a.p_new_animator<f32>()
+		// a.f64_pool << a.p_new_animator<f64>()
+	}
+}
 
 pub fn (mut a Anims) shutdown() ! {
 	for anim in a.active {
@@ -38,15 +58,36 @@ pub fn (mut a Anims) shutdown() ! {
 			free(anim)
 		}
 	}
+	/*
+	for anim in a.bin {
+		unsafe {
+			free(anim)
+		}
+	}
+	*/
+
+	for anim in a.f32pool {
+		unsafe {
+			free(anim)
+		}
+	}
 }
 
-pub fn (a &Anims) update(dt f64) {
+pub fn (mut a Anims) update(dt f64) {
 	if a.paused {
 		return
 	}
-	for animator in a.active {
+	for i := 0; i < a.active.len; i++ {
+		animator := a.active[i]
+
+		if animator.kind == .follow {
+			animator.touch()
+		}
+		// for animator in a.active {
 		if !animator.running {
-			continue // TODO move to inactive queue?
+			// TODO move to inactive queue - see if this is all worth it
+			// a.bin << animator
+			continue
 		}
 		if animator.paused {
 			continue
@@ -56,7 +97,6 @@ pub fn (a &Anims) update(dt f64) {
 }
 
 pub fn (mut s Shy) new_animator<T>(config AnimatorConfig) &Animator<T> {
-	s.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
 	mut win := s.active_window()
 	assert !isnil(win), 'Window is not alive'
 	assert !isnil(win.anims), 'Window has not initialized animation support'
@@ -64,27 +104,75 @@ pub fn (mut s Shy) new_animator<T>(config AnimatorConfig) &Animator<T> {
 	return anims.new_animator<T>(config)
 }
 
-pub fn (mut a Anims) new_animator<T>(config AnimatorConfig) &Animator<T> {
+pub fn (mut s Shy) new_follow_animator<T>(config FollowAnimatorConfig) &FollowAnimator<T> {
+	mut win := s.active_window()
+	assert !isnil(win), 'Window is not alive'
+	assert !isnil(win.anims), 'Window has not initialized animation support'
+	mut anims := win.anims
+	return anims.new_follow_animator<T>(config)
+}
+
+fn (mut a Anims) p_new_animator<T>(config AnimatorConfig) &Animator<T> {
+	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
 	mut animator := &Animator<T>{
-		// TODO BUG ...config <- doesn't work
+		shy: a.shy
+		// TODO BUG ...config <- doesn't work for generics
 	}
-	animator.running = config.running
-	animator.paused = config.paused
-	animator.ease = config.ease
-	animator.loop = config.loop
-	animator.loops = config.loops
-	animator.duration = config.duration
-	animator.user = config.user
-	animator.on_event_fn = config.on_event_fn
+	animator.config_update(config)
+	return animator
+}
+
+fn (mut a Anims) p_new_follow_animator<T>(config FollowAnimatorConfig) &FollowAnimator<T> {
+	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	mut animator := &FollowAnimator<T>{
+		shy: a.shy
+		// TODO BUG ...config <- doesn't work for generics
+	}
+	animator.config_update(config)
+	return animator
+}
+
+pub fn (mut a Anims) new_animator<T>(config AnimatorConfig) &Animator<T> {
+	mut animator := &Animator<T>(0) // unsafe { nil }
+	$if T.typ is f32 {
+		if a.f32pool.len > 0 {
+			animator = a.f32pool.pop()
+			animator.config_update(config)
+		} else {
+			animator = a.p_new_animator<T>(config)
+		}
+	} $else {
+		animator = a.p_new_animator<T>(config)
+	}
+	// animator = a.p_new_animator<T>(config)
+	a.active << animator
+	return animator
+}
+
+pub fn (mut a Anims) new_follow_animator<T>(config FollowAnimatorConfig) &FollowAnimator<T> {
+	mut animator := &FollowAnimator<T>(0) // unsafe { nil }
+	/*
+	$if T.typ is f32 {
+		if a.f32pool.len > 0 {
+			animator = a.f32pool.pop()
+			animator.config_update(config)
+		} else {
+			animator = a.p_new_animator<T>(config)
+		}
+	} $else {
+		animator = a.p_new_animator<T>(config)
+	}*/
+	animator = a.p_new_follow_animator<T>(config)
 	a.active << animator
 	return animator
 }
 
 interface IAnimator {
+	kind AnimatorKind
 	running bool
-	paused bool
-	run()
+	paused bool // run()
 	step(f64)
+	touch()
 }
 
 [params]
@@ -101,12 +189,14 @@ pub mut:
 }
 
 pub struct Animator<T> {
+	ShyStruct
+	kind AnimatorKind = .animator
 pub mut:
 	running     bool
 	paused      bool
 	ease        ease.Ease
 	loop        AnimLoop
-	loops       i64 // -1 = infinite, 0/1 = once, > 1 = X loops
+	loops       i64 // shy.infinite = infinite, 0/1 = once, > 1 = X loops
 	user        voidptr
 	on_event_fn AnimEventFn
 	duration    i64 = 1000
@@ -119,11 +209,22 @@ mut:
 	elapsed    f64
 }
 
-pub fn (mut a Animator<T>) init(from T, to T, duration i64) {
+fn (mut a Animator<T>) config_update(config AnimatorConfig) {
+	a.running = config.running
+	a.paused = config.paused
+	a.ease = config.ease
+	a.loop = config.loop
+	a.loops = config.loops
+	a.duration = config.duration
+	a.user = config.user
+	a.on_event_fn = config.on_event_fn
+}
+
+pub fn (mut a Animator<T>) init(from T, to T, duration_ms i64) {
 	a.value = from
 	a.from = from
 	a.to = to
-	a.duration = duration
+	a.duration = duration_ms
 }
 
 pub fn (a &Animator<T>) restart() {
@@ -172,7 +273,7 @@ fn (mut a Animator<T>) ended() {
 			if a.loops > 0 {
 				a.loops--
 				a.restart()
-			} else if a.loops < 0 {
+			} else if a.loops == shy.infinite {
 				a.restart()
 			} else {
 				a.reset()
@@ -183,7 +284,7 @@ fn (mut a Animator<T>) ended() {
 				a.from, a.to = a.to, a.from
 				a.loops--
 				a.restart()
-			} else if a.loops < 0 {
+			} else if a.loops == shy.infinite {
 				a.from, a.to = a.to, a.from
 				a.restart()
 			} else {
@@ -192,6 +293,8 @@ fn (mut a Animator<T>) ended() {
 		}
 	}
 }
+
+fn (a &Animator<T>) touch() {}
 
 fn (ima &Animator<T>) step(dt f64) {
 	mut a := unsafe { ima } // TODO BUG workaround mutable generic interfaces
@@ -206,5 +309,86 @@ fn (ima &Animator<T>) step(dt f64) {
 	// a.t = ease.in_curve(a.t)
 	// a.t = ease.out_curve(a.t)
 	a.value = utils.remap(a.t, 0, 1.0, a.from, a.to)
+	a.prev_value = a.value
+}
+
+[params]
+pub struct FollowAnimatorConfig {
+pub mut:
+	running bool
+	paused  bool
+	// ease        ease.Ease
+	speed       f32 = 1.0
+	user        voidptr
+	on_event_fn AnimEventFn
+}
+
+pub struct FollowAnimator<T> {
+	ShyStruct
+	kind AnimatorKind = .follow
+pub mut:
+	running bool
+	paused  bool
+	// ease        ease.Ease
+	speed       f32 = 1.0
+	user        voidptr
+	on_event_fn AnimEventFn
+mut:
+	target T
+	// to         T
+	value      T
+	prev_value T
+	// t          f64 // time, a value between 0 and 1
+	// elapsed    f64
+}
+
+fn (fa FollowAnimator<T>) touch() {
+	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
+	should_run := math.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
+	if should_run {
+		a.running = should_run
+		if a.running {
+			a.fire_event_fn(.begin)
+		}
+	}
+}
+
+fn (mut a FollowAnimator<T>) config_update(config FollowAnimatorConfig) {
+	a.running = config.running
+	a.paused = config.paused
+	a.speed = config.speed
+	// a.ease = config.ease
+	// a.loop = config.loop
+	// a.loops = config.loops
+	// a.duration = config.duration
+	a.user = config.user
+	a.on_event_fn = config.on_event_fn
+}
+
+fn (a &FollowAnimator<T>) fire_event_fn(event AnimEvent) {
+	if !isnil(a.on_event_fn) {
+		a.on_event_fn(a.user, event)
+	}
+}
+
+pub fn (a &FollowAnimator<T>) value() T {
+	return a.value
+}
+
+fn (fa &FollowAnimator<T>) step(dt f64) {
+	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
+
+	a.value = a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.speed)
+
+	// round_to_even() ?? (Banker's round)
+	p_running := a.running
+	a.running = math.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
+	if a.running != p_running {
+		if a.running {
+			a.fire_event_fn(.begin)
+		} else {
+			a.fire_event_fn(.end)
+		}
+	}
 	a.prev_value = a.value
 }

@@ -37,7 +37,7 @@ pub fn clamp<T>(val T, min T, max T) T {
 	return mth.min(mth.max(val, min), max)
 }
 
-// loopf loops a continious `value` in the range `from`,`to`
+// loop_f32 loops a continious `value` in the range `from`,`to`.
 pub fn loop_f32(value f32, from f32, to f32) f32 {
 	range := to - from
 	offset_value := value - from // value relative to 0
@@ -45,7 +45,7 @@ pub fn loop_f32(value f32, from f32, to f32) f32 {
 	return (offset_value - f32((math.floor(offset_value / range) * range))) + from
 }
 
-// loop loops a continious `value` in the range `from`,`to`
+// loop_int loops a continious `value` in the range `from`,`to`.
 pub fn loop_int(value int, from int, to int) int {
 	range := to - from
 	offset_value := value - from // value relative to 0
@@ -53,14 +53,19 @@ pub fn loop_int(value int, from int, to int) int {
 	return (offset_value - int((math.floor(offset_value / range) * range))) + from
 }
 
-// oscillate e.g. "wave" or "ping-pong" `value` between `min` and `max`
+// oscillate_int e.g. "wave" or "ping-pong" `value` between `min` and `max`.
 pub fn oscillate_int(value int, min int, max int) int {
 	range := max - min
-	return min + math.abs(((value + range) % (range * 2)) - range)
+	return min + mth.abs(((value + range) % (range * 2)) - range)
 }
 
-// oscillatef e.g. "wave" or "ping-pong" `value` between `min` and `max`
+// oscillate_f32 e.g. "wave" or "ping-pong" `value` between `min` and `max`.
 pub fn oscillate_f32(value f32, min f32, max f32) f32 {
 	range := max - min
-	return f32(min + math.abs(math.fmod((value + range), (range * 2)) - range))
+	return f32(min + mth.abs(math.fmod((value + range), (range * 2)) - range))
+}
+
+// manhattan_distance returns the "manhattan" distance between 2 points.
+pub fn manhattan_distance<T>(ax T, ay T, bx T, by T) T {
+	return mth.abs(ax - bx) + mth.abs(ay - by)
 }

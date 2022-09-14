@@ -7,6 +7,15 @@ import sdl
 
 pub fn (mut m Mouse) init() ! {
 	m.shy.log.gdebug('${@STRUCT}.${@FN}', '$m.id hi')
+
+	// TODO find a way to get mouse position in window
+	// m.position(.window) doesn't work since SDL need mouse movement
+	// before being able to generate *window local* mouse events
+	/*
+	mx, my := m.position(.global)
+	m.x = mx
+	m.y = my
+	*/
 }
 
 pub fn (mut m Mouse) show() {

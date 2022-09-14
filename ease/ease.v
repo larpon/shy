@@ -139,15 +139,18 @@ fn t_for_x(x f64, x1 f64, x2 f64) f64 {
 	return guess_t
 }
 
+[inline]
 pub fn bezier_blend(t f64) f64 {
 	return t * t * (3.0 - 2.0 * t)
 }
 
+[inline]
 pub fn parametric_blend(t f64) f64 {
 	sqt := t * t
 	return sqt / (2.0 * (sqt - t) + 1.0)
 }
 
+[inline]
 pub fn in_out_quad_blend(t f64) f64 {
 	if t <= 0.5 {
 		return 2.0 * t * t

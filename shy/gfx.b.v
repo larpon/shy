@@ -62,6 +62,7 @@ pub fn (mut g GFX) shutdown_subsystems() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	sgp.shutdown()
+	sgl.shutdown()
 }
 
 pub fn (mut g GFX) shutdown() ! {

@@ -59,24 +59,27 @@ pub fn (mut dt DrawText) begin() {
 
 	mut fonts := unsafe { win.fonts }
 	fc := fonts.get_context()
-
 	sgl.set_context(fc.sgl)
+
 	sgl.matrix_mode_projection()
 	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 
 	//¤ FLOOD dt.shy.log.gdebug('${@STRUCT}.${@FN}', 'begin ${ptr_str(fc.fsc)}...')
 	dt.font_context = fc
+	assert !isnil(fc), 'FontContext is null'
 	fc.begin()
 }
 
 pub fn (mut dt DrawText) end() {
 	dt.ShyFrame.end()
 	fc := dt.font_context
+	assert !isnil(fc), 'FontContext is null'
 	if !isnil(fc) {
 		//¤ FLOOD d2d.shy.log.gdebug('${@STRUCT}.${@FN}', 'end   ${ptr_str(fc.fsc)}...')
 		fc.end()
 		dt.font_context = null
 	}
+	sgl.draw()
 }
 
 pub fn (mut dt DrawText) text_2d() Draw2DText {
@@ -90,10 +93,11 @@ pub struct Draw2DText {
 	vec.Vec2<f32>
 	fc &FontContext
 pub mut:
-	text   string
-	font   string = defaults.font.name
-	colors [color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
-	anchor Anchor
+	text     string
+	rotation f32
+	font     string = defaults.font.name
+	colors   [color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	anchor   Anchor
 	// TODO clear up this mess
 	size   f32  = defaults.font.size
 	scale  f32  = 1.0
@@ -157,7 +161,17 @@ pub fn (t Draw2DText) draw() {
 		}
 		x := t.offset.x + t.x + off_x
 		y := t.offset.y + t.y + y_accu
-		font_context.draw_text(x, y, line)
+
+		sgl.push_matrix()
+		sgl.translate(x, y, 0)
+
+		if t.rotation != 0 {
+			sgl.rotate(t.rotation * mth.deg2rad, 0, 0, 1)
+		}
+		font_context.draw_text(0, 0, line)
+
+		sgl.translate(-x, -y, 0)
+		sgl.pop_matrix()
 	}
 }
 
