@@ -213,7 +213,7 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 
 // FrameState
 struct FrameState {
-mut:
+pub mut:
 	resync bool
 	//
 	fps_frame    u32
@@ -246,14 +246,16 @@ mut:
 	ready    bool
 	parent   &Window = null
 	children []&Window
-	state    FrameState
 	fonts    Fonts
+	anims    &Anims = null
 	// SDL / GL
 	handle     &sdl.Window
 	gl_context sdl.GLContext
 	// sokol
 	pass_action gfx.PassAction
 	gfx_context gfx.Context
+pub mut:
+	state FrameState
 }
 
 pub fn (w &Window) begin() {
@@ -351,7 +353,7 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 	desired_frametime := w.state.desired_frametime
 
 	// handle unexpected timer anomalies (overflow, extra slow frames, etc)
-	// ignore extra-slow frames
+	// ignore extra slow frames
 	if delta_time > desired_frametime * 8 {
 		delta_time = desired_frametime
 	}
@@ -403,6 +405,7 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 
 		for w.state.frame_accumulator >= desired_frametime {
 			// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
+			w.fixed_update(fixed_deltatime)
 			ctx.fixed_update(fixed_deltatime)
 
 			if consumed_delta_time > desired_frametime {
@@ -410,6 +413,7 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 				// and interleave it (so game state can always get animation frames it needs)
 
 				// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
+				w.variable_update(fixed_deltatime)
 				ctx.variable_update(fixed_deltatime)
 
 				consumed_delta_time -= desired_frametime
@@ -419,6 +423,7 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 
 		c_dt := f64(consumed_delta_time) / s.performance_frequency()
 		// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
+		w.variable_update(c_dt)
 		ctx.variable_update(c_dt)
 
 		f_dt := f64(w.state.frame_accumulator) / desired_frametime
@@ -429,9 +434,11 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 		for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
 			for i := 0; i < w.state.update_multiplicity; i++ {
 				// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+				w.fixed_update(fixed_deltatime)
 				ctx.fixed_update(fixed_deltatime)
 
 				// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
+				w.variable_update(fixed_deltatime)
 				ctx.variable_update(fixed_deltatime)
 				w.state.frame_accumulator -= desired_frametime
 			}
@@ -456,11 +463,13 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 	}
 }
 
-/*
-pub fn (w &Window) commit() {
-	gfx.commit()
+pub fn (mut w Window) variable_update(dt f64) {
+	w.anims.update(dt)
 }
-*/
+
+pub fn (mut w Window) fixed_update(dt f64) {
+}
+
 pub fn (mut w Window) end() {
 	w.fonts.on_frame_end()
 }
@@ -550,6 +559,11 @@ pub fn (mut w Window) init() ! {
 		}
 	})! // fonts.b.v
 
+	w.anims = &Anims{
+		shy: s
+	}
+	w.anims.init()!
+
 	w.render_init()
 
 	w.ready = true
@@ -569,6 +583,9 @@ pub fn (mut w Window) shutdown() ! {
 
 	w.make_current()
 
+	w.anims.shutdown()!
+	unsafe { free(w.anims) }
+
 	w.fonts.shutdown()!
 
 	w.shy.api.gfx.shutdown_subsystems()!
@@ -579,12 +596,6 @@ pub fn (mut w Window) shutdown() ! {
 	// }
 	sdl.destroy_window(w.handle)
 }
-
-/*
-pub fn (w Window) as_native() &sdl.Window {
-	return &sdl.Window(w.ref)
-}
-*/
 
 pub fn (mut w Window) toggle_fullscreen() {
 	if w.is_fullscreen() {

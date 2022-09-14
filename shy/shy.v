@@ -27,9 +27,13 @@ pub mut: // TODO error: field `App.shy` is not public - make this just "pub" to 
 	shy &Shy // = shy.null
 }
 
-fn (sb ShyStruct) init() ! {}
+fn (s ShyStruct) init() ! {
+	assert !isnil(s.shy), '${@STRUCT}.${@FN}' + 'shy is null'
+}
 
-fn (sb ShyStruct) shutdown() ! {}
+fn (s ShyStruct) shutdown() ! {
+	assert !isnil(s.shy), '${@STRUCT}.${@FN}' + 'shy is null'
+}
 
 struct ShyFrame {
 	ShyStruct
@@ -37,12 +41,14 @@ struct ShyFrame {
 
 [if !prod]
 fn (mut sf ShyFrame) begin() {
+	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 	assert sf.shy.state.in_frame_call, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 
 [if !prod]
 fn (mut sf ShyFrame) end() {
+	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 	assert sf.shy.state.in_frame_call, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
@@ -51,18 +57,25 @@ fn (mut sf ShyFrame) end() {
 [heap]
 pub struct Shy {
 	config Config
-	timer  time.StopWatch = time.new_stopwatch(auto_start: true)
+pub:
+	log log.Log
 pub mut:
 	paused   bool
 	shutdown bool
 mut:
-	log     log.Log
 	ready   bool
 	running bool
 	//
 	state State
+	timer time.StopWatch = time.new_stopwatch()
 	// The "blackbox" api implementation specific struct
+	// Can only be accessed via the unsafe api() function *outside* the module
 	api API
+}
+
+[inline; unsafe]
+pub fn (s Shy) api() API {
+	return s.api
 }
 
 [inline]
@@ -74,6 +87,7 @@ pub fn (mut s Shy) init() ! {
 	s.api.init(s)!
 	s.check_api()!
 	s.ready = true
+	s.timer.start()
 }
 
 [inline]
@@ -106,16 +120,17 @@ pub fn run<T>(mut ctx T, config Config) ! {
 }
 
 fn main_loop<T>(mut ctx T, mut s Shy) ! {
-	s.log.gdebug(@MOD + '.' + @FN, 'entering main loop.\nConfig:\n$s.config')
+	s.log.gdebug('${@MOD}.${@FN}', 'entering main loop')
 
 	mut root := s.api.wm.root
 
 	s.running = true
 	s.state.in_hot_code = true
-	for s.running {
+	for s.running && !s.paused {
 		if !s.ready {
 			s.log.gwarn('${@MOD}.${@FN}', 'not ready. Waiting 1 second...')
 			time.sleep(1 * time.second)
+			s.timer.restart()
 			continue
 		}
 
@@ -128,7 +143,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		s.state.in_frame_call = false
 
 		if s.shutdown {
-			s.log.gdebug(@MOD + '.' + @FN, 'shutdown is $s.shutdown, leaving main loop...')
+			s.log.gdebug('${@MOD}.${@FN}', 'shutdown is $s.shutdown, leaving main loop...')
 			break
 		}
 	}

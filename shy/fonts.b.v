@@ -34,7 +34,7 @@ mut:
 }
 
 fn (mut fs Fonts) load_font(name string, path string) ! {
-	fs.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	fs.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
@@ -124,8 +124,10 @@ fn (mut fs Fonts) get_context() &FontContext {
 			return fc
 		}
 	}
-	assert false, '${@STRUCT}.${@FN}' + ': no available font contexts'
-	fs.shy.log.gcritical('${@STRUCT}.${@FN}', 'no available font contexts, expect crash and burn...')
+	assert false, '${@STRUCT}.${@FN}' +
+		': no available font contexts. Bump the preloaded font contexts in the config'
+
+	fs.shy.log.gcritical('${@STRUCT}.${@FN}', 'no available font contexts. Bump the preloaded font contexts in the config')
 	return &FontContext{
 		fsc: unsafe { nil }
 	} // NOTE dummy return to please the V compiler...

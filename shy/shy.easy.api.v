@@ -7,8 +7,8 @@ module shy
 
 // EasyDo is an internal struct for fire-and-forget/instant calling of Easy methods.
 [noinit]
-struct EasyDo {
-mut:
+pub struct EasyDo {
+pub mut: // TODO error: field ... is not public - make this just "pub" to callers - and mut to internal system
 	easy &Easy = null
 }
 
@@ -30,7 +30,7 @@ pub fn (mut e Easy) shutdown() ! {}
 
 [params]
 pub struct EasyTextConfig {
-pub:
+pub mut:
 	x      f32
 	y      f32
 	text   string
@@ -40,7 +40,7 @@ pub:
 [noinit]
 pub struct EasyText {
 	ShyStruct
-pub:
+pub mut:
 	x      f32
 	y      f32
 	text   string
@@ -143,7 +143,7 @@ pub struct EasySoundConfig {
 
 pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 	mut audio := e.audio_engine
 
 	mut id := u16(0)
@@ -266,7 +266,7 @@ pub fn (e &Easy) load(ao AssetOptions) ! {
 	if _ := e.shy.assets().image_cache[ao.uri] {
 		return
 	}
-	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 	mut assets := e.shy.assets()
 	mut asset := assets.load(ao)!
 	_ := asset.to_image(

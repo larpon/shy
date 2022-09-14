@@ -1,13 +1,14 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module shy
+module embed
 
+import shy.shy
 import os
 
 // Base app skeleton for easy embedding in examples
 pub struct App {
-	ShyStruct // Initialized by shy.run<T>(...)
+	shy.ShyStruct // Initialized by shy.run<T>(...)
 }
 
 pub fn (mut a App) init() ! {}
@@ -20,40 +21,43 @@ pub fn (mut a App) variable_update(dt f64) {}
 
 pub fn (mut a App) frame(dt f64) {}
 
-pub fn (mut a App) event(e Event) {}
+pub fn (mut a App) event(e shy.Event) {}
 
 // Simple app skeleton for easy embedding in e.g. examples
 pub struct EasyApp {
 	App
 mut:
-	do     EasyDo
-	easy   &Easy     = null
-	assets &Assets   = null
-	draw   &Draw     = null
-	mouse  &Mouse    = null
-	kbd    &Keyboard = null
-	window &Window   = null
+	do     shy.EasyDo
+	easy   &shy.Easy     = shy.null
+	assets &shy.Assets   = shy.null
+	draw   &shy.Draw     = shy.null
+	mouse  &shy.Mouse    = shy.null
+	kbd    &shy.Keyboard = shy.null
+	window &shy.Window   = shy.null
 }
 
 pub fn (mut a EasyApp) init() ! {
-	a.easy = &Easy{
+	a.easy = &shy.Easy{
 		shy: a.shy
 	}
-	a.do.easy = a.easy
+	unsafe {
+		a.do.easy = a.easy
+	}
 	a.easy.init()!
 	a.assets = a.shy.assets()
 	a.draw = a.shy.draw()
-	a.mouse = a.shy.api.input.mouse(0)!
-	a.kbd = a.shy.api.input.keyboard(0)!
-	a.window = a.shy.api.wm.active_window()
+	api := unsafe { a.shy.api() }
+	a.mouse = api.input().mouse(0)!
+	a.kbd = api.input().keyboard(0)!
+	a.window = api.wm().active_window()
 }
 
-pub fn (mut a EasyApp) event(e Event) {
+pub fn (mut a EasyApp) event(e shy.Event) {
 	match e {
-		QuitEvent {
+		shy.QuitEvent {
 			a.shy.shutdown = true
 		}
-		KeyEvent {
+		shy.KeyEvent {
 			if e.state == .up {
 				return
 			}
@@ -107,11 +111,11 @@ pub fn (mut a DevApp) shutdown() ! {
 }
 */
 
-pub fn (mut a DevApp) event(e Event) {
+pub fn (mut a DevApp) event(e shy.Event) {
 	a.EasyApp.event(e)
 	mut s := a.shy
 	// Handle debug output control here
-	if e is KeyEvent {
+	if e is shy.KeyEvent {
 		key_code := e.key_code
 		if e.state == .down {
 			kb := a.kbd

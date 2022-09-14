@@ -53,27 +53,27 @@ mut:
 	buffer strings.Builder = strings.new_builder(4096)
 }
 
-pub fn (l Log) buffer() string {
+pub fn (l &Log) buffer() string {
 	return l.buffer.after(0)
 }
 
-pub fn (l Log) print_status(prefix string) {
+pub fn (l &Log) print_status(prefix string) {
 	l.redirect(term.colorize(term.blue, prefix + ' ') + term.colorize(term.white, 'Log.flags ') +
 		l.status_string())
 }
 
-pub fn (l Log) status_string() string {
+pub fn (l &Log) status_string() string {
 	return l.flags.clean_str().replace('.', '')
 }
 
-fn (l Log) redirect(str string) {
+fn (l &Log) redirect(str string) {
 	if !l.flags.has(.log) {
 		return
 	}
 	l.force_redirect(str)
 }
 
-fn (l Log) force_redirect(str string) {
+fn (l &Log) force_redirect(str string) {
 	if l.has(.std_err) {
 		eprintln(str)
 	}
@@ -82,33 +82,35 @@ fn (l Log) force_redirect(str string) {
 	}
 }
 
-pub fn (l Log) all(flags Flag) bool {
+pub fn (l &Log) all(flags Flag) bool {
 	return l.flags.all(flags)
 }
 
-pub fn (l Log) has(flags Flag) bool {
+pub fn (l &Log) has(flags Flag) bool {
 	return l.flags.has(flags)
 }
 
-pub fn (mut l Log) set(flags Flag) {
-	l.flags.set(flags)
+pub fn (l &Log) set(flags Flag) {
+	unsafe { l.flags.set(flags) }
 }
 
-pub fn (mut l Log) clear_and_set(flags Flag) {
-	l.flags = Flag(0) // clear all flags
-	l.flags.set(flags)
+pub fn (l &Log) clear_and_set(flags Flag) {
+	unsafe {
+		l.flags = Flag(0) // clear all flags
+		l.flags.set(flags)
+	}
 }
 
-pub fn (mut l Log) on(flag Flag) {
+pub fn (l &Log) on(flag Flag) {
 	if !l.has(flag) {
-		l.flags.set(flag)
+		unsafe { l.flags.set(flag) }
 		l.debug(flag.clean_str() + '${l.changes(flag)}')
 	}
 }
 
-pub fn (mut l Log) off(flag Flag) {
+pub fn (l &Log) off(flag Flag) {
 	if l.has(flag) {
-		l.flags.clear(flag)
+		unsafe { l.flags.clear(flag) }
 		if flag == .log {
 			// A last goodbye
 			l.force_redirect(term.bright_magenta('DEBUG ') + flag.clean_str() + ' off')
@@ -118,12 +120,12 @@ pub fn (mut l Log) off(flag Flag) {
 	}
 }
 
-pub fn (mut l Log) toggle(flag Flag) {
-	l.flags.toggle(flag)
+pub fn (l &Log) toggle(flag Flag) {
+	unsafe { l.flags.toggle(flag) }
 	l.debug(flag.clean_str() + '${l.changes(flag)}')
 }
 
-fn (l Log) changes(flag Flag) string {
+fn (l &Log) changes(flag Flag) string {
 	if l.flags.has(.log) {
 		return if l.has(flag) { ' on' } else { ' off' }
 	}

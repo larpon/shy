@@ -4,6 +4,7 @@
 module utils
 
 import math // TODO this can probably be shaved off at the end of development
+import mth
 import os
 
 pub const (
@@ -29,6 +30,11 @@ pub fn remap_f32_to_u8(value f32, min f32, max f32, new_min u8, new_max u8) u8 {
 [inline]
 pub fn lerp<T>(x T, y T, s T) T {
 	return x + s * (y - x)
+}
+
+[inline]
+pub fn clamp<T>(val T, min T, max T) T {
+	return mth.min(mth.max(val, min), max)
 }
 
 // loopf loops a continious `value` in the range `from`,`to`

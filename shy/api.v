@@ -77,3 +77,27 @@ fn (mut a API) free() {
 		free(a.wm)
 	}
 }
+
+pub fn (a &API) wm() &WM {
+	return a.wm
+}
+
+pub fn (a &API) gfx() &GFX {
+	return a.gfx
+}
+
+pub fn (a &API) assets() &Assets {
+	return a.assets
+}
+
+pub fn (a &API) audio() &Audio {
+	return a.audio
+}
+
+pub fn (a &API) input() &Input {
+	return a.input
+}
+
+pub fn (a &API) system() &System {
+	return a.system
+}

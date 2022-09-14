@@ -93,7 +93,7 @@ fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
 }
 
 pub fn (mut ae AudioEngine) load(path string) !u16 {
-	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "$path"')
 	s := ae.load_file(path)!
 	ae.sound_id++
@@ -102,7 +102,7 @@ pub fn (mut ae AudioEngine) load(path string) !u16 {
 }
 
 pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
-	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load your assets...')
+	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 	// See https://github.com/mackron/miniaudio/issues/517i
 	s := ae.load_file(path)!
 	ae.sound_id++

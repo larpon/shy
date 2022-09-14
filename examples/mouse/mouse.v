@@ -4,6 +4,7 @@
 module main
 
 import shy.shy
+import shy.embed
 
 fn main() {
 	mut app := &App{}
@@ -12,7 +13,7 @@ fn main() {
 
 [heap]
 struct App {
-	shy.ExampleApp
+	embed.ExampleApp
 }
 
 [markused]
