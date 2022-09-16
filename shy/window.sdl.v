@@ -70,7 +70,6 @@ pub fn (wm WM) active_window() &Window {
 		return wm.active
 	}
 	panic('WM: Error getting root window')
-	// return wm.root
 }
 
 pub fn (wm WM) root() &Window {
@@ -78,14 +77,12 @@ pub fn (wm WM) root() &Window {
 		return wm.root
 	}
 	panic('WM: Error getting root window')
-	// return wm.root
 }
 
 pub fn (mut wm WM) init_root_window() !&Window {
 	s := wm.shy
 
-	mut mx := 0
-	mut my := 0
+	mut mx, mut my := 0, 0
 	sdl.get_global_mouse_state(&mx, &my)
 
 	mut display_index := 0
@@ -202,6 +199,7 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	// }
 	mut win := &Window{
 		shy: s
+		config: config
 		id: wm.w_id
 		handle: window
 		pass_action: pass_action
@@ -240,6 +238,8 @@ pub mut:
 // Window
 pub struct Window {
 	ShyStruct
+	Rect
+	config WindowConfig
 pub:
 	id u32
 mut:
@@ -273,14 +273,14 @@ pub fn (mut w Window) render_init() {
 	s := w.shy
 
 	w.state.fps_timer = u64(0)
-	run_config := s.config.run
+	render_config := w.config.render
 	// update_rate         = f64(59.95) // TODO
 	// update_rate         = f64(120)
-	update_rate := run_config.update_rate // f64(60)
+	update_rate := render_config.update_rate // f64(60)
 	w.state.update_rate = update_rate // f64(60)
-	w.state.update_multiplicity = run_config.update_multiplicity // int(1)
-	w.state.lock_framerate = run_config.lock_framerate // false
-	// w.state.time_history_count = run_config.time_history_count // 4
+	w.state.update_multiplicity = render_config.update_multiplicity // int(1)
+	w.state.lock_framerate = render_config.lock_framerate // false
+	// w.state.time_history_count = render_config.time_history_count // 4
 
 	// V implementation of:
 	// https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
@@ -557,6 +557,7 @@ pub fn (mut w Window) init() ! {
 		preload: {
 			'system': font.default()
 		}
+		render: w.config.render
 	})! // fonts.b.v
 
 	w.anims = &Anims{
@@ -565,6 +566,9 @@ pub fn (mut w Window) init() ! {
 	w.anims.init()!
 
 	w.render_init()
+
+	w.x, w.y = w.position()
+	w.w, w.h = w.size()
 
 	w.ready = true
 }
@@ -616,6 +620,12 @@ pub fn (w &Window) is_fullscreen() bool {
 	cur_flags := sdl.get_window_flags(w.handle)
 	return cur_flags & u32(sdl.WindowFlags.fullscreen) > 0
 		|| cur_flags & u32(sdl.WindowFlags.fullscreen_desktop) > 0
+}
+
+pub fn (w &Window) position() (int, int) {
+	mut x, mut y := 0, 0
+	sdl.get_window_position(w.handle, &x, &y)
+	return x, y
 }
 
 pub fn (w &Window) size() (int, int) {

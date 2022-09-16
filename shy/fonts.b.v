@@ -22,6 +22,7 @@ struct FontsConfig {
 	ShyStruct
 	prealloc_contexts u16 = defaults.fonts.preallocate // > ~8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
 	preload           map[string]string // preload[font_name] = path_to_font
+	render            RenderConfig
 }
 
 [heap]
@@ -68,13 +69,13 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 		}
 	}
 
-	sample_count := fs.shy.config.render.msaa
+	sample_count := config.render.msaa
 	sgl_context_desc := sgl.ContextDesc{
 		sample_count: sample_count
 	} // TODO apply values for max_vertices etc.
 
 	for _ in 0 .. config.prealloc_contexts {
-		fons_context := sfons.create(1024, 1024, 1)
+		fons_context := sfons.create(256, 256, 1) // TODO configurable size
 		sgl_context := sgl.make_context(&sgl_context_desc)
 		// Default context
 		mut context := &FontContext{

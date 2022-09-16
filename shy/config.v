@@ -11,16 +11,13 @@ pub const (
 )
 
 struct Defaults {
-	run struct  {
+	render struct  {
 		update_rate         f64 = 60.0
 		update_multiplicity u8  = 1
 		lock_framerate      bool
 		time_history_count  u8 = 4
-	}
-
-	render struct  {
-		vsync VSync
-		msaa  int = 4
+		vsync               VSync
+		msaa                int = 4
 	}
 
 	fonts struct  {
@@ -30,6 +27,7 @@ struct Defaults {
 	font struct  {
 		name string = 'default'
 		size f32    = 20
+		// align TextAlign = .baseline | .left TODO V BUG
 	}
 
 	audio struct  {
@@ -72,9 +70,8 @@ fn vsynctype_from_string(str string) VSync {
 pub struct Config {
 	debug  bool
 	window WindowConfig
-	input  InputConfig
 	render RenderConfig
-	run    RunConfig
+	input  InputConfig
 }
 
 [params]
@@ -86,18 +83,16 @@ pub:
 	visible   bool   = true
 	color     Color  = shy.defaults.window.color
 	// TODO ? flags WindowFlag
-}
-
-pub struct RunConfig {
-	update_rate         f64  = shy.defaults.run.update_rate
-	update_multiplicity u8   = shy.defaults.run.update_multiplicity
-	lock_framerate      bool = shy.defaults.run.lock_framerate
-	time_history_count  u8   = shy.defaults.run.time_history_count
+	render RenderConfig
 }
 
 pub struct RenderConfig {
-	vsync VSync = shy.defaults.render.vsync
-	msaa  int   = shy.defaults.render.msaa
+	update_rate         f64   = shy.defaults.render.update_rate
+	update_multiplicity u8    = shy.defaults.render.update_multiplicity
+	lock_framerate      bool  = shy.defaults.render.lock_framerate
+	time_history_count  u8    = shy.defaults.render.time_history_count
+	vsync               VSync = shy.defaults.render.vsync
+	msaa                int   = shy.defaults.render.msaa
 }
 
 pub struct InputConfig {
@@ -114,23 +109,20 @@ pub fn config_from_toml_file(path string) ?Config {
 pub fn config_from_toml_text(toml_text string) ?Config {
 	toml_doc := toml.parse_text(toml_text)?
 	toml_wc := toml_doc.value('shy.window')
-	wc := WindowConfig{
-		title: toml_wc.value('title').default_to(shy.defaults.window.title).string()
-		resizable: toml_wc.value('resizable').default_to(shy.defaults.window.resizable).bool()
-	}
-	//
-	toml_rc := toml_doc.value('shy.run')
-	rc := RunConfig{
-		update_rate: toml_rc.value('update_rate').default_to(shy.defaults.run.update_rate).f64()
-		update_multiplicity: u8(toml_rc.value('update_multiplicity').default_to(int(shy.defaults.run.update_multiplicity)).int())
-		lock_framerate: toml_rc.value('lock_framerate').default_to(shy.defaults.run.lock_framerate).bool()
-		time_history_count: u8(toml_rc.value('time_history_count').default_to(int(shy.defaults.run.time_history_count)).int())
-	}
 	//
 	toml_rend_c := toml_doc.value('shy.render')
 	rend_c := RenderConfig{
+		update_rate: toml_rend_c.value('update_rate').default_to(shy.defaults.render.update_rate).f64()
+		update_multiplicity: u8(toml_rend_c.value('update_multiplicity').default_to(int(shy.defaults.render.update_multiplicity)).int())
+		lock_framerate: toml_rend_c.value('lock_framerate').default_to(shy.defaults.render.lock_framerate).bool()
+		time_history_count: u8(toml_rend_c.value('time_history_count').default_to(int(shy.defaults.render.time_history_count)).int())
 		vsync: vsynctype_from_string(toml_rend_c.value('vsync').default_to('on').string())
 		msaa: toml_rend_c.value('msaa').default_to(shy.defaults.render.msaa).int()
+	}
+	wc := WindowConfig{
+		title: toml_wc.value('title').default_to(shy.defaults.window.title).string()
+		resizable: toml_wc.value('resizable').default_to(shy.defaults.window.resizable).bool()
+		render: rend_c
 	}
 	//
 	toml_input_c := toml_doc.value('shy.input')
@@ -139,9 +131,8 @@ pub fn config_from_toml_text(toml_text string) ?Config {
 	}
 
 	return Config{
-		run: rc
-		render: rend_c
 		input: input_c
+		render: rend_c
 		window: wc
 	}
 }

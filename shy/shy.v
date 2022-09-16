@@ -18,13 +18,15 @@ pub enum ButtonState {
 
 struct State {
 mut:
-	in_hot_code   bool
-	in_frame_call bool
+	in_hot_code bool
+	rendering   bool
 }
 
+// ShyStruct is meant to be used as an embed for all types that need to have access to
+// all sub-systems of the Shy struct.
 struct ShyStruct {
 pub mut: // TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
-	shy &Shy // = shy.null
+	shy &Shy // TODO remove when https://github.com/vlang/v/issues/15768 is fixed
 }
 
 fn (s ShyStruct) init() ! {
@@ -42,14 +44,14 @@ struct ShyFrame {
 [if !prod]
 fn (mut sf ShyFrame) begin() {
 	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
-	assert sf.shy.state.in_frame_call, '${@STRUCT}.${@FN}' +
+	assert sf.shy.state.rendering, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 
 [if !prod]
 fn (mut sf ShyFrame) end() {
 	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
-	assert sf.shy.state.in_frame_call, '${@STRUCT}.${@FN}' +
+	assert sf.shy.state.rendering, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 
@@ -134,13 +136,13 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 			continue
 		}
 
-		// TODO re-write event processing for each window...
+		// TODO re-write event processing to be per window?
 		// Process system events
 		s.process_events<T>(mut ctx)
 
-		s.state.in_frame_call = true
-		root.render<T>(mut ctx)
-		s.state.in_frame_call = false
+		s.state.rendering = true
+		root.render<T>(mut ctx) // Windows will render their children, so this is a cascade action
+		s.state.rendering = false
 
 		if s.shutdown {
 			s.log.gdebug('${@MOD}.${@FN}', 'shutdown is $s.shutdown, leaving main loop...')

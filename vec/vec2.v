@@ -11,6 +11,13 @@ pub mut:
 	y T
 }
 
+pub fn vec2<T>(x T, y T) Vec2<T> {
+	return Vec2<T>{
+		x: x
+		y: y
+	}
+}
+
 pub fn (mut v Vec2<T>) zero() {
 	v.x = 0
 	v.y = 0
@@ -145,6 +152,7 @@ pub fn (v Vec2<T>) length() T {
 		return 0.0
 		// $compile_error('Type T in Vec2<T>.length() is not supported')
 	}
+	return 0.0
 }
 
 pub fn (v Vec2<T>) dot(u Vec2<T>) T {

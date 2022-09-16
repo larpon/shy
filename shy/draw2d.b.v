@@ -7,41 +7,7 @@ import shy.vec { Vec2 }
 import shy.mth
 import sgp
 import sokol.sgl // Required for font rendering
-
-pub struct DrawShape2D {
-	ShyFrame
-}
-
-pub fn (mut d2d DrawShape2D) begin() {
-	d2d.ShyFrame.begin()
-
-	win := d2d.shy.api.wm.active_window()
-	w, h := win.drawable_size()
-	// ratio := f32(w)/f32(h)
-
-	// Begin recording draw commands for a frame buffer of size (width, height).
-	sgp.begin(w, h)
-
-	// Set frame buffer drawing region to (0,0,width,height).
-	sgp.viewport(0, 0, w, h)
-	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
-	// sgp.project(-ratio, ratio, 1.0, -1.0)
-	// sgp.project(0, 0, w, h)
-
-	sgp.reset_project()
-}
-
-pub fn (mut d2d DrawShape2D) end() {
-	d2d.ShyFrame.end()
-	// Dispatch all draw commands to Sokol GFX.
-	sgp.flush()
-	// Finish a draw command queue, clearing it.
-	sgp.end()
-}
-
-pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
-	return config
-}
+import fontstash
 
 // DrawText
 pub struct DrawText {
@@ -89,29 +55,95 @@ pub fn (mut dt DrawText) text_2d() Draw2DText {
 	}
 }
 
+// pub type TextAlign = fontstash.Align
+
+[flag]
+pub enum TextAlign {
+	// Horizontal align
+	left // Default
+	center
+	right
+	// Vertical align
+	top
+	middle
+	bottom
+	baseline // Default
+}
+
+pub fn (ta TextAlign) str_clean() string {
+	return ta.str().all_after('{').all_before('}').trim_space()
+}
+
+pub fn (ta TextAlign) next() TextAlign {
+	if ta.has(.top) {
+		if ta.has(.left) {
+			return .top | .center
+		} else if ta.has(.center) {
+			return .top | .right
+		} else {
+			return .middle | .left
+		}
+	} else if ta.has(.middle) {
+		if ta.has(.left) {
+			return .middle | .center
+		} else if ta.has(.center) {
+			return .middle | .right
+		} else {
+			return .baseline | .left
+		}
+	} else if ta.has(.baseline) {
+		if ta.has(.left) {
+			return .baseline | .center
+		} else if ta.has(.center) {
+			return .baseline | .right
+		} else {
+			return .bottom | .left
+		}
+	} else if ta.has(.bottom) {
+		if ta.has(.left) {
+			return .bottom | .center
+		} else if ta.has(.center) {
+			return .bottom | .right
+		} else {
+			return .top | .left
+		}
+	}
+	return .top | .left
+}
+
 pub struct Draw2DText {
 	vec.Vec2<f32>
 	fc &FontContext
+mut:
+	cur_align fontstash.Align = .baseline | .left // According to fontstash source code
 pub mut:
 	text     string
 	rotation f32
 	font     string = defaults.font.name
 	colors   [color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
-	anchor   Anchor
-	// TODO clear up this mess
-	size   f32  = defaults.font.size
-	scale  f32  = 1.0
-	fills  Fill = .solid | .outline
-	offset vec.Vec2<f32>
+	origin   Anchor
+	align    TextAlign = .baseline | .left // TODO V BUG shy.defaults.font.align
+	size     f32       = defaults.font.size
+	scale    f32       = 1.0
+	fills    Fill      = .solid | .outline
+	offset   vec.Vec2<f32>
 }
 
 [inline]
 pub fn (t Draw2DText) draw() {
+	// http://www.freetype.org/freetype2/docs/tutorial/metrics.png
+
 	//¤ FLOOD d2d.shy.log.gdebug('${@STRUCT}.${@FN}', 'using ${ptr_str(fc.fsc)}...')
 	fc := t.fc
 	font_context := fc.fsc
 
 	assert !isnil(font_context), '${@STRUCT}.${@FN}' + ': no font context'
+
+	/*
+	font_context.set_alignment(.left | .baseline)
+	font_context.set_spacing(5.0)
+	font_context.set_blur(6.0)
+	*/
 
 	// color := sfons.rgba(255, 255, 255, 255)
 	if t.font != defaults.font.name {
@@ -123,44 +155,156 @@ pub fn (t Draw2DText) draw() {
 
 	lines := t.text.split('\n')
 
+	fm := t.metrics()
+	line_height := fm.line_height
+
+	mut max_w := f32(0)
+	mut max_h := f32(0)
+	if lines.len > 0 {
+		mut p_r := Rect{}
+		for line in lines {
+			r := t.bounds(line)
+			if r.w > max_w {
+				max_w = r.w
+			}
+			max_h += line_height - lines.len
+			// max_h += line_height - (line_height - r.h) - 1
+			p_r = r
+		}
+		if lines.len == 1 {
+			max_w = p_r.w
+			max_h = p_r.h
+		}
+	}
+
 	mut y_accu := f32(0)
-	for line in lines {
+	mut prev_line_height := f32(0)
+	for i, line in lines {
 		mut off_x := f32(0)
 		mut off_y := f32(0)
-		if t.anchor != .bottom_left {
-			mut buf := [4]f32{}
-			font_context.text_bounds(t.x, t.y, line, &buf[0])
-			match t.anchor {
-				.top_left {
-					off_y = buf[3] - buf[1]
-				}
-				.top_center {
-					off_y = buf[3] - buf[1]
-					off_x = (buf[0] - buf[2]) / 2
-				}
-				.top_right {
-					off_y = buf[3] - buf[1]
-					off_x = (buf[0] - buf[2])
-				}
-				.center_left {
-					off_y = (buf[3] - buf[1]) / 2
-				}
-				.center {
-					off_y = (buf[3] - buf[1]) / 2
-					off_x = (buf[0] - buf[2]) / 2
-				}
-				.center_right {
-					off_y = (buf[3] - buf[1]) / 2
-					off_x = (buf[0] - buf[2])
-				}
-				else {
-					// TODO
-				}
-			}
-			y_accu += off_y
+		// if t.origin != .bottom_left {
+
+		/*
+		mut align := TextAlign.baseline
+		if t.align.has(.right) {
+			align.set(.right)
+		} else if t.align.has(.center) {
+			align.set(.center)
+		} else {
+			align.set(.left)
 		}
-		x := t.offset.x + t.x + off_x
-		y := t.offset.y + t.y + y_accu
+		t.set_font_render_alignment(align)
+		*/
+		t.set_font_render_alignment(t.align)
+		r := t.bounds(line)
+
+		ymin, ymax := t.line_bounds(0)
+		base_lh := '' // t.baseline_height(line)
+		println('Origin: $t.origin $r.x,$r.y w$r.w h$r.h\nyMin $ymin,yMax $ymax\nMetrics: $fm\nBaseline height: $base_lh\nLine height: $line_height\nText: $line\nAlign: $t.align\n$max_w x $max_h ')
+
+		// Tweak for which corner of the text we're drawing.
+		// per default, fontstash has chosen to let the drawing start from left at the font's baseline
+		// We compensate for that here:
+
+		off_compensate_y := -(r.y + r.h) + r.h
+		off_y = off_compensate_y
+		match t.origin {
+			.top_left {}
+			.top_center {
+				// off_x += -(r.w / 2)
+				off_x += -(max_w / 2)
+
+				/*
+				if t.align.has(.center) {
+					off_x -= -(r.w / 2) - (max_w /2)
+				}*/
+			}
+			.top_right {
+				// off_x = -(r.w)
+				off_x += -max_w
+			}
+			.center_left {
+				// off_y += -(r.h / 2)
+				off_y += -(max_h / 2)
+			}
+			.center {
+				// off_x = -(r.w / 2)
+				// off_y += -(r.h / 2)
+				off_x += -(max_w / 2)
+				off_y += -(max_h / 2)
+			}
+			.center_right {
+				// off_x = -(r.w)
+				// off_y += -(r.h / 2)
+				off_x += -max_w
+				off_y += -(max_h / 2)
+			}
+			.bottom_left {
+				// off_y += -r.h
+				// off_x += -(max_w)
+				off_y += -max_h
+			}
+			.bottom_center {
+				// off_x = -(r.w / 2)
+				off_x += -(max_w / 2)
+				// off_y += -r.h
+				off_y += -max_h
+			}
+			.bottom_right {
+				// off_x = -r.w
+				// off_y += -r.h
+				off_x += -max_w
+				off_y += -max_h
+			}
+		}
+
+		/*
+		match t.align {
+			.top_left {}
+			.top_center {
+				// off_x = -(r.w / 2)
+			}
+			.top_right {
+				// off_x = -(r.w)
+			}
+			.center_left {
+				// off_y += -(r.h / 2)
+			}
+			.center {
+				// off_x = -(r.w / 2)
+				// off_y += -(r.h / 2)
+			}
+			.center_right {
+				// off_x = -(r.w)
+				// off_y += -(r.h / 2)
+			}
+			.bottom_left {
+				//	off_y += -r.h
+			}
+			.bottom_center {
+				//	off_x = -(r.w / 2)
+				//	off_y += -r.h
+				// off_y += -1*lines.len-i
+			}
+			.bottom_right {
+				//	off_x = -r.w
+				//		off_y += -r.h
+			}
+		}
+		*/
+		/*
+		off_x, off_y = t.origin.pos_wh(r.w,r.h)
+			off_y = -off_y // - ymin - ymax
+			off_x = -off_x
+		*/
+		// off_y = -off_y - r.h
+		y_accu += prev_line_height
+		prev_line_height = line_height - lines.len
+		//}
+
+		// Rounding x and y off (f32(int(...))) is important to prevent the rendering being smeared
+		x := f32(int(t.x + t.offset.x + off_x))
+		y := f32(int(t.y + t.offset.y + off_y + y_accu))
 
 		sgl.push_matrix()
 		sgl.translate(x, y, 0)
@@ -168,11 +312,175 @@ pub fn (t Draw2DText) draw() {
 		if t.rotation != 0 {
 			sgl.rotate(t.rotation * mth.deg2rad, 0, 0, 1)
 		}
+		if t.scale != 1 {
+			sgl.scale(t.scale, t.scale, 0)
+		}
 		font_context.draw_text(0, 0, line)
+
+		t.dbg_draw_rect(r)
+
+		if i == 0 {
+			bbr := Rect{
+				x: r.x
+				y: r.y
+				w: max_w
+				h: max_h
+			}
+			t.dbg_draw_rect(bbr)
+		}
 
 		sgl.translate(-x, -y, 0)
 		sgl.pop_matrix()
 	}
+}
+
+//[inline; if shy_debug_draw ?]
+fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
+	sgl.begin_line_strip()
+	sgl.v2f(x1, y1)
+	sgl.v2f(x2, y2)
+	sgl.end()
+}
+
+//[inline; if shy_debug_draw ?]
+fn (t Draw2DText) dbg_draw_rect(r Rect) {
+	sgl.begin_line_strip()
+	sgl.v2f(r.x, r.y)
+	sgl.v2f(r.x + r.w, r.y)
+	sgl.v2f(r.x + r.w, r.y)
+	sgl.v2f(r.x + r.w, r.y + r.h)
+	sgl.v2f(r.x + r.w, r.y + r.h)
+	sgl.v2f(r.x, r.y + r.h)
+	sgl.v2f(r.x, r.y)
+	sgl.end()
+}
+
+[inline]
+pub fn (t Draw2DText) set_font_render_alignment(align TextAlign) {
+	unsafe {
+		// t.cur_align = fs_align
+		t.fc.fsc.set_align(int(align))
+	}
+}
+
+/*
+[inline]
+pub fn (t Draw2DText) baseline_height(s string) f32 {
+	prev_align := t.cur_align
+	t.set_font_render_alignment(.left | .top)
+	bounds_tl := t.bounds(s)
+	t.set_font_render_alignment(.left | .baseline)
+	bounds_de := t.bounds(s)
+	t.set_font_render_alignment(prev_align)
+	// println('btl: $bounds_base\nbbase: $bounds_base')
+	return bounds_tl.y-bounds_de.y
+}
+*/
+
+[inline]
+pub fn (t Draw2DText) bounds(s string) Rect {
+	mut buf := [4]f32{}
+	t.fc.fsc.text_bounds(0, 0, s, &buf[0])
+	return Rect{
+		x: buf[0]
+		y: buf[1]
+		w: buf[2] - buf[0]
+		h: buf[3] - buf[1]
+	}
+}
+
+[inline]
+pub fn (t Draw2DText) line_bounds(y f32) (f32, f32) {
+	mut min_y, mut max_y := f32(0), f32(0)
+	t.fc.fsc.line_bounds(y, &min_y, &max_y)
+	return min_y, max_y
+}
+
+pub struct FontMetrics {
+pub:
+	ascender    f32
+	descender   f32
+	line_height f32
+}
+
+[inline]
+pub fn (t Draw2DText) metrics() FontMetrics {
+	mut asc, mut desc, line_h := f32(0), f32(0), f32(0)
+	t.fc.fsc.vert_metrics(&asc, &desc, &line_h)
+	return FontMetrics{
+		ascender: asc
+		descender: desc
+		line_height: line_h
+	}
+}
+
+[inline]
+fn (t Draw2DText) anchor_to_alignment(a Anchor) TextAlign {
+	return match a {
+		.top_left {
+			.left | .top
+		}
+		.top_center {
+			.top | .center
+		}
+		.top_right {
+			.top | .right
+		}
+		.center_left {
+			.middle | .left
+		}
+		.center {
+			.middle | .center
+		}
+		.center_right {
+			.middle | .right
+		}
+		.bottom_left {
+			.bottom | .left
+		}
+		.bottom_center {
+			.bottom | .center
+		}
+		.bottom_right {
+			.bottom | .right
+		}
+	}
+}
+
+// DrawShape2D
+pub struct DrawShape2D {
+	ShyFrame
+}
+
+pub fn (mut d2d DrawShape2D) begin() {
+	d2d.ShyFrame.begin()
+
+	win := d2d.shy.api.wm.active_window()
+	w, h := win.drawable_size()
+	// ratio := f32(w)/f32(h)
+
+	// Begin recording draw commands for a frame buffer of size (width, height).
+	sgp.begin(w, h)
+
+	// Set frame buffer drawing region to (0,0,width,height).
+	sgp.viewport(0, 0, w, h)
+	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
+	// sgp.project(-ratio, ratio, 1.0, -1.0)
+	// sgp.project(0, 0, w, h)
+
+	sgp.reset_project()
+}
+
+pub fn (mut d2d DrawShape2D) end() {
+	d2d.ShyFrame.end()
+	// Dispatch all draw commands to Sokol GFX.
+	sgp.flush()
+	// Finish a draw command queue, clearing it.
+	sgp.end()
+}
+
+pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
+	return config
 }
 
 // DrawShape2DRect
@@ -183,12 +491,14 @@ pub mut:
 	// visible bool = true
 	colors ShapeColors
 	// TODO clear up this mess
-	radius  f32     = 1.0
-	scale   f32     = 1.0
-	fills   Fill    = .solid | .outline
-	cap     Cap     = .butt
-	connect Connect = .bevel
-	offset  vec.Vec2<f32>
+	radius   f32 = 1.0
+	rotation f32
+	scale    f32     = 1.0
+	fills    Fill    = .solid | .outline
+	cap      Cap     = .butt
+	connect  Connect = .bevel
+	offset   vec.Vec2<f32>
+	origin   Anchor
 }
 
 /*
@@ -203,6 +513,76 @@ pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 	r.offset = config.offset
 }
 */
+
+[inline]
+pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
+	p_x, p_y := r.origin.pos_wh(r.w, r.h)
+	return -p_x, -p_y
+}
+
+[inline]
+pub fn (r DrawShape2DRect) draw() {
+	x := r.x
+	y := r.y
+	w := r.w
+	h := r.h
+	sx := 0 // x //* scale_factor
+	sy := 0 // y //* scale_factor
+
+	sgp.push_transform()
+	sgp.translate(x, y)
+
+	o_off_x, o_off_y := r.origin_offset()
+	sgp.translate(o_off_x, o_off_y)
+
+	if r.rotation != 0 {
+		sgp.rotate(r.rotation * mth.deg2rad)
+	}
+	if r.scale != 1 {
+		sgp.scale(r.scale, r.scale)
+	}
+
+	if r.fills.has(.solid) {
+		color := r.colors.solid
+		if color.a < 255 {
+			sgp.set_blend_mode(.blend)
+		}
+		c := color.as_f32()
+
+		sgp.set_color(c.r, c.g, c.b, c.a)
+		sgp.draw_filled_rect(sx, sy, w, h)
+	}
+	if r.fills.has(.outline) {
+		if r.radius > 1 {
+			m12x, m12y := midpoint(sx, sy, sx + w, sy)
+			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
+			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
+			m41x, m41y := midpoint(sx, sy + h, sx, sy)
+			r.draw_anchor(m12x, m12y, sx + w, sy, m23x, m23y)
+			r.draw_anchor(m23x, m23y, sx + w, sy + h, m34x, m34y)
+			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
+			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
+		} else {
+			color := r.colors.outline
+			if color.a < 255 {
+				sgp.set_blend_mode(.blend)
+			}
+			c := color.as_f32()
+
+			sgp.set_color(c.r, c.g, c.b, c.a)
+
+			sgp.draw_line(sx, sy, (sx + w), sy)
+			sgp.draw_line((sx + w), sy, (sx + w), (sy + h))
+			sgp.draw_line((sx + w), (sy + h), sx, (sy + h))
+			sgp.draw_line(sx, (sy + h), sx, sy)
+		}
+	}
+
+	sgp.translate(-x, -y)
+	sgp.pop_transform()
+
+	sgp.flush()
+}
 
 [inline]
 fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
@@ -357,52 +737,7 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 	*/
 }
 
-[inline]
-pub fn (r DrawShape2DRect) draw() {
-	x := r.x
-	y := r.y
-	w := r.w
-	h := r.h
-	sx := x //* scale_factor
-	sy := y //* scale_factor
-	if r.fills.has(.solid) {
-		color := r.colors.solid
-		if color.a < 255 {
-			sgp.set_blend_mode(.blend)
-		}
-		c := color.as_f32()
-
-		sgp.set_color(c.r, c.g, c.b, c.a)
-		sgp.draw_filled_rect(x, y, w, h)
-	}
-	if r.fills.has(.outline) {
-		if r.radius > 1 {
-			m12x, m12y := midpoint(sx, sy, sx + w, sy)
-			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
-			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
-			m41x, m41y := midpoint(sx, sy + h, sx, sy)
-			r.draw_anchor(m12x, m12y, sx + w, sy, m23x, m23y)
-			r.draw_anchor(m23x, m23y, sx + w, sy + h, m34x, m34y)
-			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
-			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
-		} else {
-			color := r.colors.outline
-			if color.a < 255 {
-				sgp.set_blend_mode(.blend)
-			}
-			c := color.as_f32()
-
-			sgp.set_color(c.r, c.g, c.b, c.a)
-
-			sgp.draw_line(sx, sy, (sx + w), sy)
-			sgp.draw_line((sx + w), sy, (sx + w), (sy + h))
-			sgp.draw_line((sx + w), (sy + h), sx, (sy + h))
-			sgp.draw_line(sx, (sy + h), sx, sy)
-		}
-	}
-
-	sgp.flush()
-}
+// DrawImage
 
 pub struct DrawImage {
 	ShyFrame
@@ -470,7 +805,7 @@ pub struct Draw2DImage {
 	image Image
 pub mut:
 	color  Color = rgb(255, 255, 255)
-	anchor Anchor
+	origin Anchor
 	// TODO clear up this mess
 	scale  f32 = 1.0
 	offset vec.Vec2<f32>

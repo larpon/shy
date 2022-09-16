@@ -3,6 +3,7 @@
 // that can be found in the LICENSE file.
 module shy
 
+import shy.vec
 // High-level as-easy-as-it-gets API
 
 // EasyDo is an internal struct for fire-and-forget/instant calling of Easy methods.
@@ -34,8 +35,12 @@ pub mut:
 	x        f32
 	y        f32
 	rotation f32
+	scale    f32 = 1.0
 	text     string
-	anchor   Anchor
+	size     f32 = defaults.font.size
+	origin   Anchor
+	align    TextAlign = .baseline | .left
+	offset   vec.Vec2<f32>
 }
 
 [noinit]
@@ -45,8 +50,12 @@ pub mut:
 	x        f32
 	y        f32
 	rotation f32
+	scale    f32 = 1.0
 	text     string
-	anchor   Anchor
+	size     f32 = defaults.font.size
+	origin   Anchor
+	align    TextAlign = .baseline | .left
+	offset   vec.Vec2<f32>
 }
 
 [inline]
@@ -59,6 +68,11 @@ pub fn (et &EasyText) draw() {
 	t.x = et.x
 	t.y = et.y
 	t.rotation = et.rotation
+	t.scale = et.scale
+	t.size = et.size
+	t.origin = et.origin
+	t.align = et.align
+	t.offset = et.offset
 	t.draw()
 	dt.end()
 }
@@ -84,7 +98,15 @@ pub fn (ed &EasyDo) text(etc EasyTextConfig) {
 pub struct EasyRectConfig {
 	Rect
 pub mut:
-	colors ShapeColors
+	radius   f32 = 1.0
+	rotation f32
+	scale    f32 = 1.0
+	colors   ShapeColors
+	fills    Fill    = .solid | .outline
+	cap      Cap     = .butt
+	connect  Connect = .bevel
+	offset   vec.Vec2<f32>
+	origin   Anchor
 }
 
 [noinit]
@@ -92,7 +114,15 @@ pub struct EasyRect {
 	ShyStruct
 	Rect
 pub mut:
-	colors ShapeColors
+	radius   f32 = 1.0
+	rotation f32
+	scale    f32 = 1.0
+	colors   ShapeColors
+	fills    Fill    = .solid | .outline
+	connect  Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
+	cap      Cap     = .butt
+	offset   vec.Vec2<f32>
+	origin   Anchor
 }
 
 [inline]
@@ -105,7 +135,15 @@ pub fn (er &EasyRect) draw() {
 	r.y = er.y
 	r.w = er.w
 	r.h = er.h
+	r.radius = er.radius
+	r.rotation = er.rotation
+	r.scale = er.scale
 	r.colors = er.colors
+	r.fills = er.fills
+	r.cap = er.cap
+	r.connect = er.connect
+	r.offset = er.offset
+	r.origin = er.origin
 	r.draw()
 	d.end()
 }
