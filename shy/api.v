@@ -6,12 +6,12 @@ module shy
 struct API {
 	ShyStruct
 mut:
-	wm     &WM
-	gfx    &GFX
-	assets &Assets
-	audio  &Audio
-	input  &Input
-	system &System
+	wm     &WM     = null
+	gfx    &GFX    = null
+	assets &Assets = null
+	audio  &Audio  = null
+	input  &Input  = null
+	system &System = null
 }
 
 pub fn (mut a API) init(shy_instance &Shy) ! {

@@ -6,8 +6,9 @@ module shy
 import shy.vec { Vec2 }
 import shy.mth
 import sgp
-import sokol.sgl // Required for font rendering
-import fontstash
+// Required for font rendering
+import sokol.sgl
+import sokol.sfons
 
 // DrawText
 pub struct DrawText {
@@ -115,12 +116,12 @@ pub struct Draw2DText {
 	vec.Vec2<f32>
 	fc &FontContext
 mut:
-	cur_align fontstash.Align = .baseline | .left // According to fontstash source code
+	cur_align TextAlign = .baseline | .left // According to fontstash source code
 pub mut:
 	text     string
 	rotation f32
 	font     string = defaults.font.name
-	colors   [color_target_size]Color = [rgb(0, 70, 255), rgb(255, 255, 255)]!
+	color    Color  = colors.shy.white
 	origin   Anchor
 	align    TextAlign = .baseline | .left // TODO V BUG shy.defaults.font.align
 	size     f32       = defaults.font.size
@@ -145,12 +146,13 @@ pub fn (t Draw2DText) draw() {
 	font_context.set_blur(6.0)
 	*/
 
-	// color := sfons.rgba(255, 255, 255, 255)
 	if t.font != defaults.font.name {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
 	}
-	// font_context.set_color(color)
+	// color := sfons.rgba(255, 255, 255, 255)
+	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
+	font_context.set_color(color)
 	font_context.set_size(t.size)
 
 	lines := t.text.split('\n')
@@ -167,7 +169,7 @@ pub fn (t Draw2DText) draw() {
 			if r.w > max_w {
 				max_w = r.w
 			}
-			max_h += line_height - lines.len
+			max_h += line_height - 2 // 1 // lines.len
 			// max_h += line_height - (line_height - r.h) - 1
 			p_r = r
 		}
@@ -195,12 +197,13 @@ pub fn (t Draw2DText) draw() {
 		}
 		t.set_font_render_alignment(align)
 		*/
-		t.set_font_render_alignment(t.align)
+		align := t.align
+		t.set_font_render_alignment(align)
 		r := t.bounds(line)
 
-		ymin, ymax := t.line_bounds(0)
-		base_lh := '' // t.baseline_height(line)
-		println('Origin: $t.origin $r.x,$r.y w$r.w h$r.h\nyMin $ymin,yMax $ymax\nMetrics: $fm\nBaseline height: $base_lh\nLine height: $line_height\nText: $line\nAlign: $t.align\n$max_w x $max_h ')
+		// ymin, ymax := t.line_bounds(0)
+		// base_lh := '' // t.baseline_height(line)
+		// println('Origin: $t.origin $r.x,$r.y w$r.w h$r.h\nyMin $ymin,yMax $ymax\nMetrics: $fm\nBaseline height: $base_lh\nLine height: $line_height\nText: $line\nAlign: $t.align\n$max_w x $max_h ')
 
 		// Tweak for which corner of the text we're drawing.
 		// per default, fontstash has chosen to let the drawing start from left at the font's baseline
@@ -208,99 +211,48 @@ pub fn (t Draw2DText) draw() {
 
 		off_compensate_y := -(r.y + r.h) + r.h
 		off_y = off_compensate_y
+
+		align_off_x := if align.has(.center) {
+			(max_w / 2)
+		} else if align.has(.right) {
+			max_w
+		} else {
+			0
+		}
+		off_x += align_off_x
 		match t.origin {
 			.top_left {}
 			.top_center {
-				// off_x += -(r.w / 2)
 				off_x += -(max_w / 2)
-
-				/*
-				if t.align.has(.center) {
-					off_x -= -(r.w / 2) - (max_w /2)
-				}*/
 			}
 			.top_right {
-				// off_x = -(r.w)
 				off_x += -max_w
 			}
 			.center_left {
-				// off_y += -(r.h / 2)
 				off_y += -(max_h / 2)
 			}
 			.center {
-				// off_x = -(r.w / 2)
-				// off_y += -(r.h / 2)
 				off_x += -(max_w / 2)
 				off_y += -(max_h / 2)
 			}
 			.center_right {
-				// off_x = -(r.w)
-				// off_y += -(r.h / 2)
 				off_x += -max_w
 				off_y += -(max_h / 2)
 			}
 			.bottom_left {
-				// off_y += -r.h
-				// off_x += -(max_w)
 				off_y += -max_h
 			}
 			.bottom_center {
-				// off_x = -(r.w / 2)
 				off_x += -(max_w / 2)
-				// off_y += -r.h
 				off_y += -max_h
 			}
 			.bottom_right {
-				// off_x = -r.w
-				// off_y += -r.h
 				off_x += -max_w
 				off_y += -max_h
 			}
 		}
-
-		/*
-		match t.align {
-			.top_left {}
-			.top_center {
-				// off_x = -(r.w / 2)
-			}
-			.top_right {
-				// off_x = -(r.w)
-			}
-			.center_left {
-				// off_y += -(r.h / 2)
-			}
-			.center {
-				// off_x = -(r.w / 2)
-				// off_y += -(r.h / 2)
-			}
-			.center_right {
-				// off_x = -(r.w)
-				// off_y += -(r.h / 2)
-			}
-			.bottom_left {
-				//	off_y += -r.h
-			}
-			.bottom_center {
-				//	off_x = -(r.w / 2)
-				//	off_y += -r.h
-				// off_y += -1*lines.len-i
-			}
-			.bottom_right {
-				//	off_x = -r.w
-				//		off_y += -r.h
-			}
-		}
-		*/
-		/*
-		off_x, off_y = t.origin.pos_wh(r.w,r.h)
-			off_y = -off_y // - ymin - ymax
-			off_x = -off_x
-		*/
-		// off_y = -off_y - r.h
 		y_accu += prev_line_height
-		prev_line_height = line_height - lines.len
-		//}
+		prev_line_height = line_height - 2 // lines.len
 
 		// Rounding x and y off (f32(int(...))) is important to prevent the rendering being smeared
 		x := f32(int(t.x + t.offset.x + off_x))
@@ -319,14 +271,15 @@ pub fn (t Draw2DText) draw() {
 
 		t.dbg_draw_rect(r)
 
-		if i == 0 {
-			bbr := Rect{
-				x: r.x
-				y: r.y
-				w: max_w
-				h: max_h
+		$if shy_debug_draw ? {
+			if i == 0 {
+				t.dbg_draw_rect(Rect{
+					x: r.x - align_off_x / 2
+					y: r.y
+					w: max_w
+					h: max_h
+				})
 			}
-			t.dbg_draw_rect(bbr)
 		}
 
 		sgl.translate(-x, -y, 0)
@@ -334,7 +287,7 @@ pub fn (t Draw2DText) draw() {
 	}
 }
 
-//[inline; if shy_debug_draw ?]
+[inline; if shy_debug_draw ?]
 fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
 	sgl.begin_line_strip()
 	sgl.v2f(x1, y1)
@@ -342,7 +295,7 @@ fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
 	sgl.end()
 }
 
-//[inline; if shy_debug_draw ?]
+[inline; if shy_debug_draw ?]
 fn (t Draw2DText) dbg_draw_rect(r Rect) {
 	sgl.begin_line_strip()
 	sgl.v2f(r.x, r.y)
@@ -358,12 +311,11 @@ fn (t Draw2DText) dbg_draw_rect(r Rect) {
 [inline]
 pub fn (t Draw2DText) set_font_render_alignment(align TextAlign) {
 	unsafe {
-		// t.cur_align = fs_align
+		t.cur_align = align
 		t.fc.fsc.set_align(int(align))
 	}
 }
 
-/*
 [inline]
 pub fn (t Draw2DText) baseline_height(s string) f32 {
 	prev_align := t.cur_align
@@ -373,9 +325,8 @@ pub fn (t Draw2DText) baseline_height(s string) f32 {
 	bounds_de := t.bounds(s)
 	t.set_font_render_alignment(prev_align)
 	// println('btl: $bounds_base\nbbase: $bounds_base')
-	return bounds_tl.y-bounds_de.y
+	return bounds_tl.y - bounds_de.y
 }
-*/
 
 [inline]
 pub fn (t Draw2DText) bounds(s string) Rect {
@@ -465,10 +416,9 @@ pub fn (mut d2d DrawShape2D) begin() {
 	// Set frame buffer drawing region to (0,0,width,height).
 	sgp.viewport(0, 0, w, h)
 	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
+	sgp.reset_project()
 	// sgp.project(-ratio, ratio, 1.0, -1.0)
 	// sgp.project(0, 0, w, h)
-
-	sgp.reset_project()
 }
 
 pub fn (mut d2d DrawShape2D) end() {
@@ -488,9 +438,8 @@ pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
 pub struct DrawShape2DRect {
 	Rect
 pub mut:
-	// visible bool = true
-	colors ShapeColors
-	// TODO clear up this mess
+	visible  bool = true
+	colors   ShapeColors
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32     = 1.0
@@ -530,16 +479,16 @@ pub fn (r DrawShape2DRect) draw() {
 	sy := 0 // y //* scale_factor
 
 	sgp.push_transform()
-	sgp.translate(x, y)
-
 	o_off_x, o_off_y := r.origin_offset()
+
 	sgp.translate(o_off_x, o_off_y)
+	sgp.translate(x + r.offset.x, y + r.offset.y + r.offset.y)
 
 	if r.rotation != 0 {
-		sgp.rotate(r.rotation * mth.deg2rad)
+		sgp.rotate_at(r.rotation * mth.deg2rad, -o_off_x, -o_off_y)
 	}
 	if r.scale != 1 {
-		sgp.scale(r.scale, r.scale)
+		sgp.scale_at(r.scale, r.scale, -o_off_x, -o_off_y)
 	}
 
 	if r.fills.has(.solid) {
@@ -737,6 +686,111 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 	*/
 }
 
+// DrawShape2DLine
+
+pub fn (d2d &DrawShape2D) line(config DrawShape2DLine) DrawShape2DLine {
+	return config
+}
+
+[params]
+pub struct DrawShape2DLine {
+	LineSegment
+pub mut:
+	visible  bool = true
+	color    Color
+	radius   f32 = 1.0
+	rotation f32
+	scale    f32 = 1.0
+	// fills    Fill    = .solid | .outline
+	cap Cap = .butt
+	// connect  Connect = .bevel
+	offset vec.Vec2<f32>
+	origin Anchor = .center_left //
+}
+
+[inline]
+pub fn (l DrawShape2DLine) origin_offset() (f32, f32) {
+	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
+	// return -p_x, -p_y
+	return 0, 0
+}
+
+[inline]
+pub fn (l DrawShape2DLine) draw() {
+	if !l.visible {
+		return
+	}
+	x1 := l.a.x
+	y1 := l.a.y
+	x2 := l.b.x
+	y2 := l.b.y
+	scale_factor := l.scale //* sgldraw.dpi_scale()
+
+	color := l.color
+	if color.a < 255 {
+		sgp.set_blend_mode(.blend)
+	}
+	c := color.as_f32()
+
+	sgp.set_color(c.r, c.g, c.b, c.a)
+
+	x1_ := x1 * scale_factor
+	y1_ := y1 * scale_factor
+	dx := x1 - x1_
+	dy := y1 - y1_
+	x2_ := x2 - dx
+	y2_ := y2 - dy
+
+	sgp.push_transform()
+	o_off_x, o_off_y := l.origin_offset()
+
+	sgp.translate(o_off_x, o_off_y)
+	// sgp.translate(x + r.offset.x, y + r.offset.y + r.offset.y)
+
+	if l.rotation != 0 {
+		sgp.rotate_at(l.rotation * mth.deg2rad, -o_off_x, -o_off_y)
+	}
+	if l.scale != 1 {
+		sgp.scale_at(l.scale, l.scale, -o_off_x, -o_off_y)
+	}
+
+	if l.radius > 1 {
+		radius := l.radius
+
+		mut tl_x := x1_ - x2_
+		mut tl_y := y1_ - y2_
+		tl_x, tl_y = perpendicular(tl_x, tl_y)
+		tl_x, tl_y = normalize(tl_x, tl_y)
+		tl_x *= radius
+		tl_y *= radius
+		tl_x += x1_
+		tl_y += y1_
+
+		tr_x := tl_x - x1_ + x2_
+		tr_y := tl_y - y1_ + y2_
+
+		mut bl_x := x2_ - x1_
+		mut bl_y := y2_ - y1_
+		bl_x, bl_y = perpendicular(bl_x, bl_y)
+		bl_x, bl_y = normalize(bl_x, bl_y)
+		bl_x *= radius
+		bl_y *= radius
+		bl_x += x1_
+		bl_y += y1_
+
+		br_x := bl_x - x1_ + x2_
+		br_y := bl_y - y1_ + y2_
+
+		sgp.draw_filled_triangle(tl_x, tl_y, tr_x, tr_y, br_x, br_y)
+		sgp.draw_filled_triangle(tl_x, tl_y, bl_x, bl_y, br_x, br_y)
+	} else {
+		sgp.draw_line(x1_, y1_, x2_, y2_)
+	}
+
+	// sgp.translate(-x, -y)
+	sgp.pop_transform()
+}
+
 // DrawImage
 
 pub struct DrawImage {
@@ -757,7 +811,7 @@ pub fn (mut di DrawImage) begin() {
 	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 	*/
 
-	win := di.shy.api.wm.active_window()
+	win := di.shy.active_window()
 	w, h := win.drawable_size()
 	// ratio := f32(w)/f32(h)
 

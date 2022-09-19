@@ -26,7 +26,7 @@ mut:
 // all sub-systems of the Shy struct.
 struct ShyStruct {
 pub mut: // TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
-	shy &Shy // TODO remove when https://github.com/vlang/v/issues/15768 is fixed
+	shy &Shy = shy.null
 }
 
 fn (s ShyStruct) init() ! {

@@ -71,7 +71,7 @@ pub fn (a &Audio) engine(id u8) !&AudioEngine {
 pub struct AudioEngine {
 	ShyStruct
 	id u8
-	e  &ma.Engine
+	e  &ma.Engine = null
 mut:
 	sound_id u16
 	sounds   map[u16]&ma.Sound // sounds belonging to the ma.Engine instance.

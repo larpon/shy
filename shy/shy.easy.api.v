@@ -163,6 +163,69 @@ pub fn (ed &EasyDo) rect(erc EasyRectConfig) {
 	ed.easy.rect(erc).draw()
 }
 
+// Line
+
+[params]
+pub struct EasyLineConfig {
+	LineSegment
+pub mut:
+	radius   f32 = 1.0
+	rotation f32
+	scale    f32   = 1.0
+	color    Color = colors.shy.white
+	cap      Cap   = .butt
+	offset   vec.Vec2<f32>
+	origin   Anchor = .center_left
+}
+
+[noinit]
+pub struct EasyLine {
+	ShyStruct
+	LineSegment
+pub mut:
+	radius   f32 = 1.0
+	rotation f32
+	scale    f32   = 1.0
+	color    Color = colors.shy.white
+	cap      Cap   = .butt
+	offset   vec.Vec2<f32>
+	origin   Anchor = .center_left
+}
+
+[inline]
+pub fn (el &EasyLine) draw() {
+	gfx := el.shy.api.gfx
+	mut d := gfx.draw.shape_2d()
+	d.begin()
+	mut l := d.line()
+	l.a = el.a
+	l.b = el.b
+	l.radius = el.radius
+	l.rotation = el.rotation
+	l.scale = el.scale
+	l.color = el.color
+	l.cap = el.cap
+	l.offset = el.offset
+	l.origin = el.origin
+	l.draw()
+	d.end()
+}
+
+[inline]
+pub fn (e &Easy) line(elc EasyLineConfig) EasyLine {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyLine{
+		...elc
+		shy: e.shy
+	}
+}
+
+[inline]
+pub fn (ed &EasyDo) line(elc EasyLineConfig) {
+	assert !isnil(ed.easy), 'Easy struct is not initialized'
+	ed.easy.line(elc).draw()
+}
+
 // Audio sub-system
 
 [noinit]

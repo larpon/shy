@@ -3,6 +3,8 @@
 // that can be found in the LICENSE file.
 module shy
 
+import shy.vec { Vec2 }
+
 pub enum Anchor {
 	top_left
 	top_center
@@ -198,9 +200,19 @@ pub fn (a Anchor) pos_rect(r Rect) (f32, f32) {
 }
 
 pub struct Rect {
+	vec.Vec2<f32>
 pub mut:
-	x f32
-	y f32
+	// x f32
+	// y f32
 	w f32 = 100
 	h f32 = 100
+}
+
+pub struct LineSegment {
+pub mut:
+	a vec.Vec2<f32>
+	b vec.Vec2<f32> = Vec2<f32>{
+		x: 100
+		y: 100
+	}
 }

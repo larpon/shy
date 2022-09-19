@@ -5,9 +5,6 @@ module shy
 
 import shy.utils
 
-// TODO outphase this
-const color_target_size = 2 // TODO a V bug prevent this to be moved to e.g. draw.v
-
 pub const (
 	colors = BaseColors{}
 )
@@ -28,18 +25,21 @@ pub struct Colorf32 {
 
 pub struct ShyColors {
 pub:
-	red   Color = Color{155, 25, 25, 255}
-	white Color = Color{211, 211, 211, 255}
-	blue  Color = Color{0, 0, 211, 255}
+	red    Color = rgb(155, 25, 25)
+	green  Color = rgb(55, 150, 55)
+	blue   Color = rgb(13, 74, 217)
+	yellow Color = rgb(201, 180, 14)
+	white  Color = rgb(211, 211, 211)
 }
 
 pub struct BaseColors {
 pub:
-	red   Color = Color{255, 0, 0, 255} // NOTE BUG using rgb(...) here triggers a C compiler error
-	green Color = Color{0, 255, 0, 255}
-	blue  Color = Color{0, 0, 255, 255}
-	white Color = Color{255, 255, 255, 255}
-	shy   ShyColors
+	red    Color = rgb(255, 0, 0)
+	green  Color = rgb(0, 255, 0)
+	blue   Color = rgb(0, 0, 255)
+	yellow Color = rgb(255, 255, 0)
+	white  Color = rgb(255, 255, 255)
+	shy    ShyColors
 }
 
 [params]

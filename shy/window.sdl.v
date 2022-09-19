@@ -249,7 +249,7 @@ mut:
 	fonts    Fonts
 	anims    &Anims = null
 	// SDL / GL
-	handle     &sdl.Window
+	handle     &sdl.Window = null
 	gl_context sdl.GLContext
 	// sokol
 	pass_action gfx.PassAction
