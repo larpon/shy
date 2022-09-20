@@ -91,7 +91,7 @@ pub fn (r DrawShape2DRect) draw() {
 	o_off_x, o_off_y := r.origin_offset()
 
 	sgp.translate(o_off_x, o_off_y)
-	sgp.translate(x + r.offset.x, y + r.offset.y + r.offset.y)
+	sgp.translate(x + r.offset.x, y + r.offset.y)
 
 	if r.rotation != 0 {
 		sgp.rotate_at(r.rotation * mth.deg2rad, -o_off_x, -o_off_y)

@@ -70,6 +70,8 @@ mut:
 	//
 	state State
 	timer time.StopWatch = time.new_stopwatch()
+	//
+	user_data voidptr = unsafe { nil }
 	// The "blackbox" api implementation specific struct
 	// Can only be accessed via the unsafe api() function *outside* the module
 	api API
@@ -111,6 +113,7 @@ pub fn new(config Config) !&Shy {
 // run runs the application instance `T`.
 pub fn run<T>(mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
+	shy_instance.user_data = voidptr(ctx)
 	ctx.shy = shy_instance
 	ctx.init()!
 

@@ -14,27 +14,42 @@ pub fn (s &Shy) ticks() u64 {
 
 [inline]
 pub fn (s &Shy) active_window() &Window {
+	assert !isnil(s.api)
 	return s.api.wm.active_window()
 }
 
 [inline]
 pub fn (s &Shy) performance_counter() u64 {
+	assert !isnil(s.api)
 	return s.api.system.performance_counter()
 }
 
 [inline]
 pub fn (s &Shy) performance_frequency() u64 {
+	assert !isnil(s.api)
 	return s.api.system.performance_frequency()
 }
 
 [inline]
 pub fn (s &Shy) assets() &Assets {
+	assert !isnil(s.api)
+	assert !isnil(s.api.assets)
 	return s.api.assets
 }
 
 [inline]
 pub fn (s &Shy) draw() &Draw {
+	assert !isnil(s.api)
+	assert !isnil(s.api.gfx)
+	assert !isnil(s.api.gfx.draw)
 	return s.api.gfx.draw
+}
+
+[inline]
+pub fn (s &Shy) scripts() &Scripts {
+	assert !isnil(s.api)
+	assert !isnil(s.api.scripts)
+	return s.api.scripts
 }
 
 [inline]

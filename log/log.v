@@ -13,9 +13,9 @@ const (
 	label_debug    = 'DEBUG'
 	label_critical = 'CRITICAL'
 	default_flags  = $if prod {
-		Flag.log | .std_err | .error | .critical
+		Flag.log | .std_err | .error | .critical | .custom
 	} $else {
-		Flag.log | .std_err | .info | .warn | .error | .critical
+		Flag.log | .std_err | .info | .warn | .error | .critical | .custom
 	}
 )
 
@@ -32,12 +32,14 @@ pub enum Flag {
 	std_err
 	std_out
 	buffer // Exposed buffer
-	// User log categories
+	// Log categories
 	info
 	warn
 	error
 	debug
 	critical
+	//
+	custom
 	// Flood control
 	flood
 }
@@ -135,6 +137,19 @@ fn (l &Log) changes(flag Flag) string {
 //
 
 [if !no_log ?]
+pub fn (l &Log) custom(id string, str string) {
+	if l.flags.has(.custom) {
+		if l.flags.has(.buffer) {
+			unsafe {
+				l.buffer.writeln(id + ' ' + str)
+			}
+		}
+		maybe_colored := term.colorize(term.blue, id + ' ')
+		l.redirect(maybe_colored + str)
+	}
+}
+
+[if !no_log ?]
 pub fn (l &Log) info(str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
@@ -200,6 +215,19 @@ pub fn (l &Log) debug(str string) {
 }
 
 // Group
+
+[if !no_log ?]
+pub fn (l &Log) gcustom(id string, group string, str string) {
+	if l.flags.has(.custom) {
+		if l.flags.has(.buffer) {
+			unsafe {
+				l.buffer.writeln(id + ' $group ' + str)
+			}
+		}
+		maybe_colored := term.colorize(term.blue, id + ' ') + term.colorize(term.white, '$group ')
+		l.redirect(maybe_colored + str)
+	}
+}
 
 [if !no_log ?]
 pub fn (l &Log) ginfo(group string, str string) {

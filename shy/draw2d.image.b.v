@@ -110,6 +110,33 @@ pub fn (i Draw2DImage) draw() {
 	sgp.reset_image(0)
 }
 
+[inline]
+pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
+	// sgp.set_blend_mode(sgp.BlendMode)
+	// sgp.reset_blend_mode()
+
+	col := i.color.as_f32()
+
+	sgp.set_color(col.r, col.g, col.b, col.a)
+	sgp.set_image(0, i.image.gfx_image)
+
+	sgp_src := sgp.Rect{
+		x: src.x
+		y: src.y
+		w: src.w
+		h: src.h
+	}
+	sgp_dst := sgp.Rect{
+		x: dst.x
+		y: dst.y
+		w: dst.w
+		h: dst.h
+	}
+	sgp.draw_textured_rect_ex(0, sgp_dst, sgp_src)
+
+	sgp.reset_image(0)
+}
+
 /*
 [inline]
 pub fn (i Draw2DImage) draw() {

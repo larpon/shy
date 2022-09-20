@@ -6,12 +6,13 @@ module shy
 struct API {
 	ShyStruct
 mut:
-	wm     &WM     = null
-	gfx    &GFX    = null
-	assets &Assets = null
-	audio  &Audio  = null
-	input  &Input  = null
-	system &System = null
+	wm      &WM      = null
+	gfx     &GFX     = null
+	assets  &Assets  = null
+	audio   &Audio   = null
+	input   &Input   = null
+	system  &System  = null
+	scripts &Scripts = null
 }
 
 pub fn (mut a API) init(shy_instance &Shy) ! {
@@ -47,6 +48,11 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	}
 	a.audio.init()!
 
+	a.scripts = &Scripts{
+		shy: s
+	}
+	a.scripts.init()!
+
 	a.input = &Input{
 		shy: s
 	}
@@ -57,6 +63,7 @@ pub fn (mut a API) shutdown() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 
 	a.input.shutdown()!
+	a.scripts.shutdown()!
 	a.assets.shutdown()!
 	a.audio.shutdown()!
 	a.system.shutdown()!
@@ -65,11 +72,12 @@ pub fn (mut a API) shutdown() ! {
 	unsafe { a.free() }
 }
 
-[unsafe]
+[manualfree; unsafe]
 fn (mut a API) free() {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	unsafe {
 		free(a.input)
+		free(a.scripts)
 		free(a.assets)
 		free(a.gfx)
 		free(a.audio)
@@ -100,4 +108,8 @@ pub fn (a &API) input() &Input {
 
 pub fn (a &API) system() &System {
 	return a.system
+}
+
+pub fn (a &API) scripts() &Scripts {
+	return a.scripts
 }

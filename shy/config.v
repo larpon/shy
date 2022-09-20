@@ -27,7 +27,7 @@ struct Defaults {
 	font struct  {
 		name string = 'default'
 		size f32    = 20
-		// align TextAlign = .baseline | .left TODO V BUG
+		// align TextAlign = .baseline | .left // TODO V BUG
 	}
 
 	audio struct  {
