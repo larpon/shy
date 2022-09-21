@@ -27,6 +27,7 @@ pub fn (mut sc Scripts) init() ! {
 }
 
 pub fn (mut sc Scripts) shutdown() ! {
+	// TODO hotcode guard on all of these
 	// mut s := sc.shy
 	sc.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 

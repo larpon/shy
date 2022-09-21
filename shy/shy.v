@@ -89,7 +89,7 @@ pub fn (mut s Shy) init() ! {
 	}
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	s.api.init(s)!
-	s.check_api()!
+	s.check_health()!
 	s.ready = true
 	s.timer.start()
 }
@@ -163,19 +163,8 @@ fn (mut s Shy) process_events<T>(mut ctx T) {
 	}
 }
 
-fn (s Shy) check_api() ! {
-	if isnil(s.api.wm) || isnil(s.api.gfx) || isnil(s.api.input) {
-		return error('not all essential api systems where set')
-	}
-	if isnil(s.api.audio) {
-		return error('not all audio api systems where set')
-	}
-	if isnil(s.api.gfx.draw) {
-		return error('not all graphics api systems where set')
-	}
-	if isnil(s.api.input.mouse) || isnil(s.api.input.keyboard) {
-		return error('not all input api systems where set')
-	}
+fn (s Shy) check_health() ! {
+	s.api.check_health()!
 }
 
 pub enum VetCategory {

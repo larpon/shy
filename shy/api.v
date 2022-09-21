@@ -86,6 +86,24 @@ fn (mut a API) free() {
 	}
 }
 
+pub fn (a &API) check_health() ! {
+	if isnil(a.wm) || isnil(a.gfx) || isnil(a.input) {
+		return error('${@STRUCT}.${@FN} not all essential api structs where set')
+	}
+	if isnil(a.scripts) {
+		return error('${@STRUCT}.${@FN} not all script api structs where set')
+	}
+	if isnil(a.audio) {
+		return error('${@STRUCT}.${@FN} not all audio api structs where set')
+	}
+	if isnil(a.gfx) || isnil(a.gfx.draw) {
+		return error('${@STRUCT}.${@FN} not all graphics api structs where set')
+	}
+	if isnil(a.input.mouse) || isnil(a.input.keyboard) {
+		return error('${@STRUCT}.${@FN} not all input api structs where set')
+	}
+}
+
 pub fn (a &API) wm() &WM {
 	return a.wm
 }

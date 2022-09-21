@@ -8,7 +8,16 @@ import libs.wren
 pub struct Wren {
 	ShyStruct
 mut:
-	vm &wren.VM = unsafe { nil }
+	vm      &wren.VM = unsafe { nil }
+	handles []WrenClass
+}
+
+pub struct WrenClass {
+	vm    &wren.VM // = unsafe { nil }
+	class &wren.Handle
+mut:
+	fields  map[string]&wren.Handle
+	methods map[string]&wren.Handle
 }
 
 fn wren_no_fn(vm &wren.VM) {}
@@ -33,7 +42,7 @@ pub fn (mut w Wren) init() ! {
 	w.vm = vm
 
 	// TODO TEST ONLY
-	w.vm.interpret('main', shy.shy_in_wren)
+	w.eval('shy', shy.shy_in_wren) or { return error('${@STRUCT}.${@FN}: $err') }
 }
 
 pub fn (mut w Wren) shutdown() ! {
@@ -57,9 +66,84 @@ pub fn (mut w Wren) eval(@module string, code string) ! {
 	return
 }
 
+/*
+// TODO needs plenty of love we need to be able to register as a foreign class
+// and do all the V -> C -> Wren and vice versa.
+// https://wren.io/embedding/calling-wren-from-c.html
+// https://wren.io/embedding/calling-c-from-wren.html
+[params]
+pub struct WrenConvertConfig {
+	mod string = 'main'
+}
+
+pub fn (mut w Wren) to_wren_code<T>() string {
+	// TODO hotcode / shutdown guard
+	// mut _ := T{}
+
+	mut code := ''
+	class_name := T.name
+
+	code += 'foreign class $class_name {'
+
+	mut f_get_set := ''
+
+	// TODO embedded structs and reference fields???
+	// $for field in T.fields {
+	// 	f_get_set += '\t$field.name { _$field.name }\n'
+	// 	f_get_set += '\t$field.name=(value){ _$field.name = value }\n'
+	// }
+
+	mut methods := ''
+	$for method in T.methods {
+		//println(method)
+		methods += '\tforeign '+'${method.name}('
+		mut args := ''
+		t_args := method.args
+		for arg in t_args {
+			args += '$arg.name,'
+		}
+		methods += args.trim_right(',') + ')\n'
+	}
+	return code + '\n' + f_get_set + methods + '}'
+	// println(wren_class.handles) // NOTE CRASH
+}
+
+pub fn (mut w Wren) to_wren<T>(config WrenConvertConfig) ! {
+	// TODO hotcode / shutdown guard
+	// mut _ := T{}
+
+	name := T.name
+
+	code := w.to_wren_code<T>()
+	println(code)
+	w.eval(config.mod,code) !
+	w.vm.ensure_slots(1)
+	w.vm.get_variable(config.mod, name, 0)
+
+	mut wren_class := WrenClass{
+		vm: w.vm
+		class: w.vm.get_slot_handle(0)
+	}
+	$for field in T.fields {
+		// println(field.name)
+
+		// mut wren_sig := field.name+'('
+		// args := '_,'.repeat(method.args.len)
+		// wren_sig += args.trim_right(',') + ')'
+		// wren_class.methods << w.vm.make_call_handle(wren_sig)
+	}
+	$for method in T.methods {
+		//println(method)
+		wren_sig := method.name+'('+'_,'.repeat(method.args.len).trim_right(',') + ')'
+		wren_class.methods[method.name] = w.vm.make_call_handle(wren_sig)
+	}
+	// println(wren_class.handles) // NOTE CRASH
+}
+*/
+
 [manualfree]
 fn wren_write_fn(vm &wren.VM, const_text &char) {
-	msg := unsafe { cstring_to_vstring(const_text) }.trim_space()
+	msg := wren_c2v_string(const_text).trim_space()
 	s := &Shy(wren.get_user_data(vm))
 	assert !isnil(s), 'Shy is nil in wren_write_fn'
 	if msg != '' {
@@ -69,15 +153,31 @@ fn wren_write_fn(vm &wren.VM, const_text &char) {
 	unsafe { msg.free() }
 }
 
+/*
+fn wren_c2v_const_string(ch_ptr &char) string {
+	if !isnil(ch_ptr) {
+		return unsafe { tos3(ch_ptr) }.trim_space()
+	}
+	return ''
+}
+*/
+
+fn wren_c2v_string(ch_ptr &char) string {
+	if !isnil(ch_ptr) {
+		return unsafe { cstring_to_vstring(ch_ptr) }
+	}
+	return ''
+}
+
 [manualfree]
 fn wren_error_fn(vm &wren.VM, error_type wren.ErrorType, const_module &char, const_line int, const_msg &char) {
-	mod := unsafe { cstring_to_vstring(const_module) }.trim_space()
-	msg := unsafe { cstring_to_vstring(const_msg) }.trim_space()
+	mod := wren_c2v_string(const_module).trim_space()
+	msg := wren_c2v_string(const_msg).trim_space()
 	s := &Shy(wren.get_user_data(vm))
 	assert !isnil(s), 'Shy is nil in wren_error_fn'
 	match error_type {
 		.compile {
-			s.log.gerror('WREN', '$mod line $const_line: $msg')
+			s.log.gerror('WREN COMPILE', '$mod line $const_line: $msg')
 			// eprintln('Scripts.wren $mod line $const_line: $msg')
 		}
 		.stack_trace {
@@ -85,7 +185,7 @@ fn wren_error_fn(vm &wren.VM, error_type wren.ErrorType, const_module &char, con
 			// eprintln('Scripts.wren $mod line $const_line in $msg')
 		}
 		.runtime {
-			s.log.gerror('WREN', '$mod line $const_line: $msg')
+			s.log.gerror('WREN RUNTIME', '$mod line $const_line: $msg')
 			// eprintln('Scripts.wren $mod line $const_line: $msg')
 		}
 	}
@@ -95,12 +195,11 @@ fn wren_error_fn(vm &wren.VM, error_type wren.ErrorType, const_module &char, con
 
 const shy_in_wren = '
 foreign class Shy {
-  // ...
+  	// ...
 	foreign static log(text)
 }
-
-System.print("Shy ?!")
-Shy.log("Shy!!")
+// System.print("Shy ?!")
+// Shy.log("Shy!!")
 '
 
 [manualfree]
