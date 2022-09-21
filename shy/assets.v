@@ -27,12 +27,14 @@ pub:
 
 [params]
 pub struct AssetOptions {
+pub:
 	uri    string
 	async  bool = true
 	stream bool
 }
 
 pub struct AssetOption {
+pub:
 	cache bool
 }
 
@@ -137,7 +139,26 @@ pub fn (mut a Assets) load(ao AssetOptions) !&Asset {
 	return asset
 }
 
-pub fn (mut a Assets) get(uri string) !&Asset {
+pub fn (a &Assets) get_cached_image(uri string) !Image {
+	if image := a.image_cache[uri] {
+		return image
+	}
+	return error('${@STRUCT}.${@FN}' +
+		': "$uri" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+}
+
+pub fn (a &Assets) get_cached<T>(uri string) !T {
+	i_t := T{}
+	if typeof(i_t).name.all_after('shy.') == 'Image' {
+		if image := a.image_cache[uri] {
+			return image
+		}
+	}
+	return error('${@STRUCT}.${@FN}' +
+		': "$uri" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+}
+
+pub fn (a &Assets) get(uri string) !&Asset {
 	if asset := a.ass[uri] {
 		return asset
 	}

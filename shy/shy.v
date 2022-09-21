@@ -178,17 +178,17 @@ fn (s Shy) check_api() ! {
 	}
 }
 
-enum VetCategory {
+pub enum VetCategory {
 	warn
 }
 
-enum VetArea {
+pub enum VetArea {
 	misc
 	hot_code
 }
 
 [if shy_vet ?]
-fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string) {
+pub fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string) {
 	mut prefix := caller + ' '
 	prefix += match area {
 		.misc { 'misc' }

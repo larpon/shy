@@ -11,7 +11,9 @@ pub const (
 )
 
 struct Defaults {
+pub:
 	render struct  {
+	pub:
 		update_rate         f64 = 60.0
 		update_multiplicity u8  = 1
 		lock_framerate      bool
@@ -21,24 +23,29 @@ struct Defaults {
 	}
 
 	fonts struct  {
+	pub:
 		preallocate u8 = 4
 	}
 
 	font struct  {
+	pub:
 		name string = 'default'
 		size f32    = 20
 		// align TextAlign = .baseline | .left // TODO V BUG
 	}
 
 	audio struct  {
+	pub:
 		engines u8 = 1
 	}
 
 	input struct  {
+	pub:
 		mice bool = false // Support multiple mouse input devices
 	}
 
 	window struct  {
+	pub:
 		title     string = 'Shy Window'
 		resizable bool   = true // Root window is resizable, can be toggled at run time
 		color     Color  = Color{0, 0, 0, 255} // Default background color of the root window

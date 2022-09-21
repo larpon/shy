@@ -1,8 +1,9 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
-module shy
+module easy
 
+import shy.shy
 import shy.vec
 // High-level as-easy-as-it-gets API
 
@@ -10,21 +11,21 @@ import shy.vec
 [noinit]
 pub struct EasyDo {
 pub mut: // TODO error: field ... is not public - make this just "pub" to callers - and mut to internal system
-	easy &Easy = null
+	easy &Easy = shy.null
 }
 
 [heap]
 pub struct Easy {
-	ShyStruct
+	shy.ShyStruct
 mut:
 	do           EasyDo
-	audio_engine &AudioEngine = null
+	audio_engine &shy.AudioEngine = shy.null
 }
 
 pub fn (mut e Easy) init() ! {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	e.do.easy = e
-	e.audio_engine = e.shy.api.audio.engine(0)!
+	e.audio_engine = e.shy.audio().engine(0)!
 }
 
 pub fn (mut e Easy) shutdown() ! {}
@@ -37,31 +38,31 @@ pub mut:
 	rotation f32
 	scale    f32 = 1.0
 	text     string
-	size     f32 = defaults.font.size
-	origin   Anchor
-	align    TextAlign = .baseline | .left
+	size     f32 = shy.defaults.font.size
+	origin   shy.Anchor
+	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2<f32>
 }
 
 [noinit]
 pub struct EasyText {
-	ShyStruct
+	shy.ShyStruct
 pub mut:
 	x        f32
 	y        f32
 	rotation f32
 	scale    f32 = 1.0
 	text     string
-	size     f32 = defaults.font.size
-	origin   Anchor
-	align    TextAlign = .baseline | .left
+	size     f32 = shy.defaults.font.size
+	origin   shy.Anchor
+	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2<f32>
 }
 
 [inline]
 pub fn (et &EasyText) draw() {
-	gfx := et.shy.api.gfx
-	mut dt := gfx.draw.text()
+	draw := et.shy.draw()
+	mut dt := draw.text()
 	dt.begin()
 	mut t := dt.text_2d()
 	t.text = et.text
@@ -96,39 +97,39 @@ pub fn (ed &EasyDo) text(etc EasyTextConfig) {
 
 [params]
 pub struct EasyRectConfig {
-	Rect
+	shy.Rect
 pub mut:
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32 = 1.0
-	colors   ShapeColors
-	fills    Fill    = .solid | .outline
-	cap      Cap     = .butt
-	connect  Connect = .bevel
+	colors   shy.ShapeColors
+	fills    shy.Fill    = .solid | .outline
+	cap      shy.Cap     = .butt
+	connect  shy.Connect = .bevel
 	offset   vec.Vec2<f32>
-	origin   Anchor
+	origin   shy.Anchor
 }
 
 [noinit]
 pub struct EasyRect {
-	ShyStruct
-	Rect
+	shy.ShyStruct
+	shy.Rect
 pub mut:
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32 = 1.0
-	colors   ShapeColors
-	fills    Fill    = .solid | .outline
-	connect  Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
-	cap      Cap     = .butt
+	colors   shy.ShapeColors
+	fills    shy.Fill    = .solid | .outline
+	connect  shy.Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
+	cap      shy.Cap     = .butt
 	offset   vec.Vec2<f32>
-	origin   Anchor
+	origin   shy.Anchor
 }
 
 [inline]
 pub fn (er &EasyRect) draw() {
-	gfx := er.shy.api.gfx
-	mut d := gfx.draw.shape_2d()
+	draw := er.shy.draw()
+	mut d := draw.shape_2d()
 	d.begin()
 	mut r := d.rect()
 	r.x = er.x
@@ -167,35 +168,35 @@ pub fn (ed &EasyDo) rect(erc EasyRectConfig) {
 
 [params]
 pub struct EasyLineConfig {
-	LineSegment
+	shy.LineSegment
 pub mut:
 	radius   f32 = 1.0
 	rotation f32
-	scale    f32   = 1.0
-	color    Color = colors.shy.white
-	cap      Cap   = .butt
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.white
+	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
-	origin   Anchor = .center_left
+	origin   shy.Anchor = .center_left
 }
 
 [noinit]
 pub struct EasyLine {
-	ShyStruct
-	LineSegment
+	shy.ShyStruct
+	shy.LineSegment
 pub mut:
 	radius   f32 = 1.0
 	rotation f32
-	scale    f32   = 1.0
-	color    Color = colors.shy.white
-	cap      Cap   = .butt
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.white
+	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
-	origin   Anchor = .center_left
+	origin   shy.Anchor = .center_left
 }
 
 [inline]
 pub fn (el &EasyLine) draw() {
-	gfx := el.shy.api.gfx
-	mut d := gfx.draw.shape_2d()
+	draw := el.shy.draw()
+	mut d := draw.shape_2d()
 	d.begin()
 	mut l := d.line()
 	l.a = el.a
@@ -230,8 +231,8 @@ pub fn (ed &EasyDo) line(elc EasyLineConfig) {
 
 [noinit]
 pub struct EasySound {
-	ShyStruct
-	engine &AudioEngine
+	shy.ShyStruct
+	engine &shy.AudioEngine
 	id     u16
 	id_end u16
 pub mut:
@@ -312,32 +313,33 @@ pub fn (es &EasySound) stop() {
 // Image drawing sub-system
 [params]
 pub struct EasyImageConfig {
-	Rect
+	shy.Rect
 pub:
 	uri   string
-	color Color = rgb(255, 255, 255)
+	color shy.Color = shy.rgb(255, 255, 255)
 }
 
 [noinit]
 pub struct EasyImage {
-	ShyStruct
-	Rect
+	shy.ShyStruct
+	shy.Rect
 pub:
 	uri   string
-	color Color = rgb(255, 255, 255)
+	color shy.Color = shy.rgb(255, 255, 255)
 }
 
 pub fn (ei &EasyImage) draw() {
 	// TODO e.shy.assets.get_cached(...) ???
-	mut image := Image{}
-	if img := ei.shy.assets().image_cache[ei.uri] {
+	mut image := shy.Image{}
+	// if img := ei.shy.assets().get_cached<shy.Image>(ei.uri) {
+	if img := ei.shy.assets().get_cached_image(ei.uri) {
 		image = img
 	} else {
 		return
 	}
 
-	gfx := ei.shy.api.gfx
-	mut d := gfx.draw.image()
+	draw := ei.shy.draw()
+	mut d := draw.image()
 	d.begin()
 	mut i2d := d.image_2d(image)
 	i2d.color = ei.color
@@ -365,9 +367,10 @@ pub fn (ed &EasyDo) image(eic EasyImageConfig) {
 }
 
 // Assets
-pub fn (e &Easy) load(ao AssetOptions) ! {
+pub fn (e &Easy) load(ao shy.AssetOptions) ! {
 	// TODO e.shy.assets.is_cached(...) ???
-	if _ := e.shy.assets().image_cache[ao.uri] {
+	// if _ := e.shy.assets().get_cached<shy.Image>(ao.uri) {
+	if _ := e.shy.assets().get_cached_image(ao.uri) {
 		return
 	}
 	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
@@ -380,7 +383,7 @@ pub fn (e &Easy) load(ao AssetOptions) ! {
 }
 
 [inline]
-pub fn (ed &EasyDo) load(ao AssetOptions) ! {
+pub fn (ed &EasyDo) load(ao shy.AssetOptions) ! {
 	assert !isnil(ed.easy), 'Easy struct is not initialized'
 	ed.easy.load(ao)!
 }

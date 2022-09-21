@@ -46,6 +46,13 @@ pub fn (s &Shy) draw() &Draw {
 }
 
 [inline]
+pub fn (s &Shy) audio() &Audio {
+	assert !isnil(s.api)
+	assert !isnil(s.api.audio)
+	return s.api.audio
+}
+
+[inline]
 pub fn (s &Shy) scripts() &Scripts {
 	assert !isnil(s.api)
 	assert !isnil(s.api.scripts)

@@ -4,6 +4,7 @@
 module embed
 
 import shy.shy
+import shy.easy
 import os
 
 // Base app skeleton for easy embedding in examples
@@ -27,8 +28,8 @@ pub fn (mut a App) event(e shy.Event) {}
 pub struct EasyApp {
 	App
 mut:
-	do     shy.EasyDo
-	easy   &shy.Easy     = shy.null
+	do     easy.EasyDo
+	easy   &easy.Easy    = shy.null
 	assets &shy.Assets   = shy.null
 	draw   &shy.Draw     = shy.null
 	mouse  &shy.Mouse    = shy.null
@@ -37,7 +38,7 @@ mut:
 }
 
 pub fn (mut a EasyApp) init() ! {
-	a.easy = &shy.Easy{
+	a.easy = &easy.Easy{
 		shy: a.shy
 	}
 	unsafe {
