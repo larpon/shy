@@ -71,6 +71,7 @@ mut:
 	state State
 	timer time.StopWatch = time.new_stopwatch()
 	//
+	app       voidptr = unsafe { nil }
 	user_data voidptr = unsafe { nil }
 	// The "blackbox" api implementation specific struct
 	// Can only be accessed via the unsafe api() function *outside* the module
@@ -113,13 +114,14 @@ pub fn new(config Config) !&Shy {
 // run runs the application instance `T`.
 pub fn run<T>(mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
-	shy_instance.user_data = voidptr(ctx)
+	shy_instance.app = voidptr(ctx)
+	// shy_instance.user_data = voidptr(ctx)
 	ctx.shy = shy_instance
 	ctx.init()!
 
 	main_loop<T>(mut ctx, mut shy_instance)!
 
-	ctx.quit()
+	ctx.shutdown()!
 	shy_instance.shutdown()!
 	unsafe { free(shy_instance) }
 }
@@ -131,7 +133,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 
 	s.running = true
 	s.state.in_hot_code = true
-	for s.running && !s.paused {
+	for s.running {
 		if !s.ready {
 			s.log.gwarn('${@MOD}.${@FN}', 'not ready. Waiting 1 second...')
 			time.sleep(1 * time.second)
@@ -149,6 +151,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 
 		if s.shutdown {
 			s.log.gdebug('${@MOD}.${@FN}', 'shutdown is $s.shutdown, leaving main loop...')
+			s.running = false
 			break
 		}
 	}
@@ -165,6 +168,20 @@ fn (mut s Shy) process_events<T>(mut ctx T) {
 
 fn (s Shy) check_health() ! {
 	s.api.check_health()!
+}
+
+[if !prod]
+pub fn (s Shy) assert_api_init() {
+	assert !s.running, 'Shy.running is true'
+	assert !s.state.in_hot_code, 'Shy is in a hot code path'
+	assert !s.shutdown, 'Shy is shutting down'
+}
+
+[if !prod]
+pub fn (s Shy) assert_api_shutdown() {
+	assert !s.running, 'Shy.running is true'
+	assert !s.state.in_hot_code, 'Shy is in a hot code path'
+	assert s.shutdown, 'Shy is not set to shut down'
 }
 
 pub enum VetCategory {

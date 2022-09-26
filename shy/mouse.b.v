@@ -12,7 +12,7 @@ pub fn (mut m Mouse) init() ! {
 	// before being able to generate *window local* mouse events
 	win := m.shy.api.wm.root()
 	w_x, w_y := win.position()
-	w_w, w_h := win.size()
+	w_w, w_h := win.wh()
 	mgx, mgy := m.position(.global)
 	if mgx > w_x && mgx < w_x + w_w && mgy > w_y && mgy < w_y + w_h {
 		m.x = mgx - w_x

@@ -60,6 +60,12 @@ pub fn (s &Shy) scripts() &Scripts {
 }
 
 [inline]
+pub fn (s &Shy) app() voidptr {
+	assert !isnil(s.app)
+	return s.app
+}
+
+[inline]
 pub fn vec2<T>(x T, y T) vec.Vec2<T> {
 	return vec.Vec2<T>{
 		x: x

@@ -16,7 +16,7 @@ pub fn (mut d2d DrawShape2D) begin() {
 	d2d.ShyFrame.begin()
 
 	win := d2d.shy.api.wm.active_window()
-	w, h := win.drawable_size()
+	w, h := win.drawable_wh()
 	// ratio := f32(w)/f32(h)
 
 	// Begin recording draw commands for a frame buffer of size (width, height).
@@ -295,14 +295,14 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 	*/
 }
 
-// DrawShape2DLine
+// DrawShape2DLineSegment
 
-pub fn (d2d &DrawShape2D) line(config DrawShape2DLine) DrawShape2DLine {
+pub fn (d2d &DrawShape2D) line_segment(config DrawShape2DLineSegment) DrawShape2DLineSegment {
 	return config
 }
 
 [params]
-pub struct DrawShape2DLine {
+pub struct DrawShape2DLineSegment {
 	LineSegment
 pub mut:
 	visible  bool = true
@@ -318,14 +318,14 @@ pub mut:
 }
 
 [inline]
-pub fn (l DrawShape2DLine) origin_offset() (f32, f32) {
+pub fn (l DrawShape2DLineSegment) origin_offset() (f32, f32) {
 	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
 	// return -p_x, -p_y
 	return 0, 0
 }
 
 [inline]
-pub fn (l DrawShape2DLine) draw() {
+pub fn (l DrawShape2DLineSegment) draw() {
 	if !l.visible {
 		return
 	}

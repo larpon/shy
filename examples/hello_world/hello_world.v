@@ -18,7 +18,7 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	a.do.text(
+	a.quick.text(
 		text: 'Hello Shy World!'
 	)
 }

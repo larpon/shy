@@ -14,6 +14,7 @@ mut:
 }
 
 pub fn (mut g GFX) init() ! {
+	g.shy.assert_api_init()
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	mut gfx_desc := gfx.Desc{
@@ -66,6 +67,7 @@ pub fn (mut g GFX) shutdown_subsystems() ! {
 }
 
 pub fn (mut g GFX) shutdown() ! {
+	g.shy.assert_api_shutdown()
 	gfx.shutdown()
 }
 

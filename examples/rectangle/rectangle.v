@@ -18,7 +18,7 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	a.do.rect(
+	a.quick.rect(
 		x: (a.window.width() / 2)
 		y: (a.window.height() / 2)
 		w: 100

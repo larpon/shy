@@ -19,7 +19,7 @@ mut:
 pub fn (mut dt DrawText) begin() {
 	dt.ShyFrame.begin()
 	win := dt.shy.active_window()
-	w, h := win.drawable_size()
+	w, h := win.drawable_wh()
 
 	sgl.defaults()
 

@@ -34,7 +34,7 @@ pub fn (mut a App) init() ! {
 pub fn (mut a App) frame(dt f64) {
 	is_looping_str := if a.sound.is_looping() { 'looping' } else { 'not looping' }
 	is_playing_str := if a.sound.is_playing() { 'playing' } else { 'not playing' }
-	a.do.text(
+	a.quick.text(
 		text: 'Press a key or click in window to play a sound\nPress "L" to loop (currently $is_looping_str)\nSound is $is_playing_str'
 	)
 }

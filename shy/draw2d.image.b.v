@@ -17,7 +17,7 @@ pub fn (mut di DrawImage) begin() {
 
 	/*
 	win := di.shy.active_window()
-	w, h := win.drawable_size()
+	w, h := win.drawable_wh()
 
 	sgl.defaults()
 
@@ -27,7 +27,7 @@ pub fn (mut di DrawImage) begin() {
 	*/
 
 	win := di.shy.active_window()
-	w, h := win.drawable_size()
+	w, h := win.drawable_wh()
 	// ratio := f32(w)/f32(h)
 
 	// Begin recording draw commands for a frame buffer of size (width, height).

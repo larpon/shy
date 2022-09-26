@@ -23,6 +23,12 @@ pub mut:
 	}
 }
 
+pub struct Size {
+pub mut:
+	w f32 = 100
+	h f32 = 100
+}
+
 pub enum Anchor {
 	top_left
 	top_center

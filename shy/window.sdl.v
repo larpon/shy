@@ -13,6 +13,7 @@ import os.font
 // https://gist.github.com/sherjilozair/c0fa81250c1b8f5e4234b1588e755bca
 
 pub fn (b Boot) init() !&WM {
+	b.shy.assert_api_init()
 	s := b.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	wm := &WM{
@@ -22,6 +23,7 @@ pub fn (b Boot) init() !&WM {
 }
 
 pub fn (mut wm WM) init() ! {
+	wm.shy.assert_api_init()
 	mut s := wm.shy
 
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
@@ -158,6 +160,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 }
 
 pub fn (mut wm WM) shutdown() ! {
+	wm.shy.assert_api_shutdown()
 	wm.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	wm.root.close()!
 	// TODO test unsafe { free(wm) }
@@ -252,15 +255,15 @@ mut:
 	handle     &sdl.Window = null
 	gl_context sdl.GLContext
 	// sokol
-	pass_action gfx.PassAction
-	gfx_context gfx.Context
+	pass_action     gfx.PassAction
+	off_pass_action gfx.PassAction
+	gfx_context     gfx.Context
 pub mut:
 	state FrameState
 }
 
 pub fn (w &Window) begin() {
-	// TODO multi window support
-	width, height := w.drawable_size()
+	width, height := w.drawable_wh()
 	gfx.begin_default_pass(&w.pass_action, width, height)
 }
 
@@ -429,6 +432,8 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 		f_dt := f64(w.state.frame_accumulator) / desired_frametime
 		// eprintln('(unlocked) ctx.frame( $f_dt )')
 		w.state.in_frame_call = true
+		// TODO remove me again
+		s.scripts().on_frame(f_dt)
 		ctx.frame(f_dt)
 	} else { // LOCKED FRAMERATE, NO INTERPOLATION
 		for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
@@ -446,6 +451,8 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 
 		// eprintln('(locked) ctx.frame( 1.0 )')
 		w.state.in_frame_call = true
+		// TODO remove me again
+		s.scripts().on_frame(1.0)
 		ctx.frame(1.0)
 	}
 
@@ -515,7 +522,7 @@ pub fn (mut w Window) init() ! {
 
 	sdl.gl_make_current(w.handle, w.gl_context)
 	// $if opengl ? {
-	match s.config.render.vsync {
+	match w.config.render.vsync {
 		.off {
 			if sdl.gl_set_swap_interval(0) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
@@ -538,7 +545,7 @@ pub fn (mut w Window) init() ! {
 			}
 		}
 	}
-	s.log.ginfo('${@STRUCT}.${@FN}', 'vsync=$s.config.render.vsync')
+	s.log.ginfo('${@STRUCT}.${@FN}', 'vsync=$w.config.render.vsync')
 	// }
 
 	w.gfx_context = gfx.setup_context()
@@ -568,7 +575,7 @@ pub fn (mut w Window) init() ! {
 	w.render_init()
 
 	w.x, w.y = w.position()
-	w.w, w.h = w.size()
+	w.w, w.h = w.wh()
 
 	w.ready = true
 }
@@ -628,10 +635,19 @@ pub fn (w &Window) position() (int, int) {
 	return x, y
 }
 
-pub fn (w &Window) size() (int, int) {
+pub fn (w &Window) wh() (int, int) {
 	mut width, mut height := 0, 0
 	sdl.get_window_size(w.handle, &width, &height)
 	return width, height
+}
+
+pub fn (w &Window) size() Size {
+	mut width, mut height := 0, 0
+	sdl.get_window_size(w.handle, &width, &height)
+	return Size{
+		w: width
+		h: height
+	}
 }
 
 pub fn (w &Window) height() int {
@@ -646,7 +662,7 @@ pub fn (w &Window) width() int {
 	return width
 }
 
-pub fn (w &Window) drawable_size() (int, int) {
+pub fn (w &Window) drawable_wh() (int, int) {
 	mut width := 0
 	mut height := 0
 	// $if opengl ? {

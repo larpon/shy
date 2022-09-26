@@ -7,9 +7,9 @@ import shy.shy
 import shy.vec
 // High-level as-easy-as-it-gets API
 
-// EasyDo is an internal struct for fire-and-forget/instant calling of Easy methods.
+// Quick is an internal struct for fire-and-forget/instant calling of Easy methods.
 [noinit]
-pub struct EasyDo {
+pub struct Quick {
 pub mut: // TODO error: field ... is not public - make this just "pub" to callers - and mut to internal system
 	easy &Easy = shy.null
 }
@@ -18,13 +18,13 @@ pub mut: // TODO error: field ... is not public - make this just "pub" to caller
 pub struct Easy {
 	shy.ShyStruct
 mut:
-	do           EasyDo
+	quick        Quick
 	audio_engine &shy.AudioEngine = shy.null
 }
 
 pub fn (mut e Easy) init() ! {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	e.do.easy = e
+	e.quick.easy = e
 	e.audio_engine = e.shy.audio().engine(0)!
 }
 
@@ -88,7 +88,7 @@ pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 }
 
 [inline]
-pub fn (ed &EasyDo) text(etc EasyTextConfig) {
+pub fn (ed &Quick) text(etc EasyTextConfig) {
 	assert !isnil(ed.easy), 'Easy struct is not initialized'
 	ed.easy.text(etc).draw()
 }
@@ -159,7 +159,7 @@ pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
 }
 
 [inline]
-pub fn (ed &EasyDo) rect(erc EasyRectConfig) {
+pub fn (ed &Quick) rect(erc EasyRectConfig) {
 	assert !isnil(ed.easy), 'Easy struct is not initialized'
 	ed.easy.rect(erc).draw()
 }
@@ -198,7 +198,7 @@ pub fn (el &EasyLine) draw() {
 	draw := el.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
-	mut l := d.line()
+	mut l := d.line_segment()
 	l.a = el.a
 	l.b = el.b
 	l.radius = el.radius
@@ -213,7 +213,7 @@ pub fn (el &EasyLine) draw() {
 }
 
 [inline]
-pub fn (e &Easy) line(elc EasyLineConfig) EasyLine {
+pub fn (e &Easy) line_segment(elc EasyLineConfig) EasyLine {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyLine{
 		...elc
@@ -222,9 +222,9 @@ pub fn (e &Easy) line(elc EasyLineConfig) EasyLine {
 }
 
 [inline]
-pub fn (ed &EasyDo) line(elc EasyLineConfig) {
+pub fn (ed &Quick) line_segment(elc EasyLineConfig) {
 	assert !isnil(ed.easy), 'Easy struct is not initialized'
-	ed.easy.line(elc).draw()
+	ed.easy.line_segment(elc).draw()
 }
 
 // Audio sub-system
@@ -361,7 +361,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 }
 
 [inline]
-pub fn (ed &EasyDo) image(eic EasyImageConfig) {
+pub fn (ed &Quick) image(eic EasyImageConfig) {
 	assert !isnil(ed.easy), 'Easy struct is not initialized'
 	ed.easy.image(eic).draw()
 }
@@ -383,7 +383,7 @@ pub fn (e &Easy) load(ao shy.AssetOptions) ! {
 }
 
 [inline]
-pub fn (ed &EasyDo) load(ao shy.AssetOptions) ! {
+pub fn (ed &Quick) load(ao shy.AssetOptions) ! {
 	assert !isnil(ed.easy), 'Easy struct is not initialized'
 	ed.easy.load(ao)!
 }

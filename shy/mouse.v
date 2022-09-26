@@ -66,7 +66,7 @@ pub fn (m Mouse) in_window(win &Window) bool {
 	// m.position(.window) doesn't always work since SDL need mouse movement
 	// before being able to generate *window local* mouse events
 	w_x, w_y := win.position()
-	w_w, w_h := win.size()
+	w_w, w_h := win.wh()
 	mgx, mgy := m.position(.global)
 	return mgx > w_x && mgx < w_x + w_w && mgy > w_y && mgy < w_y + w_h
 }

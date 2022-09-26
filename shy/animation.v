@@ -5,7 +5,7 @@ module shy
 
 import shy.utils
 import shy.ease
-import math // TODO
+import mth
 
 pub const infinite = -1
 
@@ -40,6 +40,7 @@ mut:
 }
 
 pub fn (mut a Anims) init() ! {
+	a.shy.assert_api_init()
 	// TODO make configurable
 	prealloc := 1000
 	// unsafe { a.active.flags.set(.noslices | .noshrink) }
@@ -53,6 +54,7 @@ pub fn (mut a Anims) init() ! {
 }
 
 pub fn (mut a Anims) shutdown() ! {
+	a.shy.assert_api_shutdown()
 	for anim in a.active {
 		unsafe {
 			free(anim)
@@ -200,13 +202,13 @@ pub mut:
 	user        voidptr
 	on_event_fn AnimEventFn
 	duration    i64 = 1000
+	prev_value  T
 mut:
-	from       T
-	to         T
-	value      T
-	prev_value T
-	t          f64 // time, a value between 0 and 1
-	elapsed    f64
+	from    T
+	to      T
+	value   T
+	t       f64 // time, a value between 0 and 1
+	elapsed f64
 }
 
 fn (mut a Animator<T>) config_update(config AnimatorConfig) {
@@ -225,6 +227,7 @@ pub fn (mut a Animator<T>) init(from T, to T, duration_ms i64) {
 	a.from = from
 	a.to = to
 	a.duration = duration_ms
+	a.prev_value = from
 }
 
 pub fn (a &Animator<T>) restart() {
@@ -260,7 +263,7 @@ pub fn (mut a Animator<T>) reset() {
 	a.elapsed = 0
 	a.value = a.from
 	a.t = 0
-	// a.pvalue = a.value
+	a.prev_value = a.value
 }
 
 fn (mut a Animator<T>) ended() {
@@ -308,7 +311,10 @@ fn (ima &Animator<T>) step(dt f64) {
 	// a.t = ease.parametric(a.t)
 	// a.t = ease.in_curve(a.t)
 	// a.t = ease.out_curve(a.t)
-	a.value = utils.remap(a.t, 0, 1.0, a.from, a.to)
+	value := utils.remap(a.t, 0, 1.0, a.from, a.to)
+	lerp_value := utils.lerp(value, a.prev_value, dt)
+	// println('v: $value pv: $a.prev_value lv: $lerp_value')
+	a.value = lerp_value
 	a.prev_value = a.value
 }
 
@@ -318,7 +324,7 @@ pub mut:
 	running bool
 	paused  bool
 	// ease        ease.Ease
-	speed       f32 = 1.0
+	multiply    f32 = 1.0
 	user        voidptr
 	on_event_fn AnimEventFn
 }
@@ -330,21 +336,18 @@ pub mut:
 	running bool
 	paused  bool
 	// ease        ease.Ease
-	speed       f32 = 1.0
+	multiply    f32 = 1.0
 	user        voidptr
 	on_event_fn AnimEventFn
+	prev_value  T
 mut:
 	target T
-	// to         T
-	value      T
-	prev_value T
-	// t          f64 // time, a value between 0 and 1
-	// elapsed    f64
+	value  T
 }
 
 fn (fa FollowAnimator<T>) touch() {
 	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
-	should_run := math.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
+	should_run := mth.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
 	if should_run {
 		a.running = should_run
 		if a.running {
@@ -356,7 +359,7 @@ fn (fa FollowAnimator<T>) touch() {
 fn (mut a FollowAnimator<T>) config_update(config FollowAnimatorConfig) {
 	a.running = config.running
 	a.paused = config.paused
-	a.speed = config.speed
+	a.multiply = config.multiply
 	// a.ease = config.ease
 	// a.loop = config.loop
 	// a.loops = config.loops
@@ -378,11 +381,14 @@ pub fn (a &FollowAnimator<T>) value() T {
 fn (fa &FollowAnimator<T>) step(dt f64) {
 	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
 
-	a.value = a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.speed)
+	value := a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.multiply)
+	// value := utils.remap(a.t, 0, 1.0, a.from, a.to)
+	lerp_value := utils.lerp(value, a.prev_value, dt)
+	a.value = lerp_value
 
 	// round_to_even() ?? (Banker's round)
 	p_running := a.running
-	a.running = math.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
+	a.running = mth.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
 	if a.running != p_running {
 		if a.running {
 			a.fire_event_fn(.begin)

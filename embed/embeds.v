@@ -12,9 +12,11 @@ pub struct App {
 	shy.ShyStruct // Initialized by shy.run<T>(...)
 }
 
-pub fn (mut a App) init() ! {}
+pub fn (mut a App) init() ! {
+	a.shy.assert_api_init()
+}
 
-pub fn (mut a App) quit() {}
+pub fn (mut a App) shutdown() ! {}
 
 pub fn (mut a App) fixed_update(dt f64) {}
 
@@ -28,7 +30,7 @@ pub fn (mut a App) event(e shy.Event) {}
 pub struct EasyApp {
 	App
 mut:
-	do     easy.EasyDo
+	quick  easy.Quick
 	easy   &easy.Easy    = shy.null
 	assets &shy.Assets   = shy.null
 	draw   &shy.Draw     = shy.null
@@ -38,11 +40,12 @@ mut:
 }
 
 pub fn (mut a EasyApp) init() ! {
+	a.App.init()!
 	a.easy = &easy.Easy{
 		shy: a.shy
 	}
 	unsafe {
-		a.do.easy = a.easy
+		a.quick.easy = a.easy
 	}
 	a.easy.init()!
 	a.assets = a.shy.assets()

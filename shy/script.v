@@ -12,25 +12,37 @@ pub enum ScriptLanguages {
 [heap]
 pub struct Scripts {
 	ShyStruct
-pub mut: // TODO better public access control
-	wren &Wren = unsafe { nil }
+mut:
+	wren_vms []&WrenVM
+}
+
+pub fn (sc Scripts) new_wren_vm() !&WrenVM {
+	mut wvm := &WrenVM{
+		shy: sc.shy
+	}
+	wvm.init()!
+	return wvm
 }
 
 pub fn (mut sc Scripts) init() ! {
-	mut s := sc.shy
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
-
-	sc.wren = &Wren{
-		shy: s
-	}
-	sc.wren.init()!
+	sc.shy.assert_api_init()
+	sc.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 }
 
+fn (sc Scripts) on_frame(dt f64) {
+	for wvm in sc.wren_vms {
+		mut vm := unsafe { wvm }
+		vm.on_frame(dt)
+	}
+}
+
+[manualfree]
 pub fn (mut sc Scripts) shutdown() ! {
-	// TODO hotcode guard on all of these
-	// mut s := sc.shy
+	sc.shy.assert_api_shutdown()
 	sc.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 
-	sc.wren.shutdown()!
-	unsafe { free(sc.wren) }
+	for mut wvm in sc.wren_vms {
+		wvm.shutdown()!
+		unsafe { free(wvm) }
+	}
 }

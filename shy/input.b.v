@@ -69,6 +69,7 @@ pub fn (mut ip Input) scan() ! {
 
 // init initializes input systems (keyboard, mouse etc.)
 pub fn (mut ip Input) init() ! {
+	ip.shy.assert_api_init()
 	ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	s := ip.shy
 
@@ -122,6 +123,7 @@ pub fn (mut ip Input) init() ! {
 }
 
 pub fn (mut ip Input) shutdown() ! {
+	ip.shy.assert_api_shutdown()
 	ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 }
 

@@ -42,7 +42,7 @@ pub fn loop_f32(value f32, from f32, to f32) f32 {
 	range := to - from
 	offset_value := value - from // value relative to 0
 	// + `from` to reset back to start of original range
-	return (offset_value - f32((math.floor(offset_value / range) * range))) + from
+	return (offset_value - f32((mth.floor(offset_value / range) * range))) + from
 }
 
 // loop_int loops a continious `value` in the range `from`,`to`.
@@ -50,7 +50,7 @@ pub fn loop_int(value int, from int, to int) int {
 	range := to - from
 	offset_value := value - from // value relative to 0
 	// + `from` to reset back to start of original range
-	return (offset_value - int((math.floor(offset_value / range) * range))) + from
+	return (offset_value - int((mth.floor(offset_value / range) * range))) + from
 }
 
 // oscillate_int e.g. "wave" or "ping-pong" `value` between `min` and `max`.

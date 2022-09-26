@@ -32,7 +32,7 @@ pub fn (mut a App) frame(dt f64) {
 			solid: shy.colors.shy.blue
 		}
 	}
-	a.do.rect(
+	a.quick.rect(
 		x: (win.width() / 2) - 50
 		y: (win.height() / 2) - 50
 		w: 100
@@ -40,7 +40,7 @@ pub fn (mut a App) frame(dt f64) {
 		colors: colors
 	)
 
-	a.do.text(
+	a.quick.text(
 		x: (win.width() / 10)
 		y: (win.height() / 10)
 		text: 'Window $win.id\n(press W to open a new child window)\nMouse: $mouse.x,$mouse.y'
