@@ -225,8 +225,8 @@ pub mut:
 	in_frame_call bool
 	//
 	fps_timer             u64
-	update_rate           f64 = 60.0
-	update_multiplicity   u8  = 1
+	update_rate           f64 = shy.defaults.render.update_rate
+	update_multiplicity   u8  = shy.defaults.render.update_multiplicity
 	lock_framerate        bool
 	performance_frequency u64
 	snap_frequencies      [5]i64
