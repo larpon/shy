@@ -5,6 +5,7 @@ module easy
 
 import shy.shy
 import shy.vec
+import shy.mth
 // High-level as-easy-as-it-gets API
 
 // Quick is an internal struct for fire-and-forget/instant calling of Easy methods.
@@ -168,11 +169,12 @@ pub fn (ed &Quick) rect(erc EasyRectConfig) {
 
 [params]
 pub struct EasyLineConfig {
-	shy.LineSegment
+	shy.Line
 pub mut:
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32       = 1.0
+	segment  bool      = true
 	color    shy.Color = shy.colors.shy.white
 	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
@@ -182,11 +184,12 @@ pub mut:
 [noinit]
 pub struct EasyLine {
 	shy.ShyStruct
-	shy.LineSegment
+	shy.Line
 pub mut:
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32       = 1.0
+	segment  bool      = true
 	color    shy.Color = shy.colors.shy.white
 	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
@@ -201,6 +204,29 @@ pub fn (el &EasyLine) draw() {
 	mut l := d.line_segment()
 	l.a = el.a
 	l.b = el.b
+	if !el.segment {
+		// Draw line as a ray - this is basically just done by extending the line towards the
+		// drawable area's edges - giving an illusion of an "infinite" ray passing through the drawable area.
+		mut nl := EasyLine{
+			a: el.a
+			b: el.b
+		}
+		// point a should always be the left-most point
+		nl.ensure_a_left_b_right()
+		w, h := el.shy.active_window().drawable_wh()
+		if (nl.a.x > 0 && nl.a.x < w) || (nl.a.y > 0 && nl.a.y < h) {
+			grow_a := mth.max(w - nl.a.x, h - nl.a.y)
+			nl.grow_a(-grow_a)
+			// println('a: $nl.a')
+		}
+		if (nl.b.x > 0 && nl.b.x < w) || (nl.b.y > 0 && nl.b.y < h) {
+			grow_b := mth.max(mth.max(w - nl.b.x, h - nl.b.y), mth.max(w, h))
+			nl.grow_b(grow_b)
+			// println('b: $nl.b')
+		}
+		l.a = nl.a
+		l.b = nl.b
+	}
 	l.radius = el.radius
 	l.rotation = el.rotation
 	l.scale = el.scale

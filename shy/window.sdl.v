@@ -5,6 +5,7 @@ module shy
 
 import shy.mth
 import sdl
+import time
 import sokol.gfx
 import os.font
 
@@ -238,6 +239,29 @@ pub mut:
 	frame_accumulator i64
 }
 
+struct Stepper {
+mut:
+	active bool
+	step   u16
+	rate   f32 = 60.0
+}
+
+pub fn (mut s Stepper) reset() {
+	s.active = false
+	s.step = 0
+	s.rate = 60.0
+}
+
+pub fn (mut w Window) step(frames u16, rate f32) {
+	w.stepper.active = true
+	w.stepper.step = frames
+	w.stepper.rate = rate
+}
+
+pub fn (mut w Window) unstep() {
+	w.stepper.reset()
+}
+
 // Window
 pub struct Window {
 	ShyStruct
@@ -251,6 +275,7 @@ mut:
 	children []&Window
 	fonts    Fonts
 	anims    &Anims = null
+	stepper  Stepper
 	// SDL / GL
 	handle     &sdl.Window = null
 	gl_context sdl.GLContext
@@ -328,7 +353,7 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 	if !w.ready {
 		return
 	}
-	s := w.shy
+	mut s := w.shy
 
 	w.state.fps_frame++
 	w.state.frame++
@@ -402,60 +427,87 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 	}
 
 	fixed_deltatime := w.state.fixed_deltatime
-	// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
-	if !w.state.lock_framerate {
-		mut consumed_delta_time := delta_time
 
-		for w.state.frame_accumulator >= desired_frametime {
-			// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
-			w.fixed_update(fixed_deltatime)
-			ctx.fixed_update(fixed_deltatime)
+	if !w.stepper.active {
+		// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
+		if !w.state.lock_framerate {
+			mut consumed_delta_time := delta_time
 
-			if consumed_delta_time > desired_frametime {
-				// cap variable update's dt to not be larger than fixed update,
-				// and interleave it (so game state can always get animation frames it needs)
-
-				// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
-				w.variable_update(fixed_deltatime)
-				ctx.variable_update(fixed_deltatime)
-
-				consumed_delta_time -= desired_frametime
-			}
-			w.state.frame_accumulator -= desired_frametime
-		}
-
-		c_dt := f64(consumed_delta_time) / s.performance_frequency()
-		// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
-		w.variable_update(c_dt)
-		ctx.variable_update(c_dt)
-
-		f_dt := f64(w.state.frame_accumulator) / desired_frametime
-		// eprintln('(unlocked) ctx.frame( $f_dt )')
-		w.state.in_frame_call = true
-		// TODO remove me again
-		s.scripts().on_frame(f_dt)
-		ctx.frame(f_dt)
-	} else { // LOCKED FRAMERATE, NO INTERPOLATION
-		for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
-			for i := 0; i < w.state.update_multiplicity; i++ {
-				// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+			for w.state.frame_accumulator >= desired_frametime {
+				// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
 				w.fixed_update(fixed_deltatime)
 				ctx.fixed_update(fixed_deltatime)
 
-				// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
-				w.variable_update(fixed_deltatime)
-				ctx.variable_update(fixed_deltatime)
+				if consumed_delta_time > desired_frametime {
+					// cap variable update's dt to not be larger than fixed update,
+					// and interleave it (so game state can always get animation frames it needs)
+
+					// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
+					w.variable_update(fixed_deltatime)
+					ctx.variable_update(fixed_deltatime)
+
+					consumed_delta_time -= desired_frametime
+				}
 				w.state.frame_accumulator -= desired_frametime
 			}
+
+			c_dt := f64(consumed_delta_time) / s.performance_frequency()
+			// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
+			w.variable_update(c_dt)
+			ctx.variable_update(c_dt)
+
+			f_dt := f64(w.state.frame_accumulator) / desired_frametime
+			// eprintln('(unlocked) ctx.frame( $f_dt )')
+			w.state.in_frame_call = true
+			// TODO remove me again
+			s.scripts().on_frame(f_dt)
+			ctx.frame(f_dt)
+		} else { // LOCKED FRAMERATE, NO INTERPOLATION
+			for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
+				for i := 0; i < w.state.update_multiplicity; i++ {
+					// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+					w.fixed_update(fixed_deltatime)
+					ctx.fixed_update(fixed_deltatime)
+
+					// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
+					w.variable_update(fixed_deltatime)
+					ctx.variable_update(fixed_deltatime)
+					w.state.frame_accumulator -= desired_frametime
+				}
+			}
+
+			// eprintln('(locked) ctx.frame( 1.0 )')
+			w.state.in_frame_call = true
+			// TODO remove me again
+			s.scripts().on_frame(1.0)
+			ctx.frame(1.0)
 		}
+	} else {
+		// MANUAL STEPPING via Window.step(...)
+		if w.stepper.active {
+			// w.state.fps_frame = u32(w.stepper.rate)
+			w.state.frame--
 
-		// eprintln('(locked) ctx.frame( 1.0 )')
-		w.state.in_frame_call = true
-		// TODO remove me again
-		s.scripts().on_frame(1.0)
-		ctx.frame(1.0)
+			fixed_dt := 1 / w.stepper.rate
+			rate_sim_sleep := i64(fixed_dt * 1000 * 1000)
+
+			if w.stepper.step > 0 {
+				time.sleep(rate_sim_sleep * time.microsecond) // TODO ??
+
+				w.stepper.step--
+				w.state.frame++
+
+				w.fixed_update(fixed_dt)
+				ctx.fixed_update(fixed_dt)
+				w.variable_update(fixed_dt)
+				ctx.variable_update(fixed_dt)
+			}
+			w.state.in_frame_call = true
+			// TODO remove me again
+			s.scripts().on_frame(1.0)
+			ctx.frame(1.0)
+		}
 	}
-
 	w.end()
 	w.state.in_frame_call = false
 
@@ -482,7 +534,6 @@ pub fn (mut w Window) end() {
 }
 
 pub fn (w &Window) swap() {
-	// w.shy.gfx.commit()
 	sdl.gl_swap_window(w.handle)
 }
 

@@ -6,6 +6,12 @@
 module shy
 
 import shy.vec
+import mth
+
+pub const (
+	deg2rad = mth.deg2rad
+	rad2deg = mth.rad2deg
+)
 
 [inline]
 pub fn (s &Shy) ticks() u64 {
@@ -70,5 +76,15 @@ pub fn vec2<T>(x T, y T) vec.Vec2<T> {
 	return vec.Vec2<T>{
 		x: x
 		y: y
+	}
+}
+
+[inline]
+pub fn rect(x f32, y f32, w f32, h f32) Rect {
+	return Rect{
+		x: x
+		y: y
+		w: w
+		h: h
 	}
 }

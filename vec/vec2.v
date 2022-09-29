@@ -149,6 +149,7 @@ pub fn (v Vec2<T>) length() T {
 	} $else $if T is f32 {
 		return math.sqrtf((v.x * v.x) + (v.y * v.y))
 	} $else {
+		panic('TODO ${@FN} not implemented for type')
 		return 0.0
 		// $compile_error('Type T in Vec2<T>.length() is not supported')
 	}
@@ -231,31 +232,49 @@ pub fn (v Vec2<T>) eq_f32(scalar f32) bool {
 	return v.eq_f64(f64(scalar))
 }
 
-/*
-TODO
 // distance returns the distance between the two vectors
 pub fn (v Vec2<T>) distance(u Vec2<T>) T {
-	return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
+	$if T is f64 {
+		return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
+	} $else $if T is f32 {
+		return math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
+	} $else {
+		panic('TODO ${@FN} not implemented for type')
+		return 0.0
+		// $compile_error('Type T in Vec2<T>.length() is not supported')
+	}
 }
-*/
 
 // manhattan_distance returns the Manhattan distance between the two vectors
 pub fn (v Vec2<T>) manhattan_distance(u Vec2<T>) T {
 	return math.abs(v.x - u.x) + math.abs(v.y - u.y)
 }
 
-/*
-TODO
 // angle_between returns the angle in radians between the two vectors
 pub fn (v Vec2<T>) angle_between(u Vec2<T>) T {
-	return math.atan2((v.y - u.y), (v.x - u.x))
+	$if T is f64 {
+		return math.atan2((v.y - u.y), (v.x - u.x))
+	} $else $if T is f32 {
+		return f32(math.atan2((v.y - u.y), (v.x - u.x)))
+	} $else {
+		panic('TODO ${@FN} not implemented for type')
+		return 0.0
+		// $compile_error('Type T in Vec2<T>.length() is not supported')
+	}
 }
 
 // angle returns the angle in radians of the vector
 pub fn (v Vec2<T>) angle() T {
-	return math.atan2(v.y, v.x)
+	$if T is f64 {
+		return math.atan2(v.y, v.x)
+	} $else $if T is f32 {
+		return f32(math.atan2(v.y, v.x))
+	} $else {
+		panic('TODO ${@FN} not implemented for type')
+		return 0.0
+		// $compile_error('Type T in Vec2<T>.length() is not supported')
+	}
 }
-*/
 
 // abs will set x and y values to their absolute values
 pub fn (mut v Vec2<T>) abs() {

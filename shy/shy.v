@@ -145,8 +145,9 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		// Process system events
 		s.process_events<T>(mut ctx)
 
+		// Windows will render their children, so this is a cascade action
 		s.state.rendering = true
-		root.render<T>(mut ctx) // Windows will render their children, so this is a cascade action
+		root.render<T>(mut ctx)
 		s.state.rendering = false
 
 		if s.shutdown {

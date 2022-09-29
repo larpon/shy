@@ -303,7 +303,7 @@ pub fn (d2d &DrawShape2D) line_segment(config DrawShape2DLineSegment) DrawShape2
 
 [params]
 pub struct DrawShape2DLineSegment {
-	LineSegment
+	Line
 pub mut:
 	visible  bool = true
 	color    Color
