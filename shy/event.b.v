@@ -24,7 +24,7 @@ fn (mut s Shy) poll_event() ?Event {
 				// if sdl.WindowEventID(int(evt.window.event)) == .focus_lost {
 				//	s.shutdown = true
 				//}
-				wevid := sdl.WindowEventID(int(evt.window.event))
+				wevid := unsafe { sdl.WindowEventID(int(evt.window.event)) }
 				win := s.active_window()
 				if wevid == .resized {
 					shy_event = WindowEvent{
@@ -52,7 +52,7 @@ fn (mut s Shy) poll_event() ?Event {
 				shy_event = KeyEvent{
 					timestamp: s.ticks()
 					state: .down
-					key_code: KeyCode(int(shy_key_code))
+					key_code: unsafe { KeyCode(int(shy_key_code)) }
 				}
 			}
 			.mousemotion {
@@ -265,7 +265,7 @@ fn (mut s Shy) poll_event() ?Event {
 }
 
 fn map_sdl_to_shy_keycode(kc sdl.Keycode) KeyCode {
-	return match sdl.KeyCode(int(kc)) {
+	return match unsafe { sdl.KeyCode(int(kc)) } {
 		.unknown { .unknown }
 		.@return { .@return }
 		.escape { .escape }

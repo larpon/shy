@@ -50,6 +50,11 @@ pub:
 		resizable bool   = true // Root window is resizable, can be toggled at run time
 		color     Color  = Color{0, 0, 0, 255} // Default background color of the root window
 	}
+	/*
+	TODO
+	record struct {
+		dir string = os.join_path(os.temp_dir(),'shy')
+	}*/
 }
 
 /*

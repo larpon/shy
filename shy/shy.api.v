@@ -6,7 +6,7 @@
 module shy
 
 import shy.vec
-import mth
+import shy.mth
 
 pub const (
 	deg2rad = mth.deg2rad

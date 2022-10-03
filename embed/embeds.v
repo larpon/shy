@@ -3,9 +3,10 @@
 // that can be found in the LICENSE file.
 module embed
 
+import os
+import time
 import shy.shy
 import shy.easy
-import os
 
 // Base app skeleton for easy embedding in examples
 pub struct App {
@@ -66,13 +67,23 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 				return
 			}
 			key := e.key_code
+			kb := a.kbd
+			alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 			match key {
 				.escape {
 					a.shy.shutdown = true
 				}
+				.printscreen, .f12 {
+					date := time.now()
+					date_str := date.format_ss_milli().replace_each([' ', '', '.', '', '-', '',
+						':', ''])
+					shot_file := os.join_path(os.temp_dir(), 'shy', '${@STRUCT}', '${date_str}f${a.window.state.frame}.png')
+					a.window.screenshot(shot_file) or {
+						a.shy.log.gerror('${@STRUCT}.${@FN}', '$err')
+					}
+					a.shy.log.ginfo('${@STRUCT}', 'saved screenshot to "$shot_file"')
+				}
 				else {
-					kb := a.kbd
-					alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
 						a.window.toggle_fullscreen()
 					}

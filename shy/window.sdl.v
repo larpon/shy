@@ -3,11 +3,12 @@
 // that can be found in the LICENSE file.
 module shy
 
-import shy.mth
+import os
+import os.font
 import sdl
 import time
+import shy.mth
 import sokol.gfx
-import os.font
 
 // Some code found from
 // "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
@@ -225,8 +226,8 @@ pub mut:
 	in_frame_call bool
 	//
 	fps_timer             u64
-	update_rate           f64 = shy.defaults.render.update_rate
-	update_multiplicity   u8  = shy.defaults.render.update_multiplicity
+	update_rate           f64 = defaults.render.update_rate
+	update_multiplicity   u8  = defaults.render.update_multiplicity
 	lock_framerate        bool
 	performance_frequency u64
 	snap_frequencies      [5]i64
@@ -260,6 +261,81 @@ pub fn (mut w Window) step(frames u16, rate f32) {
 
 pub fn (mut w Window) unstep() {
 	w.stepper.reset()
+}
+
+// Credits to @spytheman (https://github.com/spytheman) for his
+// invaluable implementation in the `gg` module.
+const frame_record_config = new_shy_frame_record_config()
+
+[heap]
+struct FrameRecordConfig {
+pub:
+	windows       []u64
+	exit_on_frame i64 = -1
+	frames        []u64
+	save_path     string
+	save_prefix   string
+}
+
+// record_frame records the current frame to a file.
+// record_frame acts according to the config specified in `shy.frame_record_config`.
+[if shy_record ?]
+fn (mut w Window) record_frame() {
+	rc := shy.frame_record_config
+	frame := w.state.frame
+	valid_window := rc.windows.len == 0 || w.id in rc.windows
+	if !valid_window {
+		return
+	}
+	if frame in rc.frames {
+		screenshot_file_path := '$rc.save_prefix${frame}.png'
+		$if shy_record_trace ? {
+			eprintln('>>> ${@FN} screenshot $screenshot_file_path')
+		}
+		w.screenshot(screenshot_file_path) or { panic(err) }
+		w.step(1, f32(w.state.update_rate))
+	} else {
+		mut next_frame := frame
+		for f in rc.frames {
+			if f > next_frame {
+				next_frame = f
+				break
+			}
+		}
+		mut step_frames := u16(next_frame - frame)
+		// Prevent dead-lock
+		if step_frames <= 0 {
+			step_frames = 1
+		}
+		w.step(step_frames, f32(w.state.update_rate))
+	}
+	if frame == rc.exit_on_frame {
+		$if shy_record_trace ? {
+			eprintln('>>> ${@FN} exiting at frame $frame')
+		}
+		exit(0)
+	}
+}
+
+fn new_shy_frame_record_config() &FrameRecordConfig {
+	$if shy_record ? {
+		mut window_ids := os.getenv_opt('SHY_RECORD_WINDOW') or { '' }.split_any(',').filter(it != '').map(it.u64())
+		window_ids.sort()
+		exit_on_frame := os.getenv_opt('SHY_EXIT_ON_FRAME') or { '-1' }.i64()
+		mut frames := os.getenv('SHY_RECORD_FRAME').split_any(',').filter(it != '').map(it.u64())
+		frames.sort()
+		dir := os.getenv_opt('SHY_RECORD_DIR') or { os.join_path(os.temp_dir(), 'shy') }
+		prefix := os.join_path_single(dir, os.file_name(os.executable()).all_before('.') + '_')
+		return &FrameRecordConfig{
+			windows: window_ids
+			exit_on_frame: exit_on_frame
+			frames: frames
+			save_path: dir
+			save_prefix: prefix
+		}
+	} $else {
+		return &FrameRecordConfig{}
+	}
 }
 
 // Window
@@ -347,6 +423,10 @@ pub fn (mut w Window) render_init() {
 	w.state.resync = true
 	w.state.prev_frame_time = i64(s.performance_counter())
 	w.state.frame_accumulator = 0
+
+	$if shy_record {
+		w.step(1, f32(w.state.update_rate))
+	}
 }
 
 pub fn (mut w Window) render<T>(mut ctx T) {
@@ -366,12 +446,6 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 		w.state.fps_snapshot = w.state.fps_frame // - 1
 		w.state.fps_frame = 0
 	}
-
-	// Make this window's context the current
-	w.make_current()
-
-	// Clear the window
-	w.begin()
 
 	// frame timer
 	current_frame_time := i64(s.performance_counter())
@@ -427,6 +501,12 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 	}
 
 	fixed_deltatime := w.state.fixed_deltatime
+
+	// Make this window's context the current
+	w.make_current()
+
+	// Clear the window
+	w.begin()
 
 	if !w.stepper.active {
 		// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
@@ -509,6 +589,9 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 		}
 	}
 	w.end()
+
+	w.record_frame() // Only here with `-d shy_record`
+
 	w.state.in_frame_call = false
 
 	s.api.gfx.end()
