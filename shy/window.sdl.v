@@ -424,7 +424,7 @@ pub fn (mut w Window) render_init() {
 	w.state.prev_frame_time = i64(s.performance_counter())
 	w.state.frame_accumulator = 0
 
-	$if shy_record {
+	$if shy_record ? {
 		w.step(1, f32(w.state.update_rate))
 	}
 }
