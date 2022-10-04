@@ -53,13 +53,18 @@ pub fn (mut wm WM) init() ! {
 		}
 	}
 
-	init_flags := u32(sdl.init_video | sdl.init_gamecontroller | sdl.init_haptic)
+	mut init_flags := u32(sdl.init_video)
+	$if wasm32_emscripten {
+		init_flags = init_flags | u32(sdl.init_gamecontroller)
+	} $else {
+		init_flags = init_flags | u32(sdl.init_gamecontroller | sdl.init_haptic)
+	}
 	// init_flags := u32(sdl.init_everything)
 	res := sdl.init(init_flags)
 	if res < 0 {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-		return error('Could not initialize SDL window, SDL says:\n$sdl_error_msg')
+		return error('Could not initialize SDL, SDL says:\n$sdl_error_msg')
 	}
 
 	wm.init_root_window()!
@@ -121,7 +126,14 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	// $if opengl ? {
 	// SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, HARDWARE_RENDERING);
 
-	$if android {
+	$if wasm32_emscripten {
+		// Compile with:
+		// -sUSE_WEBGL2=1 // Remember WebGL2 = GL ES 3
+		// -D SOKOL_GLES3
+		sdl.gl_set_attribute(.context_profile_mask, int(sdl.GLprofile.es))
+		sdl.gl_set_attribute(.context_major_version, 3)
+		sdl.gl_set_attribute(.context_minor_version, 0)
+	} $else $if android {
 		sdl.gl_set_attribute(.context_profile_mask, int(sdl.GLprofile.es))
 		sdl.gl_set_attribute(.context_major_version, 2)
 	} $else {
@@ -134,6 +146,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	sdl.gl_set_attribute(.depth_size, 24)
 	sdl.gl_set_attribute(.stencil_size, 8)
 	//
+
 	if s.config.render.msaa > 0 {
 		s.log.ginfo('${@STRUCT}.${@FN}', 'enabling MSAA (Multi-Sample AntiAliasing)')
 		sdl.gl_set_attribute(.multisamplebuffers, 1)
@@ -141,6 +154,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		// Setting multi-samples here will result in SDL applying yet another pass of anti-aliasing...
 		sdl.gl_set_attribute(.multisamplesamples, s.config.render.msaa)
 	}
+
 	// } // end $if opengl
 
 	win_w := int(f32(display_bounds[display_index].w) * 0.75)
@@ -172,6 +186,7 @@ pub fn (mut wm WM) shutdown() ! {
 
 fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	s := wm.shy
+
 	mut window_flags := u32(sdl.WindowFlags.hidden)
 	if config.visible {
 		window_flags = u32(sdl.WindowFlags.shown)
@@ -643,7 +658,7 @@ pub fn (w &Window) make_current() {
 
 pub fn (mut w Window) init() ! {
 	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
-	s := w.shy
+	mut s := w.shy
 
 	// $if opengl ? {
 	gl_context := sdl.gl_create_context(w.handle)
@@ -682,6 +697,12 @@ pub fn (mut w Window) init() ! {
 	s.log.ginfo('${@STRUCT}.${@FN}', 'vsync=$w.config.render.vsync')
 	// }
 
+	$if wasm32_emscripten {
+		if !s.api.gfx.ready {
+			s.api.gfx.init()!
+		}
+	}
+
 	w.gfx_context = gfx.setup_context()
 
 	// Change all contexts to this window's
@@ -692,12 +713,15 @@ pub fn (mut w Window) init() ! {
 	w.shy.api.gfx.init_subsystems()!
 
 	// TODO Initialize font drawing sub system
+	mut preload_fonts := map[string]string{}
+	$if !wasm32_emscripten {
+		preload_fonts['system'] = font.default()
+	}
+
 	w.fonts.init(FontsConfig{
 		shy: s
 		// prealloc_contexts: 8
-		preload: {
-			'system': font.default()
-		}
+		preload: preload_fonts
 		render: w.config.render
 	})! // fonts.b.v
 

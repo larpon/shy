@@ -4,6 +4,7 @@
 module main
 
 import shy.shy
+import shy.easy
 import shy.embed
 
 fn main() {
@@ -15,7 +16,7 @@ fn main() {
 struct App {
 	embed.ExampleApp
 mut:
-	sound &shy.EasySound = shy.null
+	sound &easy.EasySound = shy.null
 }
 
 [markused]

@@ -59,8 +59,50 @@ pub fn (l &Log) buffer() string {
 	return l.buffer.after(0)
 }
 
+fn no_color_fn(msg string) string {
+	return msg
+}
+
+// TODO use shy colors?
+pub fn (l &Log) colorize(color string, msg string) string {
+	mut colorized_msg := ''
+	$if wasm32_emscripten {
+		colorized_msg = msg
+	} $else {
+		mut cfn := no_color_fn
+		cfn = match color {
+			'red' {
+				term.red
+			}
+			'bright_red' {
+				term.bright_red
+			}
+			'blue' {
+				term.blue
+			}
+			'yellow' {
+				term.yellow
+			}
+			'green' {
+				term.green
+			}
+			'white' {
+				term.white
+			}
+			'bright_magenta' {
+				term.bright_magenta
+			}
+			else {
+				no_color_fn
+			}
+		}
+		colorized_msg = term.colorize(cfn, msg)
+	}
+	return colorized_msg
+}
+
 pub fn (l &Log) print_status(prefix string) {
-	l.redirect(term.colorize(term.blue, prefix + ' ') + term.colorize(term.white, 'Log.flags ') +
+	l.redirect(l.colorize('blue', prefix + ' ') + l.colorize('white', 'Log.flags ') +
 		l.status_string())
 }
 
@@ -115,7 +157,8 @@ pub fn (l &Log) off(flag Flag) {
 		unsafe { l.flags.clear(flag) }
 		if flag == .log {
 			// A last goodbye
-			l.force_redirect(term.bright_magenta('DEBUG ') + flag.clean_str() + ' off')
+			maybe_colored := l.colorize('bright_magenta', 'DEBUG ')
+			l.force_redirect(maybe_colored + flag.clean_str() + ' off')
 		} else {
 			l.debug(flag.clean_str() + '${l.changes(flag)}')
 		}
@@ -144,7 +187,7 @@ pub fn (l &Log) custom(id string, str string) {
 				l.buffer.writeln(id + ' ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.blue, id + ' ')
+		maybe_colored := l.colorize('blue', id + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -157,7 +200,7 @@ pub fn (l &Log) info(str string) {
 				l.buffer.writeln(log.label_info + ' ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.blue, log.label_info + ' ')
+		maybe_colored := l.colorize('blue', log.label_info + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -170,7 +213,7 @@ pub fn (l &Log) warn(str string) {
 				l.buffer.writeln(log.label_warn + ' ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.yellow, log.label_warn + ' ')
+		maybe_colored := l.colorize('yellow', log.label_warn + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -183,7 +226,7 @@ pub fn (l &Log) error(str string) {
 				l.buffer.writeln(log.label_error + ' ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.bright_red, log.label_error + ' ')
+		maybe_colored := l.colorize('bright_red', log.label_error + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -196,7 +239,7 @@ pub fn (l &Log) critical(str string) {
 				l.buffer.writeln(log.label_critical + ' ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.red, log.label_critical + ' ')
+		maybe_colored := l.colorize('red', log.label_critical + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -209,7 +252,7 @@ pub fn (l &Log) debug(str string) {
 				l.buffer.writeln(log.label_debug + ' ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.bright_magenta, log.label_debug + ' ')
+		maybe_colored := l.colorize('bright_magenta', log.label_debug + ' ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -224,7 +267,7 @@ pub fn (l &Log) gcustom(id string, group string, str string) {
 				l.buffer.writeln(id + ' $group ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.blue, id + ' ') + term.colorize(term.white, '$group ')
+		maybe_colored := l.colorize('blue', id + ' ') + l.colorize('white', '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -237,8 +280,7 @@ pub fn (l &Log) ginfo(group string, str string) {
 				l.buffer.writeln(log.label_info + ' $group ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.blue, log.label_info + ' ') +
-			term.colorize(term.white, '$group ')
+		maybe_colored := l.colorize('blue', log.label_info + ' ') + l.colorize('white', '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -251,8 +293,7 @@ pub fn (l &Log) gwarn(group string, str string) {
 				l.buffer.writeln(log.label_warn + ' $group ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.yellow, log.label_warn + ' ') +
-			term.colorize(term.white, '$group ')
+		maybe_colored := l.colorize('yellow', log.label_warn + ' ') + l.colorize('white', '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -265,8 +306,8 @@ pub fn (l &Log) gerror(group string, str string) {
 				l.buffer.writeln(log.label_error + ' $group ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.bright_red, log.label_error + ' ') +
-			term.colorize(term.white, '$group ')
+		maybe_colored := l.colorize('bright_red', log.label_error + ' ') +
+			l.colorize('white', '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -279,8 +320,8 @@ pub fn (l &Log) gcritical(group string, str string) {
 				l.buffer.writeln(log.label_critical + ' $group ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.red, log.label_critical + ' ') +
-			term.colorize(term.white, '$group ')
+		maybe_colored := l.colorize('red', log.label_critical + ' ') +
+			l.colorize('white', '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }
@@ -293,8 +334,8 @@ pub fn (l &Log) gdebug(group string, str string) {
 				l.buffer.writeln(log.label_debug + ' $group ' + str)
 			}
 		}
-		maybe_colored := term.colorize(term.bright_magenta, log.label_debug + ' ') +
-			term.colorize(term.white, '$group ')
+		maybe_colored := l.colorize('bright_magenta', log.label_debug + ' ') +
+			l.colorize('white', '$group ')
 		l.redirect(maybe_colored + str)
 	}
 }

@@ -10,7 +10,8 @@ import sgp
 pub struct GFX {
 	ShyStruct
 mut:
-	draw &Draw = null
+	draw  &Draw = null
+	ready bool
 }
 
 pub fn (mut g GFX) init() ! {
@@ -31,9 +32,11 @@ pub fn (mut g GFX) init() ! {
 	g.draw = &Draw{
 		shy: s
 	}
+	g.ready = true
 }
 
 pub fn (mut g GFX) init_subsystems() ! {
+	assert g.ready
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 
@@ -68,6 +71,7 @@ pub fn (mut g GFX) shutdown_subsystems() ! {
 
 pub fn (mut g GFX) shutdown() ! {
 	g.shy.assert_api_shutdown()
+	g.ready = false
 	gfx.shutdown()
 }
 

@@ -104,6 +104,9 @@ struct ExampleApp {
 
 // asset unifies locating example assets
 pub fn (ea ExampleApp) asset(path string) string {
+	$if wasm32_emscripten {
+		return path
+	}
 	return os.resource_abs_path(os.join_path('..', 'assets', path))
 }
 

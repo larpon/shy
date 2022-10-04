@@ -37,7 +37,13 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 	a.gfx = &GFX{
 		shy: s
 	}
-	a.gfx.init()!
+	$if !wasm32_emscripten {
+		// NOTE When targeting WASM/emscripten graphics needs to be initialized
+		// after the first GL context is set. This could arguably be structured
+		// more optimal. Instead the windowing system will initialize the gfx
+		// when needed. See Window.init() method.
+		a.gfx.init()!
+	}
 
 	a.wm.init()!
 
@@ -99,9 +105,12 @@ pub fn (a &API) check_health() ! {
 	if isnil(a.gfx) || isnil(a.gfx.draw) {
 		return error('${@STRUCT}.${@FN} not all graphics api structs where set')
 	}
-	if isnil(a.input.mouse) || isnil(a.input.keyboard) {
+	/*
+	// TODO
+	if isnil(a.input.mouse(0)) || isnil(a.input.keyboard(0)) {
 		return error('${@STRUCT}.${@FN} not all input api structs where set')
 	}
+	*/
 }
 
 pub fn (a &API) wm() &WM {
