@@ -5,7 +5,7 @@ module embed
 
 import os
 import time
-import shy.shy
+import shy.lib as shy
 import shy.easy
 
 // Base app skeleton for easy embedding in examples

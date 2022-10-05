@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module easy
 
-import shy.shy
+import shy.lib as shy
 import shy.vec
 import shy.mth
 // High-level as-easy-as-it-gets API

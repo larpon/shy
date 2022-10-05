@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module main
 
-import shy.shy
+import shy.lib as shy
 import shy.embed
 
 fn main() {
