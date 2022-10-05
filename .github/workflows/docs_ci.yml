@@ -28,7 +28,8 @@ jobs:
       run: sudo ln -s $(pwd)/shy ~/.vmodules/shy # Workaround for doing `mv shy ~/.vmodules`
 
     - name: Check markdown line length & code examples
-      run: v check-md -hide-warnings shy
+      run: v check-md -hide-warnings shy/README.md
+      ## TODO exclude dirs: run: v check-md -hide-warnings shy
       ## NB: -hide-warnings is used here, so that the output is less noisy,
       ## thus real errors are easier to spot.
 
