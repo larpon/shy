@@ -3,6 +3,7 @@
 // that can be found in the LICENSE file.
 module shy
 
+import shy.mth
 import shy.vec { Vec2 }
 import libs.sgp
 
@@ -73,15 +74,26 @@ pub struct Draw2DImage {
 	Rect
 	image Image
 pub mut:
-	color  Color = rgb(255, 255, 255)
-	origin Anchor
-	// TODO clear up this mess
-	scale  f32 = 1.0
-	offset vec.Vec2<f32>
+	color    Color = rgb(255, 255, 255)
+	origin   Anchor
+	rotation f32
+	scale    f32 = 1.0
+	offset   vec.Vec2<f32>
+}
+
+[inline]
+pub fn (i Draw2DImage) origin_offset() (f32, f32) {
+	p_x, p_y := i.origin.pos_wh(i.w, i.h)
+	return -p_x, -p_y
 }
 
 [inline]
 pub fn (i Draw2DImage) draw() {
+	x := i.x
+	y := i.y
+	w := i.w
+	h := i.h
+
 	// sgp.set_blend_mode(sgp.BlendMode)
 	// sgp.reset_blend_mode()
 
@@ -90,23 +102,24 @@ pub fn (i Draw2DImage) draw() {
 	sgp.set_color(col.r, col.g, col.b, col.a)
 	sgp.set_image(0, i.image.gfx_image)
 
-	/*
-	dst := sgp.Rect{
-		x: i.x
-		y: i.y
-		w: i.w
-		h: i.h
-	}
-	src := sgp.Rect{
-		x: 0
-		y: 0
-		w: 512/2
-		h: 512/2
-	}
-    sgp.draw_textured_rect_ex(0, dst, src)
-	*/
+	sgp.push_transform()
+	o_off_x, o_off_y := i.origin_offset()
 
-	sgp.draw_textured_rect(i.x, i.y, i.w, i.h)
+	sgp.translate(o_off_x, o_off_y)
+	sgp.translate(x + i.offset.x, y + i.offset.y)
+
+	if i.rotation != 0 {
+		sgp.rotate_at(i.rotation * mth.deg2rad, -o_off_x, -o_off_y)
+	}
+	if i.scale != 1 {
+		sgp.scale_at(i.scale, i.scale, -o_off_x, -o_off_y)
+	}
+
+	sgp.draw_textured_rect(0, 0, w, h)
+
+	sgp.translate(-x, -y)
+	sgp.pop_transform()
+
 	sgp.reset_image(0)
 }
 

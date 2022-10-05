@@ -341,8 +341,12 @@ pub fn (es &EasySound) stop() {
 pub struct EasyImageConfig {
 	shy.Rect
 pub:
-	uri   string
-	color shy.Color = shy.rgb(255, 255, 255)
+	uri      string
+	color    shy.Color = shy.rgb(255, 255, 255)
+	rotation f32
+	scale    f32 = 1.0
+	offset   vec.Vec2<f32>
+	origin   shy.Anchor
 }
 
 [noinit]
@@ -350,8 +354,12 @@ pub struct EasyImage {
 	shy.ShyStruct
 	shy.Rect
 pub:
-	uri   string
-	color shy.Color = shy.rgb(255, 255, 255)
+	uri      string
+	color    shy.Color = shy.rgb(255, 255, 255)
+	rotation f32
+	scale    f32 = 1.0
+	offset   vec.Vec2<f32>
+	origin   shy.Anchor
 }
 
 pub fn (ei &EasyImage) draw() {
@@ -368,11 +376,15 @@ pub fn (ei &EasyImage) draw() {
 	mut d := draw.image()
 	d.begin()
 	mut i2d := d.image_2d(image)
-	i2d.color = ei.color
 	i2d.x = ei.x
 	i2d.y = ei.y
 	i2d.w = ei.w
 	i2d.h = ei.h
+	i2d.rotation = ei.rotation
+	i2d.scale = ei.scale
+	i2d.offset = ei.offset
+	i2d.color = ei.color
+	i2d.origin = ei.origin
 	i2d.draw()
 	d.end()
 }
