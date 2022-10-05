@@ -95,10 +95,6 @@ jobs:
     - name: Run 'shy --help'
       run: shy --help
 
-    - name: Ruin Android environment on purpose
-      run: |
-        sudo rm -fr /usr/local/lib/android
-
     - name: Run 'shy doctor'
       run: shy doctor
 
