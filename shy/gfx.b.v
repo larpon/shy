@@ -5,7 +5,7 @@ module shy
 
 import sokol.gfx
 import sokol.sgl
-import sgp
+import libs.sgp
 
 pub struct GFX {
 	ShyStruct

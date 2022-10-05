@@ -4,7 +4,7 @@
 module shy
 
 import shy.vec { Vec2 }
-import sgp
+import libs.sgp
 
 // DrawImage
 

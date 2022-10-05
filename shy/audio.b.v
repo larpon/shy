@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module shy
 
-import miniaudio as ma
+import libs.miniaudio as ma
 
 pub struct Audio {
 	ShyStruct
@@ -105,7 +105,7 @@ pub fn (mut ae AudioEngine) load(path string) !u16 {
 
 pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	// See https://github.com/mackron/miniaudio/issues/517i
+	// See https://github.com/mackron/miniaudio/issues/517
 	s := ae.load_file(path)!
 	ae.sound_id++
 	id_start := ae.sound_id

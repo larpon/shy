@@ -45,6 +45,10 @@ fn (mut fs Fonts) load_font(name string, path string) ! {
 	}
 }
 
+// $if wasm32_emscripten {
+//	#flag --embed-file @VMODROOT/fonts@/fonts
+// }
+
 fn (mut fs Fonts) init(config FontsConfig) ! {
 	fs.shy = config.shy
 	mut s := fs.shy
@@ -52,19 +56,19 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 
 	// Load the Shy default font
 	// TODO use *.shy.assets() to cache the data?
-	mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
-	fs.font_data[defaults.font.name] = default_font.to_bytes()
-	fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
-
 	mut preload := config.preload.clone()
 	$if wasm32_emscripten {
-		//	#flag --embed-file @VMODROOT/examples/assets@/
+		// NOTE:	#flag --embed-file @VMODROOT/fonts@/fonts // #flag --embed-file @VMODROOT/examples/assets@/
 		preload['default'] = 'fonts/Allerta/Allerta-Regular.ttf'
+	} $else {
+		mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
+		fs.font_data[defaults.font.name] = default_font.to_bytes()
+		fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
 	}
 
 	for font_name, font_path in preload {
 		fs.load_font(font_name, font_path) or {
-			s.log.gerror(@STRUCT, ' pre-loading failed: $err.msg()')
+			s.log.gerror(@STRUCT, ' pre-loading "$font_name" failed: $err.msg()')
 		}
 	}
 
