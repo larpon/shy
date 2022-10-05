@@ -43,7 +43,7 @@ import os
 
 const (
 	auto_complete_shells = ['bash', 'fish', 'zsh', 'powershell'] // list of supported shells
-	shyexe               = os.getenv('VAB_EXE')
+	shyexe               = os.getenv('SHY_EXE')
 	help_text            = "Usage:
   shy complete [options] [SUBCMD] QUERY...
 
