@@ -1,0 +1,195 @@
+name: Code CI
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+concurrency:
+  group: general-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  code-formatting:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VFLAGS: -cc tcc
+    steps:
+    - name: Checkout V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make -j4 && sudo ./v symlink
+
+    - name: Checkout shy
+      uses: actions/checkout@v2
+      with:
+        path: shy
+
+    - name: Test code formatting
+      run: |
+        cd shy
+        v test-fmt
+
+    # TODO this makes formatting checks fail?
+    #- name: Simulate "v install shy"
+    #  run: mv shy ~/.vmodules
+
+    - name: Symlink as module
+      run: sudo ln -s $(pwd)/shy ~/.vmodules/shy # Workaround for doing `mv shy ~/.vmodules`
+
+    - name: Build shy with -skip-unused
+      run: v -skip-unused ~/.vmodules/shy
+
+    - name: Build shy
+      run: v -g ~/.vmodules/shy
+
+    - name: Symlink shy command
+      run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
+
+    - name: Test clean shy code
+      run: |
+        shy test-cleancode ~/.vmodules/shy
+
+  ubuntu-latest-bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VAB_FLAGS: -v 3
+    steps:
+    - name: Checkout V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make -j4 && sudo ./v symlink
+
+    - name: Checkout shy
+      uses: actions/checkout@v2
+      with:
+        path: shy
+
+    - name: Simulate "v install shy"
+      run: mv shy ~/.vmodules
+
+    - name: Run tests
+      run: v test ~/.vmodules/shy
+
+    - name: Build shy with -prod
+      run: v -prod ~/.vmodules/shy
+
+    - name: Build shy
+      run: v -g ~/.vmodules/shy
+
+    - name: Symlink shy
+      run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
+
+    - name: Run 'shy --help'
+      run: shy --help
+
+    - name: Ruin Android environment on purpose
+      run: |
+        sudo rm -fr /usr/local/lib/android
+
+    - name: Run 'shy doctor'
+      run: shy doctor
+
+    - name: Test shy complete
+      run: |
+        [ "$(shy complete bash shy com)" = "COMPREPLY+=('complete')" ]
+
+  ubuntu-latest-shy-can-live-anywhere:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VAB_FLAGS: -v 3
+    steps:
+    - name: Checkout V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make -j4 && sudo ./v symlink
+
+    - name: Checkout shy
+      uses: actions/checkout@v2
+      with:
+        path: shy
+
+    - name: Simulate "v install shy"
+      run: mv shy ~/.vmodules
+
+    - name: Run tests
+      run: v test  ~/.vmodules/shy
+
+    - name: Build shy
+      run: v -g ~/.vmodules/shy
+
+    - name: Move shy
+      run: |
+        sudo mv ~/.vmodules/shy/shy /usr/bin/shy
+
+    - name: Run 'shy --help'
+      run: /usr/bin/shy --help
+
+    - name: Run 'shy doctor'
+      run: /usr/bin/shy doctor
+
+  windows-latest-build:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      VAB_FLAGS: -cg -v 3 --api 30
+    steps:
+
+    #- uses: actions/setup-java@v2
+      #with:
+        #distribution: 'adopt'
+        #java-version: 15
+
+    - name: Install V
+      uses: vlang/setup-v@v1
+      with:
+        check-latest: true
+
+    # TODO https://github.com/vlang/setup-v/issues
+    - name: Checkout V examples
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+        path: v
+
+    - name: Checkout shy
+      uses: actions/checkout@v2
+      with:
+        path: shy
+
+    - name: Simulate "v install shy"
+      run: Move-Item -Path .\shy -Destination $HOME\.vmodules\shy -force
+
+    - name: Run tests
+      run: v test "$HOME\.vmodules\shy"
+
+# TODO fails on Windows
+#    - name: Build shy with -prod
+#      run: v -prod "$HOME\.vmodules\shy"
+
+    - name: Build shy
+      run: v -g "$HOME\.vmodules\shy"
+
+    - name: Add shy to PATH
+      run: echo "$HOME\.vmodules\shy" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Run shy --help
+      run: shy --help
+
+    - name: Run shy doctor
+      run: shy doctor

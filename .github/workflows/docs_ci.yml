@@ -1,0 +1,62 @@
+name: Docs CI
+
+### Run on *EVERY* commit. The documentation *SHOULD* stay valid, and
+### the developers should receive early warning if they break it.
+on: [push, pull_request]
+
+jobs:
+  check-markdown:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      VFLAGS: -cc tcc
+    steps:
+    - name: Checkout V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make -j4 && sudo ./v symlink
+
+    - name: Checkout shy
+      uses: actions/checkout@v2
+      with:
+        path: shy
+
+    - name: Symlink as module
+      run: sudo ln -s $(pwd)/shy ~/.vmodules/shy # Workaround for doing `mv shy ~/.vmodules`
+
+    - name: Check markdown line length & code examples
+      run: v check-md -hide-warnings shy
+      ## NB: -hide-warnings is used here, so that the output is less noisy,
+      ## thus real errors are easier to spot.
+
+  report-missing-fn-doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MOPTIONS: --relative-paths --exclude /tests/
+    steps:
+      - name: Checkout V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+
+      - name: Build local v
+        run: make -j4 && sudo ./v symlink
+
+      - name: Checkout shy
+        uses: actions/checkout@v2
+        with:
+          path: shy
+
+      - name: Checkout previous shy
+        uses: actions/checkout@v2
+        with:
+          repository: larpon/shy
+          ref: master
+          path: pshy
+
+      - name: Check against parent commit
+        run: v missdoc --diff $MOPTIONS pshy shy
