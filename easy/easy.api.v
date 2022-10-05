@@ -174,7 +174,7 @@ pub mut:
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32       = 1.0
-	segment  bool      = true
+	ray      bool      = true
 	color    shy.Color = shy.colors.shy.white
 	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
@@ -189,7 +189,7 @@ pub mut:
 	radius   f32 = 1.0
 	rotation f32
 	scale    f32       = 1.0
-	segment  bool      = true
+	ray      bool      = true
 	color    shy.Color = shy.colors.shy.white
 	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
@@ -204,7 +204,7 @@ pub fn (el &EasyLine) draw() {
 	mut l := d.line_segment()
 	l.a = el.a
 	l.b = el.b
-	if !el.segment {
+	if el.ray {
 		// Draw line as a ray - this is basically just done by extending the line towards the
 		// drawable area's edges - giving an illusion of an "infinite" ray passing through the drawable area.
 		mut nl := EasyLine{
