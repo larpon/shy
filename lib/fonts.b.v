@@ -61,7 +61,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 		// NOTE:	#flag --embed-file @VMODROOT/fonts@/fonts // #flag --embed-file @VMODROOT/examples/assets@/
 		preload['default'] = 'fonts/Allerta/Allerta-Regular.ttf'
 	} $else {
-		mut default_font := $embed_file('fonts/Allerta/Allerta-Regular.ttf')
+		mut default_font := $embed_file('../fonts/Allerta/Allerta-Regular.ttf')
 		fs.font_data[defaults.font.name] = default_font.to_bytes()
 		fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
 	}
