@@ -62,8 +62,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      VAB_FLAGS: -v 3
+      VFLAGS: -cc tcc -no-retry-compilation
+      SDL2_VERSION: 2.0.8
     steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --quiet -y libsdl2-dev libsdl2-ttf-dev
+        sudo apt-get install --quiet -y libsdl2-mixer-dev libsdl2-image-dev
+        curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
+        tar -zxvf SDL2.tar.gz
+
+    - name: Build SDL
+      run: |
+        cd SDL2-${SDL2_VERSION}
+        mkdir build
+        cd build
+        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        make
+        make install
+
     - name: Checkout V
       uses: actions/checkout@v2
       with:
@@ -71,6 +89,9 @@ jobs:
 
     - name: Build local v
       run: make -j4 && sudo ./v symlink
+
+    - name: Install sdl module
+      run: v install sdl
 
     - name: Checkout shy
       uses: actions/checkout@v2
@@ -106,8 +127,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      VAB_FLAGS: -v 3
+      VFLAGS: -cc tcc -no-retry-compilation
+      SDL2_VERSION: 2.0.8
     steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --quiet -y libsdl2-dev libsdl2-ttf-dev
+        sudo apt-get install --quiet -y libsdl2-mixer-dev libsdl2-image-dev
+        curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
+        tar -zxvf SDL2.tar.gz
+
+    - name: Build SDL
+      run: |
+        cd SDL2-${SDL2_VERSION}
+        mkdir build
+        cd build
+        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        make
+        make install
+
     - name: Checkout V
       uses: actions/checkout@v2
       with:
@@ -115,6 +154,9 @@ jobs:
 
     - name: Build local v
       run: make -j4 && sudo ./v symlink
+
+    - name: Install sdl module
+      run: v install sdl
 
     - name: Checkout shy
       uses: actions/checkout@v2
@@ -140,29 +182,41 @@ jobs:
     - name: Run 'shy doctor'
       run: /usr/bin/shy doctor
 
-  windows-latest-build:
-    runs-on: windows-latest
-    timeout-minutes: 10
+
+  ubuntu-latest-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
-      VAB_FLAGS: -cg -v 3 --api 30
+      VFLAGS: -cc tcc -no-retry-compilation
+      SDL2_VERSION: 2.0.10
     steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --quiet -y libsdl2-ttf-dev
+        sudo apt-get install --quiet -y libsdl2-mixer-dev libsdl2-image-dev
+        curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
+        tar -zxvf SDL2.tar.gz
 
-    #- uses: actions/setup-java@v2
-      #with:
-        #distribution: 'adopt'
-        #java-version: 15
+    - name: Build SDL
+      run: |
+        cd SDL2-${SDL2_VERSION}
+        mkdir build
+        cd build
+        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        make
+        make install
 
-    - name: Install V
-      uses: vlang/setup-v@v1
-      with:
-        check-latest: true
-
-    # TODO https://github.com/vlang/setup-v/issues
-    - name: Checkout V examples
+    - name: Checkout V
       uses: actions/checkout@v2
       with:
         repository: vlang/v
-        path: v
+
+    - name: Build local v
+      run: make -j4 && sudo ./v symlink
+
+    - name: Install sdl module
+      run: v install sdl
 
     - name: Checkout shy
       uses: actions/checkout@v2
@@ -170,23 +224,29 @@ jobs:
         path: shy
 
     - name: Simulate "v install shy"
-      run: Move-Item -Path .\shy -Destination $HOME\.vmodules\shy -force
-
-    - name: Run tests
-      run: v test "$HOME\.vmodules\shy"
-
-# TODO fails on Windows
-#    - name: Build shy with -prod
-#      run: v -prod "$HOME\.vmodules\shy"
+      run: mv shy ~/.vmodules
 
     - name: Build shy
-      run: v -g "$HOME\.vmodules\shy"
+      run: v -g ~/.vmodules/shy
 
-    - name: Add shy to PATH
-      run: echo "$HOME\.vmodules\shy" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    - name: Symlink shy
+      run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
 
-    - name: Run shy --help
+    - name: Run 'shy --help'
       run: shy --help
 
-    - name: Run shy doctor
+    - name: Run 'shy doctor'
       run: shy doctor
+
+    - name: Build shy examples
+      run: |
+        # v shader shy/examples
+
+        export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
+        export CFLAGS="${CFLAGS//$'\n'/ }"
+
+        declare -a shy_examples=('anchors' 'hello_world' 'image' 'lines' 'mouse' 'multi_window' 'rectangle' 'sound')
+        echo "Compiling shy examples ${shy_examples[@]}"
+        for example in "${shy_examples[@]}"; do
+          v -cc clang ~/.vmodules/shy/examples/$example
+        done
