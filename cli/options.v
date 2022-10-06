@@ -42,7 +42,7 @@ pub fn options_from_env(defaults Options) !Options {
 
 // extend_from_dot_shy will merge the `Options` with any content
 // found in any `.shy` config files.
-pub fn (mut opt Options) extend_from_dot_shy() {
+pub fn (mut opt Options) extend_from_dot_shy() ! {
 	// Look up values in input .shy file next to input if no flags or defaults was set
 	// TODO use TOML format here
 	// dot_shy_file := dot_shy_path(opt.input)

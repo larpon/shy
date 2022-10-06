@@ -9,7 +9,7 @@ import shy.cli
 
 fn main() {
 	// Collect user flags in an extended manner.
-	// Start with defaults -> overwrite by SHY_FLAGS -> overwrite by commandline flags -> extend by .shy file entries.
+	// Start with defaults -> merge over SHY_FLAGS -> merge over cmdline flags -> merge .shy entries.
 	mut opt := cli.Options{}
 	mut fp := &flag.FlagParser(0)
 
@@ -56,7 +56,11 @@ fn main() {
 	input := fp.args.last()
 	opt.input = input
 
-	opt.extend_from_dot_shy()
+	opt.extend_from_dot_shy() or {
+		eprintln('Error while parsing `.shy`: $err')
+		eprintln('Use `$cli.exe_short_name -h` to see all flags')
+		exit(1)
+	}
 
 	// Validate environment after options and input has been resolved
 	opt.validate_env() or { panic(err) }

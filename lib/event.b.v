@@ -515,7 +515,10 @@ fn map_sdl_to_shy_keycode(kc sdl.Keycode) KeyCode {
 		.app1 { .app1 }
 		.app2 { .app2 }
 		.audiorewind { .audiorewind }
-		.audiofastforward { .audiofastforward }
+		// .audiofastforward { .audiofastforward }
+		// TODO Done this way to be able to compile for newer SDL versions
+		// that adds to this enum, V will complain it's not exhaustive
+		else { .audiofastforward }
 	}
 }
 

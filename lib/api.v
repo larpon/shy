@@ -47,8 +47,6 @@ pub fn (mut a API) init(shy_instance &Shy) ! {
 
 	a.wm.init()!
 
-	// a.gfx.init_subsystems()!
-
 	a.audio = &Audio{
 		shy: s
 	}
