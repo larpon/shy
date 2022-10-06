@@ -258,12 +258,12 @@ jobs:
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
         done
 
-  build-with-all-sdl-versions:
+  sdl-branch-versions:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        sdl-version: [2.0.8, 2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0]
+        sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0]
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
