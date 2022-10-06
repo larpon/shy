@@ -334,5 +334,3 @@ jobs:
         for example in "${shy_examples[@]}"; do
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
         done
-
-
