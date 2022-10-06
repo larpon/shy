@@ -53,10 +53,9 @@ jobs:
     - name: Symlink shy command
       run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
 
-    # TODO broken with $embed_file
-    #- name: Test clean shy code
-    #  run: |
-    #    shy test-cleancode ~/.vmodules/shy
+    - name: Test clean shy code
+      run: |
+        shy test-cleancode ~/.vmodules/shy
 
   ubuntu-latest-bootstrap:
     runs-on: ubuntu-latest
@@ -275,7 +274,7 @@ jobs:
         curl -L https://www.libsdl.org/release/SDL2-${{ matrix.sdl-version }}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
-    - name: Build SDL
+    - name: Build SDL ${{ matrix.sdl-version }}
       run: |
         cd SDL2-${{ matrix.sdl-version }}
         mkdir build
@@ -292,7 +291,7 @@ jobs:
     - name: Build local v
       run: make -j4 && sudo ./v symlink
 
-    - name: Checkout SDL ${{ matrix.sdl-version }}
+    - name: Checkout vlang/sdl ${{ matrix.sdl-version }}
       uses: actions/checkout@v2
       with:
         ref: ${{ matrix.sdl-version }}
