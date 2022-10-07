@@ -1,12 +1,17 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
+//
+// All angles are in radians.
 module lib
 
 import math
 // import mth
 import shy.vec { Vec2 }
 
+// basic primitives
+
+// Rect represents the data structure of a rectangle
 pub struct Rect {
 pub mut:
 	x f32
@@ -26,6 +31,9 @@ pub mut:
 	angle  f32       // radians
 }
 
+// Line represents the data structure of a line segment.
+// line segments can be converted to the `Ray` type,
+// which represents an "infinite" line originating from a point.
 pub struct Line {
 pub mut:
 	a Vec2<f32>
@@ -232,6 +240,24 @@ pub fn line_line_intersect(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, x4 f3
 		return true, intersection_x, intersection_y
 	}
 	return false, 0, 0
+}
+
+// Circle represents the data structure of a circle with origin at `x`,`y`.
+pub struct Circle {
+pub mut:
+	x      f32
+	y      f32
+	radius f32 = 50
+}
+
+[inline]
+pub fn (c &Circle) bbox() Rect {
+	return Rect{
+		x: c.x - (c.radius * 0.5)
+		y: c.y - (c.radius * 0.5)
+		w: c.radius * 2
+		h: c.radius * 2
+	}
 }
 
 pub struct Size {

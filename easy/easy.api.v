@@ -100,7 +100,7 @@ pub fn (ed &Quick) text(etc EasyTextConfig) {
 pub struct EasyRectConfig {
 	shy.Rect
 pub mut:
-	radius   f32 = 1.0
+	stroke   shy.Stroke
 	rotation f32
 	scale    f32 = 1.0
 	colors   shy.ShapeColors
@@ -116,7 +116,7 @@ pub struct EasyRect {
 	shy.ShyStruct
 	shy.Rect
 pub mut:
-	radius   f32 = 1.0
+	stroke   shy.Stroke
 	rotation f32
 	scale    f32 = 1.0
 	colors   shy.ShapeColors
@@ -137,7 +137,7 @@ pub fn (er &EasyRect) draw() {
 	r.y = er.y
 	r.w = er.w
 	r.h = er.h
-	r.radius = er.radius
+	r.stroke = er.stroke
 	r.rotation = er.rotation
 	r.scale = er.scale
 	r.colors = er.colors
@@ -171,10 +171,10 @@ pub fn (ed &Quick) rect(erc EasyRectConfig) {
 pub struct EasyLineConfig {
 	shy.Line
 pub mut:
-	radius   f32 = 1.0
+	stroke   shy.Stroke
 	rotation f32
-	scale    f32       = 1.0
-	ray      bool      = true
+	scale    f32 = 1.0
+	ray      bool
 	color    shy.Color = shy.colors.shy.white
 	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
@@ -186,10 +186,10 @@ pub struct EasyLine {
 	shy.ShyStruct
 	shy.Line
 pub mut:
-	radius   f32 = 1.0
+	stroke   shy.Stroke
 	rotation f32
-	scale    f32       = 1.0
-	ray      bool      = true
+	scale    f32 = 1.0
+	ray      bool
 	color    shy.Color = shy.colors.shy.white
 	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
@@ -214,20 +214,21 @@ pub fn (el &EasyLine) draw() {
 		// point a should always be the left-most point
 		nl.ensure_a_left_b_right()
 		w, h := el.shy.active_window().drawable_wh()
-		if (nl.a.x > 0 && nl.a.x < w) || (nl.a.y > 0 && nl.a.y < h) {
-			grow_a := mth.max(w - nl.a.x, h - nl.a.y)
-			nl.grow_a(-grow_a)
-			// println('a: $nl.a')
-		}
-		if (nl.b.x > 0 && nl.b.x < w) || (nl.b.y > 0 && nl.b.y < h) {
-			grow_b := mth.max(mth.max(w - nl.b.x, h - nl.b.y), mth.max(w, h))
-			nl.grow_b(grow_b)
-			// println('b: $nl.b')
-		}
+		// TODO do something less wasteful here
+		// if (l.a.x > 0 && l.a.x < w) || (l.a.y > 0 && l.a.y < h) {
+		grow_a := mth.max(w, h) * 2
+		nl.grow_a(-grow_a)
+		// println('a: $nl.a')
+		// }
+		// if (l.b.x > 0 && l.b.x < w) || (l.b.y > 0 && l.b.y < h) {
+		grow_b := mth.max(w, h) * 2
+		nl.grow_b(grow_b)
+		// println('b: $nl.b')
+		// }
 		l.a = nl.a
 		l.b = nl.b
 	}
-	l.radius = el.radius
+	l.stroke = el.stroke
 	l.rotation = el.rotation
 	l.scale = el.scale
 	l.color = el.color

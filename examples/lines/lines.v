@@ -24,7 +24,9 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.line_segment(
 		a: shy.vec2(win_w * 0.1, win_h * 0.1)
 		b: shy.vec2(win_w * 0.9, win_h * 0.9)
-		radius: 6.0
+		stroke: shy.Stroke{
+			width: 6.0
+		}
 		color: shy.colors.shy.blue
 	)
 	a.quick.line_segment(
@@ -34,7 +36,9 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.line_segment(
 		a: shy.vec2(win_w * 0.1, win_h * 0.2)
 		b: shy.vec2(f32(a.mouse.x), a.mouse.y)
-		radius: 4.0
+		stroke: shy.Stroke{
+			width: 4.0
+		}
 		color: shy.colors.shy.green
 		ray: true
 	)

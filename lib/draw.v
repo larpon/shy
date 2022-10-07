@@ -21,6 +21,10 @@ pub enum Connect {
 	round
 }
 
+pub struct Stroke {
+	width f32 = 1.0
+}
+
 pub struct Draw {
 	ShyStruct
 }

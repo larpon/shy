@@ -42,6 +42,14 @@ pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
 	return config
 }
 
+pub fn (d2d &DrawShape2D) line_segment(config DrawShape2DLineSegment) DrawShape2DLineSegment {
+	return config
+}
+
+pub fn (d2d &DrawShape2D) circle(config DrawShape2DCircle) DrawShape2DCircle {
+	return config
+}
+
 // DrawShape2DRect
 [params]
 pub struct DrawShape2DRect {
@@ -49,7 +57,7 @@ pub struct DrawShape2DRect {
 pub mut:
 	visible  bool = true
 	colors   ShapeColors
-	radius   f32 = 1.0
+	stroke   Stroke
 	rotation f32
 	scale    f32     = 1.0
 	fills    Fill    = .solid | .outline
@@ -94,7 +102,7 @@ pub fn (r DrawShape2DRect) draw() {
 	sgp.translate(x + r.offset.x, y + r.offset.y)
 
 	if r.rotation != 0 {
-		sgp.rotate_at(r.rotation * mth.deg2rad, -o_off_x, -o_off_y)
+		sgp.rotate_at(r.rotation, -o_off_x, -o_off_y)
 	}
 	if r.scale != 1 {
 		sgp.scale_at(r.scale, r.scale, -o_off_x, -o_off_y)
@@ -111,7 +119,8 @@ pub fn (r DrawShape2DRect) draw() {
 		sgp.draw_filled_rect(sx, sy, w, h)
 	}
 	if r.fills.has(.outline) {
-		if r.radius > 1 {
+		stroke_width := r.stroke.width
+		if stroke_width > 1 {
 			m12x, m12y := midpoint(sx, sy, sx + w, sy)
 			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
 			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
@@ -144,20 +153,123 @@ pub fn (r DrawShape2DRect) draw() {
 
 [inline]
 fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+	draw_anchor(r.colors.outline, r.stroke.width, r.connect, x1, y1, x2, y2, x3, y3)
+}
+
+// DrawShape2DLineSegment
+
+[params]
+pub struct DrawShape2DLineSegment {
+	Line
+pub mut:
+	visible  bool = true
+	color    Color
+	stroke   Stroke
+	rotation f32
+	scale    f32 = 1.0
+	// fills    Fill    = .solid | .outline
+	cap Cap = .butt
+	// connect  Connect = .bevel
+	offset Vec2<f32>
+	origin Anchor = .center_left //
+}
+
+[inline]
+pub fn (l DrawShape2DLineSegment) origin_offset() (f32, f32) {
+	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
+	// return -p_x, -p_y
+	return 0, 0
+}
+
+[inline]
+pub fn (l DrawShape2DLineSegment) draw() {
+	if !l.visible {
+		return
+	}
+	x1 := l.a.x
+	y1 := l.a.y
+	x2 := l.b.x
+	y2 := l.b.y
+	scale_factor := l.scale //* sgldraw.dpi_scale()
+	stroke_width := l.stroke.width
+
+	color := l.color
+	if color.a < 255 {
+		sgp.set_blend_mode(.blend)
+	}
+	c := color.as_f32()
+
+	sgp.set_color(c.r, c.g, c.b, c.a)
+
+	x1_ := x1 * scale_factor
+	y1_ := y1 * scale_factor
+	dx := x1 - x1_
+	dy := y1 - y1_
+	x2_ := x2 - dx
+	y2_ := y2 - dy
+
+	sgp.push_transform()
+	o_off_x, o_off_y := l.origin_offset()
+
+	sgp.translate(o_off_x, o_off_y)
+	// sgp.translate(x + r.offset.x, y + r.offset.y + r.offset.y)
+
+	if l.rotation != 0 {
+		sgp.rotate_at(l.rotation, -o_off_x, -o_off_y)
+	}
+	if l.scale != 1 {
+		sgp.scale_at(l.scale, l.scale, -o_off_x, -o_off_y)
+	}
+
+	if stroke_width > 1 {
+		radius := stroke_width
+
+		mut tl_x := x1_ - x2_
+		mut tl_y := y1_ - y2_
+		tl_x, tl_y = perpendicular(tl_x, tl_y)
+		tl_x, tl_y = normalize(tl_x, tl_y)
+		tl_x *= radius
+		tl_y *= radius
+		tl_x += x1_
+		tl_y += y1_
+
+		tr_x := tl_x - x1_ + x2_
+		tr_y := tl_y - y1_ + y2_
+
+		mut bl_x := x2_ - x1_
+		mut bl_y := y2_ - y1_
+		bl_x, bl_y = perpendicular(bl_x, bl_y)
+		bl_x, bl_y = normalize(bl_x, bl_y)
+		bl_x *= radius
+		bl_y *= radius
+		bl_x += x1_
+		bl_y += y1_
+
+		br_x := bl_x - x1_ + x2_
+		br_y := bl_y - y1_ + y2_
+
+		sgp.draw_filled_triangle(tl_x, tl_y, tr_x, tr_y, br_x, br_y)
+		sgp.draw_filled_triangle(tl_x, tl_y, bl_x, bl_y, br_x, br_y)
+	} else {
+		sgp.draw_line(x1_, y1_, x2_, y2_)
+	}
+
+	// sgp.translate(-x, -y)
+	sgp.pop_transform()
+}
+
+[inline]
+fn draw_anchor(color Color, radius f32, connect Connect, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	// Original author Chris H.F. Tsang / CPOL License
 	// https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
 	// http://artgrammer.blogspot.com/search/label/opengl
 
-	//!c := r.colors.outline
-	//!sgl.c4b(c.r, c.g, c.b, c.a)
-	color := r.colors.outline
 	if color.a < 255 {
 		sgp.set_blend_mode(.blend)
 	}
 	c := color.as_f32()
 	sgp.set_color(c.r, c.g, c.b, c.a)
 
-	radius := r.radius
 	if radius == 1 {
 		sgp.draw_line(x1, y1, x2, y2)
 		return
@@ -183,7 +295,7 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 	bt_y := ar.bt.y
 	flip := ar.flip
 
-	if r.connect == .miter {
+	if connect == .miter {
 		// sgl.begin_triangles()
 		// sgl.v2f(t0_x, t0_y)
 		// sgl.v2f(vp_x, vp_y)
@@ -205,7 +317,7 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 		// sgl.v2f(t2_x, t2_y)
 		// sgl.end()
 		sgp.draw_filled_triangle(vpp_x, vpp_y, t2r_x, t2r_y, t2_x, t2_y)
-	} else if r.connect == .bevel {
+	} else if connect == .bevel {
 		// sgl.begin_triangles()
 		// sgl.v2f(t0_x, t0_y)
 		// sgl.v2f(at_x, at_y)
@@ -295,107 +407,99 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 	*/
 }
 
-// DrawShape2DLineSegment
-
-pub fn (d2d &DrawShape2D) line_segment(config DrawShape2DLineSegment) DrawShape2DLineSegment {
-	return config
-}
-
+// DrawShape2DCircle
 [params]
-pub struct DrawShape2DLineSegment {
-	Line
+pub struct DrawShape2DCircle {
+	Circle
 pub mut:
+	segments u32 // a value of 0 to 2 here means "auto"
 	visible  bool = true
-	color    Color
-	radius   f32 = 1.0
-	rotation f32
-	scale    f32 = 1.0
-	// fills    Fill    = .solid | .outline
-	cap Cap = .butt
-	// connect  Connect = .bevel
-	offset Vec2<f32>
-	origin Anchor = .center_left //
+	colors   ShapeColors
+	stroke   Stroke
+	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
+	scale    f32  = 1.0
+	fills    Fill = .solid | .outline
+	cap      Cap  = .butt
+	offset   Vec2<f32>
+	origin   Anchor = .center
+}
+
+/*
+[inline]
+pub fn (c DrawShape2DCircle) origin_offset() (f32, f32) {
+	p_x, p_y := r.origin.pos_wh(c.bbox())
+	return -p_x, -p_y
 }
 
 [inline]
-pub fn (l DrawShape2DLineSegment) origin_offset() (f32, f32) {
-	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
-	// return -p_x, -p_y
-	return 0, 0
-}
-
-[inline]
-pub fn (l DrawShape2DLineSegment) draw() {
-	if !l.visible {
-		return
-	}
-	x1 := l.a.x
-	y1 := l.a.y
-	x2 := l.b.x
-	y2 := l.b.y
-	scale_factor := l.scale //* sgldraw.dpi_scale()
-
-	color := l.color
-	if color.a < 255 {
-		sgp.set_blend_mode(.blend)
-	}
-	c := color.as_f32()
-
-	sgp.set_color(c.r, c.g, c.b, c.a)
-
-	x1_ := x1 * scale_factor
-	y1_ := y1 * scale_factor
-	dx := x1 - x1_
-	dy := y1 - y1_
-	x2_ := x2 - dx
-	y2_ := y2 - dy
+pub fn (c DrawShape2DCircle) draw() {
+	r := c.bbox()
+	x := r.x
+	y := r.y
+	w := r.w
+	h := r.h
+	sx := 0 // x //* scale_factor
+	sy := 0 // y //* scale_factor
 
 	sgp.push_transform()
-	o_off_x, o_off_y := l.origin_offset()
+	o_off_x, o_off_y := r.origin_offset()
 
 	sgp.translate(o_off_x, o_off_y)
-	// sgp.translate(x + r.offset.x, y + r.offset.y + r.offset.y)
+	sgp.translate(x + c.offset.x, y + c.offset.y)
 
-	if l.rotation != 0 {
-		sgp.rotate_at(l.rotation * mth.deg2rad, -o_off_x, -o_off_y)
+	if c.rotation != 0 {
+		sgp.rotate_at(c.rotation, -o_off_x, -o_off_y)
 	}
-	if l.scale != 1 {
-		sgp.scale_at(l.scale, l.scale, -o_off_x, -o_off_y)
-	}
-
-	if l.radius > 1 {
-		radius := l.radius
-
-		mut tl_x := x1_ - x2_
-		mut tl_y := y1_ - y2_
-		tl_x, tl_y = perpendicular(tl_x, tl_y)
-		tl_x, tl_y = normalize(tl_x, tl_y)
-		tl_x *= radius
-		tl_y *= radius
-		tl_x += x1_
-		tl_y += y1_
-
-		tr_x := tl_x - x1_ + x2_
-		tr_y := tl_y - y1_ + y2_
-
-		mut bl_x := x2_ - x1_
-		mut bl_y := y2_ - y1_
-		bl_x, bl_y = perpendicular(bl_x, bl_y)
-		bl_x, bl_y = normalize(bl_x, bl_y)
-		bl_x *= radius
-		bl_y *= radius
-		bl_x += x1_
-		bl_y += y1_
-
-		br_x := bl_x - x1_ + x2_
-		br_y := bl_y - y1_ + y2_
-
-		sgp.draw_filled_triangle(tl_x, tl_y, tr_x, tr_y, br_x, br_y)
-		sgp.draw_filled_triangle(tl_x, tl_y, bl_x, bl_y, br_x, br_y)
-	} else {
-		sgp.draw_line(x1_, y1_, x2_, y2_)
+	if c.scale != 1 {
+		sgp.scale_at(c.scale, c.scale, -o_off_x, -o_off_y)
 	}
 
-	// sgp.translate(-x, -y)
+	/*
+	if r.fills.has(.solid) {
+		color := r.colors.solid
+		if color.a < 255 {
+			sgp.set_blend_mode(.blend)
+		}
+		c := color.as_f32()
+
+		sgp.set_color(c.r, c.g, c.b, c.a)
+		sgp.draw_filled_rect(sx, sy, w, h)
+	}
+	if r.fills.has(.outline) {
+		if r.radius > 1 {
+			m12x, m12y := midpoint(sx, sy, sx + w, sy)
+			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
+			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
+			m41x, m41y := midpoint(sx, sy + h, sx, sy)
+			r.draw_anchor(m12x, m12y, sx + w, sy, m23x, m23y)
+			r.draw_anchor(m23x, m23y, sx + w, sy + h, m34x, m34y)
+			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
+			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
+		} else {
+			color := r.colors.outline
+			if color.a < 255 {
+				sgp.set_blend_mode(.blend)
+			}
+			c := color.as_f32()
+
+			sgp.set_color(c.r, c.g, c.b, c.a)
+
+			sgp.draw_line(sx, sy, (sx + w), sy)
+			sgp.draw_line((sx + w), sy, (sx + w), (sy + h))
+			sgp.draw_line((sx + w), (sy + h), sx, (sy + h))
+			sgp.draw_line(sx, (sy + h), sx, sy)
+		}
+	}
+*/
+	sgp.translate(-x, -y)
 	sgp.pop_transform()
+
+	sgp.flush()
 }
+
+[inline]
+fn (c DrawShape2DCircle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+	draw_anchor(c.colors.outline,c.stroke.width,.miter,x1,y1,x2,y2,x3,y3)
+}
+
+*/*/
