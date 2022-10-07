@@ -209,7 +209,7 @@ pub fn arc(x f32, y f32, radius f32, start_angle_in_rad f32, angle_in_rad f32, s
 	mut y1 := f32(radius * math.sinf(start_angle_in_rad))
 	for i := 0; i < steps + 1; i++ {
 		sgl.v2f(x1 + x, y1 + y)
-		if fill == .solid {
+		if fill == .body {
 			sgl.v2f(x, y)
 		}
 		tx := -y1

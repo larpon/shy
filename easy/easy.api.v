@@ -104,7 +104,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .solid | .outline
+	fills    shy.Fill  = .body | .outline
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor
 }
@@ -118,7 +118,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .solid | .outline
+	fills    shy.Fill  = .body | .outline
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor
 }
@@ -246,7 +246,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .solid | .outline
+	fills    shy.Fill  = .body | .outline
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor = .center
 }
@@ -261,7 +261,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .solid | .outline
+	fills    shy.Fill  = .body | .outline
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor = .center
 }

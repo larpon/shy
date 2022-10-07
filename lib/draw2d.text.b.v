@@ -125,7 +125,7 @@ pub mut:
 	align    TextAlign = .baseline | .left // TODO V BUG lib.defaults.font.align
 	size     f32       = defaults.font.size
 	scale    f32       = 1.0
-	fills    Fill      = .solid | .outline
+	fills    Fill      = .body | .outline
 	offset   Vec2<f32>
 }
 

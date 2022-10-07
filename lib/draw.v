@@ -6,7 +6,7 @@ module lib
 [flag]
 pub enum Fill {
 	outline
-	solid
+	body
 }
 
 pub enum Cap {

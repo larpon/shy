@@ -87,7 +87,7 @@ pub mut:
 	stroke   Stroke
 	rotation f32
 	scale    f32  = 1.0
-	fills    Fill = .solid | .outline
+	fills    Fill = .body | .outline
 	offset   Vec2<f32>
 	origin   Anchor
 }
@@ -131,7 +131,7 @@ pub fn (r DrawShape2DRect) draw() {
 		sgp.scale_at(r.scale, r.scale, -o_off_x, -o_off_y)
 	}
 
-	if r.fills.has(.solid) {
+	if r.fills.has(.body) {
 		color := r.color
 		if color.a < 255 {
 			sgp.set_blend_mode(.blend)
@@ -288,7 +288,7 @@ pub mut:
 	stroke   Stroke
 	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
 	scale    f32  = 1.0
-	fills    Fill = .solid | .outline
+	fills    Fill = .body | .outline
 	offset   Vec2<f32>
 	origin   Anchor = .center
 }
@@ -332,7 +332,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	mut xx := f32(0)
 	mut yy := f32(0)
 
-	if up.fills.has(.solid) {
+	if up.fills.has(.body) {
 		color := up.color
 		if color.a < 255 {
 			sgp.set_blend_mode(.blend)
@@ -521,7 +521,7 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 
 		sgl.begin_triangle_strip()
 		plot.arc(vpp_x, vpp_y, line_segment_length(vpp_x, vpp_y, at_x, at_y), start_angle,
-			arc_angle, u32(18), .solid)
+			arc_angle, u32(18), .body)
 		sgl.end()
 
 		sgl.begin_triangles()
