@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module lib
 
-import libs.miniaudio as ma
+import shy.thirdparty.miniaudio as ma
 
 pub struct Audio {
 	ShyStruct

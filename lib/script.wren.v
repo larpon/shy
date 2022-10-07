@@ -4,7 +4,7 @@
 module lib
 
 import time
-import libs.wren
+import shy.thirdparty.wren
 
 pub struct WrenVM {
 	ShyStruct
