@@ -23,7 +23,7 @@ pub fn (mut gp Gamepad) init() ! {
 	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
 	if haptic == sdl.null {
 		// error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.ginfo('${@STRUCT}.${@FN}', 'controller $gp.id ($gp.name) does not seem to have haptic features')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'controller $gp.id ($gp.name) does not seem to have haptic features')
 	} else {
 		// See if it can do sine waves
 		if (sdl.haptic_query(haptic) & u32(sdl.haptic_sine)) == 0 {
@@ -76,7 +76,7 @@ pub fn (mut ip Input) init() ! {
 	// mut mice_support := s.config.input.mice
 	// if mice_support {
 	// 	available_mice := mm.reinit()
-	// 	s.log.ginfo('${@STRUCT}.${@FN}', 'enabling support for multiple mice. $available_mice is currently available')
+	// 	s.log.gdebug('${@STRUCT}.${@FN}', 'enabling support for multiple mice. $available_mice is currently available')
 	// 	if available_mice < 0 {
 	// 		mm.quit()
 	// 		s.log.gerror('${@STRUCT}.${@FN}', 'error initializing ManyMouse. Falling back to unified mouse input')
@@ -131,7 +131,7 @@ fn (mut ip Input) init_input() ! {
 	mut s := ip.shy
 	// Check for joysticks/game controllers
 	if sdl.num_joysticks() < 1 {
-		s.log.ginfo('${@STRUCT}.${@FN}', 'no joysticks or game controllers connected')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'no joysticks or game controllers connected')
 	} else {
 		// Load joystick(s) / controller(s)
 		for i in 0 .. 5 {
@@ -150,7 +150,7 @@ fn (mut ip Input) init_input() ! {
 					continue
 				}
 				controller_name := unsafe { cstring_to_vstring(sdl.game_controller_name_for_index(i)) }
-				s.log.ginfo('${@STRUCT}.${@FN}', 'detected controller $i as "$controller_name"')
+				s.log.gdebug('${@STRUCT}.${@FN}', 'detected controller $i as "$controller_name"')
 
 				mut pad := &Gamepad{
 					id: i

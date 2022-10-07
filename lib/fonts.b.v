@@ -39,7 +39,7 @@ fn (mut fs Fonts) load_font(name string, path string) ! {
 
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
-		fs.shy.log.ginfo('${@STRUCT}.${@FN}', 'loaded $name: "$path"')
+		fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded $name: "$path"')
 	} else {
 		return error('${@STRUCT}.${@FN}' + ': could not load $name "$path"')
 	}
@@ -63,7 +63,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	} $else {
 		mut default_font := $embed_file('../fonts/Allerta/Allerta-Regular.ttf')
 		fs.font_data[defaults.font.name] = default_font.to_bytes()
-		fs.shy.log.ginfo(@STRUCT, 'loaded default: "$default_font.path"')
+		fs.shy.log.gdebug(@STRUCT, 'loaded default: "$default_font.path"')
 	}
 
 	for font_name, font_path in preload {

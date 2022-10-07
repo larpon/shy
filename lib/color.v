@@ -42,13 +42,6 @@ pub:
 	shy    ShyColors
 }
 
-[params]
-pub struct ShapeColors {
-pub mut:
-	solid   Color = rgb(155, 25, 25)
-	outline Color = rgb(211, 211, 211)
-}
-
 pub fn (c Color) is_opaque() bool {
 	return c.a == 255
 }

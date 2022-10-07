@@ -102,11 +102,9 @@ pub struct EasyRectConfig {
 pub mut:
 	stroke   shy.Stroke
 	rotation f32
-	scale    f32 = 1.0
-	colors   shy.ShapeColors
-	fills    shy.Fill    = .solid | .outline
-	cap      shy.Cap     = .butt
-	connect  shy.Connect = .bevel
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .solid | .outline
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor
 }
@@ -118,11 +116,9 @@ pub struct EasyRect {
 pub mut:
 	stroke   shy.Stroke
 	rotation f32
-	scale    f32 = 1.0
-	colors   shy.ShapeColors
-	fills    shy.Fill    = .solid | .outline
-	connect  shy.Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
-	cap      shy.Cap     = .butt
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .solid | .outline
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor
 }
@@ -140,10 +136,8 @@ pub fn (er &EasyRect) draw() {
 	r.stroke = er.stroke
 	r.rotation = er.rotation
 	r.scale = er.scale
-	r.colors = er.colors
+	r.color = er.color
 	r.fills = er.fills
-	r.cap = er.cap
-	r.connect = er.connect
 	r.offset = er.offset
 	r.origin = er.origin
 	r.draw()
@@ -170,13 +164,11 @@ pub fn (ed &Quick) rect(erc EasyRectConfig) {
 [params]
 pub struct EasyLineConfig {
 	shy.Line
+	shy.Stroke
 pub mut:
-	stroke   shy.Stroke
 	rotation f32
 	scale    f32 = 1.0
 	ray      bool
-	color    shy.Color = shy.colors.shy.white
-	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor = .center_left
 }
@@ -185,13 +177,11 @@ pub mut:
 pub struct EasyLine {
 	shy.ShyStruct
 	shy.Line
+	shy.Stroke
 pub mut:
-	stroke   shy.Stroke
 	rotation f32
 	scale    f32 = 1.0
 	ray      bool
-	color    shy.Color = shy.colors.shy.white
-	cap      shy.Cap   = .butt
 	offset   vec.Vec2<f32>
 	origin   shy.Anchor = .center_left
 }
@@ -214,25 +204,16 @@ pub fn (el &EasyLine) draw() {
 		// point a should always be the left-most point
 		nl.ensure_a_left_b_right()
 		w, h := el.shy.active_window().drawable_wh()
-		// TODO do something less wasteful here
-		// if (l.a.x > 0 && l.a.x < w) || (l.a.y > 0 && l.a.y < h) {
-		grow_a := mth.max(w, h) * 2
-		nl.grow_a(-grow_a)
-		// println('a: $nl.a')
-		// }
-		// if (l.b.x > 0 && l.b.x < w) || (l.b.y > 0 && l.b.y < h) {
-		grow_b := mth.max(w, h) * 2
-		nl.grow_b(grow_b)
-		// println('b: $nl.b')
-		// }
+		// TODO do something less wasteful here?
+		grow := mth.max(w, h) * 2
+		nl.grow_a(-grow)
+		nl.grow_b(grow)
 		l.a = nl.a
 		l.b = nl.b
 	}
-	l.stroke = el.stroke
+	l.Stroke = el.Stroke
 	l.rotation = el.rotation
 	l.scale = el.scale
-	l.color = el.color
-	l.cap = el.cap
 	l.offset = el.offset
 	l.origin = el.origin
 	l.draw()

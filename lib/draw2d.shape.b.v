@@ -55,14 +55,12 @@ pub fn (d2d &DrawShape2D) circle(config DrawShape2DCircle) DrawShape2DCircle {
 pub struct DrawShape2DRect {
 	Rect
 pub mut:
-	visible  bool = true
-	colors   ShapeColors
+	visible  bool  = true
+	color    Color = colors.shy.red
 	stroke   Stroke
 	rotation f32
-	scale    f32     = 1.0
-	fills    Fill    = .solid | .outline
-	cap      Cap     = .butt
-	connect  Connect = .bevel
+	scale    f32  = 1.0
+	fills    Fill = .solid | .outline
 	offset   Vec2<f32>
 	origin   Anchor
 }
@@ -74,8 +72,6 @@ pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 	r.radius = config.radius
 	r.scale = config.scale
 	r.fills = config.fills
-	r.cap = config.cap
-	r.connect = config.connect
 	r.offset = config.offset
 }
 */
@@ -109,7 +105,7 @@ pub fn (r DrawShape2DRect) draw() {
 	}
 
 	if r.fills.has(.solid) {
-		color := r.colors.solid
+		color := r.color
 		if color.a < 255 {
 			sgp.set_blend_mode(.blend)
 		}
@@ -130,7 +126,7 @@ pub fn (r DrawShape2DRect) draw() {
 			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
 			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
 		} else {
-			color := r.colors.outline
+			color := r.stroke.color
 			if color.a < 255 {
 				sgp.set_blend_mode(.blend)
 			}
@@ -153,7 +149,7 @@ pub fn (r DrawShape2DRect) draw() {
 
 [inline]
 fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
-	draw_anchor(r.colors.outline, r.stroke.width, r.connect, x1, y1, x2, y2, x3, y3)
+	draw_anchor(r.stroke, x1, y1, x2, y2, x3, y3)
 }
 
 // DrawShape2DLineSegment
@@ -161,17 +157,13 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 [params]
 pub struct DrawShape2DLineSegment {
 	Line
+	Stroke
 pub mut:
 	visible  bool = true
-	color    Color
-	stroke   Stroke
 	rotation f32
 	scale    f32 = 1.0
-	// fills    Fill    = .solid | .outline
-	cap Cap = .butt
-	// connect  Connect = .bevel
-	offset Vec2<f32>
-	origin Anchor = .center_left //
+	offset   Vec2<f32>
+	origin   Anchor = .center_left //
 }
 
 [inline]
@@ -191,7 +183,7 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	x2 := l.b.x
 	y2 := l.b.y
 	scale_factor := l.scale //* sgldraw.dpi_scale()
-	stroke_width := l.stroke.width
+	stroke_width := l.Stroke.width
 
 	color := l.color
 	if color.a < 255 {
@@ -258,11 +250,112 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	sgp.pop_transform()
 }
 
+// DrawShape2DCircle
+[params]
+pub struct DrawShape2DCircle {
+	Circle
+pub mut:
+	visible  bool = true
+	segments u32 // a value of 0 to 2 here means "auto"
+	color    Color
+	stroke   Stroke
+	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
+	scale    f32  = 1.0
+	fills    Fill = .solid | .outline
+	offset   Vec2<f32>
+	origin   Anchor = .center
+}
+
 [inline]
-fn draw_anchor(color Color, radius f32, connect Connect, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+pub fn (c DrawShape2DCircle) origin_offset() (f32, f32) {
+	bbox := c.bbox()
+	p_x, p_y := c.origin.pos_wh(bbox.w, bbox.h)
+	return -p_x, -p_y
+}
+
+[inline]
+pub fn (c DrawShape2DCircle) draw() {
+	r := c.bbox()
+
+	x := r.x
+	y := r.y
+	// w := r.w
+	// h := r.h
+	// sx := 0 // x //* scale_factor
+	// sy := 0 // y //* scale_factor
+
+	sgp.push_transform()
+	o_off_x, o_off_y := c.origin_offset()
+
+	sgp.translate(o_off_x, o_off_y)
+	sgp.translate(x + c.offset.x, y + c.offset.y)
+
+	if c.rotation != 0 {
+		sgp.rotate_at(c.rotation, -o_off_x, -o_off_y)
+	}
+	if c.scale != 1 {
+		sgp.scale_at(c.scale, c.scale, -o_off_x, -o_off_y)
+	}
+
+	/*
+	if r.fills.has(.solid) {
+		color := r.colors.solid
+		if color.a < 255 {
+			sgp.set_blend_mode(.blend)
+		}
+		c := color.as_f32()
+
+		sgp.set_color(c.r, c.g, c.b, c.a)
+		sgp.draw_filled_rect(sx, sy, w, h)
+	}
+	if r.fills.has(.outline) {
+		if r.radius > 1 {
+			m12x, m12y := midpoint(sx, sy, sx + w, sy)
+			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
+			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
+			m41x, m41y := midpoint(sx, sy + h, sx, sy)
+			r.draw_anchor(m12x, m12y, sx + w, sy, m23x, m23y)
+			r.draw_anchor(m23x, m23y, sx + w, sy + h, m34x, m34y)
+			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
+			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
+		} else {
+			color := r.colors.outline
+			if color.a < 255 {
+				sgp.set_blend_mode(.blend)
+			}
+			c := color.as_f32()
+
+			sgp.set_color(c.r, c.g, c.b, c.a)
+
+			sgp.draw_line(sx, sy, (sx + w), sy)
+			sgp.draw_line((sx + w), sy, (sx + w), (sy + h))
+			sgp.draw_line((sx + w), (sy + h), sx, (sy + h))
+			sgp.draw_line(sx, (sy + h), sx, sy)
+		}
+	}
+	*/
+	sgp.translate(-x, -y)
+	sgp.pop_transform()
+
+	sgp.flush()
+}
+
+[inline]
+fn (c DrawShape2DCircle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+	draw_anchor(c.stroke, x1, y1, x2, y2, x3, y3)
+}
+
+// Utils
+
+[inline]
+fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	// Original author Chris H.F. Tsang / CPOL License
 	// https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
 	// http://artgrammer.blogspot.com/search/label/opengl
+
+	color := stroke.color
+	radius := stroke.width * 0.5
+	connect := stroke.connect
 
 	if color.a < 255 {
 		sgp.set_blend_mode(.blend)
@@ -406,100 +499,3 @@ fn draw_anchor(color Color, radius f32, connect Connect, x1 f32, y1 f32, x2 f32,
 	line(x2, y2, x3, y3)
 	*/
 }
-
-// DrawShape2DCircle
-[params]
-pub struct DrawShape2DCircle {
-	Circle
-pub mut:
-	segments u32 // a value of 0 to 2 here means "auto"
-	visible  bool = true
-	colors   ShapeColors
-	stroke   Stroke
-	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
-	scale    f32  = 1.0
-	fills    Fill = .solid | .outline
-	cap      Cap  = .butt
-	offset   Vec2<f32>
-	origin   Anchor = .center
-}
-
-/*
-[inline]
-pub fn (c DrawShape2DCircle) origin_offset() (f32, f32) {
-	p_x, p_y := r.origin.pos_wh(c.bbox())
-	return -p_x, -p_y
-}
-
-[inline]
-pub fn (c DrawShape2DCircle) draw() {
-	r := c.bbox()
-	x := r.x
-	y := r.y
-	w := r.w
-	h := r.h
-	sx := 0 // x //* scale_factor
-	sy := 0 // y //* scale_factor
-
-	sgp.push_transform()
-	o_off_x, o_off_y := r.origin_offset()
-
-	sgp.translate(o_off_x, o_off_y)
-	sgp.translate(x + c.offset.x, y + c.offset.y)
-
-	if c.rotation != 0 {
-		sgp.rotate_at(c.rotation, -o_off_x, -o_off_y)
-	}
-	if c.scale != 1 {
-		sgp.scale_at(c.scale, c.scale, -o_off_x, -o_off_y)
-	}
-
-	/*
-	if r.fills.has(.solid) {
-		color := r.colors.solid
-		if color.a < 255 {
-			sgp.set_blend_mode(.blend)
-		}
-		c := color.as_f32()
-
-		sgp.set_color(c.r, c.g, c.b, c.a)
-		sgp.draw_filled_rect(sx, sy, w, h)
-	}
-	if r.fills.has(.outline) {
-		if r.radius > 1 {
-			m12x, m12y := midpoint(sx, sy, sx + w, sy)
-			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
-			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
-			m41x, m41y := midpoint(sx, sy + h, sx, sy)
-			r.draw_anchor(m12x, m12y, sx + w, sy, m23x, m23y)
-			r.draw_anchor(m23x, m23y, sx + w, sy + h, m34x, m34y)
-			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
-			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
-		} else {
-			color := r.colors.outline
-			if color.a < 255 {
-				sgp.set_blend_mode(.blend)
-			}
-			c := color.as_f32()
-
-			sgp.set_color(c.r, c.g, c.b, c.a)
-
-			sgp.draw_line(sx, sy, (sx + w), sy)
-			sgp.draw_line((sx + w), sy, (sx + w), (sy + h))
-			sgp.draw_line((sx + w), (sy + h), sx, (sy + h))
-			sgp.draw_line(sx, (sy + h), sx, sy)
-		}
-	}
-*/
-	sgp.translate(-x, -y)
-	sgp.pop_transform()
-
-	sgp.flush()
-}
-
-[inline]
-fn (c DrawShape2DCircle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
-	draw_anchor(c.colors.outline,c.stroke.width,.miter,x1,y1,x2,y2,x3,y3)
-}
-
-*/*/

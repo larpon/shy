@@ -81,7 +81,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 					a.window.screenshot(shot_file) or {
 						a.shy.log.gerror('${@STRUCT}.${@FN}', '$err')
 					}
-					a.shy.log.ginfo('${@STRUCT}', 'saved screenshot to "$shot_file"')
+					a.shy.log.gdebug('${@STRUCT}', 'saved screenshot to "$shot_file"')
 				}
 				else {
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
@@ -145,17 +145,17 @@ pub fn (mut a DevApp) event(e shy.Event) {
 
 				if key_code == .f1 {
 					w := s.active_window()
-					s.log.ginfo('${@STRUCT}.${@FN}', 'Current FPS $w.fps()')
+					s.log.gdebug('${@STRUCT}.${@FN}', 'Current FPS $w.fps()')
 					return
 				}
 
 				if key_code == .f2 {
-					s.log.ginfo('${@STRUCT}.${@FN}', 'Current Performance Count $s.performance_counter()')
+					s.log.gdebug('${@STRUCT}.${@FN}', 'Current Performance Count $s.performance_counter()')
 					return
 				}
 
 				if key_code == .f3 {
-					s.log.ginfo('${@STRUCT}.${@FN}', 'Current Performance Frequency $s.performance_frequency()')
+					s.log.gdebug('${@STRUCT}.${@FN}', 'Current Performance Frequency $s.performance_frequency()')
 					return
 				}
 

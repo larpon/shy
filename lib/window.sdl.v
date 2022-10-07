@@ -98,7 +98,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	displays := wm.display_count()
 
-	s.log.ginfo('${@STRUCT}.${@FN}', '$displays displays available')
+	s.log.gdebug('${@STRUCT}.${@FN}', '$displays displays available')
 
 	// get display bounds for all displays
 	mut display_bounds := []sdl.Rect{}
@@ -120,7 +120,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		dn := unsafe { cstring_to_vstring(sdl.get_display_name(display_index)) }
 		dw := display_bounds[display_index].w
 		dh := display_bounds[display_index].h
-		s.log.ginfo('${@STRUCT}.${@FN}', 'opening on screen $display_index `$dn` ${dw}x$dh@${display_mode.refresh_rate}hz')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen $display_index `$dn` ${dw}x$dh@${display_mode.refresh_rate}hz')
 	}
 
 	// $if opengl ? {
@@ -148,7 +148,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	//
 
 	if s.config.render.msaa > 0 {
-		s.log.ginfo('${@STRUCT}.${@FN}', 'enabling MSAA (Multi-Sample AntiAliasing)')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'enabling MSAA (Multi-Sample AntiAliasing)')
 		sdl.gl_set_attribute(.multisamplebuffers, 1)
 
 		// Setting multi-samples here will result in SDL applying yet another pass of anti-aliasing...
@@ -193,7 +193,7 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	}
 
 	if config.resizable {
-		s.log.ginfo('${@STRUCT}.${@FN}', 'is resizable')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'is resizable')
 		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
 	}
 
@@ -694,7 +694,7 @@ pub fn (mut w Window) init() ! {
 			}
 		}
 	}
-	s.log.ginfo('${@STRUCT}.${@FN}', 'vsync=$w.config.render.vsync')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=$w.config.render.vsync')
 	// }
 
 	$if wasm32_emscripten {

@@ -30,9 +30,7 @@ pub fn (mut a App) frame(dt f64) {
 		origin: a.origin
 		w: 50
 		h: 50
-		colors: shy.ShapeColors{
-			solid: shy.colors.blue
-		}
+		color: shy.colors.blue
 	)
 
 	a.quick.text(

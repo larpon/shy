@@ -15,14 +15,45 @@ pub enum Cap {
 	square
 }
 
+pub fn (c Cap) next() Cap {
+	return match c {
+		.butt {
+			.round
+		}
+		.round {
+			.square
+		}
+		.square {
+			.butt
+		}
+	}
+}
+
 pub enum Connect {
 	miter
 	bevel
 	round
 }
 
+pub fn (c Connect) next() Connect {
+	return match c {
+		.miter {
+			.bevel
+		}
+		.bevel {
+			.round
+		}
+		.round {
+			.miter
+		}
+	}
+}
+
 pub struct Stroke {
-	width f32 = 1.0
+	width   f32     = 1.0
+	connect Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
+	cap     Cap     = .butt
+	color   Color   = colors.shy.white
 }
 
 pub struct Draw {
