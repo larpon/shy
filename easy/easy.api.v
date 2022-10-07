@@ -242,7 +242,6 @@ pub struct EasyCircleConfig {
 	shy.Circle
 pub mut:
 	stroke   shy.Stroke
-	segments u32
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
@@ -257,7 +256,6 @@ pub struct EasyCircle {
 	shy.Circle
 pub mut:
 	stroke   shy.Stroke
-	segments u32
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
@@ -299,6 +297,72 @@ pub fn (e &Easy) circle(ecc EasyCircleConfig) EasyCircle {
 pub fn (q &Quick) circle(ecc EasyCircleConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.circle(ecc).draw()
+}
+
+// Uniform Polygon
+
+[params]
+pub struct EasyUniformPolyConfig {
+	shy.Circle
+pub mut:
+	stroke   shy.Stroke
+	segments u32 = 3
+	rotation f32
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .body | .outline
+	offset   vec.Vec2<f32>
+	origin   shy.Anchor = .center
+}
+
+[noinit]
+pub struct EasyUniformPoly {
+	shy.ShyStruct
+	shy.Circle
+pub mut:
+	stroke   shy.Stroke
+	segments u32 = 3
+	rotation f32
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .body | .outline
+	offset   vec.Vec2<f32>
+	origin   shy.Anchor = .center
+}
+
+[inline]
+pub fn (eup &EasyUniformPoly) draw() {
+	draw := eup.shy.draw()
+	mut d := draw.shape_2d()
+	d.begin()
+	mut up := d.uniform_poly(segments: eup.segments)
+	up.x = eup.x
+	up.y = eup.y
+	up.radius = eup.radius
+	up.stroke = eup.stroke
+	up.rotation = eup.rotation
+	up.scale = eup.scale
+	up.color = eup.color
+	up.fills = eup.fills
+	up.offset = eup.offset
+	up.origin = eup.origin
+	up.draw()
+	d.end()
+}
+
+[inline]
+pub fn (e &Easy) uniform_poly(eupc EasyUniformPolyConfig) EasyUniformPoly {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyUniformPoly{
+		...eupc
+		shy: e.shy
+	}
+}
+
+[inline]
+pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.uniform_poly(eupc).draw()
 }
 
 // Audio sub-system

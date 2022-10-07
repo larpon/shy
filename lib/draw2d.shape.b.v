@@ -74,7 +74,11 @@ pub fn (d2d &DrawShape2D) circle(config DrawShape2DUniformPolygon) DrawShape2DUn
 }
 
 pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
-	return config
+	segments := if config.segments <= 2 { u32(3) } else { config.segments }
+	return DrawShape2DUniformPolygon{
+		...config
+		segments: segments
+	}
 }
 
 // DrawShape2DRect
@@ -303,9 +307,10 @@ pub fn (up &DrawShape2DUniformPolygon) origin_offset() (f32, f32) {
 [inline]
 pub fn (up &DrawShape2DUniformPolygon) draw() {
 	r := up.bbox()
-
+	// A sane default is to let uniform polygons (e.g. circles)
+	// draw from their origin, we compensate for that here
 	x := up.x + r.w * 0.5
-	y := up.y + r.h * 0.5 // r.y + (r.h*0.5)
+	y := up.y + r.h * 0.5
 	radius := up.radius
 	mut segments := up.segments
 	if segments <= 2 {
