@@ -5,6 +5,7 @@ module lib
 
 import shy.vec { Vec2 }
 import shy.mth
+import math
 import shy.thirdparty.sgp
 
 // DrawShape2D
@@ -38,6 +39,22 @@ pub fn (mut d2d DrawShape2D) end() {
 	sgp.end()
 }
 
+fn radius_to_segments(r f32) u32 {
+	div := if r < 20 { u32(4) } else { u32(8) }
+	/*
+	// Logic:
+	if r < 20 {
+		div /= 2
+	}
+	*/
+	$if shy_debug_radius_to_segments ? {
+		segments := u32(mth.ceil(math.tau * r / div))
+		eprintln('Segments: $segments r: $r')
+		return segments
+	}
+	return u32(mth.ceil(math.tau * r / div))
+}
+
 pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
 	return config
 }
@@ -46,7 +63,17 @@ pub fn (d2d &DrawShape2D) line_segment(config DrawShape2DLineSegment) DrawShape2
 	return config
 }
 
-pub fn (d2d &DrawShape2D) circle(config DrawShape2DCircle) DrawShape2DCircle {
+pub fn (d2d &DrawShape2D) circle(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
+	return config
+	/*
+	return DrawShape2DUniformPolygon{
+		...config
+		segments: d2d.radius_to_segments(config.radius)
+	}
+	*/
+}
+
+pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
 	return config
 }
 
@@ -250,13 +277,13 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	sgp.pop_transform()
 }
 
-// DrawShape2DCircle
+// DrawShape2DUniformPolygon
 [params]
-pub struct DrawShape2DCircle {
+pub struct DrawShape2DUniformPolygon {
 	Circle
 pub mut:
 	visible  bool = true
-	segments u32 // a value of 0 to 2 here means "auto"
+	segments u32 // a value of 0 to 2 here will default to 3, use DrawShape2D.radius_to_segments() for automatic calculation
 	color    Color
 	stroke   Stroke
 	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
@@ -267,73 +294,104 @@ pub mut:
 }
 
 [inline]
-pub fn (c DrawShape2DCircle) origin_offset() (f32, f32) {
-	bbox := c.bbox()
-	p_x, p_y := c.origin.pos_wh(bbox.w, bbox.h)
+pub fn (up &DrawShape2DUniformPolygon) origin_offset() (f32, f32) {
+	bbox := up.bbox()
+	p_x, p_y := up.origin.pos_wh(bbox.w, bbox.h)
 	return -p_x, -p_y
 }
 
 [inline]
-pub fn (c DrawShape2DCircle) draw() {
-	r := c.bbox()
+pub fn (up &DrawShape2DUniformPolygon) draw() {
+	r := up.bbox()
 
-	x := r.x
-	y := r.y
-	// w := r.w
-	// h := r.h
-	// sx := 0 // x //* scale_factor
-	// sy := 0 // y //* scale_factor
+	x := up.x + r.w * 0.5
+	y := up.y + r.h * 0.5 // r.y + (r.h*0.5)
+	radius := up.radius
+	mut segments := up.segments
+	if segments <= 2 {
+		// segments = 3
+		segments = radius_to_segments(radius)
+	}
+	sx := 0 // x //* scale_factor
+	sy := 0 // y //* scale_factor
+	o_off_x, o_off_y := up.origin_offset()
 
 	sgp.push_transform()
-	o_off_x, o_off_y := c.origin_offset()
 
 	sgp.translate(o_off_x, o_off_y)
-	sgp.translate(x + c.offset.x, y + c.offset.y)
+	sgp.translate(x + up.offset.x, y + up.offset.y)
 
-	if c.rotation != 0 {
-		sgp.rotate_at(c.rotation, -o_off_x, -o_off_y)
+	if up.rotation != 0 {
+		sgp.rotate_at(up.rotation, -o_off_x, -o_off_y)
 	}
-	if c.scale != 1 {
-		sgp.scale_at(c.scale, c.scale, -o_off_x, -o_off_y)
+	if up.scale != 1 {
+		sgp.scale_at(up.scale, up.scale, -o_off_x, -o_off_y)
 	}
 
-	/*
-	if r.fills.has(.solid) {
-		color := r.colors.solid
+	mut theta := f32(0)
+	mut xx := f32(0)
+	mut yy := f32(0)
+
+	if up.fills.has(.solid) {
+		color := up.color
 		if color.a < 255 {
 			sgp.set_blend_mode(.blend)
 		}
-		c := color.as_f32()
+		col := color.as_f32()
+		sgp.set_color(col.r, col.g, col.b, col.a)
 
-		sgp.set_color(c.r, c.g, c.b, c.a)
-		sgp.draw_filled_rect(sx, sy, w, h)
+		theta = 2.0 * f32(mth.pi)
+		mut px := radius * math.cosf(theta) + sx
+		mut py := radius * math.sinf(theta) + sy
+		for i in 1 .. segments + 1 {
+			theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)
+			xx = radius * math.cosf(theta)
+			yy = radius * math.sinf(theta)
+			sgp.draw_filled_triangle(px, py, xx + sx, yy + sy, sx, sy)
+			px = xx + sx
+			py = yy + sy
+		}
 	}
-	if r.fills.has(.outline) {
-		if r.radius > 1 {
-			m12x, m12y := midpoint(sx, sy, sx + w, sy)
-			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
-			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
-			m41x, m41y := midpoint(sx, sy + h, sx, sy)
-			r.draw_anchor(m12x, m12y, sx + w, sy, m23x, m23y)
-			r.draw_anchor(m23x, m23y, sx + w, sy + h, m34x, m34y)
-			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
-			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
+	if up.fills.has(.outline) {
+		if up.stroke.width > 1 {
+			for i := 0; i < segments; i++ {
+				theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)
+				x1 := sx + (radius * math.cosf(theta))
+				y1 := sy + (radius * math.sinf(theta))
+				theta = 2.0 * f32(mth.pi) * f32(i + 1) / f32(segments)
+				x2 := sx + (radius * math.cosf(theta))
+				y2 := sy + (radius * math.sinf(theta))
+				theta = 2.0 * f32(mth.pi) * f32(i + 2) / f32(segments)
+				x3 := sx + (radius * math.cosf(theta))
+				y3 := sy + (radius * math.sinf(theta))
+
+				m12x, m12y := midpoint(x1, y1, x2, y2)
+				m23x, m23y := midpoint(x2, y2, x3, y3)
+
+				up.draw_anchor(m12x, m12y, x2, y2, m23x, m23y)
+			}
 		} else {
-			color := r.colors.outline
+			color := up.stroke.color
 			if color.a < 255 {
 				sgp.set_blend_mode(.blend)
 			}
-			c := color.as_f32()
+			col := color.as_f32()
+			sgp.set_color(col.r, col.g, col.b, col.a)
 
-			sgp.set_color(c.r, c.g, c.b, c.a)
-
-			sgp.draw_line(sx, sy, (sx + w), sy)
-			sgp.draw_line((sx + w), sy, (sx + w), (sy + h))
-			sgp.draw_line((sx + w), (sy + h), sx, (sy + h))
-			sgp.draw_line(sx, (sy + h), sx, sy)
+			theta = 2.0 * f32(mth.pi)
+			mut px := radius * math.cosf(theta) + sx
+			mut py := radius * math.sinf(theta) + sy
+			for i in 1 .. segments + 1 {
+				theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)
+				xx = radius * math.cosf(theta)
+				yy = radius * math.sinf(theta)
+				sgp.draw_line(px, py, xx, yy)
+				px = xx + sx
+				py = yy + sy
+			}
 		}
 	}
-	*/
+
 	sgp.translate(-x, -y)
 	sgp.pop_transform()
 
@@ -341,8 +399,8 @@ pub fn (c DrawShape2DCircle) draw() {
 }
 
 [inline]
-fn (c DrawShape2DCircle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
-	draw_anchor(c.stroke, x1, y1, x2, y2, x3, y3)
+fn (up &DrawShape2DUniformPolygon) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+	draw_anchor(up.stroke, x1, y1, x2, y2, x3, y3)
 }
 
 // Utils

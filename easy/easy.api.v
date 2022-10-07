@@ -89,9 +89,9 @@ pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 }
 
 [inline]
-pub fn (ed &Quick) text(etc EasyTextConfig) {
-	assert !isnil(ed.easy), 'Easy struct is not initialized'
-	ed.easy.text(etc).draw()
+pub fn (q &Quick) text(etc EasyTextConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.text(etc).draw()
 }
 
 // Shape drawing sub-system
@@ -154,9 +154,9 @@ pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
 }
 
 [inline]
-pub fn (ed &Quick) rect(erc EasyRectConfig) {
-	assert !isnil(ed.easy), 'Easy struct is not initialized'
-	ed.easy.rect(erc).draw()
+pub fn (q &Quick) rect(erc EasyRectConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.rect(erc).draw()
 }
 
 // Line
@@ -230,9 +230,75 @@ pub fn (e &Easy) line_segment(elc EasyLineConfig) EasyLine {
 }
 
 [inline]
-pub fn (ed &Quick) line_segment(elc EasyLineConfig) {
-	assert !isnil(ed.easy), 'Easy struct is not initialized'
-	ed.easy.line_segment(elc).draw()
+pub fn (q &Quick) line_segment(elc EasyLineConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.line_segment(elc).draw()
+}
+
+// Circle
+
+[params]
+pub struct EasyCircleConfig {
+	shy.Circle
+pub mut:
+	stroke   shy.Stroke
+	segments u32
+	rotation f32
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .solid | .outline
+	offset   vec.Vec2<f32>
+	origin   shy.Anchor = .center
+}
+
+[noinit]
+pub struct EasyCircle {
+	shy.ShyStruct
+	shy.Circle
+pub mut:
+	stroke   shy.Stroke
+	segments u32
+	rotation f32
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .solid | .outline
+	offset   vec.Vec2<f32>
+	origin   shy.Anchor = .center
+}
+
+[inline]
+pub fn (ec &EasyCircle) draw() {
+	draw := ec.shy.draw()
+	mut d := draw.shape_2d()
+	d.begin()
+	mut c := d.circle(radius: ec.radius) // NOTE this is here to let radius_to_segments have an effect
+	c.x = ec.x
+	c.y = ec.y
+	// c.radius = ec.radius
+	c.stroke = ec.stroke
+	c.rotation = ec.rotation
+	c.scale = ec.scale
+	c.color = ec.color
+	c.fills = ec.fills
+	c.offset = ec.offset
+	c.origin = ec.origin
+	c.draw()
+	d.end()
+}
+
+[inline]
+pub fn (e &Easy) circle(ecc EasyCircleConfig) EasyCircle {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyCircle{
+		...ecc
+		shy: e.shy
+	}
+}
+
+[inline]
+pub fn (q &Quick) circle(ecc EasyCircleConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.circle(ecc).draw()
 }
 
 // Audio sub-system
@@ -381,9 +447,9 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 }
 
 [inline]
-pub fn (ed &Quick) image(eic EasyImageConfig) {
-	assert !isnil(ed.easy), 'Easy struct is not initialized'
-	ed.easy.image(eic).draw()
+pub fn (q &Quick) image(eic EasyImageConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.image(eic).draw()
 }
 
 // Assets
@@ -403,7 +469,7 @@ pub fn (e &Easy) load(ao shy.AssetOptions) ! {
 }
 
 [inline]
-pub fn (ed &Quick) load(ao shy.AssetOptions) ! {
-	assert !isnil(ed.easy), 'Easy struct is not initialized'
-	ed.easy.load(ao)!
+pub fn (q &Quick) load(ao shy.AssetOptions) ! {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.load(ao)!
 }

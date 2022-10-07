@@ -160,8 +160,11 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	win_w := int(f32(display_bounds[display_index].w) * 0.75)
 	win_h := int(f32(display_bounds[display_index].h) * 0.60)
 
-	x := int(sdl.windowpos_centered_display(u32(display_index))) // display_bounds[display_index].x + display_bounds[display_index].w - win_w
-	y := int(sdl.windowpos_centered_display(u32(display_index))) // display_bounds[display_index].y
+	// x := int(sdl.windowpos_centered_display(u32(display_index)))
+	// y := int(sdl.windowpos_centered_display(u32(display_index)))
+
+	x := display_bounds[display_index].x + ((f32(display_bounds[display_index].w) - win_w) * 0.5)
+	y := display_bounds[display_index].y + ((f32(display_bounds[display_index].h) - win_h) * 0.5)
 
 	window_config := WindowConfig{
 		...s.config.window

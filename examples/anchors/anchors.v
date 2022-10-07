@@ -25,8 +25,8 @@ pub fn (mut a App) frame(dt f64) {
 	win := a.window
 	win_w, win_h := win.wh()
 	a.quick.rect(
-		x: win_w / 2
-		y: win_h / 2
+		x: f32(win_w) * 0.5
+		y: f32(win_h) * 0.5
 		origin: a.origin
 		w: 50
 		h: 50
@@ -34,8 +34,8 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.text(
-		x: win_w / 2
-		y: win_h / 2
+		x: f32(win_w) * 0.5
+		y: f32(win_h) * 0.5
 		origin: .bottom_center
 		// align: .left | .bottom
 		offset: vec.vec2<f32>(0, -50 - 20)
