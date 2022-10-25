@@ -45,11 +45,11 @@ pub fn (v Vec2<T>) add(u Vec2<T>) Vec2<T> {
 }
 
 pub fn (v Vec2<T>) add_f64(scalar f64) Vec2<T> {
-	return Vec2<T>{v.x + scalar, v.y + scalar}
+	return Vec2<T>{v.x + T(scalar), v.y + T(scalar)}
 }
 
 pub fn (v Vec2<T>) add_f32(scalar f32) Vec2<T> {
-	return Vec2<T>{v.x + scalar, v.y + scalar}
+	return Vec2<T>{v.x + T(scalar), v.y + T(scalar)}
 }
 
 pub fn (mut v Vec2<T>) plus(u Vec2<T>) {
@@ -99,7 +99,7 @@ pub fn (v Vec2<T>) mul(u Vec2<T>) Vec2<T> {
 }
 
 pub fn (v Vec2<T>) mul_f64(scalar f64) Vec2<T> {
-	return Vec2<T>{v.x * scalar, v.y * scalar}
+	return Vec2<T>{v.x * T(scalar), v.y * T(scalar)}
 }
 
 pub fn (mut v Vec2<T>) multiply(u Vec2<T>) {
@@ -108,8 +108,8 @@ pub fn (mut v Vec2<T>) multiply(u Vec2<T>) {
 }
 
 pub fn (mut v Vec2<T>) multiply_f64(scalar f64) {
-	v.x *= scalar
-	v.y *= scalar
+	v.x *= T(scalar)
+	v.y *= T(scalar)
 }
 
 //
@@ -124,7 +124,7 @@ pub fn (v Vec2<T>) div(u Vec2<T>) Vec2<T> {
 }
 
 pub fn (v Vec2<T>) div_f64(scalar f64) Vec2<T> {
-	return Vec2<T>{v.x / scalar, v.y / scalar}
+	return Vec2<T>{v.x / T(scalar), v.y / T(scalar)}
 }
 
 pub fn (mut v Vec2<T>) divide(u Vec2<T>) {
