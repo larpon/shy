@@ -12,7 +12,7 @@ pub const (
 
 struct Defaults {
 pub:
-	render struct  {
+	render struct {
 	pub:
 		update_rate         f64 = 60.0
 		update_multiplicity u8  = 1
@@ -22,29 +22,29 @@ pub:
 		msaa                int = 4
 	}
 
-	fonts struct  {
+	fonts struct {
 	pub:
 		preallocate u8 = 4
 	}
 
-	font struct  {
+	font struct {
 	pub:
 		name string = 'default'
 		size f32    = 20
 		// align TextAlign = .baseline | .left // TODO V BUG
 	}
 
-	audio struct  {
+	audio struct {
 	pub:
 		engines u8 = 1
 	}
 
-	input struct  {
+	input struct {
 	pub:
 		mice bool = false // Support multiple mouse input devices
 	}
 
-	window struct  {
+	window struct {
 	pub:
 		title     string = 'Shy Window'
 		resizable bool   = true // Root window is resizable, can be toggled at run time

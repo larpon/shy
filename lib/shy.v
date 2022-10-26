@@ -9,10 +9,10 @@ import shy.log { Log }
 pub const null = unsafe { nil }
 
 pub const (
-	half = f32(0.5)
-	quarter = f32(0.25)
+	half           = f32(0.5)
+	quarter        = f32(0.25)
 	three_quarters = f32(0.75)
-	one = f32(1.0)
+	one            = f32(1.0)
 )
 
 const vet_tag = 'VET'

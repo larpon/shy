@@ -12,17 +12,21 @@ const (
 	label_error    = 'ERROR'
 	label_debug    = 'DEBUG'
 	label_critical = 'CRITICAL'
-	default_flags  = $if prod {
-		Flag.log | .std_err | .error | .critical | .custom
-	} $else {
-		Flag.log | .std_err | .info | .warn | .error | .critical | .custom
-	}
+	default_flags  = get_default_flags_workaround()
 )
 
 // TODO
 [markused]
 fn todo_() {
 	_ := log.default_flags
+}
+
+fn get_default_flags_workaround() Flag {
+	return $if prod {
+		Flag.log | .std_err | .error | .critical | .custom
+	} $else {
+		Flag.log | .std_err | .info | .warn | .error | .critical | .custom
+	}
 }
 
 [flag]
