@@ -111,15 +111,15 @@ pub struct InputConfig {
 	mice bool = lib.defaults.input.mice
 }
 
-pub fn config_from_toml_file(path string) ?Config {
+pub fn config_from_toml_file(path string) !Config {
 	toml_text := os.read_file(path) or {
 		return error(@MOD + '.' + @FN + ' Could not read "$path": "$err.msg()"')
 	}
 	return config_from_toml_text(toml_text)
 }
 
-pub fn config_from_toml_text(toml_text string) ?Config {
-	toml_doc := toml.parse_text(toml_text)?
+pub fn config_from_toml_text(toml_text string) !Config {
+	toml_doc := toml.parse_text(toml_text)!
 	toml_wc := toml_doc.value('shy.window')
 	//
 	toml_rend_c := toml_doc.value('shy.render')
