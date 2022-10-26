@@ -26,18 +26,16 @@ pub fn (mut a App) frame(dt f64) {
 	mut win := a.shy.active_window()
 	mouse := a.mouse
 
-	mut colors := shy.ShapeColors{}
+	mut color := shy.Color{}
 	if win.id == 0 {
-		colors = shy.ShapeColors{
-			solid: shy.colors.shy.blue
-		}
+		color = shy.colors.shy.blue
 	}
 	a.quick.rect(
 		x: (win.width() / 2) - 50
 		y: (win.height() / 2) - 50
 		w: 100
 		h: 100
-		colors: colors
+		color: color
 	)
 
 	a.quick.text(
