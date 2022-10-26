@@ -1,4 +1,4 @@
-# Introduction
+<img src="logo.svg" width="128"/>
 
-Shy is an opinionated foundation for creative coding and game development written in V.
-
+# Shy
+An opinionated foundation for creative coding and game development written in V.
