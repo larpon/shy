@@ -6,6 +6,7 @@ module main
 import os
 import flag
 import shy.cli
+import shy.export
 
 fn main() {
 	// Collect user flags in an extended manner.
@@ -66,4 +67,16 @@ fn main() {
 	opt.validate_env() or { panic(err) }
 
 	// input_ext := os.file_ext(opt.input)
+	if opt.verbosity > 2 {
+		dump(opt)
+	}
+
+	// TODO move to separate external tool
+	if opt.export {
+		export_opts := opt.to_export_options()
+		export.export(export_opts) or {
+			eprintln('Error while exporting `$export_opts.input`: $err')
+			exit(1)
+		}
+	}
 }

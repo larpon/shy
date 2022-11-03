@@ -1,3 +1,6 @@
+// Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
+// Use of this source code is governed by an MIT license
+// that can be found in the LICENSE file.
 module cli
 
 import os
@@ -27,7 +30,7 @@ Sub-commands:
 	exe_git_hash         = shy_commit_hash()
 	work_directory       = shy_tmp_work_dir()
 	cache_directory      = shy_cache_dir()
-	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', '-showcc']
+	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', 'export', '-showcc']
 	subcmds              = ['complete', 'test-cleancode']
 	accepted_input_files = ['.v']
 )
@@ -75,6 +78,14 @@ pub fn launch_cmd(args []string) ! {
 	}
 	v := vxt.vexe()
 	tool_exe := os.join_path(cli.exe_dir, 'cmd', cmd)
+	mut tool_src := tool_exe
+	if !os.is_dir(tool_src) {
+		if os.is_file(tool_src + '.v') {
+			tool_src += '.v'
+		} else {
+			return error('${@MOD}.${@FN}: could not find source for "$cmd"')
+		}
+	}
 	if os.is_executable(v) {
 		hash_file := os.join_path(cli.exe_dir, 'cmd', '.' + cmd + '.hash')
 
@@ -85,9 +96,9 @@ pub fn launch_cmd(args []string) ! {
 		if hash != cli.exe_git_hash {
 			v_cmd := [
 				v,
-				tool_exe + '.v',
 				'-o',
 				tool_exe,
+				tool_src,
 			]
 			res := os.execute(v_cmd.join(' '))
 			if res.exit_code < 0 {
@@ -109,7 +120,7 @@ pub fn launch_cmd(args []string) ! {
 			// no way to implement os.execvp in JS backend
 			exit(os.system('$tool_exe $tool_args'))
 		} $else {
-			os.execvp(tool_exe, args) or { panic(err) }
+			os.execvp(tool_exe, args) or { return err }
 		}
 		exit(2)
 	}

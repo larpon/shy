@@ -2,6 +2,7 @@ module cli
 
 import os
 import flag
+import shy.export
 
 pub struct Options {
 pub:
@@ -10,6 +11,7 @@ pub:
 	work_dir  string = work_directory
 	//
 	run          bool
+	export       bool
 	parallel     bool = true // Run, what can be run, in parallel
 	cache        bool // defaults to false in os.args/flag parsing phase
 	gles_version int  // = android.default_gles_version
@@ -98,7 +100,6 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 	fp.skip_executable()
 
 	mut verbosity := fp.int_opt('verbosity', `v`, 'Verbosity level 1-3') or { defaults.verbosity }
-	// TODO implement FlagParser 'is_sat(name string) bool' or something in vlib for this usecase?
 	if ('-v' in args || 'verbosity' in args) && verbosity == 0 {
 		verbosity = 1
 	}
@@ -111,6 +112,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 		gles_version: fp.int('gles', 0, defaults.gles_version, 'GLES version to use from any of 2,3')
 		//
 		run: 'run' in cmd_flags
+		export: 'export' in cmd_flags
 		dump_usage: fp.bool('help', `h`, defaults.dump_usage, 'Show this help message and exit')
 		cache: !fp.bool('nocache', 0, defaults.cache, 'Do not use build cache')
 		//
@@ -144,4 +146,20 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 	opt.v_flags = v_flags
 
 	return opt, fp
+}
+
+pub fn (opt &Options) to_export_options() export.Options {
+	opts := export.Options {
+		verbosity: opt.verbosity
+		work_dir: os.join_path(opt.work_dir,'export')
+		parallel: opt.parallel
+		cache: opt.cache
+		gles_version: opt.gles_version
+		input: opt.input
+		output: opt.output
+		is_prod:opt.is_prod
+		c_flags: opt.c_flags
+		v_flags: opt.v_flags
+	}
+	return opts
 }
