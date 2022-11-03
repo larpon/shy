@@ -147,7 +147,7 @@ pub fn string_to_export_format(str string) !Format {
 
 fn export_appimage(opt Options) ! {
 	appimagetool_url := 'https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage'
-	appimagetool := os.join_path(ensure_cache_dir()!,'appimagetool')
+	mut appimagetool := os.join_path(ensure_cache_dir()!,'appimagetool')
 	if !os.exists(appimagetool) {
 		if opt.verbosity > 0 {
 			eprintln('Downloading `appimagetool` to "$appimagetool"...')
@@ -156,7 +156,23 @@ fn export_appimage(opt Options) ! {
 			return error('${@MOD}.${@FN}: failed to download "$appimagetool_url": $err')
 		}
 		os.chmod(appimagetool, 0o775) ! // make it executable
+
+		pwd := os.getwd()
+		os.chdir(ensure_cache_dir()!) !
+		appimagetool_extract_cmd := [
+			appimagetool,
+			'--appimage-extract',
+		]
+		aite_res := os.execute(appimagetool_extract_cmd.join(' '))
+		if aite_res.exit_code != 0 {
+			aite_cmd := appimagetool_extract_cmd.join(' ')
+			return error('${@MOD}.${@FN}: "{aite_cmd}" failed: {aite_res.output}')
+		}
+		os.chdir(pwd) !
+
+		appimagetool = os.join_path(ensure_cache_dir()!,'squashfs-root','AppRun')
 	}
+
 
 	// Build V input app for host platform
 	v_app := os.join_path(opt.work_dir,'v_app')
