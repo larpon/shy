@@ -274,12 +274,9 @@ exec "${EXEC}" "$@"'
 	os.chmod(app_run_path, 0o775)! // make it executable
 
 	// Resolve dependencies
-	//
-	mut so_excludes := [
-		//'linux-vdso.so.1',
-		//'ld-linux-x86-64.so.2',
-	]
-	string{}
+	mut so_excludes := []string{}
+	// so_excludes << 'linux-vdso.so.1',
+	// so_excludes << 'ld-linux-x86-64.so.2',
 	so_excludes << appimage_exclude_list(opt.verbosity)!
 
 	mut skip_resolve := [
@@ -314,6 +311,23 @@ exec "${EXEC}" "$@"'
 	app_exe := os.join_path(app_dir_path, 'usr', 'bin', app_name)
 	os.mv(v_app, app_exe)!
 
+	// strip exe
+	strip_exe := os.find_abs_path_of_executable('strip') or { '' }
+	if os.is_executable(strip_exe) {
+		if opt.verbosity > 0 {
+			eprintln('Running {strip_exe} "{app_exe}"...')
+		}
+		strip_cmd := [
+			'{strip_exe}',
+			'"{app_exe}"',
+		]
+		strip_res := os.execute(strip_cmd.join(' '))
+		if strip_res.exit_code != 0 {
+			cmd := strip_cmd.join(' ')
+			return error('{@MOD}.{@FN}: "{cmd}" failed: {strip_res.output}')
+		}
+	}
+
 	// Compress exe
 	if opt.compress {
 		if opt.verbosity > 0 {
@@ -322,7 +336,7 @@ exec "${EXEC}" "$@"'
 		upx_cmd := [
 			'upx',
 			'-9',
-			app_exe,
+			'"{app_exe}"',
 		]
 		upx_res := os.execute(upx_cmd.join(' '))
 		if upx_res.exit_code != 0 {
