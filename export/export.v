@@ -12,9 +12,9 @@ fn tmp_work_dir() string {
 }
 
 fn ensure_cache_dir() !string {
-	dir := os.join_path(os.cache_dir(),'shy','export')
+	dir := os.join_path(os.cache_dir(), 'shy', 'export')
 	if !os.is_dir(dir) {
-		os.mkdir_all(dir) !
+		os.mkdir_all(dir)!
 	}
 	return dir
 }
@@ -33,7 +33,7 @@ pub enum Format {
 
 pub fn (f Format) ext() string {
 	return match f {
-		.zip{
+		.zip {
 			'zip'
 		}
 		.directory {
@@ -61,18 +61,18 @@ pub:
 	gles_version int  // = android.default_gles_version
 pub mut:
 	// I/O
-	input           string
-	output          string
-	format          Format
-	variant         Variant
-	is_prod         bool
-	c_flags         []string // flags passed to the C compiler(s)
-	v_flags         []string // flags passed to the V compiler
+	input   string
+	output  string
+	format  Format
+	variant Variant
+	is_prod bool
+	c_flags []string // flags passed to the C compiler(s)
+	v_flags []string // flags passed to the V compiler
 }
 
 // resolve_output returns the path/file and format of the export.
-fn (opt &Options) resolve_output() !(string,Format) {
-	mut	output := opt.output
+fn (opt &Options) resolve_output() !(string, Format) {
+	mut output := opt.output
 	// If no specific output file is given, we use the input file
 	if output == '' {
 		output = opt.input
@@ -84,7 +84,7 @@ fn (opt &Options) resolve_output() !(string,Format) {
 		format = string_to_export_format(ext)!
 		return output, format
 	}
-	return output+'.'+format.ext(), format
+	return output + '.' + format.ext(), format
 }
 
 pub fn export(opt &Options) ! {
@@ -93,7 +93,7 @@ pub fn export(opt &Options) ! {
 	}
 
 	if !os.is_dir(opt.work_dir) {
-		os.mkdir_all(opt.work_dir) !
+		os.mkdir_all(opt.work_dir)!
 	}
 
 	// Determine output path/file and format.
@@ -110,12 +110,8 @@ pub fn export(opt &Options) ! {
 	}
 	uos := os.user_os()
 	match format {
-		.zip {
-
-		}
-		.directory {
-
-		}
+		.zip {}
+		.directory {}
 		.appimage, .appimage_dir {
 			if uos != 'linux' {
 				return error('${@MOD}.${@FN}: AppImage format is only supported on Linux hosts')
@@ -147,7 +143,7 @@ pub fn string_to_export_format(str string) !Format {
 
 fn export_appimage(opt Options) ! {
 	appimagetool_url := 'https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage'
-	mut appimagetool := os.join_path(ensure_cache_dir()!,'appimagetool')
+	mut appimagetool := os.join_path(ensure_cache_dir()!, 'appimagetool')
 	if !os.exists(appimagetool) {
 		if opt.verbosity > 0 {
 			eprintln('Downloading `appimagetool` to "$appimagetool"...')
@@ -155,10 +151,10 @@ fn export_appimage(opt Options) ! {
 		http.download_file(appimagetool_url, appimagetool) or {
 			return error('${@MOD}.${@FN}: failed to download "$appimagetool_url": $err')
 		}
-		os.chmod(appimagetool, 0o775) ! // make it executable
+		os.chmod(appimagetool, 0o775)! // make it executable
 
 		pwd := os.getwd()
-		os.chdir(ensure_cache_dir()!) !
+		os.chdir(ensure_cache_dir()!)!
 		appimagetool_extract_cmd := [
 			appimagetool,
 			'--appimage-extract',
@@ -168,14 +164,13 @@ fn export_appimage(opt Options) ! {
 			aite_cmd := appimagetool_extract_cmd.join(' ')
 			return error('${@MOD}.${@FN}: "{aite_cmd}" failed: {aite_res.output}')
 		}
-		os.chdir(pwd) !
+		os.chdir(pwd)!
 
-		appimagetool = os.join_path(ensure_cache_dir()!,'squashfs-root','AppRun')
+		appimagetool = os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
 	}
 
-
 	// Build V input app for host platform
-	v_app := os.join_path(opt.work_dir,'v_app')
+	v_app := os.join_path(opt.work_dir, 'v_app')
 	if opt.verbosity > 0 {
 		eprintln('Building app to "$v_app"...')
 	}
@@ -196,7 +191,7 @@ fn export_appimage(opt Options) ! {
 	// https://docs.appimage.org/packaging-guide/manual.html
 	//
 	app_name := os.file_name(opt.input).all_before_last('.')
-	app_dir_path := os.join_path(opt.work_dir,'{app_name}.AppDir')
+	app_dir_path := os.join_path(opt.work_dir, '{app_name}.AppDir')
 	if os.exists(app_dir_path) {
 		os.rmdir_all(app_dir_path)!
 	}
@@ -209,30 +204,30 @@ fn export_appimage(opt Options) ! {
 	sub_dirs := [
 		os.join_path('bin'),
 		os.join_path('usr'),
-		os.join_path('usr','bin'),
-		os.join_path('usr','sbin'),
-		os.join_path('usr','games'),
-		os.join_path('usr','share'),
-		os.join_path('usr','local'),
-		os.join_path('usr','local','lib'),
-		os.join_path('usr','lib'),
-		os.join_path('usr','lib','perl5'),
-		os.join_path('usr','lib','i386-linux-gnu'),
-		os.join_path('usr','lib','x86_64-linux-gnu'),
-		os.join_path('usr','lib32'),
-		os.join_path('usr','lib64'),
+		os.join_path('usr', 'bin'),
+		os.join_path('usr', 'sbin'),
+		os.join_path('usr', 'games'),
+		os.join_path('usr', 'share'),
+		os.join_path('usr', 'local'),
+		os.join_path('usr', 'local', 'lib'),
+		os.join_path('usr', 'lib'),
+		os.join_path('usr', 'lib', 'perl5'),
+		os.join_path('usr', 'lib', 'i386-linux-gnu'),
+		os.join_path('usr', 'lib', 'x86_64-linux-gnu'),
+		os.join_path('usr', 'lib32'),
+		os.join_path('usr', 'lib64'),
 		os.join_path('lib'),
-		os.join_path('lib','i386-linux-gnu'),
-		os.join_path('lib','x86_64-linux-gnu'),
+		os.join_path('lib', 'i386-linux-gnu'),
+		os.join_path('lib', 'x86_64-linux-gnu'),
 		os.join_path('lib32'),
 		os.join_path('lib64'),
 	]
 	for sub_dir in sub_dirs {
-		os.mkdir_all(os.join_path(app_dir_path,sub_dir))!
+		os.mkdir_all(os.join_path(app_dir_path, sub_dir))!
 	}
 
 	// Write .desktop file entry
-	desktop_path := os.join_path(app_dir_path,'{app_name}.desktop')
+	desktop_path := os.join_path(app_dir_path, '{app_name}.desktop')
 	desktop_contents := '[Desktop Entry]
 Name={app_name}
 Exec={app_name}
@@ -247,8 +242,8 @@ Categories=Game;'
 	// TODO desktop-file-validate your.desktop ??
 
 	// Copy icon TODO
-	shy_icon := os.join_path(@VMODROOT,'logo.svg')
-	app_icon := os.join_path(app_dir_path,'{app_name}'+os.file_ext(shy_icon))
+	shy_icon := os.join_path(@VMODROOT, 'logo.svg')
+	app_icon := os.join_path(app_dir_path, '{app_name}' + os.file_ext(shy_icon))
 	os.cp(shy_icon, app_icon) or {
 		return error('failed to copy "{shy_icon}" to "{app_icon}": $err')
 	}
@@ -258,8 +253,9 @@ Categories=Game;'
 	// Suggested:
 	// https://github.com/AppImage/AppImageKit/blob/master/resources/AppRun
 	//
-	app_run_path := os.join_path(app_dir_path,'AppRun')
-	app_run_contents := r'#!/bin/sh
+	app_run_path := os.join_path(app_dir_path, 'AppRun')
+	app_run_contents :=
+		r'#!/bin/sh
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin/:${HERE}/usr/sbin/:${HERE}/usr/games/:${HERE}/bin/:${HERE}/sbin/${PATH:+:$PATH}"
@@ -269,18 +265,21 @@ export XDG_DATA_DIRS="${HERE}/usr/share/${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
 export PERLLIB="${HERE}/usr/share/perl5/:${HERE}/usr/lib/perl5/${PERLLIB:+:$PERLLIB}"
 export GSETTINGS_SCHEMA_DIR="${HERE}/usr/share/glib-2.0/schemas/${GSETTINGS_SCHEMA_DIR:+:$GSETTINGS_SCHEMA_DIR}"
 export QT_PLUGIN_PATH="${HERE}/usr/lib/qt4/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt4/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt4/plugins/:${HERE}/usr/lib32/qt4/plugins/:${HERE}/usr/lib64/qt4/plugins/:${HERE}/usr/lib/qt5/plugins/:${HERE}/usr/lib/i386-linux-gnu/qt5/plugins/:${HERE}/usr/lib/x86_64-linux-gnu/qt5/plugins/:${HERE}/usr/lib32/qt5/plugins/:${HERE}/usr/lib64/qt5/plugins/${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
-EXEC=$(grep -e '+"'^Exec=.*'"+r' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2 | cut -d " " -f 1)
+EXEC=$(grep -e ' +
+		"'^Exec=.*'" +
+		r' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2 | cut -d " " -f 1)
 exec "${EXEC}" "$@"'
 
 	os.write_file(app_run_path, app_run_contents)!
-	os.chmod(app_run_path, 0o775) ! // make it executable
+	os.chmod(app_run_path, 0o775)! // make it executable
 
 	// Resolve dependencies
 	//
 	mut so_excludes := [
-    	//'linux-vdso.so.1',
-    	//'ld-linux-x86-64.so.2',
-	]string{}
+		//'linux-vdso.so.1',
+		//'ld-linux-x86-64.so.2',
+	]
+	string{}
 	so_excludes << appimage_exclude_list(opt.verbosity)!
 
 	mut skip_resolve := [
@@ -296,10 +295,9 @@ exec "${EXEC}" "$@"'
 	}
 	dependencies := resolve_dependencies(rd_config)!
 	dump(dependencies)
-
 	for _, lib_path in dependencies {
-		app_lib_dir := os.join_path(app_dir_path,os.dir(lib_path).all_after('/'))
-		mut app_lib := os.join_path(app_lib_dir,os.file_name(lib_path))
+		app_lib_dir := os.join_path(app_dir_path, os.dir(lib_path).all_after('/'))
+		mut app_lib := os.join_path(app_lib_dir, os.file_name(lib_path))
 		mut lib_real_path := lib_path
 		if os.is_link(lib_real_path) {
 			lib_real_path = os.real_path(lib_real_path)
@@ -313,7 +311,7 @@ exec "${EXEC}" "$@"'
 	}
 
 	// Move v_app to .AppDir
-	app_exe := os.join_path(app_dir_path,'usr','bin',app_name)
+	app_exe := os.join_path(app_dir_path, 'usr', 'bin', app_name)
 	os.mv(v_app, app_exe)!
 
 	// Compress exe
@@ -335,7 +333,7 @@ exec "${EXEC}" "$@"'
 
 	// Clean up empty dirs
 	for sub_dir in sub_dirs.reverse() {
-		rmdir_path := os.join_path(app_dir_path,sub_dir)
+		rmdir_path := os.join_path(app_dir_path, sub_dir)
 		if os.is_dir(rmdir_path) && os.is_dir_empty(rmdir_path) {
 			if opt.verbosity > 2 {
 				eprintln('Removing empty dir "{rmdir_path}"')
@@ -346,7 +344,7 @@ exec "${EXEC}" "$@"'
 
 	if opt.verbosity > 1 {
 		eprintln('Created .AppDir:')
-		os.walk(app_dir_path, fn (path string){
+		os.walk(app_dir_path, fn (path string) {
 			eprintln('{path}')
 		})
 	}
@@ -370,7 +368,7 @@ exec "${EXEC}" "$@"'
 		ait_cmd := appimagetool_cmd.join(' ')
 		return error('${@MOD}.${@FN}: "{ait_cmd}" failed: {ait_res.output}')
 	}
-	os.chmod(output, 0o775) ! // make it executable
+	os.chmod(output, 0o775)! // make it executable
 }
 
 // pub struct Dependency{
@@ -378,13 +376,13 @@ exec "${EXEC}" "$@"'
 // 	// { 'so':so, 'path':path, 'realpath':realpath, 'dependants':set([executable]), 'type':'lib' }
 // }
 
-struct ResolveDependenciesConfig{
-	verbosity int
-	indent int
-	exe string
-	excludes []string
+struct ResolveDependenciesConfig {
+	verbosity    int
+	indent       int
+	exe          string
+	excludes     []string
 	skip_resolve []string
-	format Format
+	format       Format
 }
 
 fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDependenciesConfig) ! {
@@ -416,11 +414,11 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 	verbosity := config.verbosity
 	indent := config.indent
-	mut root_indents := '  '.repeat(indent)+' '
+	mut root_indents := '  '.repeat(indent) + ' '
 	if indent == 0 {
 		root_indents = ''
 	}
-	indents := '  '.repeat(indent+1)+' '
+	indents := '  '.repeat(indent + 1) + ' '
 	executable := config.exe
 	excludes := config.excludes
 	skip_resolve := config.skip_resolve
@@ -430,8 +428,8 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		eprintln('{root_indents}{base} (included)')
 	}
 	objdump_cmd := [
-		'objdump'
-		'-x'
+		'objdump',
+		'-x',
 		executable,
 	]
 	od_res := os.execute(objdump_cmd.join(' '))
@@ -494,11 +492,10 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 			resolved_deps[so_name] = path
 		}
 
-		//if _ := deps[so_name] {
-			// Could add to "dependants" here
+		// if _ := deps[so_name] {
+		// Could add to "dependants" here
 		//	continue
 		//}
-
 	}
 
 	for so_name, path in resolved_deps {
@@ -514,7 +511,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		conf := ResolveDependenciesConfig{
 			...config
 			exe: path
-			indent: indent+1
+			indent: indent + 1
 		}
 		resolve_dependencies_recursively(mut deps, conf)!
 	}
@@ -533,14 +530,15 @@ pub fn appimage_exclude_list(verbosity int) ![]string {
 	// https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/master/excludelist
 	// Previously at: https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist
 	excludes_url := 'https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/master/excludelist'
-	excludes_path := os.join_path(ensure_cache_dir()!,'excludes')
+	excludes_path := os.join_path(ensure_cache_dir()!, 'excludes')
 	if !os.exists(excludes_path) {
 		if verbosity > 0 {
-		 	eprintln('Downloading `excludes` to "$excludes_path"...')
+			eprintln('Downloading `excludes` to "$excludes_path"...')
 		}
 		http.download_file(excludes_url, excludes_path) or {
 			return error('${@MOD}.${@FN}: failed to download "$excludes_url": $err')
 		}
 	}
-	return os.read_lines(excludes_path) or {[]string{}}.filter(it.trim_space() != '' && !it.trim_space().starts_with('#'))
+	return os.read_lines(excludes_path) or { []string{} }.filter(it.trim_space() != ''
+		&& !it.trim_space().starts_with('#'))
 }

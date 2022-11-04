@@ -149,15 +149,15 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 }
 
 pub fn (opt &Options) to_export_options() export.Options {
-	opts := export.Options {
+	opts := export.Options{
 		verbosity: opt.verbosity
-		work_dir: os.join_path(opt.work_dir,'export')
+		work_dir: os.join_path(opt.work_dir, 'export')
 		parallel: opt.parallel
 		cache: opt.cache
 		gles_version: opt.gles_version
 		input: opt.input
 		output: opt.output
-		is_prod:opt.is_prod
+		is_prod: opt.is_prod
 		c_flags: opt.c_flags
 		v_flags: opt.v_flags
 	}
