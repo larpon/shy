@@ -6,7 +6,7 @@ module lib
 import shy.vec { Vec2 }
 import shy.mth
 // Required for font rendering
-import shy.wraps.sokol.gl as sgl
+import shy.wraps.sokol.gl
 import shy.wraps.sokol.sfons
 
 // DrawText
@@ -21,14 +21,14 @@ pub fn (mut dt DrawText) begin() {
 	win := dt.shy.active_window()
 	w, h := win.drawable_wh()
 
-	sgl.defaults()
+	gl.defaults()
 
 	mut fonts := unsafe { win.fonts }
 	fc := fonts.get_context()
-	sgl.set_context(fc.sgl)
+	gl.set_context(fc.sgl)
 
-	sgl.matrix_mode_projection()
-	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+	gl.matrix_mode_projection()
+	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 
 	//¤ FLOOD dt.shy.log.gdebug('${@STRUCT}.${@FN}', 'begin ${ptr_str(fc.fsc)}...')
 	dt.font_context = fc
@@ -45,7 +45,7 @@ pub fn (mut dt DrawText) end() {
 		fc.end()
 		dt.font_context = null
 	}
-	sgl.draw()
+	gl.draw()
 }
 
 pub fn (mut dt DrawText) text_2d() Draw2DText {
@@ -257,14 +257,14 @@ pub fn (t Draw2DText) draw() {
 		x := f32(int(t.x + t.offset.x + off_x))
 		y := f32(int(t.y + t.offset.y + off_y + y_accu))
 
-		sgl.push_matrix()
-		sgl.translate(x, y, 0)
+		gl.push_matrix()
+		gl.translate(x, y, 0)
 
 		if t.rotation != 0 {
-			sgl.rotate(t.rotation * mth.deg2rad, 0, 0, 1)
+			gl.rotate(t.rotation * mth.deg2rad, 0, 0, 1)
 		}
 		if t.scale != 1 {
-			sgl.scale(t.scale, t.scale, 0)
+			gl.scale(t.scale, t.scale, 0)
 		}
 		font_context.draw_text(0, 0, line)
 
@@ -281,30 +281,30 @@ pub fn (t Draw2DText) draw() {
 			}
 		}
 
-		sgl.translate(-x, -y, 0)
-		sgl.pop_matrix()
+		gl.translate(-x, -y, 0)
+		gl.pop_matrix()
 	}
 }
 
 [inline; if shy_debug_draw ?]
 fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
-	sgl.begin_line_strip()
-	sgl.v2f(x1, y1)
-	sgl.v2f(x2, y2)
-	sgl.end()
+	gl.begin_line_strip()
+	gl.v2f(x1, y1)
+	gl.v2f(x2, y2)
+	gl.end()
 }
 
 [inline; if shy_debug_draw ?]
 fn (t Draw2DText) dbg_draw_rect(r Rect) {
-	sgl.begin_line_strip()
-	sgl.v2f(r.x, r.y)
-	sgl.v2f(r.x + r.w, r.y)
-	sgl.v2f(r.x + r.w, r.y)
-	sgl.v2f(r.x + r.w, r.y + r.h)
-	sgl.v2f(r.x + r.w, r.y + r.h)
-	sgl.v2f(r.x, r.y + r.h)
-	sgl.v2f(r.x, r.y)
-	sgl.end()
+	gl.begin_line_strip()
+	gl.v2f(r.x, r.y)
+	gl.v2f(r.x + r.w, r.y)
+	gl.v2f(r.x + r.w, r.y)
+	gl.v2f(r.x + r.w, r.y + r.h)
+	gl.v2f(r.x + r.w, r.y + r.h)
+	gl.v2f(r.x, r.y + r.h)
+	gl.v2f(r.x, r.y)
+	gl.end()
 }
 
 [inline]

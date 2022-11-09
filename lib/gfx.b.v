@@ -4,8 +4,8 @@
 module lib
 
 import shy.wraps.sokol.gfx
-import shy.wraps.sokol.gl as sgl
-import shy.wraps.sgp
+import shy.wraps.sokol.gl
+import shy.wraps.sokol.gp
 
 pub struct GFX {
 	ShyStruct
@@ -42,22 +42,22 @@ pub fn (mut g GFX) init_subsystems() ! {
 
 	// sokol_gl is used by the font and image system
 	sample_count := s.config.render.msaa
-	sgl_desc := &sgl.Desc{
+	sgl_desc := &gl.Desc{
 		context_pool_size: 2 * 512 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 2 * 1024 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		sample_count: sample_count
 	}
-	sgl.setup(sgl_desc)
+	gl.setup(sgl_desc)
 
 	// Initialize Sokol GP which is used for shape drawing.
 	// TODO Adjust the size of command buffers.
-	sgp_desc := sgp.Desc{
+	sgp_desc := gp.Desc{
 		// max_vertices: 1_000_000
 		// max_commands: 100_000
 	}
-	sgp.setup(&sgp_desc)
-	if !sgp.is_valid() {
-		error_msg := unsafe { cstring_to_vstring(sgp.get_error_message(sgp.get_last_error())) }
+	gp.setup(&sgp_desc)
+	if !gp.is_valid() {
+		error_msg := unsafe { cstring_to_vstring(gp.get_error_message(gp.get_last_error())) }
 		panic('Failed to create Sokol GP context:\n$error_msg')
 	}
 }
@@ -65,8 +65,8 @@ pub fn (mut g GFX) init_subsystems() ! {
 pub fn (mut g GFX) shutdown_subsystems() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'bye')
-	sgp.shutdown()
-	sgl.shutdown()
+	gp.shutdown()
+	gl.shutdown()
 }
 
 pub fn (mut g GFX) shutdown() ! {

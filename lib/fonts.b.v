@@ -8,7 +8,7 @@ module lib
 import os
 import shy.wraps.fontstash
 import shy.wraps.sokol.sfons
-import shy.wraps.sokol.gl as sgl
+import shy.wraps.sokol.gl
 
 struct Fonts {
 	ShyStruct
@@ -30,7 +30,7 @@ struct FontContext {
 mut:
 	in_use bool
 	fsc    &fontstash.Context
-	sgl    sgl.Context
+	sgl    gl.Context
 	fonts  map[string]int
 }
 
@@ -80,7 +80,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	}
 
 	sample_count := config.render.msaa
-	sgl_context_desc := sgl.ContextDesc{
+	sgl_context_desc := gl.ContextDesc{
 		sample_count: sample_count
 	} // TODO apply values for max_vertices etc.
 
@@ -92,7 +92,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 			allocator: unsafe { nil }
 		}
 		fons_context := sfons.create(&fons_desc)
-		sgl_context := sgl.make_context(&sgl_context_desc)
+		sgl_context := gl.make_context(&sgl_context_desc)
 		// Default context
 		mut context := &FontContext{
 			fsc: fons_context

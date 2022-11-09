@@ -5,7 +5,7 @@ module lib
 
 import shy.mth
 import shy.vec { Vec2 }
-import shy.wraps.sgp
+import shy.wraps.sokol.gp
 
 // DrawImage
 
@@ -32,15 +32,15 @@ pub fn (mut di DrawImage) begin() {
 	// ratio := f32(w)/f32(h)
 
 	// Begin recording draw commands for a frame buffer of size (width, height).
-	sgp.begin(w, h)
+	gp.begin(w, h)
 
 	// Set frame buffer drawing region to (0,0,width,height).
-	sgp.viewport(0, 0, w, h)
+	gp.viewport(0, 0, w, h)
 	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
-	// sgp.project(-ratio, ratio, 1.0, -1.0)
-	// sgp.project(0, 0, w, h)
+	// gp.project(-ratio, ratio, 1.0, -1.0)
+	// gp.project(0, 0, w, h)
 
-	sgp.reset_project()
+	gp.reset_project()
 }
 
 pub fn (mut di DrawImage) end() {
@@ -52,9 +52,9 @@ pub fn (mut di DrawImage) end() {
 	*/
 
 	// Dispatch all draw commands to Sokol GFX.
-	sgp.flush()
+	gp.flush()
 	// Finish a draw command queue, clearing it.
-	sgp.end()
+	gp.end()
 }
 
 pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
@@ -94,60 +94,60 @@ pub fn (i Draw2DImage) draw() {
 	w := i.w
 	h := i.h
 
-	// sgp.set_blend_mode(sgp.BlendMode)
-	// sgp.reset_blend_mode()
+	// gp.set_blend_mode(gp.BlendMode)
+	// gp.reset_blend_mode()
 
 	col := i.color.as_f32()
 
-	sgp.set_color(col.r, col.g, col.b, col.a)
-	sgp.set_image(0, i.image.gfx_image)
+	gp.set_color(col.r, col.g, col.b, col.a)
+	gp.set_image(0, i.image.gfx_image)
 
-	sgp.push_transform()
+	gp.push_transform()
 	o_off_x, o_off_y := i.origin_offset()
 
-	sgp.translate(o_off_x, o_off_y)
-	sgp.translate(x + i.offset.x, y + i.offset.y)
+	gp.translate(o_off_x, o_off_y)
+	gp.translate(x + i.offset.x, y + i.offset.y)
 
 	if i.rotation != 0 {
-		sgp.rotate_at(i.rotation * mth.deg2rad, -o_off_x, -o_off_y)
+		gp.rotate_at(i.rotation * mth.deg2rad, -o_off_x, -o_off_y)
 	}
 	if i.scale != 1 {
-		sgp.scale_at(i.scale, i.scale, -o_off_x, -o_off_y)
+		gp.scale_at(i.scale, i.scale, -o_off_x, -o_off_y)
 	}
 
-	sgp.draw_textured_rect(0, 0, w, h)
+	gp.draw_textured_rect(0, 0, w, h)
 
-	sgp.translate(-x, -y)
-	sgp.pop_transform()
+	gp.translate(-x, -y)
+	gp.pop_transform()
 
-	sgp.reset_image(0)
+	gp.reset_image(0)
 }
 
 [inline]
 pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
-	// sgp.set_blend_mode(sgp.BlendMode)
-	// sgp.reset_blend_mode()
+	// gp.set_blend_mode(gp.BlendMode)
+	// gp.reset_blend_mode()
 
 	col := i.color.as_f32()
 
-	sgp.set_color(col.r, col.g, col.b, col.a)
-	sgp.set_image(0, i.image.gfx_image)
+	gp.set_color(col.r, col.g, col.b, col.a)
+	gp.set_image(0, i.image.gfx_image)
 
-	sgp_src := sgp.Rect{
+	sgp_src := gp.Rect{
 		x: src.x
 		y: src.y
 		w: src.w
 		h: src.h
 	}
-	sgp_dst := sgp.Rect{
+	sgp_dst := gp.Rect{
 		x: dst.x
 		y: dst.y
 		w: dst.w
 		h: dst.h
 	}
-	sgp.draw_textured_rect_ex(0, sgp_dst, sgp_src)
+	gp.draw_textured_rect_ex(0, sgp_dst, sgp_src)
 
-	sgp.reset_image(0)
+	gp.reset_image(0)
 }
 
 /*
