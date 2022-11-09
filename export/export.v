@@ -162,7 +162,7 @@ fn export_appimage(opt Options) ! {
 		aite_res := os.execute(appimagetool_extract_cmd.join(' '))
 		if aite_res.exit_code != 0 {
 			aite_cmd := appimagetool_extract_cmd.join(' ')
-			return error('${@MOD}.${@FN}: "{aite_cmd}" failed: {aite_res.output}')
+			return error('${@MOD}.${@FN}: "{aite_cmd}" failed: $aite_res.output')
 		}
 		os.chdir(pwd)!
 
@@ -189,7 +189,7 @@ fn export_appimage(opt Options) ! {
 	v_res := os.execute(v_cmd.join(' '))
 	if v_res.exit_code != 0 {
 		vcmd := v_cmd.join(' ')
-		return error('{@MOD}.{@FN}: "{vcmd}" failed: {v_res.output}')
+		return error('{@MOD}.{@FN}: "{vcmd}" failed: $v_res.output')
 	}
 
 	// Prepare AppDir directory. We do it manually because the "format",
@@ -198,7 +198,7 @@ fn export_appimage(opt Options) ! {
 	// https://docs.appimage.org/packaging-guide/manual.html
 	//
 	app_name := os.file_name(opt.input).all_before_last('.')
-	app_dir_path := os.join_path(opt.work_dir, '{app_name}.AppDir')
+	app_dir_path := os.join_path(opt.work_dir, '${app_name}.AppDir')
 	if os.exists(app_dir_path) {
 		os.rmdir_all(app_dir_path)!
 	}
@@ -234,7 +234,7 @@ fn export_appimage(opt Options) ! {
 	}
 
 	// Write .desktop file entry
-	desktop_path := os.join_path(app_dir_path, '{app_name}.desktop')
+	desktop_path := os.join_path(app_dir_path, '${app_name}.desktop')
 	desktop_contents := '[Desktop Entry]
 Name={app_name}
 Exec={app_name}
@@ -250,7 +250,7 @@ Categories=Game;'
 
 	// Copy icon TODO
 	shy_icon := os.join_path(@VMODROOT, 'logo.svg')
-	app_icon := os.join_path(app_dir_path, '{app_name}' + os.file_ext(shy_icon))
+	app_icon := os.join_path(app_dir_path, '$app_name' + os.file_ext(shy_icon))
 	os.cp(shy_icon, app_icon) or {
 		return error('failed to copy "{shy_icon}" to "{app_icon}": $err')
 	}
@@ -311,7 +311,7 @@ exec "${EXEC}" "$@"'
 			lib_real_path = os.real_path(lib_real_path)
 		}
 		if opt.verbosity > 1 {
-			eprintln('Copying "{lib_real_path}" to "{app_lib}"')
+			eprintln('Copying "$lib_real_path" to "$app_lib"')
 		}
 		os.cp(lib_real_path, app_lib) or {
 			return error('failed to copy "{lib_real_path}" to "{app_lib}": $err')
@@ -326,16 +326,16 @@ exec "${EXEC}" "$@"'
 	strip_exe := os.find_abs_path_of_executable('strip') or { '' }
 	if os.is_executable(strip_exe) {
 		if opt.verbosity > 0 {
-			eprintln('Running {strip_exe} "{app_exe}"...')
+			eprintln('Running $strip_exe "$app_exe"...')
 		}
 		strip_cmd := [
-			'{strip_exe}',
-			'"{app_exe}"',
+			'$strip_exe',
+			'"$app_exe"',
 		]
 		strip_res := os.execute(strip_cmd.join(' '))
 		if strip_res.exit_code != 0 {
 			stripcmd := strip_cmd.join(' ')
-			return error('{@MOD}.{@FN}: "{stripcmd}" failed: {strip_res.output}')
+			return error('{@MOD}.{@FN}: "{stripcmd}" failed: $strip_res.output')
 		}
 	}
 
@@ -347,9 +347,9 @@ exec "${EXEC}" "$@"'
 				eprintln('Compressing "$app_exe"...')
 			}
 			upx_cmd := [
-				'{upx_exe}',
+				'$upx_exe',
 				'-9',
-				'"{app_exe}"',
+				'"$app_exe"',
 			]
 			upx_res := os.execute(upx_cmd.join(' '))
 			if upx_res.exit_code != 0 {
@@ -364,7 +364,7 @@ exec "${EXEC}" "$@"'
 		rmdir_path := os.join_path(app_dir_path, sub_dir)
 		if os.is_dir(rmdir_path) && os.is_dir_empty(rmdir_path) {
 			if opt.verbosity > 2 {
-				eprintln('Removing empty dir "{rmdir_path}"')
+				eprintln('Removing empty dir "$rmdir_path"')
 			}
 			os.rmdir(rmdir_path)!
 		}
@@ -373,7 +373,7 @@ exec "${EXEC}" "$@"'
 	if opt.verbosity > 1 {
 		eprintln('Created .AppDir:')
 		os.walk(app_dir_path, fn (path string) {
-			eprintln('{path}')
+			eprintln('$path')
 		})
 	}
 
@@ -384,7 +384,7 @@ exec "${EXEC}" "$@"'
 	// Write .AppDir to AppImage using `appimagetool`
 	output := opt.output
 	if opt.verbosity > 0 {
-		eprintln('Building AppImage "{output}"...')
+		eprintln('Building AppImage "$output"...')
 	}
 	appimagetool_cmd := [
 		appimagetool,
@@ -394,7 +394,7 @@ exec "${EXEC}" "$@"'
 	ait_res := os.execute(appimagetool_cmd.join(' '))
 	if ait_res.exit_code != 0 {
 		ait_cmd := appimagetool_cmd.join(' ')
-		return error('${@MOD}.${@FN}: "{ait_cmd}" failed: {ait_res.output}')
+		return error('${@MOD}.${@FN}: "{ait_cmd}" failed: $ait_res.output')
 	}
 	os.chmod(output, 0o775)! // make it executable
 }
@@ -453,7 +453,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 	if verbosity > 0 {
 		base := os.file_name(executable)
-		eprintln('{root_indents}{base} (include)')
+		eprintln('$root_indents$base (include)')
 	}
 	objdump_cmd := [
 		'objdump',
@@ -463,7 +463,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	od_res := os.execute(objdump_cmd.join(' '))
 	if od_res.exit_code != 0 {
 		cmd := objdump_cmd.join(' ')
-		return error('{@MOD}.{@FN} "{cmd}" failed:\n{od_res.output}')
+		return error('${@MOD}.${@FN} "$cmd" failed:\n$od_res.output')
 	}
 	od_lines := od_res.output.split('\n').map(it.trim_space())
 	mut exe_deps := []string{}
@@ -478,7 +478,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		so_name := parts[1]
 		if so_name in excludes {
 			if verbosity > 1 {
-				eprintln('{indents}{so_name} (exclude)')
+				eprintln('$indents$so_name (exclude)')
 			}
 			continue
 		}
@@ -495,7 +495,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	ldd_res := os.execute(ldd_cmd.join(' '))
 	if ldd_res.exit_code != 0 {
 		cmd := ldd_cmd.join(' ')
-		return error('{@MOD}.{@FN} "{cmd}" failed:\n{ldd_res.output}')
+		return error('${@MOD}.${@FN} "$cmd" failed:\n$ldd_res.output')
 	}
 	ldd_lines := ldd_res.output.split('\n').map(it.trim_space())
 	for line in ldd_lines {
@@ -517,7 +517,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		if so_name in exe_deps {
 			if existing := resolved_deps[so_name] {
 				if existing != path {
-					eprintln('{indents}{so_name} Warning: resolved path is ambiguous "{existing}" vs. "{path}"')
+					eprintln('{indents}{so_name} Warning: resolved path is ambiguous "$existing" vs. "$path"')
 				}
 				continue
 			}
@@ -535,7 +535,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 		if so_name in skip_resolve {
 			if verbosity > 1 {
-				eprintln('{indents}{so_name} (skip)')
+				eprintln('$indents$so_name (skip)')
 			}
 			continue
 		}
@@ -552,7 +552,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 pub fn resolve_dependencies(config ResolveDependenciesConfig) !map[string]string {
 	mut deps := map[string]string{}
 	if config.verbosity > 0 {
-		eprintln('Resolving {config.format.ext()} dependencies...')
+		eprintln('Resolving $config.format.ext() dependencies...')
 	}
 	resolve_dependencies_recursively(mut deps, config)!
 	return deps

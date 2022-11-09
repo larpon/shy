@@ -4,7 +4,7 @@ import shy.wraps.fontstash
 import shy.wraps.sokol.f
 
 /*
-    sfonst_allocator_t
+sfonst_allocator_t
 
     Used in sfons_desc_t to provide custom memory-alloc and -free functions
     to sokol_fontstash.h. If memory management should be overridden, both the
@@ -16,20 +16,20 @@ import shy.wraps.sokol.f
 */
 [typedef]
 struct C.sfons_allocator_t {
-    // void* (*alloc)(size_t size, void* user_data);
-	alloc fn(size usize, user_data voidptr) voidptr
+	// void* (*alloc)(size_t size, void* user_data);
+	alloc fn (size usize, user_data voidptr) voidptr
 	// void (*free)(void* ptr, void* user_data);
-    free fn(ptr voidptr, user_data voidptr)
-    user_data voidptr
+	free      fn (ptr voidptr, user_data voidptr)
+	user_data voidptr
 }
 
 pub type Allocator = C.sfons_allocator_t
 
 [typedef]
 struct C.sfons_desc_t {
-    width int    // initial width of font atlas texture (default: 512, must be power of 2)
-    height int   // initial height of font atlas texture (default: 512, must be power of 2)
-    allocator Allocator    // optional memory allocation overrides
+	width     int       // initial width of font atlas texture (default: 512, must be power of 2)
+	height    int       // initial height of font atlas texture (default: 512, must be power of 2)
+	allocator Allocator // optional memory allocation overrides
 }
 
 pub type Desc = C.sfons_desc_t

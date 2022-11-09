@@ -3,7 +3,7 @@ module sgp
 
 import shy.wraps.sokol.gfx
 
-pub const used_import = 1 //c.used_import
+pub const used_import = 1 // c.used_import
 
 //
 // sokol_gp.h
