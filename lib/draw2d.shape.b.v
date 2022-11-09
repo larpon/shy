@@ -6,7 +6,7 @@ module lib
 import shy.vec { Vec2 }
 import shy.mth
 import math
-import shy.thirdparty.sgp
+import shy.wraps.sgp
 
 // DrawShape2D
 pub struct DrawShape2D {

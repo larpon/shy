@@ -6,9 +6,9 @@
 module lib
 
 import os
-import fontstash
-import sokol.sfons
-import sokol.sgl
+import shy.wraps.fontstash
+import shy.wraps.sokol.sfons
+import shy.wraps.sokol.gl as sgl
 
 struct Fonts {
 	ShyStruct
@@ -85,7 +85,13 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	} // TODO apply values for max_vertices etc.
 
 	for _ in 0 .. config.prealloc_contexts {
-		fons_context := sfons.create(256, 256, 1) // TODO configurable size
+		// TODO configurable size:
+		fons_desc := sfons.Desc{
+			width: 256
+			height: 256
+			allocator: unsafe { nil }
+		}
+		fons_context := sfons.create(&fons_desc)
 		sgl_context := sgl.make_context(&sgl_context_desc)
 		// Default context
 		mut context := &FontContext{

@@ -10402,7 +10402,7 @@ pub fn engine_node_uninit(p_engine_node &EngineNode, const_p_allocation_callback
 	C.ma_engine_node_uninit(p_engine_node, const_p_allocation_callbacks)
 }
 
-pub const sound_source_channel_count = 0xFFFFFFFF
+pub const sound_source_channel_count = u32(0xFFFFFFFF)
 
 [typedef]
 struct C.ma_sound_config {

@@ -3,9 +3,9 @@
 // that can be found in the LICENSE file.
 module lib
 
-import sokol.gfx
-import sokol.sgl
-import shy.thirdparty.sgp
+import shy.wraps.sokol.gfx
+import shy.wraps.sokol.gl as sgl
+import shy.wraps.sgp
 
 pub struct GFX {
 	ShyStruct
@@ -25,7 +25,7 @@ pub fn (mut g GFX) init() ! {
 	}
 	gfx_desc.context.sample_count = s.config.render.msaa
 	gfx.setup(&gfx_desc)
-	assert gfx.is_valid()
+	assert gfx.isvalid()
 
 	// NOTE Init subsystems was here
 

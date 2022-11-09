@@ -6,8 +6,8 @@ module lib
 import shy.vec { Vec2 }
 import shy.mth
 // Required for font rendering
-import sokol.sgl
-import sokol.sfons
+import shy.wraps.sokol.gl as sgl
+import shy.wraps.sokol.sfons
 
 // DrawText
 pub struct DrawText {

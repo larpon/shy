@@ -172,21 +172,28 @@ fn export_appimage(opt Options) ! {
 	// Build V input app for host platform
 	v_app := os.join_path(opt.work_dir, 'v_app')
 	if opt.verbosity > 0 {
-		eprintln('Building app to "$v_app"...')
+		eprintln('Building V source as "$v_app"...')
 	}
-	v_cmd := [
+	mut v_cmd := [
 		vxt.vexe(),
+	]
+	if opt.is_prod {
+		v_cmd << '-prod'
+	}
+	v_cmd << opt.v_flags
+	v_cmd << [
 		'-o',
 		v_app,
 		opt.input,
 	]
-	res := os.execute(v_cmd.join(' '))
-	if res.exit_code != 0 {
+	v_res := os.execute(v_cmd.join(' '))
+	if v_res.exit_code != 0 {
 		vcmd := v_cmd.join(' ')
-		return error('${@MOD}.${@FN}: "$vcmd" failed: $res.output')
+		return error('{@MOD}.{@FN}: "{vcmd}" failed: {v_res.output}')
 	}
 
-	// Prepare AppDir directory
+	// Prepare AppDir directory. We do it manually because the "format",
+	// or rather, conventions - are fairly straight forward and appimage-builder is a mess.
 	// https://docs.appimage.org/packaging-guide/overview.html#manually-creating-an-appdir
 	// https://docs.appimage.org/packaging-guide/manual.html
 	//
@@ -279,6 +286,9 @@ exec "${EXEC}" "$@"'
 	// so_excludes << 'ld-linux-x86-64.so.2',
 	so_excludes << appimage_exclude_list(opt.verbosity)!
 
+	// libSDL2 detects and dlopen() it's dependencies at runtime.
+	// Skipping it here avoid pulling in *it's* dependencies from this host computer,
+	// resulting in a higher chance of success running the app in the wild.
 	mut skip_resolve := [
 		'libSDL2-2.0.so.0',
 	]
@@ -291,11 +301,12 @@ exec "${EXEC}" "$@"'
 		skip_resolve: skip_resolve
 	}
 	dependencies := resolve_dependencies(rd_config)!
-	dump(dependencies)
+	// dump(dependencies)
 	for _, lib_path in dependencies {
 		app_lib_dir := os.join_path(app_dir_path, os.dir(lib_path).all_after('/'))
 		mut app_lib := os.join_path(app_lib_dir, os.file_name(lib_path))
 		mut lib_real_path := lib_path
+		// Resolve symlinks. These are *very* common on all distros.
 		if os.is_link(lib_real_path) {
 			lib_real_path = os.real_path(lib_real_path)
 		}
@@ -323,25 +334,28 @@ exec "${EXEC}" "$@"'
 		]
 		strip_res := os.execute(strip_cmd.join(' '))
 		if strip_res.exit_code != 0 {
-			cmd := strip_cmd.join(' ')
-			return error('{@MOD}.{@FN}: "{cmd}" failed: {strip_res.output}')
+			stripcmd := strip_cmd.join(' ')
+			return error('{@MOD}.{@FN}: "{stripcmd}" failed: {strip_res.output}')
 		}
 	}
 
 	// Compress exe
 	if opt.compress {
-		if opt.verbosity > 0 {
-			eprintln('Compressing "$app_exe"...')
-		}
-		upx_cmd := [
-			'upx',
-			'-9',
-			'"{app_exe}"',
-		]
-		upx_res := os.execute(upx_cmd.join(' '))
-		if upx_res.exit_code != 0 {
-			upxcmd := upx_cmd.join(' ')
-			return error('${@MOD}.${@FN}: "{upxcmd}" failed: $upx_res.output')
+		upx_exe := os.find_abs_path_of_executable('upx') or { '' }
+		if os.is_executable(upx_exe) {
+			if opt.verbosity > 0 {
+				eprintln('Compressing "$app_exe"...')
+			}
+			upx_cmd := [
+				'{upx_exe}',
+				'-9',
+				'"{app_exe}"',
+			]
+			upx_res := os.execute(upx_cmd.join(' '))
+			if upx_res.exit_code != 0 {
+				upxcmd := upx_cmd.join(' ')
+				return error('${@MOD}.${@FN}: "{upxcmd}" failed: $upx_res.output')
+			}
 		}
 	}
 
@@ -405,8 +419,8 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	// shared objects, not the full path. Using only `ldd` *does* result in resolved lib paths BUT
 	// they're done recursively and printed in one stream which makes it impossible to know
 	// which libs has dependencies on which, on top `ldd` has security issues and problems with cross-compiled
-	// binaries. The issues are mostly ignored in our case since we consider the input (v sources) "trusted" and we do not
-	// support cross-compiled binaries anyway at this point (Not sure AppImages support it either?!).
+	// binaries. The issues are mostly ignored in our case since we consider the input (v sources -> binary) "trusted" and we do not
+	// support V cross-compiled binaries anyway at this point (Not sure AppImages support it either?!).
 	//
 	// Digging even further and reading source code of programs like `lddtree` will reveal
 	// that it's not straight forward to know what `.so` will be loaded by `ld` upon execution
@@ -439,7 +453,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 	if verbosity > 0 {
 		base := os.file_name(executable)
-		eprintln('{root_indents}{base} (included)')
+		eprintln('{root_indents}{base} (include)')
 	}
 	objdump_cmd := [
 		'objdump',
@@ -449,7 +463,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	od_res := os.execute(objdump_cmd.join(' '))
 	if od_res.exit_code != 0 {
 		cmd := objdump_cmd.join(' ')
-		return error('${@MOD}.${@FN} "$cmd" failed:\n$od_res.output')
+		return error('{@MOD}.{@FN} "{cmd}" failed:\n{od_res.output}')
 	}
 	od_lines := od_res.output.split('\n').map(it.trim_space())
 	mut exe_deps := []string{}
@@ -464,7 +478,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		so_name := parts[1]
 		if so_name in excludes {
 			if verbosity > 1 {
-				eprintln('{indents}{so_name} (excluded)')
+				eprintln('{indents}{so_name} (exclude)')
 			}
 			continue
 		}
@@ -481,11 +495,15 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	ldd_res := os.execute(ldd_cmd.join(' '))
 	if ldd_res.exit_code != 0 {
 		cmd := ldd_cmd.join(' ')
-		return error('${@MOD}.${@FN} "$cmd" failed:\n$ldd_res.output')
+		return error('{@MOD}.{@FN} "{cmd}" failed:\n{ldd_res.output}')
 	}
 	ldd_lines := ldd_res.output.split('\n').map(it.trim_space())
 	for line in ldd_lines {
 		if line.contains('statically linked') {
+			continue
+		}
+		if line.contains('not found') {
+			// TODO ?? - give error here? add an option to continue?
 			continue
 		}
 		parts := line.split(' ')
@@ -507,7 +525,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		}
 
 		// if _ := deps[so_name] {
-		// Could add to "dependants" here
+		//  // Could add to "dependants" here for further info
 		//	continue
 		//}
 	}
@@ -517,7 +535,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 		if so_name in skip_resolve {
 			if verbosity > 1 {
-				eprintln('{indents}{so_name} (skipped)')
+				eprintln('{indents}{so_name} (skip)')
 			}
 			continue
 		}

@@ -4,7 +4,7 @@
 module lib
 
 import os
-import sokol.gfx
+import shy.wraps.sokol.gfx
 import stbi
 
 pub enum AssetStatus {

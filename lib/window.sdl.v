@@ -8,7 +8,7 @@ import os.font
 import sdl
 import time
 import shy.mth
-import sokol.gfx
+import shy.wraps.sokol.gfx
 
 // Some code found from
 // "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
