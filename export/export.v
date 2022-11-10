@@ -415,14 +415,16 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	// Resolving shared object (.so) dependencies on Linux is not as straight forward as
 	// one could wish for. Using `objdump` alone gives us only the *names* of the
 	// shared objects, not the full path. Using only `ldd` *does* result in resolved lib paths BUT
-	// they're done recursively and printed in one stream which makes it impossible to know
-	// which libs has dependencies on which, on top `ldd` has security issues and problems with cross-compiled
-	// binaries. The issues are mostly ignored in our case since we consider the input (v sources -> binary) "trusted" and we do not
-	// support V cross-compiled binaries anyway at this point (Not sure AppImages support it either?!).
+	// they're done recursively, in some cases by executing the exe/lib - and, on top, it's printed
+	// *in one stream* which makes it impossible to know which libs has dependencies on which,
+	// further more `ldd` has security issues and problems with cross-compiled binaries.
+	// The issues are mostly ignored in our case since we consider the input (v sources -> binary)
+	// "trusted" and we do not support V cross-compiled binaries anyway at this point
+	// (Not sure AppImages even support it?!).
 	//
 	// Digging even further and reading source code of programs like `lddtree` will reveal
 	// that it's not straight forward to know what `.so` will be loaded by `ld` upon execution
-	// (LD_LIBRARY_PATH etc. mess and misuse).
+	// due to LD_LIBRARY_PATH mess and misuse etc.
 	//
 	// So. For now we've chosen a solution using a mix of both `objdump` and `ldd` - it has pitfalls for sure -
 	// but how many and how severe - only time will tell. If we are to do this "correctly" it'll need a lot
@@ -431,7 +433,8 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 	// a given V executable rely on in-order for us to collect them and package them up, for example, in an AppImage.
 	//
 	// The strategy is thus the following:
-	// 1. Run `objdump` on the exe/so file (had to choose one; readelf lost: https://stackoverflow.com/questions/8979664/readelf-vs-objdump-why-are-both-needed)
+	// 1. Run `objdump` on the exe/so file (had to choose one; readelf lost:
+	// https://stackoverflow.com/questions/8979664/readelf-vs-objdump-why-are-both-needed)
 	// this gives us the immediate (1st level) dependencies of the app.
 	// 2. Run `ldd` on the same exe/so file to obtain the first encountered resolved path(s) to the 1st level exe/so dependency.
 	// 3. Do step 1 and 2 for all dependencies, recursively
