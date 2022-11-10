@@ -7,6 +7,8 @@ import os
 import shy.vxt
 import net.http
 
+pub const available_format_strings = ['zip', 'directory', 'appimage_dir', 'appimage']
+
 fn tmp_work_dir() string {
 	return os.join_path(os.temp_dir(), 'export')
 }
@@ -136,7 +138,7 @@ pub fn string_to_export_format(str string) !Format {
 			.appimage_dir
 		}
 		else {
-			error('${@MOD}.${@FN}: unsupported format "$str"')
+			error('${@MOD}.${@FN}: unsupported format "$str". Available: $export.available_format_strings')
 		}
 	}
 }
