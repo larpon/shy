@@ -552,11 +552,11 @@ pub type PassAction = C.sg_pass_action
 [typedef]
 struct C.sg_bindings {
 pub mut:
-	_start_canary u32
-	// TODO 	vertex_buffers [SG_MAX_SHADERSTAGE_BUFFERS]Buffer
-	// TODO 	vertex_buffer_offsets [SG_MAX_SHADERSTAGE_BUFFERS]int
-	index_buffer        Buffer
-	index_buffer_offset int
+	_start_canary         u32
+	vertex_buffers        [8]Buffer
+	vertex_buffer_offsets [8]int
+	index_buffer          Buffer
+	index_buffer_offset   int
 	// TODO 	vs_images [SG_MAX_SHADERSTAGE_IMAGES]Image
 	// TODO 	fs_images [SG_MAX_SHADERSTAGE_IMAGES]Image
 	_end_canary u32
@@ -685,7 +685,7 @@ pub type ShaderStageDesc = C.sg_shader_stage_desc
 struct C.sg_shader_desc {
 pub mut:
 	_start_canary u32
-	// TODO 	attrs [SG_MAX_VERTEX_ATTRIBUTES]ShaderAttrDesc
+	// TODO 	attrs [16]ShaderAttrDesc
 	vs          ShaderStageDesc
 	fs          ShaderStageDesc
 	label       &char = unsafe { nil }
@@ -718,8 +718,9 @@ pub type VertexAttrDesc = C.sg_vertex_attr_desc
 
 [typedef]
 struct C.sg_layout_desc {
-	// TODO 	buffers [SG_MAX_SHADERSTAGE_BUFFERS]BufferLayoutDesc
-	// TODO 	attrs [SG_MAX_VERTEX_ATTRIBUTES]VertexAttrDesc
+pub mut:
+	buffers [8]BufferLayoutDesc
+	attrs   [16]VertexAttrDesc
 }
 
 pub type LayoutDesc = C.sg_layout_desc

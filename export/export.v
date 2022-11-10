@@ -204,10 +204,19 @@ fn export_appimage(opt Options) ! {
 	}
 	os.mkdir_all(app_dir_path)!
 
-	// Create AppDir structure
-	// Please keep this list in order so that it can be reversed
-	// so the longest paths in each root sub-dir will come first if looped.
-	// (empty directories can then be cleaned up afterwards)
+	// Create an AppDir structure, that the appimagetool can work on.
+	//
+	// NOTE Please keep this list in "growing" order so the longest paths in
+	// each root/sub-dir will come first if looped in reverse order.
+	//
+	// By *growing* we mean that the longest possible path in a directory path
+	// should always come after any dirs above it in the list.
+	// This way empty directories can then, easily, be cleaned
+	// up afterwards by reversing the list.
+	//
+	// We use a hardcoded list to avoid accidentially including any user paths
+	// added to e.g. LD_LIBRARY_PATH - maybe we should add a flag for switching
+	// this safety off.
 	sub_dirs := [
 		os.join_path('bin'),
 		os.join_path('usr'),
