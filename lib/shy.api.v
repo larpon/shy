@@ -6,11 +6,11 @@
 module lib
 
 import shy.vec
-import shy.mth
+// TODO BUG see consts below // import shy.mth
 
 pub const (
-	deg2rad = mth.deg2rad
-	rad2deg = mth.rad2deg
+	deg2rad = f32(0.017453292519943295) // TODO BUG with `-live` mth.deg2rad
+	rad2deg = f32(57.29577951308232) // TODO BUG with `-live` mth.rad2deg
 )
 
 [inline]
