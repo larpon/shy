@@ -45,9 +45,9 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		}
 	}
 
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "$a.ao.uri" to image')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.ao.uri}" to image')
 	stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
-		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "$a.ao.uri"')
+		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${a.ao.uri}"')
 	}
 
 	mut image := Image{
@@ -116,16 +116,16 @@ pub fn (mut a Assets) shutdown() ! {
 pub fn (mut a Assets) load(ao AssetOptions) !&Asset {
 	uri := ao.uri
 	if !os.is_file(uri) {
-		return error('${@STRUCT}.${@FN}' + ': "$uri" does not exist')
+		return error('${@STRUCT}.${@FN}' + ': "${uri}" does not exist')
 	}
 	if _ := a.ass[uri] {
-		return error('${@STRUCT}.${@FN}' + ': "$uri" already exist')
+		return error('${@STRUCT}.${@FN}' + ': "${uri}" already exist')
 	}
 	// TODO enable network fetching etc.
 	if ao.async {
 	}
 	bytes := os.read_bytes(uri) or {
-		return error('${@STRUCT}.${@FN}' + ': "$uri" could not be loaded')
+		return error('${@STRUCT}.${@FN}' + ': "${uri}" could not be loaded')
 	}
 	// TODO asset pool??
 	asset := &Asset{
@@ -134,7 +134,7 @@ pub fn (mut a Assets) load(ao AssetOptions) !&Asset {
 		ao: ao
 		status: .loaded
 	}
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "$uri"')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${uri}"')
 	a.ass[uri] = asset
 	return asset
 }
@@ -144,7 +144,7 @@ pub fn (a &Assets) get_cached_image(uri string) !Image {
 		return image
 	}
 	return error('${@STRUCT}.${@FN}' +
-		': "$uri" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
 pub fn (a &Assets) get_cached<T>(uri string) !T {
@@ -155,7 +155,7 @@ pub fn (a &Assets) get_cached<T>(uri string) !T {
 		}
 	}
 	return error('${@STRUCT}.${@FN}' +
-		': "$uri" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
 pub fn (a &Assets) get(uri string) !&Asset {
@@ -163,7 +163,7 @@ pub fn (a &Assets) get(uri string) !&Asset {
 		return asset
 	}
 	return error('${@STRUCT}.${@FN}' +
-		': "$uri" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
 pub enum ImageKind {

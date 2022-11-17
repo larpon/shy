@@ -63,7 +63,7 @@ pub fn (mut a Audio) shutdown() ! {
 
 pub fn (a &Audio) engine(id u8) !&AudioEngine {
 	return a.engines[id] or {
-		return error('${@STRUCT}.${@FN}' + ': engine with id $id does not exist')
+		return error('${@STRUCT}.${@FN}' + ': engine with id ${id} does not exist')
 	}
 }
 
@@ -89,14 +89,14 @@ pub fn (mut e AudioEngine) shutdown() ! {
 fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
 	sound := &ma.Sound{}
 	if ma.sound_init_from_file(ae.e, path.str, 0, ma.null, ma.null, sound) != .success {
-		return error('${@STRUCT}.${@FN}' + ' failed to load sound "$path"')
+		return error('${@STRUCT}.${@FN}' + ' failed to load sound "${path}"')
 	}
 	return sound
 }
 
 pub fn (mut ae AudioEngine) load(path string) !u16 {
 	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "$path"')
+	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${path}"')
 	s := ae.load_file(path)!
 	ae.sound_id++
 	ae.sounds[ae.sound_id] = s
@@ -111,9 +111,9 @@ pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 	id_start := ae.sound_id
 	ae.sounds[id_start] = s
 	if copies > 1 {
-		ae.shy.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', 'keep in mind that instancing the same sound ($path) $copies times, also duplicate the memory for the sound $copies times')
+		ae.shy.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', 'keep in mind that instancing the same sound (${path}) ${copies} times, also duplicate the memory for the sound ${copies} times')
 		for _ in 0 .. copies {
-			ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'duplicating "$path"')
+			ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'duplicating "${path}"')
 			copy_sound := &ma.Sound{}
 			ma.sound_init_copy(ae.e, s, 0, ma.null, copy_sound)
 			ae.sound_id++
@@ -126,7 +126,7 @@ pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 pub fn (ae &AudioEngine) play(id u16) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
-		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'playing sound $sound_id via engine $ae.id')
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'playing sound ${sound_id} via engine ${ae.id}')
 		ma.sound_start(sound)
 	}
 }
@@ -134,7 +134,7 @@ pub fn (ae &AudioEngine) play(id u16) {
 pub fn (ae &AudioEngine) stop(id u16) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
-		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'stopping $sound_id in engine $ae.id')
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'stopping ${sound_id} in engine ${ae.id}')
 		ma.sound_stop(sound)
 	}
 }
@@ -162,7 +162,7 @@ pub fn (ae &AudioEngine) is_looping(id u16) bool {
 pub fn (ae &AudioEngine) set_looping(id u16, loop bool) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
-		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'set loop = $loop on sound $sound_id in engine $ae.id')
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'set loop = ${loop} on sound ${sound_id} in engine ${ae.id}')
 		b := if loop { ma.@true } else { ma.@false }
 		ma.sound_set_looping(sound, u32(b))
 	}

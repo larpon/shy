@@ -158,7 +158,7 @@ fn main_loop<T>(mut ctx T, mut s Shy) ! {
 		s.state.rendering = false
 
 		if s.shutdown {
-			s.log.gdebug('${@MOD}.${@FN}', 'shutdown is $s.shutdown, leaving main loop...')
+			s.log.gdebug('${@MOD}.${@FN}', 'shutdown is ${s.shutdown}, leaving main loop...')
 			s.running = false
 			break
 		}
@@ -213,11 +213,11 @@ pub fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string
 			match area {
 				.hot_code {
 					if s.state.in_hot_code {
-						s.log.gwarn('$lib.vet_tag ' + prefix, msg)
+						s.log.gwarn('${lib.vet_tag} ' + prefix, msg)
 					}
 				}
 				else {
-					s.log.gwarn('$lib.vet_tag ' + prefix, msg)
+					s.log.gwarn('${lib.vet_tag} ' + prefix, msg)
 				}
 			}
 		}

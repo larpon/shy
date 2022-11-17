@@ -63,8 +63,8 @@ pub fn (mut wm WM) init() ! {
 	res := sdl.init(init_flags)
 	if res < 0 {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-		return error('Could not initialize SDL, SDL says:\n$sdl_error_msg')
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+		return error('Could not initialize SDL, SDL says:\n${sdl_error_msg}')
 	}
 
 	wm.init_root_window()!
@@ -98,7 +98,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	displays := wm.display_count()
 
-	s.log.gdebug('${@STRUCT}.${@FN}', '$displays displays available')
+	s.log.gdebug('${@STRUCT}.${@FN}', '${displays} displays available')
 
 	// get display bounds for all displays
 	mut display_bounds := []sdl.Rect{}
@@ -120,7 +120,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		dn := unsafe { cstring_to_vstring(sdl.get_display_name(display_index)) }
 		dw := display_bounds[display_index].w
 		dh := display_bounds[display_index].h
-		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen $display_index `$dn` ${dw}x$dh@${display_mode.refresh_rate}hz')
+		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen ${display_index} `${dn}` ${dw}x${dh}@${display_mode.refresh_rate}hz')
 	}
 
 	// $if opengl ? {
@@ -210,8 +210,8 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 		int(config.h), window_flags)
 	if window == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-		return error('Could not create SDL window "$config.title", SDL says:\n$sdl_error_msg')
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+		return error('Could not create SDL window "${config.title}", SDL says:\n${sdl_error_msg}')
 	}
 
 	// Create a black color as a default pass (default window background color)
@@ -306,9 +306,9 @@ fn (mut w Window) record_frame() {
 		return
 	}
 	if frame in rc.frames {
-		screenshot_file_path := '$rc.save_prefix${frame}.png'
+		screenshot_file_path := '${rc.save_prefix}${frame}.png'
 		$if shy_record_trace ? {
-			eprintln('>>> ${@FN} screenshot $screenshot_file_path')
+			eprintln('>>> ${@FN} screenshot ${screenshot_file_path}')
 		}
 		w.screenshot(screenshot_file_path) or { panic(err) }
 		w.step(1, f32(w.state.update_rate))
@@ -329,7 +329,7 @@ fn (mut w Window) record_frame() {
 	}
 	if frame == rc.exit_on_frame {
 		$if shy_record_trace ? {
-			eprintln('>>> ${@FN} exiting at frame $frame')
+			eprintln('>>> ${@FN} exiting at frame ${frame}')
 		}
 		exit(0)
 	}
@@ -667,8 +667,8 @@ pub fn (mut w Window) init() ! {
 	gl_context := sdl.gl_create_context(w.handle)
 	if gl_context == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-		return error('Could not create OpenGL context, SDL says:\n$sdl_error_msg')
+		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+		return error('Could not create OpenGL context, SDL says:\n${sdl_error_msg}')
 	}
 	w.gl_context = gl_context
 
@@ -678,26 +678,26 @@ pub fn (mut w Window) init() ! {
 		.off {
 			if sdl.gl_set_swap_interval(0) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-				return error('Could not set OpenGL swap interval:\n$sdl_error_msg')
+				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+				return error('Could not set OpenGL swap interval:\n${sdl_error_msg}')
 			}
 		}
 		.on {
 			if sdl.gl_set_swap_interval(1) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-				return error('Could not set OpenGL swap interval:\n$sdl_error_msg')
+				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+				return error('Could not set OpenGL swap interval:\n${sdl_error_msg}')
 			}
 		}
 		.adaptive {
 			if sdl.gl_set_swap_interval(-1) < 0 {
 				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: $sdl_error_msg')
-				return error('Could not set OpenGL swap interval:\n$sdl_error_msg')
+				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+				return error('Could not set OpenGL swap interval:\n${sdl_error_msg}')
 			}
 		}
 	}
-	s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=$w.config.render.vsync')
+	s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=${w.config.render.vsync}')
 	// }
 
 	$if wasm32_emscripten {

@@ -59,7 +59,7 @@ pub fn (mut w WrenVM) init() ! {
 	w.vm = vm
 
 	// TODO TEST ONLY
-	w.eval('shy', lib.shy_in_wren) or { return error('${@STRUCT}.${@FN}: $err') }
+	w.eval('shy', lib.shy_in_wren) or { return error('${@STRUCT}.${@FN}: ${err}') }
 
 	// Register handle for the Shy.frame method
 	w.vm.ensure_slots(1)
@@ -135,7 +135,7 @@ pub fn (mut w WrenVM) register_class<T>(fn_name string, fn_ptr wren.ForeignMetho
 
 	mut code := ''
 
-	code += 'class $class_name {
+	code += 'class ${class_name} {
 	construct new(){}'
 
 	mut f_get_set := ''
@@ -333,15 +333,15 @@ fn wren_error_fn(vm &wren.VM, error_type wren.ErrorType, const_module &char, con
 	assert !isnil(s), 'Shy is nil'
 	match error_type {
 		.compile {
-			s.log.gerror('WREN COMPILE', '$mod line $const_line: $msg')
+			s.log.gerror('WREN COMPILE', '${mod} line ${const_line}: ${msg}')
 			// eprintln('Scripts.wren $mod line $const_line: $msg')
 		}
 		.stack_trace {
-			s.log.gerror('WREN', '$mod line $const_line in $msg')
+			s.log.gerror('WREN', '${mod} line ${const_line} in ${msg}')
 			// eprintln('Scripts.wren $mod line $const_line in $msg')
 		}
 		.runtime {
-			s.log.gerror('WREN RUNTIME', '$mod line $const_line: $msg')
+			s.log.gerror('WREN RUNTIME', '${mod} line ${const_line}: ${msg}')
 			// eprintln('Scripts.wren $mod line $const_line: $msg')
 		}
 	}
@@ -419,7 +419,7 @@ fn wren_bind_foreign_method(vm &wren.VM, const_module &char, const_class_name &c
 		unsafe { sig.free() }
 	}
 
-	println('Wren is looking up $mod $class $sig')
+	println('Wren is looking up ${mod} ${class} ${sig}')
 
 	// Unknown method
 	mut func := wren_no_fn

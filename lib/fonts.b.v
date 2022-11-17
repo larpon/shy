@@ -39,9 +39,9 @@ fn (mut fs Fonts) load_font(name string, path string) ! {
 
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
-		fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded $name: "$path"')
+		fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded ${name}: "${path}"')
 	} else {
-		return error('${@STRUCT}.${@FN}' + ': could not load $name "$path"')
+		return error('${@STRUCT}.${@FN}' + ': could not load ${name} "${path}"')
 	}
 }
 
@@ -63,16 +63,16 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	} $else {
 		mut default_font := $embed_file('../fonts/Allerta/Allerta-Regular.ttf')
 		fs.font_data[defaults.font.name] = default_font.to_bytes()
-		fs.shy.log.gdebug(@STRUCT, 'loaded default: "$default_font.path"')
+		fs.shy.log.gdebug(@STRUCT, 'loaded default: "${default_font.path}"')
 	}
 
 	for font_name, font_path in preload {
 		fs.load_font(font_name, font_path) or {
-			s.log.gerror(@STRUCT, ' pre-loading "$font_name" failed: $err.msg()')
+			s.log.gerror(@STRUCT, ' pre-loading "${font_name}" failed: ${err.msg()}')
 		}
 	}
 
-	s.log.gdebug(@STRUCT, 'pre-allocating $config.prealloc_contexts contexts...')
+	s.log.gdebug(@STRUCT, 'pre-allocating ${config.prealloc_contexts} contexts...')
 	$if shy_vet ? {
 		if config.prealloc_contexts > defaults.fonts.preallocate {
 			s.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', ' keep in mind that pre-allocating many font contexts is quite memory consuming')
@@ -126,7 +126,7 @@ fn (mut fs Fonts) shutdown() ! {
 	}
 	for font_name, data in fs.font_data {
 		if data.len > 0 {
-			s.log.gdebug('${@STRUCT}.${@FN}', 'freeing font $font_name data...')
+			s.log.gdebug('${@STRUCT}.${@FN}', 'freeing font ${font_name} data...')
 			unsafe { data.free() }
 		}
 	}

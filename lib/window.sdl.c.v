@@ -29,7 +29,7 @@ pub fn (w Window) screenshot(path string) ! {
 pub fn (w Window) areashot(area Rect, path string) ! {
 	dir := os.dir(path)
 	if !os.is_dir(dir) {
-		os.mkdir_all(dir) or { return error('${@MOD}.${@STRUCT}.${@FN}: $err') }
+		os.mkdir_all(dir) or { return error('${@MOD}.${@STRUCT}.${@FN}: ${err}') }
 	}
 	match os.file_ext(path) {
 		'.png' {
@@ -53,7 +53,7 @@ fn (w Window) areashot_ppm(area Rect, path string) ! {
 		unsafe { ss.destroy() }
 	}
 	write_rgba_to_ppm(path, ss.width, ss.height, 4, ss.pixels) or {
-		return error('${@MOD}.${@STRUCT}.${@FN}: $err')
+		return error('${@MOD}.${@STRUCT}.${@FN}: ${err}')
 	}
 }
 
@@ -67,7 +67,7 @@ fn (w Window) areashot_png(area Rect, path string) ! {
 	}
 	stbi.set_flip_vertically_on_write(true)
 	stbi.stbi_write_png(path, ss.width, ss.height, 4, ss.pixels, ss.width * 4) or {
-		return error('${@MOD}.${@STRUCT}.${@FN}: $err')
+		return error('${@MOD}.${@STRUCT}.${@FN}: ${err}')
 	}
 }
 
@@ -78,7 +78,7 @@ fn write_rgba_to_ppm(path string, w int, h int, components int, pixels &u8) ! {
 		f_out.close()
 	}
 	f_out.writeln('P3')!
-	f_out.writeln('$w $h')!
+	f_out.writeln('${w} ${h}')!
 	f_out.writeln('255')!
 	for i := h - 1; i >= 0; i-- {
 		for j := 0; j < w; j++ {
@@ -87,7 +87,7 @@ fn write_rgba_to_ppm(path string, w int, h int, components int, pixels &u8) ! {
 				r := int(pixels[idx])
 				g := int(pixels[idx + 1])
 				b := int(pixels[idx + 2])
-				f_out.write_string('$r $g $b ')!
+				f_out.write_string('${r} ${g} ${b} ')!
 			}
 		}
 	}

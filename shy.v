@@ -15,14 +15,14 @@ fn main() {
 	mut fp := &flag.FlagParser(0)
 
 	opt = cli.options_from_env(opt) or {
-		eprintln('Error while parsing `SHY_FLAGS`: $err')
-		eprintln('Use `$cli.exe_short_name -h` to see all flags')
+		eprintln('Error while parsing `SHY_FLAGS`: ${err}')
+		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
 		exit(1)
 	}
 
 	opt, fp = cli.args_to_options(os.args, opt) or {
-		eprintln('Error while parsing `os.args`: $err')
-		eprintln('Use `$cli.exe_short_name -h` to see all flags')
+		eprintln('Error while parsing `os.args`: ${err}')
+		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
 		exit(1)
 	}
 
@@ -58,8 +58,8 @@ fn main() {
 	opt.input = input
 
 	opt.extend_from_dot_shy() or {
-		eprintln('Error while parsing `.shy`: $err')
-		eprintln('Use `$cli.exe_short_name -h` to see all flags')
+		eprintln('Error while parsing `.shy`: ${err}')
+		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
 		exit(1)
 	}
 
@@ -75,7 +75,7 @@ fn main() {
 	if opt.export {
 		export_opts := opt.to_export_options()
 		export.export(export_opts) or {
-			eprintln('Error while exporting `$export_opts.input`: $err')
+			eprintln('Error while exporting `${export_opts.input}`: ${err}')
 			exit(1)
 		}
 	}

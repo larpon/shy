@@ -83,7 +83,7 @@ pub fn launch_cmd(args []string) ! {
 		if os.is_file(tool_src + '.v') {
 			tool_src += '.v'
 		} else {
-			return error('${@MOD}.${@FN}: could not find source for "$cmd"')
+			return error('${@MOD}.${@FN}: could not find source for "${cmd}"')
 		}
 	}
 	if os.is_executable(v) {
@@ -102,23 +102,23 @@ pub fn launch_cmd(args []string) ! {
 			]
 			res := os.execute(v_cmd.join(' '))
 			if res.exit_code < 0 {
-				return error('${@MOD}.${@FN} failed compiling "$cmd": $res.output')
+				return error('${@MOD}.${@FN} failed compiling "${cmd}": ${res.output}')
 			}
 			if res.exit_code == 0 {
 				os.write_file(hash_file, cli.exe_git_hash) or {}
 			} else {
 				vcmd := v_cmd.join(' ')
-				return error('${@MOD}.${@FN} "$vcmd" failed:\n$res.output')
+				return error('${@MOD}.${@FN} "${vcmd}" failed:\n${res.output}')
 			}
 		}
 	}
 	if os.is_executable(tool_exe) {
 		os.setenv('SHY_EXE', os.join_path(cli.exe_dir, cli.exe_name), true)
 		$if windows {
-			exit(os.system('${os.quoted_path(tool_exe)} $tool_args'))
+			exit(os.system('${os.quoted_path(tool_exe)} ${tool_args}'))
 		} $else $if js {
 			// no way to implement os.execvp in JS backend
-			exit(os.system('$tool_exe $tool_args'))
+			exit(os.system('${tool_exe} ${tool_args}'))
 		} $else {
 			os.execvp(tool_exe, args) or { return err }
 		}
@@ -126,7 +126,7 @@ pub fn launch_cmd(args []string) ! {
 	}
 	exec := (tool_exe + ' ' + tool_args.join(' ')).trim_right(' ')
 	v_message := if !os.is_executable(v) { ' (v was not found)' } else { '' }
-	return error('${@MOD}.${@FN} failed executing "$exec"$v_message')
+	return error('${@MOD}.${@FN} failed executing "${exec}"${v_message}')
 }
 
 // string_to_args converts `input` string to an `os.args`-like array.
@@ -165,7 +165,7 @@ pub fn string_to_args(input string) ![]string {
 	}
 	if in_string {
 		return error(@FN +
-			': could not parse input, missing closing string delimiter `$delim.ascii_str()`')
+			': could not parse input, missing closing string delimiter `${delim.ascii_str()}`')
 	}
 	return args
 }

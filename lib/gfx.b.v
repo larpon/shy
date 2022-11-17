@@ -58,7 +58,7 @@ pub fn (mut g GFX) init_subsystems() ! {
 	gp.setup(&sgp_desc)
 	if !gp.is_valid() {
 		error_msg := unsafe { cstring_to_vstring(gp.get_error_message(gp.get_last_error())) }
-		panic('Failed to create Sokol GP context:\n$error_msg')
+		panic('Failed to create Sokol GP context:\n${error_msg}')
 	}
 }
 

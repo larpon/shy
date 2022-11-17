@@ -80,7 +80,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 		if special_flag in args {
 			if special_flag == '-gc' {
 				gc_type := args[(args.index(special_flag)) + 1]
-				v_flags << special_flag + ' $gc_type'
+				v_flags << special_flag + ' ${gc_type}'
 				args.delete(args.index(special_flag) + 1)
 			} else if special_flag.starts_with('-') {
 				v_flags << special_flag
@@ -125,7 +125,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 	}
 
 	opt.additional_args = fp.finalize() or {
-		return error(@FN + ': flag parser failed finalizing: $err')
+		return error(@FN + ': flag parser failed finalizing: ${err}')
 	}
 
 	mut c_flags := []string{}

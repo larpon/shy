@@ -49,7 +49,7 @@ fn radius_to_segments(r f32) u32 {
 	*/
 	$if shy_debug_radius_to_segments ? {
 		segments := u32(mth.ceil(math.tau * r / div))
-		eprintln('Segments: $segments r: $r')
+		eprintln('Segments: ${segments} r: ${r}')
 		return segments
 	}
 	return u32(mth.ceil(math.tau * r / div))

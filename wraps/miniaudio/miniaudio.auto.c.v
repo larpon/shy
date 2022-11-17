@@ -77,7 +77,7 @@ pub const version_minor = 11
 
 pub const version_revision = 9
 
-pub const version_string = '${version_major}.${version_minor}.$version_revision'
+pub const version_string = '${version_major}.${version_minor}.${version_revision}'
 
 pub const @true = 1
 

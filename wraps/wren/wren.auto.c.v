@@ -22,7 +22,7 @@ pub const version_minor = 4
 
 pub const version_patch = 0
 
-pub const version_string = '${version_major}.${version_minor}.$version_patch'
+pub const version_string = '${version_major}.${version_minor}.${version_patch}'
 
 /*
 TODO Function: #define WREN_VERSION_NUMBER (WREN_VERSION_MAJOR * 1000000 +                    \

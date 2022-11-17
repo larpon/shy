@@ -39,7 +39,7 @@ pub fn (mut a App) frame(dt f64) {
 		origin: .bottom_center
 		// align: .left | .bottom
 		offset: vec.vec2<f32>(0, -50 - 20)
-		text: 'Current draw origin:\n$a.origin'
+		text: 'Current draw origin:\n${a.origin}'
 	)
 
 	tx, ty := a.origin.pos_wh(win.Rect.w, win.Rect.h)
@@ -47,7 +47,7 @@ pub fn (mut a App) frame(dt f64) {
 		x: tx
 		y: ty
 		origin: a.origin
-		text: '$a.origin / ' + a.align.str_clean()
+		text: '${a.origin} / ' + a.align.str_clean()
 		size: 42
 	)
 

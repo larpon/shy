@@ -41,7 +41,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		x: (win.width() / 10)
 		y: (win.height() / 10)
-		text: 'Window $win.id\n(press W to open a new child window)\nMouse: $mouse.x,$mouse.y'
+		text: 'Window ${win.id}\n(press W to open a new child window)\nMouse: ${mouse.x},${mouse.y}'
 	)
 }
 

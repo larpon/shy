@@ -120,9 +120,9 @@ pub fn (mut a App) frame(dt f64) {
 		y: f32(win.height()) * (1.0 - 0.01)
 		origin: .bottom_left
 		text: 'Animation running for ${es:.1f} seconds
-Frame: $win.state.frame
-follow at ${a.fa_x.value():.1f},${a.fa_y.value():.1f} running: $a.fa_x.running
-text at ${text.x:.1f},${text.y:.1f} x.t ${a.a_x.t():.4f} $win.state.update_rate @hz
-FPS: $win.fps()'
+Frame: ${win.state.frame}
+follow at ${a.fa_x.value():.1f},${a.fa_y.value():.1f} running: ${a.fa_x.running}
+text at ${text.x:.1f},${text.y:.1f} x.t ${a.a_x.t():.4f} ${win.state.update_rate} @hz
+FPS: ${win.fps()}'
 	)
 }

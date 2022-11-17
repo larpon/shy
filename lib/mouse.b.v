@@ -6,7 +6,7 @@ module lib
 import sdl
 
 pub fn (mut m Mouse) init() ! {
-	m.shy.log.gdebug('${@STRUCT}.${@FN}', '$m.id hi')
+	m.shy.log.gdebug('${@STRUCT}.${@FN}', '${m.id} hi')
 
 	// m.position(.window) doesn't work since SDL need mouse movement
 	// before being able to generate *window local* mouse events
