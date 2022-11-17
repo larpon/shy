@@ -113,7 +113,7 @@ pub struct InputConfig {
 
 pub fn config_from_toml_file(path string) !Config {
 	toml_text := os.read_file(path) or {
-		return error(@MOD + '.' + @FN + ' Could not read "${path}": "${err.msg()}"')
+		return error('${@MOD}.${@FN} could not read "${path}": "${err.msg()}"')
 	}
 	return config_from_toml_text(toml_text)
 }

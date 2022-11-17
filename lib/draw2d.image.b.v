@@ -20,11 +20,11 @@ pub fn (mut di DrawImage) begin() {
 	win := di.shy.active_window()
 	w, h := win.drawable_wh()
 
-	sgl.defaults()
+	gl.defaults()
 
-	// sgl.set_context(fc.sgl)
-	sgl.matrix_mode_projection()
-	sgl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+	// gl.set_context(fc.sgl)
+	gl.matrix_mode_projection()
+	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 	*/
 
 	win := di.shy.active_window()

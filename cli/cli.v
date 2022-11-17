@@ -164,8 +164,7 @@ pub fn string_to_args(input string) ![]string {
 		args << buf
 	}
 	if in_string {
-		return error(@FN +
-			': could not parse input, missing closing string delimiter `${delim.ascii_str()}`')
+		return error('${@FN}: could not parse input, missing closing string delimiter `${delim.ascii_str()}`')
 	}
 	return args
 }

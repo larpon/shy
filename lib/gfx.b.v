@@ -40,22 +40,22 @@ pub fn (mut g GFX) init_subsystems() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 
-	// sokol_gl is used by the font and image system
+	// sokol_gl is used by the font system
 	sample_count := s.config.render.msaa
-	sgl_desc := &gl.Desc{
+	gl_desc := &gl.Desc{
 		context_pool_size: 2 * 512 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 2 * 1024 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		sample_count: sample_count
 	}
-	gl.setup(sgl_desc)
+	gl.setup(gl_desc)
 
 	// Initialize Sokol GP which is used for shape drawing.
 	// TODO Adjust the size of command buffers.
-	sgp_desc := gp.Desc{
+	gp_desc := gp.Desc{
 		// max_vertices: 1_000_000
 		// max_commands: 100_000
 	}
-	gp.setup(&sgp_desc)
+	gp.setup(&gp_desc)
 	if !gp.is_valid() {
 		error_msg := unsafe { cstring_to_vstring(gp.get_error_message(gp.get_last_error())) }
 		panic('Failed to create Sokol GP context:\n${error_msg}')
