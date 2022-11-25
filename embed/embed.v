@@ -145,8 +145,24 @@ pub fn (mut a EasyApp) frame_begin() {
 pub fn (mut a EasyApp) frame_end() {
 	a.fonts.on_frame_end()
 
+	/*
 	gl.set_context(gl.default_context)
+	for layer in 0..a.draw.layer {
+		if layer in a.draw.font_layer {
+			gl.draw_layer(layer)
+		} else {
+			gl.draw()
+		}
+	}
+	*/
+
 	gl.draw()
+	/*
+	unsafe {
+		a.draw.layer = 0
+		a.draw.font_layer.clear()
+	}
+	*/
 	a.gfx.end_pass()
 
 	// a.gfx.begin_pass(0)

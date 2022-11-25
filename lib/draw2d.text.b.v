@@ -24,7 +24,11 @@ pub fn (mut dt DrawText) begin() {
 
 	mut fonts := unsafe { dt.fonts }
 	fc := fonts.get_context()
-	gl.set_context(fc.sgl)
+	// gl.set_context(fc.sgl)
+
+	// unsafe { dt.shy.api.draw.layer++ }
+	// gl.set_context(gl.default_context)
+	// gl.layer(dt.shy.api.draw.layer)
 
 	gl.defaults()
 
@@ -46,7 +50,9 @@ pub fn (mut dt DrawText) end() {
 		fc.end()
 		dt.font_context = null
 	}
-	gl.context_draw(fc.sgl)
+
+	// gl.draw_layer(dt.shy.api.draw.layer)
+	// gl.context_draw(fc.sgl)
 	// gl.draw()
 }
 

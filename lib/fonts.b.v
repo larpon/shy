@@ -8,7 +8,7 @@ module lib
 import os
 import shy.wraps.fontstash
 import shy.wraps.sokol.sfons
-import shy.wraps.sokol.gl
+// import shy.wraps.sokol.gl
 
 pub struct Fonts {
 	ShyStruct
@@ -30,8 +30,8 @@ pub struct FontContext {
 mut:
 	in_use bool
 	fsc    &fontstash.Context
-	sgl    gl.Context
-	fonts  map[string]int
+	// sgl    gl.Context
+	fonts map[string]int
 }
 
 pub fn (mut fs Fonts) load_font(name string, path string) ! {
@@ -79,36 +79,38 @@ pub fn (mut fs Fonts) init(config FontsConfig) ! {
 		}
 	}
 
+	/*
 	sample_count := config.render.msaa
-	sgl_context_desc := gl.ContextDesc{
+	gl_context_desc := gl.ContextDesc{
 		sample_count: sample_count
-	} // TODO apply values for max_vertices etc.
+	}*/
+	// TODO apply values for max_vertices etc.
 
-	for _ in 0 .. config.prealloc_contexts {
-		// TODO configurable size:
-		fons_desc := sfons.Desc{
-			width: 256
-			height: 256
-			allocator: unsafe { nil }
-		}
-		fons_context := sfons.create(&fons_desc)
-		sgl_context := gl.make_context(&sgl_context_desc)
-		// Default context
-		mut context := &FontContext{
-			fsc: fons_context
-			sgl: sgl_context
-		}
-
-		// TODO use *.shy.assets() to cache the data
-		for font_name, _ in preload {
-			if bytes := fs.font_data[font_name] {
-				context.fonts[font_name] = fons_context.add_font_mem(font_name, bytes,
-					false)
-			}
-		}
-		s.log.gdebug('${@STRUCT}.${@FN}', 'adding font context ${ptr_str(context.fsc)}...')
-		fs.contexts << context
+	//{
+	// for _ in 0 .. config.prealloc_contexts {
+	// TODO configurable size:
+	fons_desc := sfons.Desc{
+		width: 256
+		height: 256
+		allocator: unsafe { nil }
 	}
+	fons_context := sfons.create(&fons_desc)
+	// gl_context := gl.make_context(&gl_context_desc)
+	// Default context
+	mut context := &FontContext{
+		fsc: fons_context
+		// sgl: sgl_context
+	}
+
+	// TODO use *.shy.assets() to cache the data
+	for font_name, _ in preload {
+		if bytes := fs.font_data[font_name] {
+			context.fonts[font_name] = fons_context.add_font_mem(font_name, bytes, false)
+		}
+	}
+	s.log.gdebug('${@STRUCT}.${@FN}', 'adding font context ${ptr_str(context.fsc)}...')
+	fs.contexts << context
+	//}
 	fs.ready = true
 }
 
@@ -133,6 +135,10 @@ pub fn (mut fs Fonts) shutdown() ! {
 }
 
 pub fn (mut fs Fonts) get_context() &FontContext {
+	mut fc := fs.contexts[0]
+	fc.in_use = true
+	return fc
+	/*
 	for fc in fs.contexts {
 		if !fc.in_use {
 			unsafe {
@@ -140,14 +146,20 @@ pub fn (mut fs Fonts) get_context() &FontContext {
 			}
 			return fc
 		}
-	}
+	}*/
+
+	/*
 	assert false, '${@STRUCT}.${@FN}' +
 		': no available font contexts. Bump the preloaded font contexts in the config'
 
 	fs.shy.log.gcritical('${@STRUCT}.${@FN}', 'no available font contexts. Bump the preloaded font contexts in the config')
+	*/
+
+	/*
 	return &FontContext{
 		fsc: unsafe { nil }
 	} // NOTE dummy return to please the V compiler...
+	*/
 }
 
 pub fn (mut fs Fonts) on_frame_end() {

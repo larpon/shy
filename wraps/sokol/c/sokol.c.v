@@ -19,6 +19,10 @@ $if prod {
 	#define NDEBUG 1
 }
 
+$if debug {
+	#define _DEBUG 1
+}
+
 // METAL
 $if macos {
 	$if darwin_sokol_glcore33 ? {

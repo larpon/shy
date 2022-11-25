@@ -57,10 +57,13 @@ pub struct Stroke {
 }
 
 pub struct Draw {
-	ShyStruct
+	ShyStruct // pub mut:
+	//	layer int
+	//	font_layer []int
 }
 
 pub fn (d &Draw) shape_2d() DrawShape2D {
+	// unsafe { d.layer++ }
 	s := d.shy
 	mut d2d := DrawShape2D{
 		shy: s
@@ -74,6 +77,9 @@ pub fn (d &Draw) shape_2d() DrawShape2D {
 }
 
 pub fn (d &Draw) text(fonts Fonts) DrawText {
+	// unsafe { d.layer++ }
+	// d.font_layer << d.layer
+
 	s := d.shy
 	mut dt := DrawText{
 		shy: s
@@ -88,6 +94,7 @@ pub fn (d &Draw) text(fonts Fonts) DrawText {
 }
 
 pub fn (d &Draw) image() DrawImage {
+	// unsafe { d.layer++ }
 	s := d.shy
 	mut di := DrawImage{
 		shy: s

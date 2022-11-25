@@ -26,6 +26,7 @@ mut:
 	quick        Quick
 	audio_engine &shy.AudioEngine = shy.null
 	fonts        shy.Fonts
+	layer        int
 }
 
 pub struct EasyConfig {

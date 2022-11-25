@@ -425,3 +425,18 @@ pub fn draw() {
 pub fn context_draw(ctx Context) {
 	C.sgl_context_draw(ctx)
 }
+
+[inline]
+pub fn layer(layer_id int) {
+	C.sgl_layer(layer_id)
+}
+
+[inline]
+pub fn draw_layer(layer_id int) {
+	C.sgl_draw_layer(layer_id)
+}
+
+[inline]
+pub fn context_draw_layer(ctx Context, layer_id int) {
+	C.sgl_context_draw_layer(ctx, layer_id)
+}

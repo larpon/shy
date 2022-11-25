@@ -20,7 +20,9 @@ pub fn (mut d2d DrawShape2D) begin() {
 	w, h := win.drawable_wh()
 	// ratio := f32(w)/f32(h)
 
-	gl.set_context(gl.default_context)
+	// unsafe { d2d.shy.api.draw.layer++ }
+	// gl.set_context(gl.default_context)
+	// gl.layer(d2d.shy.api.draw.layer)
 
 	gl.defaults()
 
@@ -31,6 +33,7 @@ pub fn (mut d2d DrawShape2D) begin() {
 
 pub fn (mut d2d DrawShape2D) end() {
 	d2d.ShyFrame.end()
+	// gl.draw_layer(d2d.shy.api.draw.layer)
 }
 
 fn radius_to_segments(r f32) u32 {

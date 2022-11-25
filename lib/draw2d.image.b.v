@@ -19,6 +19,10 @@ pub fn (mut di DrawImage) begin() {
 	win := di.shy.active_window()
 	w, h := win.drawable_wh()
 
+	// unsafe { di.shy.api.draw.layer++ }
+	// gl.set_context(gl.default_context)
+	// gl.layer(di.shy.api.draw.layer)
+
 	gl.defaults()
 
 	// gl.set_context(s_gl_context)
@@ -29,6 +33,7 @@ pub fn (mut di DrawImage) begin() {
 pub fn (mut di DrawImage) end() {
 	di.ShyFrame.end()
 
+	// gl.draw_layer(di.shy.api.draw.layer)
 	// Finish a draw command queue, clearing it.
 	// gl.draw()
 }
