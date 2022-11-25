@@ -165,6 +165,7 @@ pub fn (mut fs Fonts) get_context() &FontContext {
 pub fn (mut fs Fonts) on_frame_end() {
 	for mut fc in fs.contexts {
 		if fc.in_use {
+			sfons.flush(fc.fsc)
 			fc.in_use = false
 			// FLOOD fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'handing out ${ptr_str(fc.fsc)}...')
 		}
@@ -189,5 +190,5 @@ pub fn (fc &FontContext) begin() {
 }
 
 pub fn (fc &FontContext) end() {
-	sfons.flush(fc.fsc)
+	// sfons.flush(fc.fsc)
 }
