@@ -46,9 +46,8 @@ pub fn (s &Shy) assets() &Assets {
 [inline]
 pub fn (s &Shy) draw() &Draw {
 	assert !isnil(s.api)
-	assert !isnil(s.api.gfx)
-	assert !isnil(s.api.gfx.draw)
-	return s.api.gfx.draw
+	assert !isnil(s.api.draw)
+	return s.api.draw
 }
 
 [inline]

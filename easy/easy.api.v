@@ -8,6 +8,10 @@ import shy.vec
 import shy.mth
 // High-level as-easy-as-it-gets API
 
+// $if !shy_easy ? {
+//	$compile_error('Please use `v -d shy_easy ...` when building or running this module')
+// }
+
 // Quick is an internal struct for fire-and-forget/instant calling of Easy methods.
 [noinit]
 pub struct Quick {
@@ -21,12 +25,19 @@ pub struct Easy {
 mut:
 	quick        Quick
 	audio_engine &shy.AudioEngine = shy.null
+	fonts        shy.Fonts
 }
 
-pub fn (mut e Easy) init() ! {
+pub struct EasyConfig {
+	// audio_engine &shy.AudioEngine = shy.null
+	fonts shy.Fonts
+}
+
+pub fn (mut e Easy) init(ec EasyConfig) ! {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	e.quick.easy = e
 	e.audio_engine = e.shy.audio().engine(0)!
+	e.fonts = ec.fonts
 }
 
 pub fn (mut e Easy) shutdown() ! {}
@@ -43,6 +54,7 @@ pub mut:
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2<f32>
+	fonts    shy.Fonts // TODO fix this font mess
 }
 
 [noinit]
@@ -58,12 +70,13 @@ pub mut:
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2<f32>
+	fonts    shy.Fonts // TODO fix this font mess
 }
 
 [inline]
 pub fn (et &EasyText) draw() {
 	draw := et.shy.draw()
-	mut dt := draw.text()
+	mut dt := draw.text(et.fonts) // TODO fix this font mess
 	dt.begin()
 	mut t := dt.text_2d()
 	t.text = et.text
@@ -85,6 +98,7 @@ pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 	return EasyText{
 		...etc
 		shy: e.shy
+		fonts: e.fonts // TODO fix this font mess
 	}
 }
 
@@ -217,7 +231,7 @@ pub fn (el &EasyLine) draw() {
 	l.offset = el.offset
 	l.origin = el.origin
 	l.draw()
-	d.end()
+	// d.end()
 }
 
 [inline]
@@ -492,6 +506,12 @@ pub fn (ei &EasyImage) draw() {
 	i2d.y = ei.y
 	i2d.w = ei.w
 	i2d.h = ei.h
+	if i2d.w < 0 {
+		i2d.w = image.width
+	}
+	if i2d.h < 0 {
+		i2d.h = image.height
+	}
 	i2d.rotation = ei.rotation
 	i2d.scale = ei.scale
 	i2d.offset = ei.offset

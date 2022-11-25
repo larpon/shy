@@ -10,7 +10,7 @@ import shy.wraps.fontstash
 import shy.wraps.sokol.sfons
 import shy.wraps.sokol.gl
 
-struct Fonts {
+pub struct Fonts {
 	ShyStruct
 mut:
 	ready     bool
@@ -18,7 +18,7 @@ mut:
 	font_data map[string][]u8
 }
 
-struct FontsConfig {
+pub struct FontsConfig {
 	ShyStruct
 	prealloc_contexts u16 = defaults.fonts.preallocate // > ~8 needs sokol.gfx.Desc.pipeline_pool_size / .context_pool_size
 	preload           map[string]string // preload[font_name] = path_to_font
@@ -26,7 +26,7 @@ struct FontsConfig {
 }
 
 [heap]
-struct FontContext {
+pub struct FontContext {
 mut:
 	in_use bool
 	fsc    &fontstash.Context
@@ -34,7 +34,7 @@ mut:
 	fonts  map[string]int
 }
 
-fn (mut fs Fonts) load_font(name string, path string) ! {
+pub fn (mut fs Fonts) load_font(name string, path string) ! {
 	fs.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 
 	if bytes := os.read_bytes(path) {
@@ -49,7 +49,7 @@ fn (mut fs Fonts) load_font(name string, path string) ! {
 //	#flag --embed-file @VMODROOT/fonts@/fonts
 // }
 
-fn (mut fs Fonts) init(config FontsConfig) ! {
+pub fn (mut fs Fonts) init(config FontsConfig) ! {
 	fs.shy = config.shy
 	mut s := fs.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
@@ -112,7 +112,7 @@ fn (mut fs Fonts) init(config FontsConfig) ! {
 	fs.ready = true
 }
 
-fn (mut fs Fonts) shutdown() ! {
+pub fn (mut fs Fonts) shutdown() ! {
 	fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
 	mut s := fs.shy
 	for context in fs.contexts {
@@ -132,7 +132,7 @@ fn (mut fs Fonts) shutdown() ! {
 	}
 }
 
-fn (mut fs Fonts) get_context() &FontContext {
+pub fn (mut fs Fonts) get_context() &FontContext {
 	for fc in fs.contexts {
 		if !fc.in_use {
 			unsafe {
@@ -150,7 +150,7 @@ fn (mut fs Fonts) get_context() &FontContext {
 	} // NOTE dummy return to please the V compiler...
 }
 
-fn (mut fs Fonts) on_frame_end() {
+pub fn (mut fs Fonts) on_frame_end() {
 	for mut fc in fs.contexts {
 		if fc.in_use {
 			fc.in_use = false
@@ -159,7 +159,7 @@ fn (mut fs Fonts) on_frame_end() {
 	}
 }
 
-fn (fc &FontContext) set_defaults() {
+pub fn (fc &FontContext) set_defaults() {
 	font_context := fc.fsc
 
 	font_id := fc.fonts[defaults.font.name]
@@ -171,11 +171,11 @@ fn (fc &FontContext) set_defaults() {
 	font_context.set_size(defaults.font.size)
 }
 
-fn (fc &FontContext) begin() {
+pub fn (fc &FontContext) begin() {
 	fc.fsc.clear_state()
 	fc.set_defaults()
 }
 
-fn (fc &FontContext) end() {
+pub fn (fc &FontContext) end() {
 	sfons.flush(fc.fsc)
 }

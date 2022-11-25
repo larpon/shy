@@ -4,14 +4,67 @@
 module lib
 
 import shy.wraps.sokol.gfx
-import shy.wraps.sokol.gl
-import shy.wraps.sokol.gp
 
 pub struct GFX {
 	ShyStruct
 mut:
-	draw  &Draw = null
 	ready bool
+	// TODO render passes
+	passes []RenderPass
+	// pass RenderPass
+}
+
+// Render passes / targets
+pub struct RenderPass {
+	// label string // TODO probably not necessary?
+	pass        gfx.Pass
+	pass_action gfx.PassAction
+	// pipeline        gfx.Pipeline
+	// bindings        gfx.Bindings
+}
+
+fn (mut g GFX) init_default_passes() ! {
+	// Create a default pass (use window background color)
+	color := g.shy.config.window.color.as_f32()
+	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
+
+	rp := RenderPass{
+		// label: 'default'
+		pass_action: pass_action
+	}
+	g.add_pass(rp)
+}
+
+pub fn (mut g GFX) add_pass(pass RenderPass) int {
+	g.passes << pass
+	return g.passes.len - 1
+}
+
+pub fn (mut g GFX) make_clear_color_pass_action(color Color) gfx.PassAction {
+	c := color.as_f32()
+	return gfx.create_clear_pass(c.r, c.g, c.b, c.a)
+}
+
+pub fn (mut g GFX) begin_pass(id u16) {
+	g.shy.running
+	assert g.passes.len > 0, 'no render passes available'
+
+	if p := g.passes[id] {
+		// g.pass = p
+		// g.shy.log.gdebug('${@STRUCT}.${@FN}', 'setting render pass ${id}:${p.label}')
+		if id == 0 {
+			// Default pass
+			width, height := g.shy.active_window().drawable_wh()
+			gfx.begin_default_pass(&p.pass_action, width, height)
+		} else {
+			gfx.begin_pass(p.pass, &p.pass_action)
+			// gfx.apply_pipeline(p.pipeline)
+			// gfx.apply_bindings(&p.bindings)
+			// gfx.apply_uniforms(.vs, SLOT_vs_params, &SG_RANGE(vs_params))
+		}
+		return
+	}
+	assert false, 'no render pass with id ${id} available'
 }
 
 pub fn (mut g GFX) init() ! {
@@ -27,46 +80,9 @@ pub fn (mut g GFX) init() ! {
 	gfx.setup(&gfx_desc)
 	assert gfx.isvalid()
 
-	// NOTE Init subsystems was here
+	g.init_default_passes()!
 
-	g.draw = &Draw{
-		shy: s
-	}
 	g.ready = true
-}
-
-pub fn (mut g GFX) init_subsystems() ! {
-	assert g.ready
-	mut s := g.shy
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
-
-	// sokol_gl is used by the font system
-	sample_count := s.config.render.msaa
-	gl_desc := &gl.Desc{
-		context_pool_size: 2 * 512 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		pipeline_pool_size: 2 * 1024 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		sample_count: sample_count
-	}
-	gl.setup(gl_desc)
-
-	// Initialize Sokol GP which is used for shape drawing.
-	// TODO Adjust the size of command buffers.
-	gp_desc := gp.Desc{
-		// max_vertices: 1_000_000
-		// max_commands: 100_000
-	}
-	gp.setup(&gp_desc)
-	if !gp.is_valid() {
-		error_msg := unsafe { cstring_to_vstring(gp.get_error_message(gp.get_last_error())) }
-		panic('Failed to create Sokol GP context:\n${error_msg}')
-	}
-}
-
-pub fn (mut g GFX) shutdown_subsystems() ! {
-	mut s := g.shy
-	s.log.gdebug('${@STRUCT}.${@FN}', 'bye')
-	gp.shutdown()
-	gl.shutdown()
 }
 
 pub fn (mut g GFX) shutdown() ! {
@@ -79,6 +95,6 @@ pub fn (g GFX) commit() {
 	gfx.commit()
 }
 
-pub fn (g GFX) end() {
+pub fn (g GFX) end_pass() {
 	gfx.end_pass()
 }

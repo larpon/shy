@@ -80,6 +80,7 @@ fn vsynctype_from_string(str string) VSync {
 
 [params]
 pub struct Config {
+pub:
 	debug  bool
 	window WindowConfig
 	render RenderConfig
@@ -99,6 +100,7 @@ pub:
 }
 
 pub struct RenderConfig {
+pub:
 	update_rate         f64   = lib.defaults.render.update_rate
 	update_multiplicity u8    = lib.defaults.render.update_multiplicity
 	lock_framerate      bool  = lib.defaults.render.lock_framerate

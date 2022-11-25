@@ -17,12 +17,6 @@ pub const (
 
 const vet_tag = 'VET'
 
-//
-pub enum ButtonState {
-	up
-	down
-}
-
 struct State {
 mut:
 	in_hot_code bool
@@ -65,9 +59,9 @@ fn (mut sf ShyFrame) end() {
 // Shy carries all of shy's internal state.
 [heap]
 pub struct Shy {
-	config Config
 pub:
-	log Log
+	log    Log
+	config Config
 pub mut:
 	paused   bool
 	shutdown bool
@@ -78,8 +72,8 @@ mut:
 	state State
 	timer time.StopWatch = time.new_stopwatch()
 	//
-	app       voidptr = unsafe { nil }
-	user_data voidptr = unsafe { nil }
+	app voidptr = unsafe { nil }
+	// user_data voidptr = unsafe { nil }
 	// The "blackbox" api implementation specific struct
 	// Can only be accessed via the unsafe api() function *outside* the module
 	api API
@@ -97,7 +91,7 @@ pub fn (mut s Shy) init() ! {
 	}
 	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
 	s.api.init(s)!
-	s.check_health()!
+	s.health()!
 	s.ready = true
 	s.timer.start()
 }
@@ -119,6 +113,7 @@ pub fn new(config Config) !&Shy {
 }
 
 // run runs the application instance `T`.
+[manualfree]
 pub fn run<T>(mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
 	shy_instance.app = voidptr(ctx)
@@ -126,56 +121,15 @@ pub fn run<T>(mut ctx T, config Config) ! {
 	ctx.shy = shy_instance
 	ctx.init()!
 
-	main_loop<T>(mut ctx, mut shy_instance)!
+	shy_instance.api.main<T>(mut ctx, mut shy_instance)!
 
 	ctx.shutdown()!
 	shy_instance.shutdown()!
 	unsafe { free(shy_instance) }
 }
 
-fn main_loop<T>(mut ctx T, mut s Shy) ! {
-	s.log.gdebug('${@MOD}.${@FN}', 'entering main loop')
-
-	mut root := s.api.wm.root
-
-	s.running = true
-	s.state.in_hot_code = true
-	for s.running {
-		if !s.ready {
-			s.log.gwarn('${@MOD}.${@FN}', 'not ready. Waiting 1 second...')
-			time.sleep(1 * time.second)
-			s.timer.restart()
-			continue
-		}
-
-		// TODO re-write event processing to be per window?
-		// Process system events
-		s.process_events<T>(mut ctx)
-
-		// Windows will render their children, so this is a cascade action
-		s.state.rendering = true
-		root.render<T>(mut ctx)
-		s.state.rendering = false
-
-		if s.shutdown {
-			s.log.gdebug('${@MOD}.${@FN}', 'shutdown is ${s.shutdown}, leaving main loop...')
-			s.running = false
-			break
-		}
-	}
-	s.state.in_hot_code = false
-}
-
-// process_events processes all events and delegate them to T
-fn (mut s Shy) process_events<T>(mut ctx T) {
-	for {
-		event := s.poll_event() or { break }
-		ctx.event(event)
-	}
-}
-
-fn (s Shy) check_health() ! {
-	s.api.check_health()!
+fn (s Shy) health() ! {
+	s.api.health()!
 }
 
 [if !prod]

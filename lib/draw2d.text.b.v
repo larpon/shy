@@ -14,6 +14,7 @@ pub struct DrawText {
 	ShyFrame
 mut:
 	font_context &FontContext = null
+	fonts        Fonts
 }
 
 pub fn (mut dt DrawText) begin() {
@@ -21,11 +22,11 @@ pub fn (mut dt DrawText) begin() {
 	win := dt.shy.active_window()
 	w, h := win.drawable_wh()
 
-	gl.defaults()
-
-	mut fonts := unsafe { win.fonts }
+	mut fonts := unsafe { dt.fonts }
 	fc := fonts.get_context()
 	gl.set_context(fc.sgl)
+
+	gl.defaults()
 
 	gl.matrix_mode_projection()
 	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
@@ -45,7 +46,8 @@ pub fn (mut dt DrawText) end() {
 		fc.end()
 		dt.font_context = null
 	}
-	gl.draw()
+	gl.context_draw(fc.sgl)
+	// gl.draw()
 }
 
 pub fn (mut dt DrawText) text_2d() Draw2DText {

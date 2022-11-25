@@ -5,7 +5,7 @@ module lib
 
 import shy.mth
 import shy.vec { Vec2 }
-import shy.wraps.sokol.gp
+import shy.wraps.sokol.gl
 
 // DrawImage
 
@@ -16,45 +16,21 @@ pub struct DrawImage {
 pub fn (mut di DrawImage) begin() {
 	di.ShyFrame.begin()
 
-	/*
 	win := di.shy.active_window()
 	w, h := win.drawable_wh()
 
 	gl.defaults()
 
-	// gl.set_context(fc.sgl)
+	// gl.set_context(s_gl_context)
 	gl.matrix_mode_projection()
 	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
-	*/
-
-	win := di.shy.active_window()
-	w, h := win.drawable_wh()
-	// ratio := f32(w)/f32(h)
-
-	// Begin recording draw commands for a frame buffer of size (width, height).
-	gp.begin(w, h)
-
-	// Set frame buffer drawing region to (0,0,width,height).
-	gp.viewport(0, 0, w, h)
-	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
-	// gp.project(-ratio, ratio, 1.0, -1.0)
-	// gp.project(0, 0, w, h)
-
-	gp.reset_project()
 }
 
 pub fn (mut di DrawImage) end() {
 	di.ShyFrame.end()
 
-	/*
 	// Finish a draw command queue, clearing it.
-	sgl.draw()
-	*/
-
-	// Dispatch all draw commands to Sokol GFX.
-	gp.flush()
-	// Finish a draw command queue, clearing it.
-	gp.end()
+	// gl.draw()
 }
 
 pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
@@ -94,33 +70,48 @@ pub fn (i Draw2DImage) draw() {
 	w := i.w
 	h := i.h
 
-	// gp.set_blend_mode(gp.BlendMode)
-	// gp.reset_blend_mode()
+	u0 := f32(0.0)
+	v0 := f32(0.0)
+	u1 := f32(1.0)
+	v1 := f32(1.0)
+	x0 := f32(0)
+	y0 := f32(0)
+	x1 := f32(w)
+	y1 := f32(h)
 
-	col := i.color.as_f32()
+	gl.push_matrix()
 
-	gp.set_color(col.r, col.g, col.b, col.a)
-	gp.set_image(0, i.image.gfx_image)
+	gl.enable_texture()
+	gl.texture(i.image.gfx_image)
 
-	gp.push_transform()
 	o_off_x, o_off_y := i.origin_offset()
 
-	gp.translate(o_off_x, o_off_y)
-	gp.translate(x + i.offset.x, y + i.offset.y)
+	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(x + i.offset.x, y + i.offset.y, 0)
 
 	if i.rotation != 0 {
-		gp.rotate_at(i.rotation * mth.deg2rad, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.rotate(i.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if i.scale != 1 {
-		gp.scale_at(i.scale, i.scale, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.scale(i.scale, i.scale, 1)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 
-	gp.draw_textured_rect(0, 0, w, h)
+	gl.c4b(i.color.r, i.color.g, i.color.b, i.color.a)
+	gl.begin_quads()
+	gl.v2f_t2f(x0, y0, u0, v0)
+	gl.v2f_t2f(x1, y0, u1, v0)
+	gl.v2f_t2f(x1, y1, u1, v1)
+	gl.v2f_t2f(x0, y1, u0, v1)
+	gl.end()
 
-	gp.translate(-x, -y)
-	gp.pop_transform()
+	gl.translate(-f32(x), -f32(y), 0)
+	gl.disable_texture()
 
-	gp.reset_image(0)
+	gl.pop_matrix()
 }
 
 [inline]
@@ -128,6 +119,8 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	// gp.set_blend_mode(gp.BlendMode)
 	// gp.reset_blend_mode()
 
+	panic('${@FN} TODO')
+	/*
 	col := i.color.as_f32()
 
 	gp.set_color(col.r, col.g, col.b, col.a)
@@ -148,6 +141,7 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	gp.draw_textured_rect_ex(0, sgp_dst, sgp_src)
 
 	gp.reset_image(0)
+	*/
 }
 
 /*

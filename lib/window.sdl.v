@@ -4,7 +4,6 @@
 module lib
 
 import os
-import os.font
 import sdl
 import time
 import shy.mth
@@ -214,18 +213,12 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 		return error('Could not create SDL window "${config.title}", SDL says:\n${sdl_error_msg}')
 	}
 
-	// Create a black color as a default pass (default window background color)
-	color := s.config.window.color.as_f32()
-	pass_action := gfx.create_clear_pass(color.r, color.g, color.b, color.a)
-	// g.pass_action = pass_action
-
 	// }
 	mut win := &Window{
 		shy: s
 		config: config
 		id: wm.w_id
 		handle: window
-		pass_action: pass_action
 	}
 	win.init()!
 	wm.w_id++
@@ -357,6 +350,7 @@ fn new_shy_frame_record_config() &FrameRecordConfig {
 }
 
 // Window
+[heap]
 pub struct Window {
 	ShyStruct
 	Rect
@@ -367,23 +361,20 @@ mut:
 	ready    bool
 	parent   &Window = null
 	children []&Window
-	fonts    Fonts
 	anims    &Anims = null
 	stepper  Stepper
 	// SDL / GL
 	handle     &sdl.Window = null
 	gl_context sdl.GLContext
 	// sokol
-	pass_action     gfx.PassAction
-	off_pass_action gfx.PassAction
-	gfx_context     gfx.Context
+	gfx_context gfx.Context
 pub mut:
 	state FrameState
 }
 
-pub fn (w &Window) begin() {
-	width, height := w.drawable_wh()
-	gfx.begin_default_pass(&w.pass_action, width, height)
+pub fn (mut w Window) begin_frame() {
+	// Make *this* window's context the current
+	w.make_current()
 }
 
 [inline]
@@ -447,6 +438,7 @@ pub fn (mut w Window) render_init() {
 	}
 }
 
+// render renders one frame
 pub fn (mut w Window) render<T>(mut ctx T) {
 	if !w.ready {
 		return
@@ -520,12 +512,8 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 
 	fixed_deltatime := w.state.fixed_deltatime
 
-	// Make this window's context the current
-	w.make_current()
-
-	// Clear the window
-	w.begin()
-
+	w.begin_frame()
+	ctx.frame_begin()
 	if !w.stepper.active {
 		// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
 		if !w.state.lock_framerate {
@@ -606,17 +594,8 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 			ctx.frame(1.0)
 		}
 	}
-	w.end()
-
-	w.record_frame() // Only here with `-d shy_record`
-
-	w.state.in_frame_call = false
-
-	s.api.gfx.end()
-	s.api.gfx.commit()
-
-	// display() / swap buffers
-	w.swap()
+	ctx.frame_end()
+	w.end_frame()
 
 	for mut cw in w.children {
 		cw.render<T>(mut ctx)
@@ -630,8 +609,14 @@ pub fn (mut w Window) variable_update(dt f64) {
 pub fn (mut w Window) fixed_update(dt f64) {
 }
 
-pub fn (mut w Window) end() {
-	w.fonts.on_frame_end()
+pub fn (mut w Window) end_frame() {
+	w.record_frame() // NOTE Compiled out unless using `-d shy_record`
+	w.state.in_frame_call = false
+
+	w.shy.api.gfx.commit()
+
+	// display() / swap buffers for this window/GL context's frame
+	w.swap()
 }
 
 pub fn (w &Window) swap() {
@@ -711,22 +696,11 @@ pub fn (mut w Window) init() ! {
 	// Change all contexts to this window's
 	w.make_current()
 
+	/*
 	// Init subsystem's for this context setup
 	// TODO does this work ????
 	w.shy.api.gfx.init_subsystems()!
-
-	// TODO Initialize font drawing sub system
-	mut preload_fonts := map[string]string{}
-	$if !wasm32_emscripten {
-		preload_fonts['system'] = font.default()
-	}
-
-	w.fonts.init(FontsConfig{
-		shy: s
-		// prealloc_contexts: 8
-		preload: preload_fonts
-		render: w.config.render
-	})! // fonts.b.v
+	*/
 
 	w.anims = &Anims{
 		shy: s
@@ -758,9 +732,7 @@ pub fn (mut w Window) shutdown() ! {
 	w.anims.shutdown()!
 	unsafe { free(w.anims) }
 
-	w.fonts.shutdown()!
-
-	w.shy.api.gfx.shutdown_subsystems()!
+	// w.shy.api.gfx.shutdown_subsystems()!
 
 	gfx.discard_context(w.gfx_context)
 	// $if opengl ? {

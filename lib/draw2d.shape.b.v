@@ -6,7 +6,7 @@ module lib
 import shy.vec { Vec2 }
 import shy.mth
 import math
-import shy.wraps.sokol.gp
+import shy.wraps.sokol.gl
 
 // DrawShape2D
 pub struct DrawShape2D {
@@ -20,23 +20,17 @@ pub fn (mut d2d DrawShape2D) begin() {
 	w, h := win.drawable_wh()
 	// ratio := f32(w)/f32(h)
 
-	// Begin recording draw commands for a frame buffer of size (width, height).
-	gp.begin(w, h)
+	gl.set_context(gl.default_context)
 
-	// Set frame buffer drawing region to (0,0,width,height).
-	gp.viewport(0, 0, w, h)
-	// Set drawing coordinate space to (left=-ratio, right=ratio, top=1, bottom=-1).
-	gp.reset_project()
-	// gp.project(-ratio, ratio, 1.0, -1.0)
-	// gp.project(0, 0, w, h)
+	gl.defaults()
+
+	// gl.set_context(s_gl_context)
+	gl.matrix_mode_projection()
+	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 }
 
 pub fn (mut d2d DrawShape2D) end() {
 	d2d.ShyFrame.end()
-	// Dispatch all draw commands to Sokol GFX.
-	gp.flush()
-	// Finish a draw command queue, clearing it.
-	gp.end()
 }
 
 fn radius_to_segments(r f32) u32 {
@@ -122,28 +116,32 @@ pub fn (r DrawShape2DRect) draw() {
 	sx := 0 // x //* scale_factor
 	sy := 0 // y //* scale_factor
 
-	gp.push_transform()
+	gl.push_matrix()
 	o_off_x, o_off_y := r.origin_offset()
 
-	gp.translate(o_off_x, o_off_y)
-	gp.translate(x + r.offset.x, y + r.offset.y)
+	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(x + r.offset.x, y + r.offset.y, 0)
 
 	if r.rotation != 0 {
-		gp.rotate_at(r.rotation, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.rotate(r.rotation, 0, 0, 1.0)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if r.scale != 1 {
-		gp.scale_at(r.scale, r.scale, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.scale(r.scale, r.scale, 1)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 
 	if r.fills.has(.body) {
 		color := r.color
-		if color.a < 255 {
-			gp.set_blend_mode(.blend)
-		}
-		c := color.as_f32()
-
-		gp.set_color(c.r, c.g, c.b, c.a)
-		gp.draw_filled_rect(sx, sy, w, h)
+		gl.c4b(color.r, color.g, color.b, color.a)
+		gl.begin_quads()
+		gl.v2f(sx, sy)
+		gl.v2f((sx + w), sy)
+		gl.v2f((sx + w), (sy + h))
+		gl.v2f(sx, (sy + h))
+		gl.end()
 	}
 	if r.fills.has(.outline) {
 		stroke_width := r.stroke.width
@@ -158,24 +156,19 @@ pub fn (r DrawShape2DRect) draw() {
 			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
 		} else {
 			color := r.stroke.color
-			if color.a < 255 {
-				gp.set_blend_mode(.blend)
-			}
-			c := color.as_f32()
-
-			gp.set_color(c.r, c.g, c.b, c.a)
-
-			gp.draw_line(sx, sy, (sx + w), sy)
-			gp.draw_line((sx + w), sy, (sx + w), (sy + h))
-			gp.draw_line((sx + w), (sy + h), sx, (sy + h))
-			gp.draw_line(sx, (sy + h), sx, sy)
+			gl.c4b(color.r, color.g, color.b, color.a)
+			gl.begin_line_strip()
+			gl.v2f(sx, sy)
+			gl.v2f((sx + w), sy)
+			gl.v2f((sx + w), (sy + h))
+			gl.v2f(sx, (sy + h))
+			gl.v2f(sx, sy) // TODO render error, lines should meet
+			gl.end()
 		}
 	}
 
-	gp.translate(-x, -y)
-	gp.pop_transform()
-
-	gp.flush()
+	gl.translate(-f32(x), -f32(y), 0)
+	gl.pop_matrix()
 }
 
 [inline]
@@ -217,12 +210,7 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	stroke_width := l.Stroke.width
 
 	color := l.color
-	if color.a < 255 {
-		gp.set_blend_mode(.blend)
-	}
-	c := color.as_f32()
-
-	gp.set_color(c.r, c.g, c.b, c.a)
+	gl.c4b(color.r, color.g, color.b, color.a)
 
 	x1_ := x1 * scale_factor
 	y1_ := y1 * scale_factor
@@ -231,17 +219,21 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	x2_ := x2 - dx
 	y2_ := y2 - dy
 
-	gp.push_transform()
+	gl.push_matrix()
 	o_off_x, o_off_y := l.origin_offset()
 
-	gp.translate(o_off_x, o_off_y)
-	// gp.translate(x + r.offset.x, y + r.offset.y + r.offset.y)
+	gl.translate(o_off_x, o_off_y, 0)
+	// gl.translate(x + r.offset.x, y + r.offset.y + r.offset.y, 0)
 
 	if l.rotation != 0 {
-		gp.rotate_at(l.rotation, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.rotate(l.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if l.scale != 1 {
-		gp.scale_at(l.scale, l.scale, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.scale(l.scale, l.scale, 1)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 
 	if stroke_width > 1 {
@@ -271,14 +263,22 @@ pub fn (l DrawShape2DLineSegment) draw() {
 		br_x := bl_x - x1_ + x2_
 		br_y := bl_y - y1_ + y2_
 
-		gp.draw_filled_triangle(tl_x, tl_y, tr_x, tr_y, br_x, br_y)
-		gp.draw_filled_triangle(tl_x, tl_y, bl_x, bl_y, br_x, br_y)
+		gl.begin_quads()
+		gl.v2f(tl_x, tl_y)
+		gl.v2f(tr_x, tr_y)
+		gl.v2f(br_x, br_y)
+		gl.v2f(bl_x, bl_y)
+		gl.end()
 	} else {
-		gp.draw_line(x1_, y1_, x2_, y2_)
+		gl.begin_line_strip()
+		gl.v2f(x1_, y1_)
+		gl.v2f(x2_, y2_)
+		gl.end()
 	}
 
-	// gp.translate(-x, -y)
-	gp.pop_transform()
+	// gl.translate(-f32(x), -f32(y), 0)
+	gl.pop_matrix()
+	// gl.draw()
 }
 
 // DrawShape2DUniformPolygon
@@ -321,16 +321,20 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	sy := 0 // y //* scale_factor
 	o_off_x, o_off_y := up.origin_offset()
 
-	gp.push_transform()
+	gl.push_matrix()
 
-	gp.translate(o_off_x, o_off_y)
-	gp.translate(x + up.offset.x, y + up.offset.y)
+	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(x + up.offset.x, y + up.offset.y, 0)
 
 	if up.rotation != 0 {
-		gp.rotate_at(up.rotation, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.rotate(up.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if up.scale != 1 {
-		gp.scale_at(up.scale, up.scale, -o_off_x, -o_off_y)
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.scale(up.scale, up.scale, 1)
+		gl.translate(o_off_x, o_off_y, 0)
 	}
 
 	mut theta := f32(0)
@@ -339,23 +343,26 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 
 	if up.fills.has(.body) {
 		color := up.color
-		if color.a < 255 {
-			gp.set_blend_mode(.blend)
-		}
-		col := color.as_f32()
-		gp.set_color(col.r, col.g, col.b, col.a)
+
+		gl.c4b(color.r, color.g, color.b, color.a)
 
 		theta = 2.0 * f32(mth.pi)
 		mut px := radius * math.cosf(theta) + sx
 		mut py := radius * math.sinf(theta) + sy
+		gl.begin_triangles()
 		for i in 1 .. segments + 1 {
 			theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)
 			xx = radius * math.cosf(theta)
 			yy = radius * math.sinf(theta)
-			gp.draw_filled_triangle(px, py, xx + sx, yy + sy, sx, sy)
+
+			gl.v2f(px, py)
+			gl.v2f(xx + sx, yy + sy)
+			gl.v2f(sx, sy)
+
 			px = xx + sx
 			py = yy + sy
 		}
+		gl.end()
 	}
 	if up.fills.has(.outline) {
 		if up.stroke.width > 1 {
@@ -377,30 +384,29 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 			}
 		} else {
 			color := up.stroke.color
-			if color.a < 255 {
-				gp.set_blend_mode(.blend)
-			}
-			col := color.as_f32()
-			gp.set_color(col.r, col.g, col.b, col.a)
+			gl.c4b(color.r, color.g, color.b, color.a)
 
 			theta = 2.0 * f32(mth.pi)
 			mut px := radius * math.cosf(theta) + sx
 			mut py := radius * math.sinf(theta) + sy
+			gl.begin_line_strip()
 			for i in 1 .. segments + 1 {
 				theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)
 				xx = radius * math.cosf(theta)
 				yy = radius * math.sinf(theta)
-				gp.draw_line(px, py, xx, yy)
+
+				gl.v2f(px, py)
+				gl.v2f(xx, yy)
+
 				px = xx + sx
 				py = yy + sy
 			}
+			gl.end()
 		}
 	}
 
-	gp.translate(-x, -y)
-	gp.pop_transform()
-
-	gp.flush()
+	gl.translate(-f32(x), -f32(y), 0)
+	gl.pop_matrix()
 }
 
 [inline]
@@ -420,14 +426,13 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	radius := stroke.width * 0.5
 	connect := stroke.connect
 
-	if color.a < 255 {
-		gp.set_blend_mode(.blend)
-	}
-	c := color.as_f32()
-	gp.set_color(c.r, c.g, c.b, c.a)
+	gl.c4b(color.r, color.g, color.b, color.a)
 
 	if radius == 1 {
-		gp.draw_line(x1, y1, x2, y2)
+		gl.begin_line_strip()
+		gl.v2f(x1, y1)
+		gl.v2f(x2, y2)
+		gl.end()
 		return
 	}
 
@@ -452,61 +457,51 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	flip := ar.flip
 
 	if connect == .miter {
-		// sgl.begin_triangles()
-		// sgl.v2f(t0_x, t0_y)
-		// sgl.v2f(vp_x, vp_y)
-		// sgl.v2f(vpp_x, vpp_y)
-		gp.draw_filled_triangle(t0_x, t0_y, vp_x, vp_y, vpp_x, vpp_y)
+		gl.begin_triangles()
+		gl.v2f(t0_x, t0_y)
+		gl.v2f(vp_x, vp_y)
+		gl.v2f(vpp_x, vpp_y)
 
-		// sgl.v2f(vpp_x, vpp_y)
-		// sgl.v2f(t0r_x, t0r_y)
-		// sgl.v2f(t0_x, t0_y)
-		gp.draw_filled_triangle(vpp_x, vpp_y, t0r_x, t0r_y, t0_x, t0_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t0r_x, t0r_y)
+		gl.v2f(t0_x, t0_y)
 
-		// sgl.v2f(vp_x, vp_y)
-		// sgl.v2f(vpp_x, vpp_y)
-		// sgl.v2f(t2_x, t2_y)
-		gp.draw_filled_triangle(vp_x, vp_y, vpp_x, vpp_y, t2_x, t2_y)
+		gl.v2f(vp_x, vp_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t2_x, t2_y)
 
-		// sgl.v2f(vpp_x, vpp_y)
-		// sgl.v2f(t2r_x, t2r_y)
-		// sgl.v2f(t2_x, t2_y)
-		// sgl.end()
-		gp.draw_filled_triangle(vpp_x, vpp_y, t2r_x, t2r_y, t2_x, t2_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t2r_x, t2r_y)
+		gl.v2f(t2_x, t2_y)
+		gl.end()
 	} else if connect == .bevel {
-		// sgl.begin_triangles()
-		// sgl.v2f(t0_x, t0_y)
-		// sgl.v2f(at_x, at_y)
-		// sgl.v2f(vpp_x, vpp_y)
-		gp.draw_filled_triangle(t0_x, t0_y, at_x, at_y, vpp_x, vpp_y)
+		gl.begin_triangles()
+		gl.v2f(t0_x, t0_y)
+		gl.v2f(at_x, at_y)
+		gl.v2f(vpp_x, vpp_y)
 
-		// sgl.v2f(vpp_x, vpp_y)
-		// sgl.v2f(t0r_x, t0r_y)
-		// sgl.v2f(t0_x, t0_y)
-		gp.draw_filled_triangle(vpp_x, vpp_y, t0r_x, t0r_y, t0_x, t0_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t0r_x, t0r_y)
+		gl.v2f(t0_x, t0_y)
 
-		// sgl.v2f(at_x, at_y)
-		// sgl.v2f(bt_x, bt_y)
-		// sgl.v2f(vpp_x, vpp_y)
-		gp.draw_filled_triangle(at_x, at_y, bt_x, bt_y, vpp_x, vpp_y)
+		gl.v2f(at_x, at_y)
+		gl.v2f(bt_x, bt_y)
+		gl.v2f(vpp_x, vpp_y)
 
-		// sgl.v2f(vpp_x, vpp_y)
-		// sgl.v2f(bt_x, bt_y)
-		// sgl.v2f(t2_x, t2_y)
-		gp.draw_filled_triangle(vpp_x, vpp_y, bt_x, bt_y, t2_x, t2_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(bt_x, bt_y)
+		gl.v2f(t2_x, t2_y)
 
-		// sgl.v2f(vpp_x, vpp_y)
-		// sgl.v2f(t2_x, t2_y)
-		// sgl.v2f(t2r_x, t2r_y)
-		// sgl.end()
-		gp.draw_filled_triangle(vpp_x, vpp_y, t2_x, t2_y, t2r_x, t2r_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t2_x, t2_y)
+		gl.v2f(t2r_x, t2r_y)
+		gl.end()
 
 		/*
 		// NOTE Adding this will also end up in .miter
-		// sgl.v2f(at_x, at_y)
-		// sgl.v2f(vp_x, vp_y)
-		// sgl.v2f(bt_x, bt_y)
-		gp.draw_filled_triangle(at_x, at_y, vp_x, vp_y, bt_x, bt_y)
+		// gl.v2f(at_x, at_y)
+		// gl.v2f(vp_x, vp_y)
+		// gl.v2f(bt_x, bt_y)
 		*/
 	} else {
 		// .round
@@ -524,40 +519,40 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 		/*
 		TODO port this
 
-		sgl.begin_triangle_strip()
+		gl.begin_triangle_strip()
 		plot.arc(vpp_x, vpp_y, line_segment_length(vpp_x, vpp_y, at_x, at_y), start_angle,
 			arc_angle, u32(18), .body)
-		sgl.end()
+		gl.end()
 
-		sgl.begin_triangles()
+		gl.begin_triangles()
 
-		sgl.v2f(t0_x, t0_y)
-		sgl.v2f(at_x, at_y)
-		sgl.v2f(vpp_x, vpp_y)
+		gl.v2f(t0_x, t0_y)
+		gl.v2f(at_x, at_y)
+		gl.v2f(vpp_x, vpp_y)
 
-		sgl.v2f(vpp_x, vpp_y)
-		sgl.v2f(t0r_x, t0r_y)
-		sgl.v2f(t0_x, t0_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t0r_x, t0r_y)
+		gl.v2f(t0_x, t0_y)
 
 		// TODO arc_points
 		// sgl.v2f(at_x, at_y)
 		// sgl.v2f(bt_x, bt_y)
 		// sgl.v2f(vpp_x, vpp_y)
 
-		sgl.v2f(vpp_x, vpp_y)
-		sgl.v2f(bt_x, bt_y)
-		sgl.v2f(t2_x, t2_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(bt_x, bt_y)
+		gl.v2f(t2_x, t2_y)
 
-		sgl.v2f(vpp_x, vpp_y)
-		sgl.v2f(t2_x, t2_y)
-		sgl.v2f(t2r_x, t2r_y)
+		gl.v2f(vpp_x, vpp_y)
+		gl.v2f(t2_x, t2_y)
+		gl.v2f(t2r_x, t2r_y)
 
-		sgl.end()*/
+		gl.end()*/
 	}
 
-	// Expected base lines
+	// DEBUG: Expected base lines
 	/*
-	sgl.c4b(0, 255, 0, 90)
+	gl.c4b(0, 255, 0, 90)
 	line(x1, y1, x2, y2)
 	line(x2, y2, x3, y3)
 	*/
