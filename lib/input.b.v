@@ -17,7 +17,7 @@ mut:
 }
 
 pub fn (mut gp Gamepad) init() ! {
-	gp.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	gp.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	s := gp.shy
 	// Open the device
 	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
@@ -70,7 +70,7 @@ pub fn (mut ip Input) scan() ! {
 // init initializes input systems (keyboard, mouse etc.)
 pub fn (mut ip Input) init() ! {
 	ip.shy.assert_api_init()
-	ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	ip.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	s := ip.shy
 
 	// mut mice_support := s.config.input.mice
@@ -124,7 +124,7 @@ pub fn (mut ip Input) init() ! {
 
 pub fn (mut ip Input) shutdown() ! {
 	ip.shy.assert_api_shutdown()
-	ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	ip.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 }
 
 fn (mut ip Input) init_input() ! {

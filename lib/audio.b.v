@@ -18,7 +18,7 @@ mut:
 // init initializes the audio system.
 pub fn (mut a Audio) init() ! {
 	a.shy.assert_api_init()
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	// Initialize default playback engine
 	ma_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
@@ -55,7 +55,7 @@ pub fn (mut a Audio) new_engine() !&AudioEngine {
 
 pub fn (mut a Audio) shutdown() ! {
 	a.shy.assert_api_shutdown()
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	for _, mut engine in a.engines {
 		engine.shutdown()!
 	}

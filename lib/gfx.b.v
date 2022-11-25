@@ -70,7 +70,7 @@ pub fn (mut g GFX) begin_pass(id u16) {
 pub fn (mut g GFX) init() ! {
 	g.shy.assert_api_init()
 	mut s := g.shy
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
 	mut gfx_desc := gfx.Desc{
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		context_pool_size: 4 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...

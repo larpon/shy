@@ -31,7 +31,7 @@ mut:
 pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 	mut s := unsafe { shy_instance }
 	a.shy = s
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
 	boot := Boot{
 		shy: s
 	}

@@ -52,7 +52,7 @@ pub fn (mut fs Fonts) load_font(name string, path string) ! {
 pub fn (mut fs Fonts) init(config FontsConfig) ! {
 	fs.shy = config.shy
 	mut s := fs.shy
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
 	// Load the Shy default font
 	// TODO use *.shy.assets() to cache the data?
@@ -113,7 +113,7 @@ pub fn (mut fs Fonts) init(config FontsConfig) ! {
 }
 
 pub fn (mut fs Fonts) shutdown() ! {
-	fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	fs.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	mut s := fs.shy
 	for context in fs.contexts {
 		if !isnil(context.fsc) {

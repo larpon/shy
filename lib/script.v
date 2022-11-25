@@ -26,7 +26,7 @@ pub fn (sc Scripts) new_wren_vm() !&WrenVM {
 
 pub fn (mut sc Scripts) init() ! {
 	sc.shy.assert_api_init()
-	sc.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 }
 
 fn (sc Scripts) on_frame(dt f64) {
@@ -39,7 +39,7 @@ fn (sc Scripts) on_frame(dt f64) {
 [manualfree]
 pub fn (mut sc Scripts) shutdown() ! {
 	sc.shy.assert_api_shutdown()
-	sc.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 
 	for mut wvm in sc.wren_vms {
 		wvm.shutdown()!

@@ -89,7 +89,7 @@ pub fn (mut s Shy) init() ! {
 	$if debug ? {
 		s.log.set(.debug)
 	}
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
 	s.api.init(s)!
 	s.health()!
 	s.ready = true

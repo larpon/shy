@@ -16,7 +16,7 @@ import shy.wraps.sokol.gfx
 pub fn (b Boot) init() !&WM {
 	b.shy.assert_api_init()
 	s := b.shy
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
 	wm := &WM{
 		shy: s
 	}
@@ -27,7 +27,7 @@ pub fn (mut wm WM) init() ! {
 	wm.shy.assert_api_init()
 	mut s := wm.shy
 
-	s.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
 	$if linux {
 		// Experiments
@@ -179,7 +179,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 pub fn (mut wm WM) shutdown() ! {
 	wm.shy.assert_api_shutdown()
-	wm.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	wm.root.close()!
 	// TODO test unsafe { free(wm) }
 
@@ -645,7 +645,7 @@ pub fn (w &Window) make_current() {
 }
 
 pub fn (mut w Window) init() ! {
-	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	mut s := w.shy
 
 	// $if opengl ? {
@@ -717,12 +717,12 @@ pub fn (mut w Window) init() ! {
 
 pub fn (mut w Window) close() ! {
 	w.ready = false
-	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	w.shutdown()!
 }
 
 pub fn (mut w Window) shutdown() ! {
-	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	for mut window in w.children {
 		window.close()!
 	}

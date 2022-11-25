@@ -40,7 +40,7 @@ fn (w WrenVM) on_frame(dt f64) {
 fn wren_no_fn(vm &wren.VM) {}
 
 pub fn (mut w WrenVM) init() ! {
-	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'hi')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 
 	mut config := wren.Configuration{
 		// userData: voidptr(w.shy) // Doesn't work?!
@@ -75,7 +75,7 @@ pub fn (mut w WrenVM) init() ! {
 }
 
 pub fn (mut w WrenVM) shutdown() ! {
-	w.shy.log.gdebug('${@STRUCT}.${@FN}', 'bye')
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	for class in w.classes {
 		for _, method in class.methods {
 			w.vm.release_handle(method)
