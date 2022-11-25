@@ -796,6 +796,7 @@ pub mut:
 	stencil       StencilState
 	color_count   int
 	// TODO 	colors [SG_MAX_COLOR_ATTACHMENTS]ColorState
+	colors                    [4]ColorState
 	primitive_type            PrimitiveType
 	index_type                IndexType
 	cull_mode                 CullMode
@@ -825,6 +826,7 @@ struct C.sg_pass_desc {
 pub mut:
 	_start_canary u32
 	// TODO 	color_attachments [SG_MAX_COLOR_ATTACHMENTS]PassAttachmentDesc
+	color_attachments        [4]PassAttachmentDesc
 	depth_stencil_attachment PassAttachmentDesc
 	label                    &char = unsafe { nil }
 	_end_canary              u32

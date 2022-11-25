@@ -3,8 +3,8 @@ module gl
 import shy.wraps.sokol.gfx
 
 pub const (
-	version = gfx.version + 1
-	context = Context{0x00010001} // C.SGL_DEFAULT_CONTEXT = { 0x00010001 }
+	version         = gfx.version + 0
+	default_context = Context{0x00010001} // C.SGL_DEFAULT_CONTEXT = { 0x00010001 }
 )
 
 // setup/shutdown/misc

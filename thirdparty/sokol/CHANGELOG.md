@@ -1,5 +1,118 @@
 ## Updates
 
+- **16-Nov-2022**: Render layer support has been added to sokol_debugtext.h,
+  same general changes as in sokol_gl.h with two new functions:
+  sdtx_layer(layer_id) to select the layer to record text into, and
+  sdtx_draw_layer(layer_id) to draw the recorded text in that layer inside a
+  sokol-gfx render pass. The new sample [debugtext-layers-sapp](https://floooh.github.io/sokol-html5/debugtext-layers-sapp) demonstrates the feature together with
+  sokol-gl.
+
+
+- **11-Nov-2022**: sokol_gl.h has 2 new public API functions which enable
+  layered rendering: sgl_layer(), sgl_draw_layer() (technically it's three
+  functions: there's also sgl_context_draw_layer(), but that's just a variant of
+  sgl_draw_layer()). This allows to 'interleave' sokol-gl rendering
+  with other render operations. The [spine-layers-sapp](https://floooh.github.io/sokol-html5/spine-layers-sapp.html)
+  sample has been updated to use multiple sokol-gl layers.
+
+- **09-Nov-2022**: sokol_gfx.h now allows to add 'commit listeners', these
+  are callback functions which are called from inside sg_commit(). This is
+  mainly useful for libraries which build on top of sokol-gfx to be notified
+  about the start/end point of a frame, which in turn may simplify the public
+  API, or the internal implementation, because the library no longer needs to
+  'guess' when a new frame starts.
+
+  For more details, search for 'COMMIT LISTENERS' in the sokol_gfx.h header.
+
+  This also results in a minor breaking change in sokol_spine.h: The function
+  ```sspine_new_frame()``` has been removed and replaced with an internal commit
+  listener.
+
+  Likewise, sokol_gl.h now uses a commit listener in the implementation, but
+  without changing the public API (the feature will be important for an upcoming
+  sokol-gl feature to support rendering layers, and for this a 'new-frame-function'
+  would have been needed).
+
+- **05-Nov-2022** A breaking change in sokol_fetch.h, and a minor change in
+  sokol_app.h which should only break for very users:
+  - An ```sfetch_range_t``` ptr/size pair struct has been added to sokol_fetch.h,
+    and discrete ptr/size pairs have been replaced with sfetch_range_t
+    items. This affects the structs ```sfetch_request_t``` and ```sfetch_response_t```,
+    and the function ```sfetch_bind_buffer()```.
+  - The required changes in ```sfetch_response_t``` might be a bit non-obviois: To
+    access the fetched data, previous ```.buffer_ptr``` and ```.fetched_size```
+    was used. The fetched data is now accessible through an ```sfetch_range_t data```
+    item (```data.ptr``` and ```data.size```). The old ```.fetched_offset``` item
+    has been renamed to ```.data_offset``` to better conform with the new naming.
+  - The last two occurances of discrete ptr/size pairs in sokol_app.h now have also
+    been replaced with ```sapp_range_t``` items, this only affects the structs
+    ```sapp_html5_fetch_request``` and ```sapp_html5_fetch_response```.
+
+- **03-Nov-2022** The language bindings generation has been updated for Zig 0.10.0,
+  and clang-14 (there was a minor change in the JSON ast-dump format).
+  Many thanks to github user @kcbanner for the Zig PR!
+
+- **02-Nov-2022** A new header sokol_spine.h (in the util dir), this is a
+  renderer and 'handle wrapper' around the spine-c runtime (Spine is a popular 2D
+  character anim system: http://esotericsoftware.com/). This turned out a much bigger
+  rabbit-hole than I initially expected, but the effort is justified by being a
+  experimentation testbed for a couple of things I want to add to other sokol
+  headers (for instance cleaned up handle pool code, a new logging- and error-reporting
+  system, render layers which will be useful for sokol_gl.h and sokol_debugtext.h).
+
+- **22-Oct-2022** All sokol headers now allow to override logging with a
+  callback function (installed in the setup call) instead of defining a SOKOL_LOG
+  macro. Overriding SOKOL_LOG still works as default fallback, but this is no
+  longer documented, consider this deprecated. Many thanks to github user
+  @Manuzor for the PR (see https://github.com/floooh/sokol/pull/721 for details)
+
+- **21-Oct-2022** RGB9E5 pixel format support in sokol_gfx.h and a GLES2 related
+  bugfix in the sokol_app.h Android backend:
+  - sokol_gfx.h now supports RGB9E5 textures (3*9 bit RGB + 5 bit shared exponent),
+    this works in all backends except GLES2 and WebGL1 (use ```sg_query_pixelformat()```
+    to check for runtime support). Many thanks to github user @allcreater for the PR!
+  - a bugfix in the sokol_app.h Android backend: when forcing a GLES2 context via
+    sapp_desc.gl_force_gles2, the Android backend correctly created a GLES2 context,
+    but then didn't communicate this through the function ```sapp_gles2()``` (which
+    still returned false in this case). This caused the sokol_gfx.h GL backend to
+    use the GLES3 code path instead GLES2 (which surprisingly seemed to have worked
+    fine, at least for the sokol samples which force GLES2).
+
+- **19-Oct-2022** Some fixes in the embedded Javascript code blocks (via EM_JS)
+  in sokol_app.h, sokol_args.h, sokol_audio.h and sokol_fetch.h:
+  - the JS code has been 'modernized' (e.g. const and let instead of var,
+    ```() => { ... }``` instead of ```function () { ... }``` for callbacks)
+  - false positives in the Closure static analysis have been supressed
+    via inline hints
+
+- **16-Oct-2022** The Odin bindings generator and the generated bindings have
+  been simplified (the Odin binding now don't have separate wrapper functions).
+  Requires the latest Odin release. Also note: On M1 Macs I'm currently seeing
+  what looks like an ABI problem (in functions which pass color values to the C
+  side as uint8_t, the colors come out wrong). This also happened with the
+  previous binding version, so it looks like a regression in Odin. Might be
+  related to this recent bugfix (which I haven't tested yet):
+  https://github.com/odin-lang/Odin/issues/2121 Many thanks to @thePHTest for the
+  PR! (https://github.com/floooh/sokol/pull/719)
+
+- **15-Oct-2022**
+    - fixes for Emscripten 3.1.24: the sokol headers now use the new
+    **EM_JS_DEPS()** macro to declare 'indirect dependencies on JS library functions'.
+    This is a (much more robust) follow-up fix to the Emscripten related fixes from 10-Sep-2022.
+    The new Emscripten SDK also displays a couple of Javascript "static analyzer" warnings
+    by the Closure compiler (used in release mode to optimize and minify the generated
+    JS code). I fixed a couple of those warnings, but some warnings persist (all of them
+    false positives). Not sure yet if these can be fixed or need to be supressed, but
+    that's for another time.
+    - the webkitAudioContext() fallback in sokol_audio.h's Emscripten backend
+    has been removed (only AudioContext is supported now), the fallback also
+    triggered a Closure warning, so it probably never worked as intended anyway.
+    - I also had to undo an older workaround in sokol_app.h on iOS (https://github.com/floooh/sokol/issues/645)
+    because this is now triggering a Metal validation layer error (https://github.com/floooh/sokol/issues/726).
+    The original case is no longer reproducible, so undoing the old workaround seems to
+    be a quick fix. Eventually I want to get rid of MTKView though, and go down to
+    CAMetalLayer.
+
 - **08-Oct-2022** sokol_app.h Android backend: the ```sapp_touchpoint``` struct
   now has a new item ```sapp_android_tooltype android_tooltype;```. This exposes the
   result of the Android NDK function ```AMotionEvent_getToolType()```.

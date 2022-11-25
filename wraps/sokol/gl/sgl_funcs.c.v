@@ -100,3 +100,5 @@ fn C.sgl_end()
 // render recorded commands
 fn C.sgl_draw()
 fn C.sgl_context_draw(ctx C.sgl_context)
+fn C.sgl_draw_layer(layer_id int)
+fn C.sgl_context_draw_layer(ctx C.sgl_context, layer_id int)
