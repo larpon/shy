@@ -25,20 +25,11 @@ pub struct Easy {
 mut:
 	quick        Quick
 	audio_engine &shy.AudioEngine = shy.null
-	fonts        shy.Fonts
-	layer        int
 }
 
-pub struct EasyConfig {
-	// audio_engine &shy.AudioEngine = shy.null
-	fonts shy.Fonts
-}
-
-pub fn (mut e Easy) init(ec EasyConfig) ! {
-	assert !isnil(e.shy), 'Easy struct is not initialized'
+pub fn (mut e Easy) init() ! {
 	e.quick.easy = e
 	e.audio_engine = e.shy.audio().engine(0)!
-	e.fonts = ec.fonts
 }
 
 pub fn (mut e Easy) shutdown() ! {}
@@ -55,7 +46,6 @@ pub mut:
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2<f32>
-	fonts    shy.Fonts // TODO fix this font mess
 }
 
 [noinit]
@@ -71,13 +61,12 @@ pub mut:
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2<f32>
-	fonts    shy.Fonts // TODO fix this font mess
 }
 
 [inline]
 pub fn (et &EasyText) draw() {
 	draw := et.shy.draw()
-	mut dt := draw.text(et.fonts) // TODO fix this font mess
+	mut dt := draw.text()
 	dt.begin()
 	mut t := dt.text_2d()
 	t.text = et.text
@@ -99,7 +88,6 @@ pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 	return EasyText{
 		...etc
 		shy: e.shy
-		fonts: e.fonts // TODO fix this font mess
 	}
 }
 

@@ -17,20 +17,14 @@ struct App {
 }
 
 [markused]
-pub fn (mut a App) init() ! {
-	a.ExampleApp.init()!
-
-	a.quick.load(
-		uri: a.asset('image/shy_logo.png')
-	)!
-}
-
-[markused]
 pub fn (mut a App) frame(dt f64) {
-	a.quick.image(
+	a.quick.uniform_poly(
 		x: shy.half * a.window.width()
 		y: shy.half * a.window.height()
-		uri: a.asset('image/shy_logo.png')
-		origin: .center
+		radius: 100
+		segments: 6
+		stroke: shy.Stroke{
+			width: 10
+		}
 	)
 }

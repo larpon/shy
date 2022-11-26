@@ -5,7 +5,6 @@ module lib
 
 import shy.vec { Vec2 }
 import shy.mth
-// Required for font rendering
 import shy.wraps.sokol.gl
 import shy.wraps.sokol.sfons
 
@@ -14,7 +13,6 @@ pub struct DrawText {
 	ShyFrame
 mut:
 	font_context &FontContext = null
-	fonts        Fonts
 }
 
 pub fn (mut dt DrawText) begin() {
@@ -22,7 +20,7 @@ pub fn (mut dt DrawText) begin() {
 	win := dt.shy.active_window()
 	w, h := win.drawable_wh()
 
-	mut fonts := unsafe { dt.fonts }
+	mut fonts := unsafe { dt.shy.api.gfx.fonts }
 	fc := fonts.get_context()
 	// gl.set_context(fc.sgl)
 

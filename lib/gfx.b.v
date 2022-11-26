@@ -3,7 +3,9 @@
 // that can be found in the LICENSE file.
 module lib
 
+import os.font
 import shy.wraps.sokol.gfx
+import shy.wraps.sokol.gl
 
 pub struct GFX {
 	ShyStruct
@@ -12,6 +14,7 @@ mut:
 	// TODO render passes
 	passes []RenderPass
 	// pass RenderPass
+	fonts Fonts
 }
 
 // Render passes / targets
@@ -85,6 +88,44 @@ pub fn (mut g GFX) init() ! {
 	g.ready = true
 }
 
+pub fn (mut g GFX) subsystem_init() ! {
+	// g.shy.assert_api_init()
+	mut s := g.shy
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
+
+	// sokol_gl is used for all drawing operations in the Easy/Quick app types
+	sample_count := g.shy.config.render.msaa
+	gl_desc := &gl.Desc{
+		// max_vertices: 1_000_000
+		// max_commands: 100_000
+		context_pool_size: 2 * 512 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		pipeline_pool_size: 2 * 1024 // TODO default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		sample_count: sample_count
+	}
+	gl.setup(gl_desc)
+
+	// TODO Initialize font drawing sub system
+	mut preload_fonts := map[string]string{}
+	$if !wasm32_emscripten {
+		preload_fonts['system'] = font.default()
+	}
+
+	g.fonts.init(FontsConfig{
+		shy: g.shy
+		// prealloc_contexts: 8
+		preload: preload_fonts
+		render: g.shy.config.render
+	})! // fonts.b.v
+}
+
+pub fn (mut g GFX) subsystem_shutdown() ! {
+	// g.shy.assert_api_init()
+	mut s := g.shy
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
+	g.fonts.shutdown()!
+	gl.shutdown()
+}
+
 pub fn (mut g GFX) shutdown() ! {
 	g.shy.assert_api_shutdown()
 	g.ready = false
@@ -95,6 +136,8 @@ pub fn (g GFX) commit() {
 	gfx.commit()
 }
 
-pub fn (g GFX) end_pass() {
+pub fn (mut g GFX) end_pass() {
+	g.fonts.on_frame_end()
+	gl.draw()
 	gfx.end_pass()
 }

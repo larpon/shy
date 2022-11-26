@@ -14,3 +14,7 @@ mut:
 	w_id   u32
 	active &Window = null
 }
+
+fn (wm &WM) find_window(wid u32) ?&Window {
+	return wm.root.find_window(wid)
+}

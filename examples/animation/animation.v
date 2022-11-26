@@ -107,8 +107,8 @@ pub fn (mut a App) frame(dt f64) {
 	}
 
 	a.quick.rect(
-		x: (win.width() / 2)
-		y: (win.height() / 2)
+		x: shy.half * win.width()
+		y: shy.half * win.height()
 		rotation: a.a_r.value() * shy.deg2rad
 		scale: a.a_s.value()
 		origin: .center

@@ -76,14 +76,13 @@ pub fn (d &Draw) shape_2d() DrawShape2D {
 	return d2d
 }
 
-pub fn (d &Draw) text(fonts Fonts) DrawText {
+pub fn (d &Draw) text() DrawText {
 	// unsafe { d.layer++ }
 	// d.font_layer << d.layer
 
 	s := d.shy
 	mut dt := DrawText{
 		shy: s
-		fonts: fonts // TODO fix this horrible font mess
 	}
 	dt.init() or {
 		msg := 'initializing DrawText failed'

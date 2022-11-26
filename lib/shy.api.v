@@ -37,6 +37,13 @@ pub fn (s &Shy) performance_frequency() u64 {
 }
 
 [inline]
+pub fn (s &Shy) wm() &WM {
+	assert !isnil(s.api)
+	assert !isnil(s.api.wm)
+	return s.api.wm
+}
+
+[inline]
 pub fn (s &Shy) assets() &Assets {
 	assert !isnil(s.api)
 	assert !isnil(s.api.assets)

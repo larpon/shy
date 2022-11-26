@@ -19,8 +19,8 @@ struct App {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.circle(
-		x: (a.window.width() / 2)
-		y: (a.window.height() / 2)
+		x: shy.half * a.window.width()
+		y: shy.half * a.window.height()
 		radius: 100
 		stroke: shy.Stroke{
 			width: 10

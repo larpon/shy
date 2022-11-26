@@ -372,6 +372,16 @@ pub mut:
 	state FrameState
 }
 
+pub fn (w &Window) find_window(id u32) ?&Window {
+	if w.id == id {
+		return w
+	}
+	for win in w.children {
+		return win.find_window(id)
+	}
+	return none
+}
+
 pub fn (mut w Window) begin_frame() {
 	// Make *this* window's context the current
 	w.make_current()
@@ -628,7 +638,11 @@ pub fn (w Window) is_root() bool {
 }
 
 pub fn (mut w Window) new_window(config WindowConfig) !&Window {
+	w.shy.running = false // TODO
+	w.shy.state.in_hot_code = false // TODO
 	win := w.shy.api.wm.new_window(config)!
+	w.shy.running = true // TODO
+	w.shy.state.in_hot_code = true // TODO
 	unsafe {
 		win.parent = w
 	}
@@ -696,11 +710,9 @@ pub fn (mut w Window) init() ! {
 	// Change all contexts to this window's
 	w.make_current()
 
-	/*
 	// Init subsystem's for this context setup
 	// TODO does this work ????
-	w.shy.api.gfx.init_subsystems()!
-	*/
+	w.shy.api.gfx.subsystem_init()!
 
 	w.anims = &Anims{
 		shy: s
@@ -732,7 +744,7 @@ pub fn (mut w Window) shutdown() ! {
 	w.anims.shutdown()!
 	unsafe { free(w.anims) }
 
-	// w.shy.api.gfx.shutdown_subsystems()!
+	w.shy.api.gfx.subsystem_shutdown()!
 
 	gfx.discard_context(w.gfx_context)
 	// $if opengl ? {
