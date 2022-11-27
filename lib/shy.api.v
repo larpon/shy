@@ -78,8 +78,8 @@ pub fn (s &Shy) app() voidptr {
 }
 
 [inline]
-pub fn vec2<T>(x T, y T) vec.Vec2<T> {
-	return vec.Vec2<T>{
+pub fn vec2[T](x T, y T) vec.Vec2[T] {
+	return vec.Vec2[T]{
 		x: x
 		y: y
 	}

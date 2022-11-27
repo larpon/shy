@@ -108,7 +108,7 @@ pub fn (mut w WrenVM) register_lookup_fn<T>(fn_ptr wren.ForeignMethodFn)! {
 }
 */
 
-pub fn (mut w WrenVM) register_class<T>(fn_name string, fn_ptr wren.ForeignMethodFn) ! {
+pub fn (mut w WrenVM) register_class[T](fn_name string, fn_ptr wren.ForeignMethodFn) ! {
 	class_name := T.name
 
 	/*
@@ -169,7 +169,7 @@ pub fn (mut w WrenVM) register_class<T>(fn_name string, fn_ptr wren.ForeignMetho
 	w.classes << wren_class
 }
 
-pub fn (mut w WrenVM) eval2<T>(wren_code string) ! {
+pub fn (mut w WrenVM) eval2[T](wren_code string) ! {
 	class_name := T.name
 	w.eval(class_name, wren_code)!
 }

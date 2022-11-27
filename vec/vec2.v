@@ -5,29 +5,29 @@ module vec
 
 import math
 
-pub struct Vec2<T> {
+pub struct Vec2[T] {
 pub mut:
 	x T
 	y T
 }
 
-pub fn vec2<T>(x T, y T) Vec2<T> {
-	return Vec2<T>{
+pub fn vec2[T](x T, y T) Vec2[T] {
+	return Vec2[T]{
 		x: x
 		y: y
 	}
 }
 
-pub fn (mut v Vec2<T>) zero() {
+pub fn (mut v Vec2[T]) zero() {
 	v.x = 0
 	v.y = 0
 }
 
-pub fn (mut v Vec2<T>) copy() Vec2<T> {
-	return Vec2<T>{v.x, v.y}
+pub fn (mut v Vec2[T]) copy() Vec2[T] {
+	return Vec2[T]{v.x, v.y}
 }
 
-pub fn (mut v Vec2<T>) from(u Vec2<T>) {
+pub fn (mut v Vec2[T]) from(u Vec2[T]) {
 	v.x = u.x
 	v.y = u.y
 }
@@ -36,28 +36,28 @@ pub fn (mut v Vec2<T>) from(u Vec2<T>) {
 // Addition
 //
 // + operator overload. Adds two vectors
-pub fn (v1 Vec2<T>) + (v2 Vec2<T>) Vec2<T> {
-	return Vec2<T>{v1.x + v2.x, v1.y + v2.y}
+pub fn (v1 Vec2[T]) + (v2 Vec2[T]) Vec2[T] {
+	return Vec2[T]{v1.x + v2.x, v1.y + v2.y}
 }
 
-pub fn (v Vec2<T>) add(u Vec2<T>) Vec2<T> {
-	return Vec2<T>{v.x + u.x, v.y + u.y}
+pub fn (v Vec2[T]) add(u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x + u.x, v.y + u.y}
 }
 
-pub fn (v Vec2<T>) add_f64(scalar f64) Vec2<T> {
-	return Vec2<T>{v.x + T(scalar), v.y + T(scalar)}
+pub fn (v Vec2[T]) add_f64(scalar f64) Vec2[T] {
+	return Vec2[T]{v.x + T(scalar), v.y + T(scalar)}
 }
 
-pub fn (v Vec2<T>) add_f32(scalar f32) Vec2<T> {
-	return Vec2<T>{v.x + T(scalar), v.y + T(scalar)}
+pub fn (v Vec2[T]) add_f32(scalar f32) Vec2[T] {
+	return Vec2[T]{v.x + T(scalar), v.y + T(scalar)}
 }
 
-pub fn (mut v Vec2<T>) plus(u Vec2<T>) {
+pub fn (mut v Vec2[T]) plus(u Vec2[T]) {
 	v.x += u.x
 	v.y += u.y
 }
 
-pub fn (mut v Vec2<T>) plus_scalar(scalar T) {
+pub fn (mut v Vec2[T]) plus_scalar(scalar T) {
 	v.x += scalar
 	v.y += scalar
 }
@@ -65,24 +65,24 @@ pub fn (mut v Vec2<T>) plus_scalar(scalar T) {
 //
 // Subtraction
 //
-pub fn (v1 Vec2<T>) - (v2 Vec2<T>) Vec2<T> {
-	return Vec2<T>{v1.x - v2.x, v1.y - v2.y}
+pub fn (v1 Vec2[T]) - (v2 Vec2[T]) Vec2[T] {
+	return Vec2[T]{v1.x - v2.x, v1.y - v2.y}
 }
 
-pub fn (v Vec2<T>) sub(u Vec2<T>) Vec2<T> {
-	return Vec2<T>{v.x - u.x, v.y - u.y}
+pub fn (v Vec2[T]) sub(u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x - u.x, v.y - u.y}
 }
 
-pub fn (v Vec2<T>) sub_scalar(scalar T) Vec2<T> {
-	return Vec2<T>{v.x - scalar, v.y - scalar}
+pub fn (v Vec2[T]) sub_scalar(scalar T) Vec2[T] {
+	return Vec2[T]{v.x - scalar, v.y - scalar}
 }
 
-pub fn (mut v Vec2<T>) subtract(u Vec2<T>) {
+pub fn (mut v Vec2[T]) subtract(u Vec2[T]) {
 	v.x -= u.x
 	v.y -= u.y
 }
 
-pub fn (mut v Vec2<T>) subtract_f64(scalar f64) {
+pub fn (mut v Vec2[T]) subtract_f64(scalar f64) {
 	v.x -= scalar
 	v.y -= scalar
 }
@@ -90,24 +90,24 @@ pub fn (mut v Vec2<T>) subtract_f64(scalar f64) {
 //
 // Multiplication
 //
-pub fn (v1 Vec2<T>) * (v2 Vec2<T>) Vec2<T> {
-	return Vec2<T>{v1.x * v2.x, v1.y * v2.y}
+pub fn (v1 Vec2[T]) * (v2 Vec2[T]) Vec2[T] {
+	return Vec2[T]{v1.x * v2.x, v1.y * v2.y}
 }
 
-pub fn (v Vec2<T>) mul(u Vec2<T>) Vec2<T> {
-	return Vec2<T>{v.x * u.x, v.y * u.y}
+pub fn (v Vec2[T]) mul(u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x * u.x, v.y * u.y}
 }
 
-pub fn (v Vec2<T>) mul_f64(scalar f64) Vec2<T> {
-	return Vec2<T>{v.x * T(scalar), v.y * T(scalar)}
+pub fn (v Vec2[T]) mul_f64(scalar f64) Vec2[T] {
+	return Vec2[T]{v.x * T(scalar), v.y * T(scalar)}
 }
 
-pub fn (mut v Vec2<T>) multiply(u Vec2<T>) {
+pub fn (mut v Vec2[T]) multiply(u Vec2[T]) {
 	v.x *= u.x
 	v.y *= u.y
 }
 
-pub fn (mut v Vec2<T>) multiply_f64(scalar f64) {
+pub fn (mut v Vec2[T]) multiply_f64(scalar f64) {
 	v.x *= T(scalar)
 	v.y *= T(scalar)
 }
@@ -115,24 +115,24 @@ pub fn (mut v Vec2<T>) multiply_f64(scalar f64) {
 //
 // Division
 //
-pub fn (v1 Vec2<T>) / (v2 Vec2<T>) Vec2<T> {
-	return Vec2<T>{v1.x / v2.x, v1.y / v2.y}
+pub fn (v1 Vec2[T]) / (v2 Vec2[T]) Vec2[T] {
+	return Vec2[T]{v1.x / v2.x, v1.y / v2.y}
 }
 
-pub fn (v Vec2<T>) div(u Vec2<T>) Vec2<T> {
-	return Vec2<T>{v.x / u.x, v.y / u.y}
+pub fn (v Vec2[T]) div(u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x / u.x, v.y / u.y}
 }
 
-pub fn (v Vec2<T>) div_f64(scalar f64) Vec2<T> {
-	return Vec2<T>{v.x / T(scalar), v.y / T(scalar)}
+pub fn (v Vec2[T]) div_f64(scalar f64) Vec2[T] {
+	return Vec2[T]{v.x / T(scalar), v.y / T(scalar)}
 }
 
-pub fn (mut v Vec2<T>) divide(u Vec2<T>) {
+pub fn (mut v Vec2[T]) divide(u Vec2[T]) {
 	v.x /= u.x
 	v.y /= u.y
 }
 
-pub fn (mut v Vec2<T>) divide_f64(scalar f64) {
+pub fn (mut v Vec2[T]) divide_f64(scalar f64) {
 	v.x /= scalar
 	v.y /= scalar
 }
@@ -140,7 +140,7 @@ pub fn (mut v Vec2<T>) divide_f64(scalar f64) {
 //
 // Utility
 //
-pub fn (v Vec2<T>) length() T {
+pub fn (v Vec2[T]) length() T {
 	if v.x == 0 && v.y == 0 {
 		return 0
 	}
@@ -156,38 +156,38 @@ pub fn (v Vec2<T>) length() T {
 	return 0.0
 }
 
-pub fn (v Vec2<T>) dot(u Vec2<T>) T {
+pub fn (v Vec2[T]) dot(u Vec2[T]) T {
 	return (v.x * u.x) + (v.y * u.y)
 }
 
 // cross returns the cross product of v and u
-pub fn (v Vec2<T>) cross(u Vec2<T>) T {
+pub fn (v Vec2[T]) cross(u Vec2[T]) T {
 	return (v.x * u.y) - (v.y * u.x)
 }
 
 // unit return this vector's unit vector
-pub fn (v Vec2<T>) unit() Vec2<T> {
+pub fn (v Vec2[T]) unit() Vec2[T] {
 	length := v.length()
-	return Vec2<T>{v.x / length, v.y / length}
+	return Vec2[T]{v.x / length, v.y / length}
 }
 
-pub fn (v Vec2<T>) perp() Vec2<T> {
-	return Vec2<T>{-v.y, v.x}
+pub fn (v Vec2[T]) perp() Vec2[T] {
+	return Vec2[T]{-v.y, v.x}
 }
 
 // perpendicular return the perpendicular vector of this
-pub fn (v Vec2<T>) perpendicular(u Vec2<T>) Vec2<T> {
+pub fn (v Vec2[T]) perpendicular(u Vec2[T]) Vec2[T] {
 	return v - v.project(u)
 }
 
 // project returns the projected vector
-pub fn (v Vec2<T>) project(u Vec2<T>) Vec2<T> {
+pub fn (v Vec2[T]) project(u Vec2[T]) Vec2[T] {
 	percent := v.dot(u) / u.dot(v)
 	return u.mul_f64(percent)
 }
 
 // eq returns a bool indicating if the two vectors are equal
-pub fn (v Vec2<T>) eq(u Vec2<T>) bool {
+pub fn (v Vec2[T]) eq(u Vec2[T]) bool {
 	return v.x == u.x && v.y == u.y
 }
 
@@ -198,7 +198,7 @@ pub fn (v Vec2<T>) eq(u Vec2<T>) bool {
 // }
 
 // eq_approx will return a bool indicating if vectors are approximately equal within the tolerance
-pub fn (v Vec2<T>) eq_approx(u Vec2<T>, tolerance T) bool {
+pub fn (v Vec2[T]) eq_approx(u Vec2[T], tolerance T) bool {
 	diff_x := math.abs(v.x - u.x)
 	diff_y := math.abs(v.y - u.y)
 	if diff_x <= tolerance && diff_y <= tolerance {
@@ -215,7 +215,7 @@ pub fn (v Vec2<T>) eq_approx(u Vec2<T>, tolerance T) bool {
 }
 
 // is_approx_zero will return a bool indicating if this vector is zero within tolerance
-pub fn (v Vec2<T>) is_approx_zero(tolerance T) bool {
+pub fn (v Vec2[T]) is_approx_zero(tolerance T) bool {
 	if math.abs(v.x) <= tolerance && math.abs(v.y) <= tolerance {
 		return true
 	}
@@ -223,17 +223,17 @@ pub fn (v Vec2<T>) is_approx_zero(tolerance T) bool {
 }
 
 // eq_f64 returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec2<T>) eq_f64(scalar f64) bool {
+pub fn (v Vec2[T]) eq_f64(scalar f64) bool {
 	return v.x == scalar && v.y == scalar
 }
 
 // eq_f32 returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec2<T>) eq_f32(scalar f32) bool {
+pub fn (v Vec2[T]) eq_f32(scalar f32) bool {
 	return v.eq_f64(f64(scalar))
 }
 
 // distance returns the distance between the two vectors
-pub fn (v Vec2<T>) distance(u Vec2<T>) T {
+pub fn (v Vec2[T]) distance(u Vec2[T]) T {
 	$if T is f64 {
 		return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
 	} $else $if T is f32 {
@@ -246,12 +246,12 @@ pub fn (v Vec2<T>) distance(u Vec2<T>) T {
 }
 
 // manhattan_distance returns the Manhattan distance between the two vectors
-pub fn (v Vec2<T>) manhattan_distance(u Vec2<T>) T {
+pub fn (v Vec2[T]) manhattan_distance(u Vec2[T]) T {
 	return math.abs(v.x - u.x) + math.abs(v.y - u.y)
 }
 
 // angle_between returns the angle in radians between the two vectors
-pub fn (v Vec2<T>) angle_between(u Vec2<T>) T {
+pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 	$if T is f64 {
 		return math.atan2((v.y - u.y), (v.x - u.x))
 	} $else $if T is f32 {
@@ -264,7 +264,7 @@ pub fn (v Vec2<T>) angle_between(u Vec2<T>) T {
 }
 
 // angle returns the angle in radians of the vector
-pub fn (v Vec2<T>) angle() T {
+pub fn (v Vec2[T]) angle() T {
 	$if T is f64 {
 		return math.atan2(v.y, v.x)
 	} $else $if T is f32 {
@@ -277,7 +277,7 @@ pub fn (v Vec2<T>) angle() T {
 }
 
 // abs will set x and y values to their absolute values
-pub fn (mut v Vec2<T>) abs() {
+pub fn (mut v Vec2[T]) abs() {
 	if v.x < 0 {
 		v.x = math.abs(v.x)
 	}

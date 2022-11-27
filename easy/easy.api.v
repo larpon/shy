@@ -45,7 +45,7 @@ pub mut:
 	size     f32 = shy.defaults.font.size
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 }
 
 [noinit]
@@ -60,7 +60,7 @@ pub mut:
 	size     f32 = shy.defaults.font.size
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 }
 
 [inline]
@@ -108,7 +108,7 @@ pub mut:
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .outline
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
 
@@ -122,7 +122,7 @@ pub mut:
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .outline
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
 
@@ -172,7 +172,7 @@ pub mut:
 	rotation f32
 	scale    f32 = 1.0
 	ray      bool
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center_left
 }
 
@@ -185,7 +185,7 @@ pub mut:
 	rotation f32
 	scale    f32 = 1.0
 	ray      bool
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center_left
 }
 
@@ -249,7 +249,7 @@ pub mut:
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .outline
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
 
@@ -263,7 +263,7 @@ pub mut:
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .outline
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
 
@@ -314,7 +314,7 @@ pub mut:
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .outline
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
 
@@ -329,7 +329,7 @@ pub mut:
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .outline
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
 
@@ -460,7 +460,7 @@ pub:
 	color    shy.Color = shy.rgb(255, 255, 255)
 	rotation f32
 	scale    f32 = 1.0
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
 
@@ -473,7 +473,7 @@ pub:
 	color    shy.Color = shy.rgb(255, 255, 255)
 	rotation f32
 	scale    f32 = 1.0
-	offset   vec.Vec2<f32>
+	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
 

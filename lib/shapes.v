@@ -27,7 +27,7 @@ pub fn (mut r Rect) displace_from(origin Anchor) {
 
 pub struct Ray {
 pub mut:
-	origin Vec2<f32> // origin point
+	origin Vec2[f32] // origin point
 	angle  f32       // radians
 }
 
@@ -36,8 +36,8 @@ pub mut:
 // which represents an "infinite" line originating from a point.
 pub struct Line {
 pub mut:
-	a Vec2<f32>
-	b Vec2<f32> = Vec2<f32>{
+	a Vec2[f32]
+	b Vec2[f32] = Vec2[f32]{
 		x: 100
 		y: 100
 	}
@@ -278,7 +278,7 @@ pub enum Anchor {
 	bottom_right
 }
 
-pub fn (a Anchor) pos_wh<T>(w T, h T) (T, T) {
+pub fn (a Anchor) pos_wh[T](w T, h T) (T, T) {
 	mut x, mut y := T(0), T(0)
 	match a {
 		.top_left {

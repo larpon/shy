@@ -59,7 +59,7 @@ pub mut:
 	origin   Anchor
 	rotation f32
 	scale    f32 = 1.0
-	offset   Vec2<f32>
+	offset   Vec2[f32]
 }
 
 [inline]

@@ -9,7 +9,7 @@ import shy.embed
 
 fn main() {
 	mut app := &App{}
-	shy.run<App>(mut app)!
+	shy.run[App](mut app)!
 }
 
 [heap]

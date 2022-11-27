@@ -449,7 +449,7 @@ pub fn (mut w Window) render_init() {
 }
 
 // render renders one frame
-pub fn (mut w Window) render<T>(mut ctx T) {
+pub fn (mut w Window) render[T](mut ctx T) {
 	if !w.ready {
 		return
 	}
@@ -608,7 +608,7 @@ pub fn (mut w Window) render<T>(mut ctx T) {
 	w.end_frame()
 
 	for mut cw in w.children {
-		cw.render<T>(mut ctx)
+		cw.render[T](mut ctx)
 	}
 }
 

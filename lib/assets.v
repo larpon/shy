@@ -147,7 +147,7 @@ pub fn (a &Assets) get_cached_image(uri string) !Image {
 		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
-pub fn (a &Assets) get_cached<T>(uri string) !T {
+pub fn (a &Assets) get_cached[T](uri string) !T {
 	i_t := T{}
 	if typeof(i_t).name.all_after('shy.') == 'Image' {
 		if image := a.image_cache[uri] {

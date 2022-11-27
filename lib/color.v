@@ -57,28 +57,28 @@ pub fn (c &Color) as_f32() Colorf32 {
 	}
 }
 
-pub fn (c &Color) r_as<T>() T {
+pub fn (c &Color) r_as[T]() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.r, 0, 255, 0.0, 1.0)
 	}
 	panic('A shy TODO :)')
 }
 
-pub fn (c &Color) g_as<T>() T {
+pub fn (c &Color) g_as[T]() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.g, 0, 255, 0.0, 1.0)
 	}
 	panic('A shy TODO :)')
 }
 
-pub fn (c &Color) b_as<T>() T {
+pub fn (c &Color) b_as[T]() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.b, 0, 255, 0.0, 1.0)
 	}
 	panic('A shy TODO :)')
 }
 
-pub fn (c &Color) a_as<T>() T {
+pub fn (c &Color) a_as[T]() T {
 	$if T.typ is f32 {
 		return utils.remap_u8_to_f32(c.a, 0, 255, 0.0, 1.0)
 	}

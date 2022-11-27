@@ -8,14 +8,14 @@ import math // TODO
 import shy.mth
 
 struct AnchorResult {
-	t0   Vec2<f32>
-	t0r  Vec2<f32>
-	t2   Vec2<f32>
-	t2r  Vec2<f32>
-	vp   Vec2<f32>
-	vpp  Vec2<f32>
-	at   Vec2<f32>
-	bt   Vec2<f32>
+	t0   Vec2[f32]
+	t0r  Vec2[f32]
+	t2   Vec2[f32]
+	t2r  Vec2[f32]
+	vp   Vec2[f32]
+	vpp  Vec2[f32]
+	at   Vec2[f32]
+	bt   Vec2[f32]
 	flip bool
 }
 
@@ -78,14 +78,14 @@ fn anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, radius f32) AnchorResu
 
 	// println('T0: $t0_x, $t0_y vP: $vp_x, $vp_y -vP: $vpp_x, $vpp_y')
 	return AnchorResult{
-		t0: Vec2<f32>{t0_x, t0_y}
-		t0r: Vec2<f32>{t0r_x, t0r_y}
-		t2: Vec2<f32>{t2_x, t2_y}
-		t2r: Vec2<f32>{t2r_x, t2r_y}
-		vp: Vec2<f32>{vp_x, vp_y}
-		vpp: Vec2<f32>{vpp_x, vpp_y}
-		at: Vec2<f32>{at_x, at_y}
-		bt: Vec2<f32>{bt_x, bt_y}
+		t0: Vec2[f32]{t0_x, t0_y}
+		t0r: Vec2[f32]{t0r_x, t0r_y}
+		t2: Vec2[f32]{t2_x, t2_y}
+		t2r: Vec2[f32]{t2r_x, t2r_y}
+		vp: Vec2[f32]{vp_x, vp_y}
+		vpp: Vec2[f32]{vpp_x, vpp_y}
+		at: Vec2[f32]{at_x, at_y}
+		bt: Vec2[f32]{bt_x, bt_y}
 		flip: flip
 	}
 }

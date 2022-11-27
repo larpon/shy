@@ -114,14 +114,14 @@ pub fn new(config Config) !&Shy {
 
 // run runs the application instance `T`.
 [manualfree]
-pub fn run<T>(mut ctx T, config Config) ! {
+pub fn run[T](mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
 	shy_instance.app = voidptr(ctx)
 	// shy_instance.user_data = voidptr(ctx)
 	ctx.shy = shy_instance
 	ctx.init()!
 
-	shy_instance.api.main<T>(mut ctx, mut shy_instance)!
+	shy_instance.api.main[T](mut ctx, mut shy_instance)!
 
 	ctx.shutdown()!
 	shy_instance.shutdown()!

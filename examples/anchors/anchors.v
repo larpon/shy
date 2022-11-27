@@ -9,7 +9,7 @@ import shy.embed
 
 fn main() {
 	mut app := &App{}
-	shy.run<App>(mut app)!
+	shy.run[App](mut app)!
 }
 
 [heap]
@@ -38,7 +38,7 @@ pub fn (mut a App) frame(dt f64) {
 		y: f32(win_h) * 0.5
 		origin: .bottom_center
 		// align: .left | .bottom
-		offset: vec.vec2<f32>(0, -50 - 20)
+		offset: vec.vec2[f32](0, -50 - 20)
 		text: 'Current draw origin:\n${a.origin}'
 	)
 

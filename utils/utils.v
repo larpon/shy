@@ -13,7 +13,7 @@ pub const (
 )
 
 [inline]
-pub fn remap<T>(value T, min T, max T, new_min T, new_max T) T {
+pub fn remap[T](value T, min T, max T, new_min T, new_max T) T {
 	return (((value - min) * (new_max - new_min)) / (max - min)) + new_min
 }
 
@@ -28,12 +28,12 @@ pub fn remap_f32_to_u8(value f32, min f32, max f32, new_min u8, new_max u8) u8 {
 }
 
 [inline]
-pub fn lerp<T>(x T, y T, s T) T {
+pub fn lerp[T](x T, y T, s T) T {
 	return x + s * (y - x)
 }
 
 [inline]
-pub fn clamp<T>(val T, min T, max T) T {
+pub fn clamp[T](val T, min T, max T) T {
 	return mth.min(mth.max(val, min), max)
 }
 
@@ -66,6 +66,6 @@ pub fn oscillate_f32(value f32, min f32, max f32) f32 {
 }
 
 // manhattan_distance returns the "manhattan" distance between 2 points.
-pub fn manhattan_distance<T>(ax T, ay T, bx T, by T) T {
+pub fn manhattan_distance[T](ax T, ay T, bx T, by T) T {
 	return mth.abs(ax - bx) + mth.abs(ay - by)
 }

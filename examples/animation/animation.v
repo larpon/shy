@@ -10,19 +10,19 @@ import time
 
 fn main() {
 	mut app := &App{}
-	shy.run<App>(mut app)!
+	shy.run[App](mut app)!
 }
 
 [heap]
 struct App {
 	embed.ExampleApp
 mut:
-	a_x   &shy.Animator<f32>       = shy.null
-	a_y   &shy.Animator<f32>       = shy.null
-	a_r   &shy.Animator<f32>       = shy.null
-	a_s   &shy.Animator<f32>       = shy.null
-	fa_x  &shy.FollowAnimator<f32> = shy.null
-	fa_y  &shy.FollowAnimator<f32> = shy.null
+	a_x   &shy.Animator[f32]       = shy.null
+	a_y   &shy.Animator[f32]       = shy.null
+	a_r   &shy.Animator[f32]       = shy.null
+	a_s   &shy.Animator[f32]       = shy.null
+	fa_x  &shy.FollowAnimator[f32] = shy.null
+	fa_y  &shy.FollowAnimator[f32] = shy.null
 	timer time.StopWatch = time.new_stopwatch()
 }
 
@@ -30,7 +30,7 @@ mut:
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
-	a.a_x = a.shy.new_animator<f32>(
+	a.a_x = a.shy.new_animator[f32](
 		ease: ease.Ease{
 			kind: .sine
 			mode: .in_out
@@ -40,7 +40,7 @@ pub fn (mut a App) init() ! {
 		loop: .pingpong
 	)
 
-	a.a_y = a.shy.new_animator<f32>(
+	a.a_y = a.shy.new_animator[f32](
 		ease: ease.Ease{
 			kind: .sine
 			mode: .in_out
@@ -49,7 +49,7 @@ pub fn (mut a App) init() ! {
 		loop: .pingpong
 	)
 
-	a.a_r = a.shy.new_animator<f32>(
+	a.a_r = a.shy.new_animator[f32](
 		ease: ease.Ease{
 			kind: .sine // .back
 			mode: .in_out
@@ -58,7 +58,7 @@ pub fn (mut a App) init() ! {
 		loop: .pingpong
 	)
 
-	a.a_s = a.shy.new_animator<f32>(
+	a.a_s = a.shy.new_animator[f32](
 		ease: ease.Ease{
 			kind: .back
 			mode: .in_out
@@ -67,8 +67,8 @@ pub fn (mut a App) init() ! {
 		loop: .pingpong
 	)
 
-	a.fa_x = a.shy.new_follow_animator<f32>(multiply: 1.5)
-	a.fa_y = a.shy.new_follow_animator<f32>(multiply: 1.5)
+	a.fa_x = a.shy.new_follow_animator[f32](multiply: 1.5)
+	a.fa_y = a.shy.new_follow_animator[f32](multiply: 1.5)
 }
 
 [markused]

@@ -168,7 +168,7 @@ pub fn (a &ShyAPI) scripts() &Scripts {
 // V embeds with generics is not quite ready yet?!
 // TODO BUG MAY NEED WORKAROUND
 // pub fn api_main<T>(mut ctx T, mut s Shy) ! {
-pub fn (mut a ShyAPI) main<T>(mut ctx T, mut s Shy) ! {
+pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 	s.log.gdebug('${@MOD}.${@FN}', 'entering core loop')
 
 	mut api := unsafe { s.api() }
@@ -197,7 +197,7 @@ pub fn (mut a ShyAPI) main<T>(mut ctx T, mut s Shy) ! {
 
 		// Windows will render their children, so this is a cascade action
 		s.state.rendering = true
-		root.render<T>(mut ctx)
+		root.render[T](mut ctx)
 		s.state.rendering = false
 
 		if s.shutdown {

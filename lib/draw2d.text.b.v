@@ -118,7 +118,7 @@ pub fn (ta TextAlign) next() TextAlign {
 }
 
 pub struct Draw2DText {
-	Vec2<f32>
+	Vec2[f32]
 	fc &FontContext
 mut:
 	cur_align TextAlign = .baseline | .left // According to fontstash source code
@@ -132,7 +132,7 @@ pub mut:
 	size     f32       = defaults.font.size
 	scale    f32       = 1.0
 	fills    Fill      = .body | .outline
-	offset   Vec2<f32>
+	offset   Vec2[f32]
 }
 
 [inline]

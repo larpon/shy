@@ -89,7 +89,7 @@ pub mut:
 	rotation f32
 	scale    f32  = 1.0
 	fills    Fill = .body | .outline
-	offset   Vec2<f32>
+	offset   Vec2[f32]
 	origin   Anchor
 }
 
@@ -189,7 +189,7 @@ pub mut:
 	visible  bool = true
 	rotation f32
 	scale    f32 = 1.0
-	offset   Vec2<f32>
+	offset   Vec2[f32]
 	origin   Anchor = .center_left //
 }
 
@@ -296,7 +296,7 @@ pub mut:
 	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
 	scale    f32  = 1.0
 	fills    Fill = .body | .outline
-	offset   Vec2<f32>
+	offset   Vec2[f32]
 	origin   Anchor = .center
 }
 
