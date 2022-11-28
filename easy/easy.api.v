@@ -451,10 +451,18 @@ pub fn (es &EasySound) stop() {
 	es.engine.set_looping(es.id, es.loop)
 }
 
+pub struct EasyImageConfigRect {
+	x f32
+	y f32
+	w f32 = -1
+	h f32 = -1
+}
+
 // Image drawing sub-system
 [params]
 pub struct EasyImageConfig {
-	shy.Rect
+	// shy.Rect: shy.Rect{0,0,-1,-1}
+	EasyImageConfigRect
 pub:
 	uri      string
 	color    shy.Color = shy.rgb(255, 255, 255)
@@ -462,6 +470,7 @@ pub:
 	scale    f32 = 1.0
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor
+	region   shy.Rect = shy.Rect{0, 0, -1, -1}
 }
 
 [noinit]
@@ -475,6 +484,7 @@ pub:
 	scale    f32 = 1.0
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor
+	region   shy.Rect = shy.Rect{0, 0, -1, -1}
 }
 
 pub fn (ei &EasyImage) draw() {
@@ -495,27 +505,63 @@ pub fn (ei &EasyImage) draw() {
 	i2d.y = ei.y
 	i2d.w = ei.w
 	i2d.h = ei.h
-	if i2d.w < 0 {
-		i2d.w = image.width
-	}
-	if i2d.h < 0 {
-		i2d.h = image.height
-	}
+	i2d.color = ei.color
 	i2d.rotation = ei.rotation
 	i2d.scale = ei.scale
 	i2d.offset = ei.offset
-	i2d.color = ei.color
 	i2d.origin = ei.origin
-	i2d.draw()
+
+	if ei.region.w >= 0 || ei.region.h >= 0 {
+		src := shy.Rect{
+			x: 0
+			y: 0
+			w: ei.h
+			h: ei.h
+		}
+		i2d.draw_region(src, ei.region)
+	} else {
+		i2d.draw()
+	}
 	d.end()
 }
 
 [inline]
 pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
+
+	// TODO
+	mut image := shy.Image{}
+	// if img := ei.shy.assets().get_cached<shy.Image>(ei.uri) {
+	if img := e.shy.assets().get_cached_image(eic.uri) {
+		image = img
+	} else {
+		// return
+		// TODO
+		panic('${@STRUCT}.${@FN}: "${eic.uri}" not found in cache, please load it')
+	}
+
+	mut r := shy.Rect{
+		x: eic.x
+		y: eic.y
+	}
+	r.w = if eic.w < 0 { f32(image.width) } else { eic.w }
+	r.h = if eic.h < 0 { f32(image.height) } else { eic.h }
+
+	// TODO WORKAROUND "...eic" spread doesn't work
+	// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with outher values :(
 	return EasyImage{
-		...eic
 		shy: e.shy
+		Rect: r
+		// y: r.y
+		// w: r.w
+		// h: r.h
+		uri: eic.uri
+		color: eic.color
+		rotation: eic.rotation
+		scale: eic.scale
+		offset: eic.offset
+		origin: eic.origin
+		region: eic.region
 	}
 }
 
