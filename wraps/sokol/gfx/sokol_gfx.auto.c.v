@@ -1617,44 +1617,44 @@ pub fn init_pass(pass_id Pass, const_desc &PassDesc) {
 	C.sg_init_pass(pass_id, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL bool sg_uninit_buffer(sg_buffer buf_id)`
-fn C.sg_uninit_buffer(buf_id Buffer) bool
+// C: `SOKOL_GFX_API_DECL void sg_uninit_buffer(sg_buffer buf_id)`
+fn C.sg_uninit_buffer(buf_id Buffer)
 
 // uninit_buffer is currently undocumented
-pub fn uninit_buffer(buf_id Buffer) bool {
-	return C.sg_uninit_buffer(buf_id)
+pub fn uninit_buffer(buf_id Buffer) {
+	C.sg_uninit_buffer(buf_id)
 }
 
-// C: `SOKOL_GFX_API_DECL bool sg_uninit_image(sg_image img_id)`
-fn C.sg_uninit_image(img_id Image) bool
+// C: `SOKOL_GFX_API_DECL void sg_uninit_image(sg_image img_id)`
+fn C.sg_uninit_image(img_id Image)
 
 // uninit_image is currently undocumented
-pub fn uninit_image(img_id Image) bool {
-	return C.sg_uninit_image(img_id)
+pub fn uninit_image(img_id Image) {
+	C.sg_uninit_image(img_id)
 }
 
-// C: `SOKOL_GFX_API_DECL bool sg_uninit_shader(sg_shader shd_id)`
-fn C.sg_uninit_shader(shd_id Shader) bool
+// C: `SOKOL_GFX_API_DECL sg_uninit_shader(sg_shader shd_id)`
+fn C.sg_uninit_shader(shd_id Shader)
 
 // uninit_shader is currently undocumented
-pub fn uninit_shader(shd_id Shader) bool {
-	return C.sg_uninit_shader(shd_id)
+pub fn uninit_shader(shd_id Shader) {
+	C.sg_uninit_shader(shd_id)
 }
 
-// C: `SOKOL_GFX_API_DECL bool sg_uninit_pipeline(sg_pipeline pip_id)`
-fn C.sg_uninit_pipeline(pip_id Pipeline) bool
+// C: `SOKOL_GFX_API_DECL void sg_uninit_pipeline(sg_pipeline pip_id)`
+fn C.sg_uninit_pipeline(pip_id Pipeline)
 
 // uninit_pipeline is currently undocumented
-pub fn uninit_pipeline(pip_id Pipeline) bool {
-	return C.sg_uninit_pipeline(pip_id)
+pub fn uninit_pipeline(pip_id Pipeline) {
+	C.sg_uninit_pipeline(pip_id)
 }
 
-// C: `SOKOL_GFX_API_DECL bool sg_uninit_pass(sg_pass pass_id)`
-fn C.sg_uninit_pass(pass_id Pass) bool
+// C: `SOKOL_GFX_API_DECL void sg_uninit_pass(sg_pass pass_id)`
+fn C.sg_uninit_pass(pass_id Pass)
 
 // uninit_pass is currently undocumented
-pub fn uninit_pass(pass_id Pass) bool {
-	return C.sg_uninit_pass(pass_id)
+pub fn uninit_pass(pass_id Pass) {
+	C.sg_uninit_pass(pass_id)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_fail_buffer(sg_buffer buf_id)`
