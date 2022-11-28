@@ -13,8 +13,8 @@ import shy.wraps.sokol.sfons
 pub struct Fonts {
 	ShyStruct
 mut:
-	ready     bool
-	contexts  []&FontContext
+	ready bool
+	// contexts  []&FontContext
 	font_data map[string][]u8
 }
 
@@ -49,7 +49,8 @@ pub fn (mut fs Fonts) load_font(name string, path string) ! {
 //	#flag --embed-file @VMODROOT/fonts@/fonts
 // }
 
-pub fn (mut fs Fonts) init(config FontsConfig) ! {
+// pub fn (mut fs Fonts) init(config FontsConfig) !&FontContext {
+pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	fs.shy = config.shy
 	mut s := fs.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
@@ -108,15 +109,17 @@ pub fn (mut fs Fonts) init(config FontsConfig) ! {
 			context.fonts[font_name] = fons_context.add_font_mem(font_name, bytes, false)
 		}
 	}
-	s.log.gdebug('${@STRUCT}.${@FN}', 'adding font context ${ptr_str(context.fsc)}...')
-	fs.contexts << context
+	// fs.contexts << context
 	//}
 	fs.ready = true
+	return context
 }
 
 pub fn (mut fs Fonts) shutdown() ! {
 	fs.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	mut s := fs.shy
+
+	/*
 	for context in fs.contexts {
 		if !isnil(context.fsc) {
 			s.log.gdebug('${@STRUCT}.${@FN}', 'destroying font context ${ptr_str(context.fsc)}...')
@@ -126,6 +129,7 @@ pub fn (mut fs Fonts) shutdown() ! {
 			}
 		}
 	}
+	*/
 	for font_name, data in fs.font_data {
 		if data.len > 0 {
 			s.log.gdebug('${@STRUCT}.${@FN}', 'freeing font ${font_name} data...')
@@ -134,6 +138,7 @@ pub fn (mut fs Fonts) shutdown() ! {
 	}
 }
 
+/*
 pub fn (mut fs Fonts) get_context() &FontContext {
 	mut fc := fs.contexts[0]
 	fc.in_use = true
@@ -161,7 +166,9 @@ pub fn (mut fs Fonts) get_context() &FontContext {
 	} // NOTE dummy return to please the V compiler...
 	*/
 }
+*/
 
+/*
 pub fn (mut fs Fonts) on_frame_end() {
 	for mut fc in fs.contexts {
 		if fc.in_use {
@@ -170,7 +177,7 @@ pub fn (mut fs Fonts) on_frame_end() {
 			// FLOOD fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'handing out ${ptr_str(fc.fsc)}...')
 		}
 	}
-}
+}*/
 
 pub fn (fc &FontContext) set_defaults() {
 	font_context := fc.fsc

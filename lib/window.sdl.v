@@ -7,7 +7,7 @@ import os
 import sdl
 import time
 import shy.mth
-import shy.wraps.sokol.gfx
+// import shy.wraps.sokol.gfx
 
 // Some code found from
 // "Minimal sprite rendering example with SDL2 for windowing, sokol_gfx for graphics API using OpenGL 3.3 on MacOS"
@@ -367,7 +367,7 @@ mut:
 	handle     &sdl.Window = null
 	gl_context sdl.GLContext
 	// sokol
-	gfx_context gfx.Context
+	// gfx_context gfx.Context
 pub mut:
 	state FrameState
 }
@@ -650,12 +650,24 @@ pub fn (mut w Window) new_window(config WindowConfig) !&Window {
 	return win
 }
 
+/*
+fn (w &Window) make_current_init_and_shutdown() {
+	unsafe {
+		w.shy.api.wm.active = w
+	}
+	sdl.gl_make_current(w.handle, w.gl_context)
+	w.shy.api.gfx.activate_context(w.id)
+	// gfx.activate_context(w.gfx_context)
+}*/
+
 pub fn (w &Window) make_current() {
 	unsafe {
 		w.shy.api.wm.active = w
 	}
 	sdl.gl_make_current(w.handle, w.gl_context)
-	gfx.activate_context(w.gfx_context)
+	w.shy.api.gfx.activate_context(w.id)
+	// gfx.activate_context(w.gfx_context)
+	w.shy.api.gfx.activate_subsystem_context(w.id)
 }
 
 pub fn (mut w Window) init() ! {
@@ -699,20 +711,25 @@ pub fn (mut w Window) init() ! {
 	s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=${w.config.render.vsync}')
 	// }
 
-	$if wasm32_emscripten {
-		if !s.api.gfx.ready {
-			s.api.gfx.init()!
-		}
+	//$if wasm32_emscripten {
+	// if !s.api.gfx.ready {
+	if w.id == 0 {
+		s.api.gfx.init()!
 	}
-
-	w.gfx_context = gfx.setup_context()
+	//}
+	//}
 
 	// Change all contexts to this window's
-	w.make_current()
+	w.shy.api.gfx.init_context(w.id)!
+	w.shy.api.gfx.activate_context(w.id)
 
+	// if w.id == 0 {
+	w.shy.api.gfx.subsystem_gl_init(w.id)!
+	//}
 	// Init subsystem's for this context setup
 	// TODO does this work ????
-	w.shy.api.gfx.subsystem_init()!
+	w.shy.api.gfx.subsystem_init(w.id)!
+	w.make_current()
 
 	w.anims = &Anims{
 		shy: s
@@ -738,16 +755,23 @@ pub fn (mut w Window) shutdown() ! {
 	for mut window in w.children {
 		window.close()!
 	}
-
-	w.make_current()
-
 	w.anims.shutdown()!
 	unsafe { free(w.anims) }
 
-	w.shy.api.gfx.subsystem_shutdown()!
+	w.make_current()
 
-	gfx.discard_context(w.gfx_context)
+	w.shy.api.gfx.subsystem_shutdown(w.id)!
+
+	w.shy.api.gfx.subsystem_gl_shutdown(w.id)!
+
+	w.shy.api.gfx.shutdown_context(w.id)!
+	// gfx.discard_context(w.gfx_context)
 	// $if opengl ? {
+
+	if w.id == 0 {
+		w.shy.api.gfx.shutdown()!
+	}
+
 	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)

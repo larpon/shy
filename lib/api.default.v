@@ -50,13 +50,14 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 	a.gfx = &GFX{
 		shy: s
 	}
+	/*
 	$if !wasm32_emscripten {
 		// NOTE When targeting WASM/emscripten graphics needs to be initialized
 		// after the first GL context is set. This could arguably be structured
 		// more optimal. Instead the windowing system will initialize the gfx
 		// when needed. See Window.init() method.
 		a.gfx.init()!
-	}
+	}*/
 
 	a.wm.init()!
 
@@ -91,7 +92,7 @@ pub fn (mut a ShyAPI) shutdown() ! {
 	a.audio.shutdown()!
 	a.system.shutdown()!
 	a.wm.shutdown()!
-	a.gfx.shutdown()!
+	// a.gfx.shutdown()!
 	unsafe { a.free() }
 }
 

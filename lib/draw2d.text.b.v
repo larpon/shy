@@ -20,8 +20,8 @@ pub fn (mut dt DrawText) begin() {
 	win := dt.shy.active_window()
 	w, h := win.drawable_wh()
 
-	mut fonts := unsafe { dt.shy.api.gfx.fonts }
-	fc := fonts.get_context()
+	mut gfx := unsafe { dt.shy.api.gfx }
+	fc := gfx.get_font_context(win.id)
 	// gl.set_context(fc.sgl)
 
 	// unsafe { dt.shy.api.draw.layer++ }
