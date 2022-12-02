@@ -5,8 +5,11 @@
    viewBox="0 0 270.933 270.933"
    version="1.1"
    id="svg18"
-   sodipodi:docname="logo.svg"
+   sodipodi:docname="shy.svg"
    inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
+   inkscape:export-filename="shy.png"
+   inkscape:export-xdpi="48"
+   inkscape:export-ydpi="48"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -40,13 +43,13 @@
      inkscape:deskcolor="#505050"
      showgrid="false"
      inkscape:zoom="0.32593203"
-     inkscape:cx="556.86457"
-     inkscape:cy="576.80738"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
-     inkscape:window-x="1920"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:cx="521.58114"
+     inkscape:cy="587.54581"
+     inkscape:window-width="1418"
+     inkscape:window-height="1026"
+     inkscape:window-x="2291"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg18" />
   <path
      fill="#d41212"
@@ -54,23 +57,25 @@
      color="#000000"
      overflow="visible"
      id="path12"
-     style="display:inline"
+     style="display:inline;fill:#b91919;fill-opacity:1"
      inkscape:label="bg" />
   <path
      fill="#fdfdfd"
      d="m 79.294798,185.77708 c 2.010371,-4.10261 6.968877,-9.16732 8.170064,-8.3387 1.028863,0.70974 -2.96959,7.21588 -4.239699,9.96498 -13.473629,29.1632 27.948167,44.37658 52.402917,44.49739 22.41974,0.11076 50.84011,-10.33929 50.28845,-32.94369 -0.35504,-14.54778 -9.37969,-22.90425 -40.71648,-28.37962 -40.19908,-7.02385 -107.521956,-8.65947 -105.310271,-62.77206 2.13854,-52.322968 59.491809,-76.610515 99.025581,-78.732568 59.02801,-3.168444 111.9932,46.578019 76.78558,100.763648 -3.48386,5.36175 -10.48979,7.81467 -15.23817,5.42436 -5.27498,-2.65542 -7.27419,-10.46559 -5.25633,-14.80731 22.45967,-48.325155 -33.9064,-70.843849 -67.58405,-66.682661 -29.735972,3.674156 -61.299045,20.585565 -67.353474,43.02974 -13.477466,49.961871 51.009834,49.151041 78.436164,51.848701 37.53428,3.69188 74.45451,14.26358 72.54015,48.099 -1.67578,29.61863 -38.30383,44.54772 -68.82601,45.13766 -36.95316,0.71423 -79.84284,-21.99121 -63.124422,-56.10887 z"
      id="path16"
      inkscape:label="S"
-     style="display:inline;fill:#fdfdfd;fill-opacity:1"
+     style="display:inline;fill:#ffffff;fill-opacity:1"
      sodipodi:nodetypes="sssssssssssssssss" />
-  <path
-     id="rect1201"
-     style="overflow:visible;fill:#ffffff;fill-opacity:1;stroke-width:0.999999;stop-color:#000000"
-     d="m 73.817508,106.15057 c 2.613794,-21.474569 23.993447,-33.901496 46.364282,-37.8365 22.08052,-3.883939 46.06572,-0.704888 56.49645,17.064187 9.45454,16.106093 3.65165,31.877763 -6.35589,38.208913 -13.06052,8.26258 -41.67484,-0.11786 -33.73779,-22.27146 9.28703,-25.921656 -12.72271,-25.86554 -23.15333,-24.016042 -12.41025,2.200513 -31.671799,9.06093 -39.613722,28.850902 z"
-     sodipodi:nodetypes="csssssc" />
   <path
      id="path1204"
      style="overflow:visible;fill:#ffffff;fill-opacity:1;stroke-width:0.999997;stop-color:#000000"
      d="m 172.80013,204.60765 c -4.7438,12.26301 -22.4071,17.36075 -39.71489,17.40551 -17.0832,0.0441 -34.681902,-4.22309 -40.213075,-15.63701 -5.01353,-10.34569 1.38639,-18.96142 9.720935,-21.64759 10.87716,-3.5056 31.27825,4.26126 22.4493,16.38484 -10.33065,14.18564 6.20366,16.36709 14.27552,16.33762 9.60378,-0.0351 24.95572,-2.09897 33.48221,-12.84337 z"
-     sodipodi:nodetypes="csssssc" />
+     sodipodi:nodetypes="csssssc"
+     inkscape:label="fireball bottom" />
+  <path
+     id="rect1201"
+     style="overflow:visible;fill:#ffffff;fill-opacity:1;stroke-width:0.999999;stop-color:#000000"
+     d="m 73.817508,106.15057 c 2.613794,-21.474569 23.993447,-33.901496 46.364282,-37.8365 22.08052,-3.883939 46.06572,-0.704888 56.49645,17.064187 9.45454,16.106093 3.65165,31.877763 -6.35589,38.208913 -13.06052,8.26258 -41.67484,-0.11786 -33.73779,-22.27146 9.28703,-25.921656 -12.72271,-25.86554 -23.15333,-24.016042 -12.41025,2.200513 -31.671799,9.06093 -39.613722,28.850902 z"
+     sodipodi:nodetypes="csssssc"
+     inkscape:label="fireball top" />
 </svg>

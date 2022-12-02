@@ -33,9 +33,8 @@ pub struct Anims {
 mut:
 	running bool
 	paused  bool
-	active  []&IAnimator
-	// bin     []&IAnimator
-	f32pool []&Animator[f32]
+	active  []&IAnimator     = []&IAnimator{cap: 1000} // Should match prealloc
+	f32pool []&Animator[f32] = []&Animator[f32]{cap: 1000} // Should match prealloc
 	// f64_pool    []&Animator<f64>
 }
 
@@ -43,7 +42,7 @@ pub fn (mut a Anims) init() ! {
 	a.shy.assert_api_init()
 	// TODO make configurable
 	prealloc := 1000
-	// unsafe { a.active.flags.set(.noslices | .noshrink) }
+	unsafe { a.active.flags.set(.noslices | .noshrink) }
 	// unsafe { a.bin.flags.set(.noslices | .noshrink) }
 	unsafe { a.f32pool.flags.set(.noslices | .noshrink) }
 	// unsafe { a.f64_pool.flags.set(.noslices | .noshrink) }
@@ -53,6 +52,7 @@ pub fn (mut a Anims) init() ! {
 	}
 }
 
+[manualfree]
 pub fn (mut a Anims) shutdown() ! {
 	a.shy.assert_api_shutdown()
 	for anim in a.active {
@@ -60,14 +60,6 @@ pub fn (mut a Anims) shutdown() ! {
 			free(anim)
 		}
 	}
-	/*
-	for anim in a.bin {
-		unsafe {
-			free(anim)
-		}
-	}
-	*/
-
 	for anim in a.f32pool {
 		unsafe {
 			free(anim)
@@ -86,9 +78,17 @@ pub fn (mut a Anims) update(dt f64) {
 			animator.touch()
 		}
 		// for animator in a.active {
-		if !animator.running {
-			// TODO move to inactive queue - see if this is all worth it
-			// a.bin << animator
+		if !animator.running && !animator.recycle {
+			// TODO move to inactive pool - measure if this is even all worth it.
+			// Doing this has some implications when the anim is restarted:
+			// we need (maybe expensive?) logic to detect and transfer the animator back into
+			// the active pool - maybe it's just more "efficient" to simply let the
+			// animation live in the active pool. Hmm...
+			// Let's try with a recycle flag:
+			if animator is Animator[f32] {
+				a.f32pool << animator
+				a.active.delete(i)
+			}
 			continue
 		}
 		if animator.paused {
@@ -169,10 +169,12 @@ pub fn (mut a Anims) new_follow_animator[T](config FollowAnimatorConfig) &Follow
 	return animator
 }
 
+// IAnimator is what the Anims system can control
 interface IAnimator {
 	kind AnimatorKind
 	running bool
 	paused bool // run()
+	recycle bool
 	step(f64)
 	touch()
 }
@@ -182,6 +184,7 @@ pub struct AnimatorConfig {
 pub mut:
 	running     bool
 	paused      bool
+	recycle     bool
 	ease        ease.Ease
 	loop        AnimLoop
 	loops       i64 // -1 = infinite, 0/1 = once, > 1 = X loops
@@ -190,12 +193,14 @@ pub mut:
 	duration    i64 = 1000
 }
 
+[noinit]
 pub struct Animator[T] {
 	ShyStruct
 	kind AnimatorKind = .animator
 pub mut:
 	running     bool
 	paused      bool
+	recycle     bool
 	ease        ease.Ease
 	loop        AnimLoop
 	loops       i64 // shy.infinite = infinite, 0/1 = once, > 1 = X loops
@@ -214,6 +219,7 @@ mut:
 fn (mut a Animator[T]) config_update(config AnimatorConfig) {
 	a.running = config.running
 	a.paused = config.paused
+	a.recycle = config.recycle
 	a.ease = config.ease
 	a.loop = config.loop
 	a.loops = config.loops
@@ -323,6 +329,7 @@ pub struct FollowAnimatorConfig {
 pub mut:
 	running bool
 	paused  bool
+	recycle bool
 	// ease        ease.Ease
 	multiply    f32 = 1.0
 	user        voidptr
@@ -335,6 +342,7 @@ pub struct FollowAnimator[T] {
 pub mut:
 	running bool
 	paused  bool
+	recycle bool
 	// ease        ease.Ease
 	multiply    f32 = 1.0
 	user        voidptr
@@ -359,7 +367,9 @@ fn (fa FollowAnimator[T]) touch() {
 fn (mut a FollowAnimator[T]) config_update(config FollowAnimatorConfig) {
 	a.running = config.running
 	a.paused = config.paused
+	a.recycle = config.recycle
 	a.multiply = config.multiply
+
 	// a.ease = config.ease
 	// a.loop = config.loop
 	// a.loops = config.loops

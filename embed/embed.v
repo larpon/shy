@@ -73,11 +73,11 @@ pub fn (mut a EasyApp) shutdown() ! {
 
 pub fn (mut a EasyApp) frame_begin() {
 	a.App.frame_begin()
-	a.gfx.begin_pass(0)
+	a.gfx.begin_easy_frame()
 }
 
 pub fn (mut a EasyApp) frame_end() {
-	a.gfx.end_pass()
+	a.gfx.end_easy_frame()
 	a.App.frame_end()
 }
 
@@ -107,6 +107,11 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 					}
 					a.shy.log.gdebug('${@STRUCT}', 'saved screenshot to "${shot_file}"')
 				}
+				.f8 {
+					if alt_is_held {
+						unsafe { a.window.todo___reinit_graphics_workaround() } // TODO should be handled differently but via events!!
+					}
+				}
 				else {
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
 						a.window.toggle_fullscreen()
@@ -126,12 +131,12 @@ struct ExampleApp {
 	EasyApp
 }
 
-// asset unifies locating example assets
+// asset unifies locating project assets
 pub fn (ea ExampleApp) asset(path string) string {
 	$if wasm32_emscripten {
 		return path
 	}
-	return os.resource_abs_path(os.join_path('..', 'assets', path))
+	return os.resource_abs_path(os.join_path('..', '..', 'assets', path))
 }
 
 // pub fn (mut ea ExampleApp) init()! {
@@ -216,10 +221,10 @@ struct TestApp {
 	EasyApp
 }
 
-// asset unifies locating example assets
+// asset unifies locating project assets
 pub fn (ta TestApp) asset(path string) string {
 	$if wasm32_emscripten {
 		return path
 	}
-	return os.resource_abs_path(os.join_path('..', '..', 'examples', 'assets', path))
+	return os.resource_abs_path(os.join_path('..', '..', 'assets', path))
 }

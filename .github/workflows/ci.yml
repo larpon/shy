@@ -252,7 +252,7 @@ jobs:
         export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
         export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
 
-        declare -a shy_examples=('anchors' 'hello_world' 'image' 'shapes/lines' 'shapes/rectangle' 'mouse' 'multi_window' 'sound')
+        declare -a shy_examples=('anchors' 'hello_world' 'image' 'shapes/lines' 'shapes/rectangle' 'mouse' 'multi_window' 'sound', 'timers')
         echo "Compiling shy examples ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
@@ -329,7 +329,7 @@ jobs:
         export CFLAGS="$(/tmp/sdl2-${{ matrix.sdl-version }}/bin/sdl2-config --cflags)"
         export LDFLAGS="$(/tmp/sdl2-${{ matrix.sdl-version }}/bin/sdl2-config --libs)"
 
-        declare -a shy_examples=('anchors' 'hello_world' 'image' 'shapes/lines' 'shapes/rectangle' 'mouse' 'multi_window' 'sound')
+        declare -a shy_examples=('anchors' 'hello_world' 'image' 'shapes/lines' 'shapes/rectangle' 'mouse' 'multi_window' 'sound', 'timers')
         echo "Compiling shy examples ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example

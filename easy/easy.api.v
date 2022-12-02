@@ -83,6 +83,15 @@ pub fn (et &EasyText) draw() {
 }
 
 [inline]
+pub fn (e &Easy) new_text(etc EasyTextConfig) &EasyText {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return &EasyText{
+		...etc
+		shy: e.shy
+	}
+}
+
+[inline]
 pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyText{
@@ -548,7 +557,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 	r.h = if eic.h < 0 { f32(image.height) } else { eic.h }
 
 	// TODO WORKAROUND "...eic" spread doesn't work
-	// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with outher values :(
+	// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
 	return EasyImage{
 		shy: e.shy
 		Rect: r

@@ -25,13 +25,15 @@ pub mut:
 	a f32
 }
 
+// ShyColors holds the official project colors,
+// changing these will affect examples and visual tests
 pub struct ShyColors {
 pub:
-	red    Color = rgb(155, 25, 25)
+	red    Color = rgb(185, 25, 25) // Same red as used in the shy logo
 	green  Color = rgb(55, 150, 55)
-	blue   Color = rgb(13, 74, 217)
-	yellow Color = rgb(201, 180, 14)
-	white  Color = rgb(211, 211, 211)
+	blue   Color = rgb(15, 75, 215)
+	yellow Color = rgb(210, 200, 15)
+	white  Color = rgb(255, 255, 255) // Same white as used in the logo
 }
 
 pub struct BaseColors {
@@ -46,6 +48,10 @@ pub:
 
 pub fn (c &Color) is_opaque() bool {
 	return c.a == 255
+}
+
+pub fn (c &Colorf32) is_opaque() bool {
+	return c.a == 1.0
 }
 
 pub fn (c &Color) as_f32() Colorf32 {

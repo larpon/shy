@@ -21,7 +21,7 @@ pub fn (mut dt DrawText) begin() {
 	w, h := win.drawable_wh()
 
 	mut gfx := unsafe { dt.shy.api.gfx }
-	fc := gfx.get_font_context(win.id)
+	fc := gfx.get_font_context(win.gfx)
 	// gl.set_context(fc.sgl)
 
 	// unsafe { dt.shy.api.draw.layer++ }

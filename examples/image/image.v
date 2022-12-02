@@ -21,7 +21,7 @@ pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
 	a.quick.load(
-		uri: a.asset('image/shy_logo.png')
+		uri: a.asset('image/shy.png')
 	)!
 }
 
@@ -30,7 +30,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
 		x: shy.half * a.window.width()
 		y: shy.half * a.window.height()
-		uri: a.asset('image/shy_logo.png')
+		uri: a.asset('image/shy.png')
 		origin: .center
 	)
 }

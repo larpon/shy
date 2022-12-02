@@ -64,7 +64,7 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	}
 
 	// Sokol image
-	// eprintln('\n init sokol image $img.path ok=$img.sg_image_ok')
+	// eprintln('\n init sokol image ${img.path} ok=${img.sg_image_ok}')
 	mut img_desc := gfx.ImageDesc{
 		width: image.width
 		height: image.height
@@ -76,7 +76,8 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
 	}
 
-	// println('$image.width x $image.height x $image.channels --- $a.data.len')
+	println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
+	println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
 	img_desc.data.subimage[0][0] = gfx.Range{
 		ptr: stb_img.data
 		size: usize(4 * image.width * image.height) // TODO 4 is not always equal to image.channels count ?

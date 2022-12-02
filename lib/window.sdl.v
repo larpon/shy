@@ -146,6 +146,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	sdl.gl_set_attribute(.stencil_size, 8)
 	//
 
+	/*
 	if s.config.render.msaa > 0 {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'enabling MSAA (Multi-Sample AntiAliasing)')
 		sdl.gl_set_attribute(.multisamplebuffers, 1)
@@ -153,6 +154,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		// Setting multi-samples here will result in SDL applying yet another pass of anti-aliasing...
 		sdl.gl_set_attribute(.multisamplesamples, s.config.render.msaa)
 	}
+	*/
 
 	// } // end $if opengl
 
@@ -361,13 +363,14 @@ mut:
 	ready    bool
 	parent   &Window = null
 	children []&Window
-	anims    &Anims = null
+	anims    &Anims  = null
+	timers   &Timers = null
 	stepper  Stepper
 	// SDL / GL
 	handle     &sdl.Window = null
 	gl_context sdl.GLContext
-	// sokol
-	// gfx_context gfx.Context
+	// id of GFX/Context this window has been given
+	gfx u32
 pub mut:
 	state FrameState
 }
@@ -384,7 +387,7 @@ pub fn (w &Window) find_window(id u32) ?&Window {
 
 pub fn (mut w Window) begin_frame() {
 	// Make *this* window's context the current
-	w.make_current()
+	w.set_current()
 }
 
 [inline]
@@ -613,6 +616,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 }
 
 pub fn (mut w Window) variable_update(dt f64) {
+	w.timers.update(dt)
 	w.anims.update(dt)
 }
 
@@ -638,11 +642,7 @@ pub fn (w Window) is_root() bool {
 }
 
 pub fn (mut w Window) new_window(config WindowConfig) !&Window {
-	w.shy.running = false // TODO
-	w.shy.state.in_hot_code = false // TODO
 	win := w.shy.api.wm.new_window(config)!
-	w.shy.running = true // TODO
-	w.shy.state.in_hot_code = true // TODO
 	unsafe {
 		win.parent = w
 	}
@@ -650,24 +650,14 @@ pub fn (mut w Window) new_window(config WindowConfig) !&Window {
 	return win
 }
 
-/*
-fn (w &Window) make_current_init_and_shutdown() {
+pub fn (w &Window) set_current() {
 	unsafe {
 		w.shy.api.wm.active = w
 	}
 	sdl.gl_make_current(w.handle, w.gl_context)
-	w.shy.api.gfx.activate_context(w.id)
-	// gfx.activate_context(w.gfx_context)
-}*/
-
-pub fn (w &Window) make_current() {
 	unsafe {
-		w.shy.api.wm.active = w
+		w.shy.api.gfx.activate_context(w.gfx)
 	}
-	sdl.gl_make_current(w.handle, w.gl_context)
-	w.shy.api.gfx.activate_context(w.id)
-	// gfx.activate_context(w.gfx_context)
-	w.shy.api.gfx.activate_subsystem_context(w.id)
 }
 
 pub fn (mut w Window) init() ! {
@@ -711,30 +701,30 @@ pub fn (mut w Window) init() ! {
 	s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=${w.config.render.vsync}')
 	// }
 
-	//$if wasm32_emscripten {
-	// if !s.api.gfx.ready {
-	if w.id == 0 {
+	// Initialize main graphics system if it's not already initialized
+	if !s.api.gfx.ready {
+		// if w.id == 0 {
 		s.api.gfx.init()!
 	}
-	//}
-	//}
 
 	// Change all contexts to this window's
-	w.shy.api.gfx.init_context(w.id)!
-	w.shy.api.gfx.activate_context(w.id)
+	unsafe {
+		w.shy.api.wm.active = w
+	}
+	w.gfx = w.shy.api.gfx.make_context()!
 
-	// if w.id == 0 {
-	w.shy.api.gfx.subsystem_gl_init(w.id)!
-	//}
-	// Init subsystem's for this context setup
-	// TODO does this work ????
-	w.shy.api.gfx.subsystem_init(w.id)!
-	w.make_current()
+	// Set this window's graphics context as the current
+	w.set_current()
 
 	w.anims = &Anims{
 		shy: s
 	}
 	w.anims.init()!
+
+	w.timers = &Timers{
+		shy: s
+	}
+	w.timers.init()!
 
 	w.render_init()
 
@@ -758,16 +748,14 @@ pub fn (mut w Window) shutdown() ! {
 	w.anims.shutdown()!
 	unsafe { free(w.anims) }
 
-	w.make_current()
+	w.timers.shutdown()!
+	unsafe { free(w.timers) }
 
-	w.shy.api.gfx.subsystem_shutdown(w.id)!
+	w.set_current()
 
-	w.shy.api.gfx.subsystem_gl_shutdown(w.id)!
+	w.shy.api.gfx.shutdown_context(w.gfx)!
 
-	w.shy.api.gfx.shutdown_context(w.id)!
-	// gfx.discard_context(w.gfx_context)
-	// $if opengl ? {
-
+	// NOTE Last window shuts down the graphics module
 	if w.id == 0 {
 		w.shy.api.gfx.shutdown()!
 	}
@@ -775,6 +763,16 @@ pub fn (mut w Window) shutdown() ! {
 	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)
+}
+
+[unsafe]
+pub fn (mut w Window) todo___reinit_graphics_workaround() {
+	// TODO ugly hack that crashes on multi-windows
+	w.ready = false
+	// eprintln('GFX id before: ${w.gfx}')
+	w.gfx = w.shy.api.gfx.reinit() or { panic('${@STRUCT}.${@FN}: reinit failed') }
+	// eprintln('GFX id after: ${w.gfx}')
+	w.ready = true
 }
 
 pub fn (mut w Window) toggle_fullscreen() {
@@ -789,6 +787,11 @@ pub fn (mut w Window) toggle_fullscreen() {
 		}
 		sdl.set_window_fullscreen(w.handle, window_flags)
 	}
+
+	// TODO ... doesn't work?! Should be scheduled to be handled as an event i.e. out of any frame calls!
+	// w.shy.once(fn [mut w] () {
+	// 	w.todo___reinit_graphics_workaround()
+	//}, 500)
 }
 
 pub fn (w &Window) is_fullscreen() bool {
@@ -838,4 +841,16 @@ pub fn (w &Window) drawable_wh() (int, int) {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
 	return width, height
+}
+
+pub fn (w &Window) drawable_size() Size {
+	mut width := 0
+	mut height := 0
+	// $if opengl ? {
+	sdl.gl_get_drawable_size(w.handle, &width, &height)
+	// }
+	return Size{
+		w: width
+		h: height
+	}
 }

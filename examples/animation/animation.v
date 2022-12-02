@@ -30,42 +30,21 @@ mut:
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
-	a.a_x = a.shy.new_animator[f32](
+	a_config := shy.AnimatorConfig{
 		ease: ease.Ease{
 			kind: .sine
 			mode: .in_out
 			// custom_fn: custom_ease
 		}
+		recycle: true
 		loops: shy.infinite
 		loop: .pingpong
-	)
+	}
 
-	a.a_y = a.shy.new_animator[f32](
-		ease: ease.Ease{
-			kind: .sine
-			mode: .in_out
-		}
-		loops: shy.infinite
-		loop: .pingpong
-	)
-
-	a.a_r = a.shy.new_animator[f32](
-		ease: ease.Ease{
-			kind: .sine // .back
-			mode: .in_out
-		}
-		loops: shy.infinite
-		loop: .pingpong
-	)
-
-	a.a_s = a.shy.new_animator[f32](
-		ease: ease.Ease{
-			kind: .back
-			mode: .in_out
-		}
-		loops: shy.infinite
-		loop: .pingpong
-	)
+	a.a_x = a.shy.new_animator[f32](a_config)
+	a.a_y = a.shy.new_animator[f32](a_config)
+	a.a_r = a.shy.new_animator[f32](a_config)
+	a.a_s = a.shy.new_animator[f32](a_config)
 
 	a.fa_x = a.shy.new_follow_animator[f32](multiply: 1.5)
 	a.fa_y = a.shy.new_follow_animator[f32](multiply: 1.5)
