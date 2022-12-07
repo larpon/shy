@@ -197,16 +197,17 @@ fn (mut c Context) sokol_gl_init() ! {
 	gl.setup(gl_desc)
 
 	// pass action and pipeline for the default render pass
-	gl_pip_desc := gfx.PipelineDesc{
+	mut gl_pip_desc := gfx.PipelineDesc{
 		cull_mode: .back
 		depth: gfx.DepthState{
 			write_enabled: true
 			compare: .less_equal
 		}
 	}
+
 	display := Display{
 		pass_action: gfx.create_clear_pass(0.5, 0.7, 1.0, 1.0)
-		gl_pip: gl.context_make_pipeline(gl.default_context(), &gl_pip_desc)
+		gl_pip: gl.context_make_pipeline(gl.default_context, &gl_pip_desc)
 	}
 
 	// create a sokol-gl context compatible with the offscreen render pass
