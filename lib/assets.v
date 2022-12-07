@@ -71,16 +71,15 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		num_mipmaps: 0 // TODO image.mipmaps
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
-		label: &u8(0)
-		// d3d11_texture: 0
-		pixel_format: .rgba8 // C.SG_PIXELFORMAT_RGBA8
+		// label: &u8(0)
+		pixel_format: .rgba8
 	}
 
-	println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
-	println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
+	// println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
+	// println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
 	img_desc.data.subimage[0][0] = gfx.Range{
 		ptr: stb_img.data
-		size: usize(4 * image.width * image.height) // TODO 4 is not always equal to image.channels count ?
+		size: usize(4 * image.width * image.height) // NOTE 4 is not always equal to image.channels count, but sokol_gl contexts expect it
 	}
 
 	image.gfx_image = gfx.make_image(&img_desc)
@@ -140,6 +139,19 @@ pub fn (mut a Assets) load(ao AssetOptions) !&Asset {
 	return asset
 }
 
+pub fn (a &Assets) get[T](uri string) !T {
+	$if T is Image {
+		return a.get_cached_image(uri)
+	}
+	$else $if T is &Asset {
+		return a.ass[uri]
+	}
+	// t := T{}
+	// tof := typeof(t).name
+	tof := 'TODO'
+	return error('${@STRUCT}.${@FN}' + ': "${uri}" of type ${tof} is not supported')
+}
+
 pub fn (a &Assets) get_cached_image(uri string) !Image {
 	if image := a.image_cache[uri] {
 		return image
@@ -159,13 +171,14 @@ pub fn (a &Assets) get_cached[T](uri string) !T {
 		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
+/*
 pub fn (a &Assets) get(uri string) !&Asset {
 	if asset := a.ass[uri] {
 		return asset
 	}
 	return error('${@STRUCT}.${@FN}' +
 		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
-}
+}*/
 
 pub enum ImageKind {
 	unknown
