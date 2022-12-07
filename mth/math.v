@@ -29,11 +29,15 @@ pub fn abs[T](a T) T {
 
 // gcd finds the Greatest Common Divisor between two numbers.
 pub fn gcd[T](a T, b T) T {
-    return T(if b == 0 { a } else { gcd(b, T(math.mod(f64(a),f64(b)))) })
+	return T(if b == 0 {
+		a
+	} else {
+		gcd(b, T(math.mod(f64(a), f64(b))))
+	})
 }
 
 // reduce reduces a fraction by finding the Greatest Common Divisor and dividing by it.
-pub fn reduce[T](numerator T, denominator T) (T,T) {
-	g_c_d := gcd(numerator,denominator)
-  	return numerator/g_c_d, denominator/g_c_d
+pub fn reduce[T](numerator T, denominator T) (T, T) {
+	g_c_d := gcd(numerator, denominator)
+	return numerator / g_c_d, denominator / g_c_d
 }

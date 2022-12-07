@@ -142,8 +142,7 @@ pub fn (mut a Assets) load(ao AssetOptions) !&Asset {
 pub fn (a &Assets) get[T](uri string) !T {
 	$if T is Image {
 		return a.get_cached_image(uri)
-	}
-	$else $if T is &Asset {
+	} $else $if T is &Asset {
 		return a.ass[uri]
 	}
 	// t := T{}

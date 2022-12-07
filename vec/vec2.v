@@ -148,8 +148,7 @@ pub fn (v Vec2[T]) length() T {
 		return math.sqrt((v.x * v.x) + (v.y * v.y))
 	} $else $if T is f32 {
 		return math.sqrtf((v.x * v.x) + (v.y * v.y))
-	}
-	$else $if T is u32 {
+	} $else $if T is u32 {
 		return u32(math.sqrtf((v.x * v.x) + (v.y * v.y)))
 	}
 	panic('TODO ${@FN} not implemented for type')
@@ -239,8 +238,7 @@ pub fn (v Vec2[T]) distance(u Vec2[T]) T {
 		return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
 	} $else $if T is f32 {
 		return math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
-	}
-	$else $if T is u32 {
+	} $else $if T is u32 {
 		return u32(math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y)))
 	}
 
@@ -260,8 +258,7 @@ pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 		return math.atan2((v.y - u.y), (v.x - u.x))
 	} $else $if T is f32 {
 		return f32(math.atan2((v.y - u.y), (v.x - u.x)))
-	}
-	$else $if T is u32 {
+	} $else $if T is u32 {
 		return u32(math.atan2((v.y - u.y), (v.x - u.x)))
 	}
 
@@ -276,8 +273,7 @@ pub fn (v Vec2[T]) angle() T {
 		return math.atan2(v.y, v.x)
 	} $else $if T is f32 {
 		return f32(math.atan2(v.y, v.x))
-	}
-	$else $if T is u32 {
+	} $else $if T is u32 {
 		return u32(math.atan2(v.y, v.x))
 	}
 
