@@ -148,12 +148,13 @@ pub fn (v Vec2[T]) length() T {
 		return math.sqrt((v.x * v.x) + (v.y * v.y))
 	} $else $if T is f32 {
 		return math.sqrtf((v.x * v.x) + (v.y * v.y))
-	} $else {
-		panic('TODO ${@FN} not implemented for type')
-		return 0.0
-		// $compile_error('Type T in Vec2<T>.length() is not supported')
 	}
-	return 0.0
+	$else $if T is u32 {
+		return u32(math.sqrtf((v.x * v.x) + (v.y * v.y)))
+	}
+	panic('TODO ${@FN} not implemented for type')
+	return T(0.0)
+	// $compile_error('Type T in Vec2<T>.length() is not supported')
 }
 
 pub fn (v Vec2[T]) dot(u Vec2[T]) T {
@@ -238,11 +239,14 @@ pub fn (v Vec2[T]) distance(u Vec2[T]) T {
 		return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
 	} $else $if T is f32 {
 		return math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
-	} $else {
-		panic('TODO ${@FN} not implemented for type')
-		return 0.0
-		// $compile_error('Type T in Vec2<T>.length() is not supported')
 	}
+	$else $if T is u32 {
+		return u32(math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y)))
+	}
+
+	panic('TODO ${@FN} not implemented for type')
+	return T(0.0)
+	// $compile_error('Type T in Vec2<T>.length() is not supported')
 }
 
 // manhattan_distance returns the Manhattan distance between the two vectors
@@ -256,11 +260,14 @@ pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 		return math.atan2((v.y - u.y), (v.x - u.x))
 	} $else $if T is f32 {
 		return f32(math.atan2((v.y - u.y), (v.x - u.x)))
-	} $else {
-		panic('TODO ${@FN} not implemented for type')
-		return 0.0
-		// $compile_error('Type T in Vec2<T>.length() is not supported')
 	}
+	$else $if T is u32 {
+		return u32(math.atan2((v.y - u.y), (v.x - u.x)))
+	}
+
+	panic('TODO ${@FN} not implemented for type')
+	return T(0.0)
+	// $compile_error('Type T in Vec2<T>.length() is not supported')
 }
 
 // angle returns the angle in radians of the vector
@@ -269,11 +276,14 @@ pub fn (v Vec2[T]) angle() T {
 		return math.atan2(v.y, v.x)
 	} $else $if T is f32 {
 		return f32(math.atan2(v.y, v.x))
-	} $else {
-		panic('TODO ${@FN} not implemented for type')
-		return 0.0
-		// $compile_error('Type T in Vec2<T>.length() is not supported')
 	}
+	$else $if T is u32 {
+		return u32(math.atan2(v.y, v.x))
+	}
+
+	panic('TODO ${@FN} not implemented for type')
+	return T(0.0)
+	// $compile_error('Type T in Vec2<T>.length() is not supported')
 }
 
 // abs will set x and y values to their absolute values
