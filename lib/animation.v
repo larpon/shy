@@ -39,7 +39,7 @@ mut:
 }
 
 pub fn (mut a Anims) init() ! {
-	a.shy.assert_api_init()
+	// a.shy.assert_api_init() // TODO fix for multi-window
 	// TODO make configurable
 	prealloc := 1000
 	unsafe { a.active.flags.set(.noslices | .noshrink) }

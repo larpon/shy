@@ -28,7 +28,7 @@ mut:
 }
 
 pub fn (mut t Timers) init() ! {
-	t.shy.assert_api_init()
+	// t.shy.assert_api_init() // TODO fix for multi-window
 	// TODO make configurable
 	prealloc := 1000
 	unsafe { t.active.flags.set(.noslices | .noshrink) }
