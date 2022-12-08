@@ -32,8 +32,11 @@ mut:
 
 struct Offscreen {
 mut:
-	pass_action gfx.PassAction
+	width int
+	height int
 	pass        gfx.Pass
+	pass_desc   gfx.PassDesc
+	pass_action gfx.PassAction
 	img         gfx.Image
 	gl_ctx      gl.Context
 }
@@ -74,16 +77,6 @@ pub fn (mut g GFX) init() ! {
 	assert gfx.isvalid()
 
 	g.ready = true
-}
-
-pub fn (mut g GFX) reinit() !u32 {
-	g.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	mut c := g.get_active_context()
-	c.shutdown()!
-	g.shutdown()!
-	g.init()!
-	cid := g.make_context()!
-	return cid
 }
 
 pub fn (mut g GFX) shutdown() ! {
@@ -184,6 +177,8 @@ fn (mut c Context) sokol_gl_init() ! {
 	// sokol_gl is used for all drawing operations in the easy/quick app types
 	sample_count := c.shy.config.render.msaa
 
+	offscreen_sample_count := 1
+
 	win := c.shy.active_window()
 	w, h := win.drawable_wh()
 
@@ -217,7 +212,7 @@ fn (mut c Context) sokol_gl_init() ! {
 		// max_commands: 4
 		color_format: .rgba8
 		depth_format: .@none
-		sample_count: sample_count
+		sample_count: offscreen_sample_count
 	}
 
 	// create an offscreen render target texture, pass, and pass_action
@@ -226,7 +221,7 @@ fn (mut c Context) sokol_gl_init() ! {
 		width: w
 		height: h
 		pixel_format: .rgba8
-		sample_count: sample_count
+		sample_count: offscreen_sample_count
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		min_filter: .nearest
@@ -238,14 +233,46 @@ fn (mut c Context) sokol_gl_init() ! {
 	off_pass_desc.color_attachments[0].image = off_img
 
 	offscreen := Offscreen{
+		width: w
+		height: h
 		pass: gfx.make_pass(&off_pass_desc)
 		pass_action: gfx.create_clear_pass(0.0, 0.0, 0.0, 1.0)
+		pass_desc: off_pass_desc
 		gl_ctx: gl.make_context(gl_ctx_desc)
 		img: off_img
 	}
 
 	c.display = display
 	c.offscreen = offscreen
+}
+
+fn (mut c Context) offscreen_reinit(width int, height int) ! {
+	offscreen_sample_count := 1
+
+	gfx.destroy_pass(c.offscreen.pass)
+	gfx.destroy_image(c.offscreen.pass_desc.color_attachments[0].image)
+	// recreate an offscreen render target texture, pass, and pass_action
+	mut img_desc := gfx.ImageDesc{
+		render_target: true
+		width: width
+		height: height
+		pixel_format: .rgba8
+		sample_count: offscreen_sample_count
+		wrap_u: .clamp_to_edge
+		wrap_v: .clamp_to_edge
+		min_filter: .nearest
+		mag_filter: .nearest
+	}
+	off_img := gfx.make_image(&img_desc)
+
+	mut off_pass_desc := gfx.PassDesc{}
+	off_pass_desc.color_attachments[0].image = off_img
+
+	c.offscreen.width = width
+	c.offscreen.height = height
+	c.offscreen.pass = gfx.make_pass(&off_pass_desc)
+	c.offscreen.pass_desc = off_pass_desc
+	c.offscreen.img = off_img
 }
 
 [manualfree]
@@ -286,6 +313,15 @@ pub fn (mut g GFX) begin_easy_frame() {
 	c := g.get_active_context()
 	off := c.offscreen
 	gl.set_context(off.gl_ctx)
+
+	// Reinit offscreen pass if necessary
+	// TODO make nicer
+	win := g.shy.active_window()
+	w, h := win.drawable_wh()
+	if off.width != w || off.height != h {
+		mut mc := unsafe { g.get_active_context() }
+		mc.offscreen_reinit(w,h) or { panic(err) }
+	}
 }
 
 pub fn (mut g GFX) end_easy_frame() {
@@ -326,6 +362,9 @@ pub fn (mut g GFX) end_easy_frame() {
 	gl.ortho(0.0, w, h, 0.0, -1.0, 1.0)
 
 	gl.push_matrix()
+
+	//gl.scale(2.5, 2.5, 1)
+
 	gl.c4b(255, 255, 255, 255)
 	g.draw_flipped_textured_plane(0, 0, w, h)
 	gl.pop_matrix()

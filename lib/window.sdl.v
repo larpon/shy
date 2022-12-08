@@ -765,16 +765,6 @@ pub fn (mut w Window) shutdown() ! {
 	sdl.destroy_window(w.handle)
 }
 
-[unsafe]
-pub fn (mut w Window) todo___reinit_graphics_workaround() {
-	// TODO ugly hack that crashes on multi-windows
-	w.ready = false
-	// eprintln('GFX id before: ${w.gfx}')
-	w.gfx = w.shy.api.gfx.reinit() or { panic('${@STRUCT}.${@FN}: reinit failed') }
-	// eprintln('GFX id after: ${w.gfx}')
-	w.ready = true
-}
-
 pub fn (mut w Window) toggle_fullscreen() {
 	if w.is_fullscreen() {
 		sdl.set_window_fullscreen(w.handle, 0)
@@ -787,11 +777,6 @@ pub fn (mut w Window) toggle_fullscreen() {
 		}
 		sdl.set_window_fullscreen(w.handle, window_flags)
 	}
-
-	// TODO ... doesn't work?! Should be scheduled to be handled as an event i.e. out of any frame calls!
-	// w.shy.once(fn [mut w] () {
-	// 	w.todo___reinit_graphics_workaround()
-	//}, 500)
 }
 
 pub fn (w &Window) is_fullscreen() bool {

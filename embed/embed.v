@@ -107,11 +107,6 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 					}
 					a.shy.log.gdebug('${@STRUCT}', 'saved screenshot to "${shot_file}"')
 				}
-				.f8 {
-					if alt_is_held {
-						unsafe { a.window.todo___reinit_graphics_workaround() } // TODO should be handled differently but via events!!
-					}
-				}
 				else {
 					if key == .f || key == .f11 || (key == .@return && alt_is_held) {
 						a.window.toggle_fullscreen()
