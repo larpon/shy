@@ -41,8 +41,8 @@ pub fn (mut di DrawImage) end() {
 
 pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 	return Draw2DImage{
-		w: image.width
-		h: image.height
+		width: image.width
+		height: image.height
 		image: image
 		alpha_pipeline: di.draw.alpha_pipeline
 	}
@@ -67,7 +67,7 @@ pub mut:
 
 [inline]
 pub fn (i Draw2DImage) origin_offset() (f32, f32) {
-	p_x, p_y := i.origin.pos_wh(i.w, i.h)
+	p_x, p_y := i.origin.pos_wh(i.width, i.height)
 	return -p_x, -p_y
 }
 
@@ -75,8 +75,8 @@ pub fn (i Draw2DImage) origin_offset() (f32, f32) {
 pub fn (i Draw2DImage) draw() {
 	x := i.x
 	y := i.y
-	w := i.w
-	h := i.h
+	w := i.width
+	h := i.height
 
 	u0 := f32(0.0)
 	v0 := f32(0.0)
@@ -146,14 +146,14 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 
 	u0 = utils.remap(dst.x, 0, w, 0, 1)
 	v0 = utils.remap(dst.y, 0, h, 0, 1)
-	u1 = utils.remap(dst.x + dst.w, 0, w, 0, 1)
-	v1 = utils.remap(dst.y + dst.h, 0, h, 0, 1)
-	// eprintln('dst: ${dst.x},${dst.y},${dst.w},${dst.h} u0: $u0, v0: $v0, u1: $u1, v1: $v1')
+	u1 = utils.remap(dst.x + dst.width, 0, w, 0, 1)
+	v1 = utils.remap(dst.y + dst.height, 0, h, 0, 1)
+	// eprintln('dst: ${dst.x},${dst.y},${dst.width},${dst.height} u0: $u0, v0: $v0, u1: $u1, v1: $v1')
 
 	mut x0 := f32(src.x)
 	mut y0 := f32(src.y)
-	mut x1 := f32(src.w)
-	mut y1 := f32(src.h)
+	mut x1 := f32(src.width)
+	mut y1 := f32(src.height)
 
 	gl.push_matrix()
 
@@ -180,8 +180,8 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 
 	// eprintln('image: ${w}x${h}\nsrc: ${src} dst: ${dst}')
 	// TODO division by zero can probably happen here...
-	dw := mth.min(dst.w, w) / mth.max(dst.w, w)
-	dh := mth.min(dst.h, h) / mth.max(dst.h, h)
+	dw := mth.min(dst.width, w) / mth.max(dst.width, w)
+	dh := mth.min(dst.height, h) / mth.max(dst.height, h)
 	if dw != 1 || dh != 1 {
 		gl.translate(-o_off_x, -o_off_y, 0)
 		gl.scale(dw, dh, 1)

@@ -21,8 +21,8 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: (shy.half * a.window.width())
 		y: (shy.half * a.window.height())
-		w: 100
-		h: 100
+		width: 100
+		height: 100
 		origin: .center
 	)
 }

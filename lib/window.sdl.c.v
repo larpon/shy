@@ -20,8 +20,8 @@ pub fn (w Window) screenshot(path string) ! {
 	area := Rect{
 		x: 0
 		y: 0
-		w: w.width()
-		h: w.height()
+		width: w.width()
+		height: w.height()
 	}
 	return w.areashot(area, path)
 }
@@ -104,8 +104,8 @@ mut:
 
 [manualfree]
 fn (w Window) dump_pixels(rect Rect) &Screenshot {
-	img_width := int(rect.w)
-	img_height := int(rect.h)
+	img_width := int(rect.width)
+	img_height := int(rect.height)
 	img_size := img_width * img_height * 4
 	img_pixels := unsafe { &u8(malloc(img_size)) }
 	C.shy_gl_read_rgba_pixels(rect.x, rect.y, img_width, img_height, img_pixels)

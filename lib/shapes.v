@@ -14,10 +14,10 @@ import shy.vec { Vec2 }
 // Rect represents the data structure of a rectangle
 pub struct Rect {
 pub mut:
-	x f32
-	y f32
-	w f32 = 100
-	h f32 = 100
+	x      f32
+	y      f32
+	width  f32 = 100
+	height f32 = 100
 }
 
 [inline]
@@ -110,8 +110,8 @@ pub fn (l &Line) intersect_rect(r Rect) (u8, f32, f32, f32, f32) {
 
 	rx := r.x
 	ry := r.y
-	rw := r.w
-	rh := r.h
+	rw := r.width
+	rh := r.height
 
 	// check if the line has hit any of the rectangle's sides
 	// uses the Line/Line function below
@@ -177,8 +177,8 @@ pub fn (l &Line) hit_rect(r Rect) bool {
 
 	rx := r.x
 	ry := r.y
-	rw := r.w
-	rh := r.h
+	rw := r.width
+	rh := r.height
 
 	// check if the line has hit any of the rectangle's sides
 	// uses the Line/Line function below
@@ -255,15 +255,15 @@ pub fn (c &Circle) bbox() Rect {
 	return Rect{
 		x: c.x - (c.radius * 0.5)
 		y: c.y - (c.radius * 0.5)
-		w: c.radius * 2
-		h: c.radius * 2
+		width: c.radius * 2
+		height: c.radius * 2
 	}
 }
 
 pub struct Size {
 pub mut:
-	w f32 = 100
-	h f32 = 100
+	width  f32 = 100
+	height f32 = 100
 }
 
 pub enum Anchor {
@@ -425,36 +425,36 @@ pub fn (a Anchor) pos_rect(r Rect) (f32, f32) {
 			y = r.y
 		}
 		.top_center {
-			x = r.x + (r.w / 2)
+			x = r.x + (r.width / 2)
 			y = r.y
 		}
 		.top_right {
-			x = r.x + r.w
+			x = r.x + r.width
 			y = r.y
 		}
 		.center_left {
 			x = r.x
-			y = r.y + (r.h / 2)
+			y = r.y + (r.height / 2)
 		}
 		.center {
-			x = r.x + (r.w / 2)
-			y = r.y + (r.h / 2)
+			x = r.x + (r.width / 2)
+			y = r.y + (r.height / 2)
 		}
 		.center_right {
-			x = r.x + r.w
-			y = r.y + (r.h / 2)
+			x = r.x + r.width
+			y = r.y + (r.height / 2)
 		}
 		.bottom_left {
 			x = r.x
-			y = r.y + r.h
+			y = r.y + r.height
 		}
 		.bottom_center {
-			x = r.x + (r.w / 2)
-			y = r.y + r.h
+			x = r.x + (r.width / 2)
+			y = r.y + r.height
 		}
 		.bottom_right {
-			x = r.x + r.w
-			y = r.y + r.h
+			x = r.x + r.width
+			y = r.y + r.height
 		}
 	}
 	return x, y
@@ -468,36 +468,36 @@ pub fn (a Anchor) displace_rect(r Rect) (f32, f32) {
 			y = r.y
 		}
 		.top_center {
-			x = r.x - (r.w / 2)
+			x = r.x - (r.width / 2)
 			y = r.y
 		}
 		.top_right {
-			x = r.x - r.w
+			x = r.x - r.width
 			y = r.y
 		}
 		.center_left {
 			x = r.x
-			y = r.y - (r.h / 2)
+			y = r.y - (r.height / 2)
 		}
 		.center {
-			x = r.x - (r.w / 2)
-			y = r.y - (r.h / 2)
+			x = r.x - (r.width / 2)
+			y = r.y - (r.height / 2)
 		}
 		.center_right {
-			x = r.x - r.w
-			y = r.y - (r.h / 2)
+			x = r.x - r.width
+			y = r.y - (r.height / 2)
 		}
 		.bottom_left {
 			x = r.x
-			y = r.y - r.h
+			y = r.y - r.height
 		}
 		.bottom_center {
-			x = r.x - (r.w / 2)
-			y = r.y - r.h
+			x = r.x - (r.width / 2)
+			y = r.y - r.height
 		}
 		.bottom_right {
-			x = r.x - r.w
-			y = r.y - r.h
+			x = r.x - r.width
+			y = r.y - r.height
 		}
 	}
 	return x, y

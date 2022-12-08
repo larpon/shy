@@ -117,8 +117,8 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		mut display_mode := sdl.DisplayMode{}
 		sdl.get_current_display_mode(display_index, &display_mode)
 		dn := unsafe { cstring_to_vstring(sdl.get_display_name(display_index)) }
-		dw := display_bounds[display_index].w
-		dh := display_bounds[display_index].h
+		dw := display_bounds[display_index].width
+		dh := display_bounds[display_index].height
 		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen ${display_index} `${dn}` ${dw}x${dh}@${display_mode.refresh_rate}hz')
 	}
 
@@ -171,8 +171,8 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		...s.config.window
 		x: x
 		y: y
-		w: win_w
-		h: win_h
+		width: win_w
+		height: win_h
 	}
 	win := wm.new_window(window_config)!
 	wm.root = win
@@ -207,8 +207,8 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	// window_flags := u32(sdl.null)
 	// window_flags := u32(sdl.WindowFlags.fullscreen)
 
-	window := sdl.create_window(config.title.str, int(config.x), int(config.y), int(config.w),
-		int(config.h), window_flags)
+	window := sdl.create_window(config.title.str, int(config.x), int(config.y), int(config.width),
+		int(config.height), window_flags)
 	if window == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
@@ -729,7 +729,7 @@ pub fn (mut w Window) init() ! {
 	w.render_init()
 
 	w.x, w.y = w.position()
-	w.w, w.h = w.wh()
+	w.width, w.height = w.wh()
 
 	w.ready = true
 }
@@ -802,8 +802,8 @@ pub fn (w &Window) size() Size {
 	mut width, mut height := 0, 0
 	sdl.get_window_size(w.handle, &width, &height)
 	return Size{
-		w: width
-		h: height
+		width: width
+		height: height
 	}
 }
 
@@ -835,7 +835,7 @@ pub fn (w &Window) drawable_size() Size {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
 	return Size{
-		w: width
-		h: height
+		width: width
+		height: height
 	}
 }

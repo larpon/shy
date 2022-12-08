@@ -97,7 +97,7 @@ pub fn rect(x f32, y f32, w f32, h f32) Rect {
 	return Rect{
 		x: x
 		y: y
-		w: w
-		h: h
+		width: w
+		height: h
 	}
 }

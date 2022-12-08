@@ -17,8 +17,8 @@ fn main() {
 	mut app := &App{}
 	shy.run[App](mut app,
 		window: shy.WindowConfig{
-			w: 600
-			h: 400
+			width: 600
+			height: 400
 		}
 	)!
 }
@@ -40,15 +40,15 @@ pub fn (mut a App) init() ! {
 	win_size := a.window.size()
 
 	a.once_text = a.easy.new_text(
-		x: shy.half * win_size.w
-		y: shy.half * win_size.h
+		x: shy.half * win_size.width
+		y: shy.half * win_size.height
 		size: 50
 		origin: .center
 		align: .center
 	)
 
 	a.info_text = a.easy.new_text(
-		x: shy.half * win_size.w
+		x: shy.half * win_size.width
 		y: 10
 		origin: .top_center
 		align: .center
@@ -56,7 +56,7 @@ pub fn (mut a App) init() ! {
 	)
 
 	a.clock_text = a.easy.new_text(
-		y: win_size.h
+		y: win_size.height
 		origin: .bottom_left
 		text: 'Local time: ${time.now().format_ss()}'
 	)
@@ -69,10 +69,10 @@ pub fn (mut a App) init() ! {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	win_size := a.window.size()
-	a.info_text.x = shy.half * win_size.w
-	a.once_text.x = shy.half * win_size.w
-	a.once_text.y = shy.half * win_size.h
-	a.clock_text.y = win_size.h
+	a.info_text.x = shy.half * win_size.width
+	a.once_text.x = shy.half * win_size.width
+	a.once_text.y = shy.half * win_size.height
+	a.clock_text.y = win_size.height
 
 	a.info_text.draw()
 	a.once_text.draw()

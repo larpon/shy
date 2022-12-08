@@ -106,7 +106,7 @@ pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 
 [inline]
 pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
-	p_x, p_y := r.origin.pos_wh(r.w, r.h)
+	p_x, p_y := r.origin.pos_wh(r.width, r.height)
 	return -p_x, -p_y
 }
 
@@ -116,8 +116,8 @@ pub fn (r DrawShape2DRect) draw() {
 	// this could/should maybe someday be switchable by a flag...?
 	x := f32(int(r.x))
 	y := f32(int(r.y))
-	w := f32(int(r.w)) - 0.5
-	h := f32(int(r.h)) - 1.0
+	w := f32(int(r.width)) - 0.5
+	h := f32(int(r.height)) - 1.0
 	sx := f32(0.5) // x //* scale_factor
 	sy := f32(0.5) // y //* scale_factor
 
@@ -308,7 +308,7 @@ pub mut:
 [inline]
 pub fn (up &DrawShape2DUniformPolygon) origin_offset() (f32, f32) {
 	bbox := up.bbox()
-	p_x, p_y := up.origin.pos_wh(bbox.w, bbox.h)
+	p_x, p_y := up.origin.pos_wh(bbox.width, bbox.height)
 	return -p_x, -p_y
 }
 
@@ -317,8 +317,8 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	r := up.bbox()
 	// A sane default is to let uniform polygons (e.g. circles)
 	// draw from their origin, we compensate for that here
-	x := up.x + r.w * 0.5
-	y := up.y + r.h * 0.5
+	x := up.x + r.width * 0.5
+	y := up.y + r.height * 0.5
 	radius := up.radius
 	mut segments := up.segments
 	if segments <= 2 {

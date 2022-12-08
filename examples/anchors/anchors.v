@@ -28,8 +28,8 @@ pub fn (mut a App) frame(dt f64) {
 		x: f32(win_w) * 0.5
 		y: f32(win_h) * 0.5
 		origin: a.origin
-		w: 50
-		h: 50
+		width: 50
+		height: 50
 		color: shy.colors.blue
 	)
 
@@ -42,7 +42,7 @@ pub fn (mut a App) frame(dt f64) {
 		text: 'Current draw origin:\n${a.origin}'
 	)
 
-	tx, ty := a.origin.pos_wh(win.Rect.w, win.Rect.h)
+	tx, ty := a.origin.pos_wh(win.Rect.width, win.Rect.height)
 	a.quick.text(
 		x: tx
 		y: ty
@@ -56,8 +56,8 @@ pub fn (mut a App) frame(dt f64) {
 		x: tx
 		y: ty
 		origin: .center
-		w: 4
-		h: 4
+		width: 4
+		height: 4
 	)
 
 	// Mark center of window
@@ -65,8 +65,8 @@ pub fn (mut a App) frame(dt f64) {
 		x: win_w / 2
 		y: win_h / 2
 		origin: .center
-		w: 2
-		h: 2
+		width: 2
+		height: 2
 	)
 
 	test_text := 'Test text
@@ -89,8 +89,8 @@ line 3'
 		x: at_x
 		y: at_y
 		origin: .center
-		w: 4
-		h: 4
+		width: 4
+		height: 4
 	)
 }
 

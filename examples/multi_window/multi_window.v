@@ -33,8 +33,8 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: (shy.half * win.width()) - 50
 		y: (shy.half * win.height()) - 50
-		w: 100
-		h: 100
+		width: 100
+		height: 100
 		color: color
 	)
 
@@ -58,8 +58,8 @@ pub fn (mut a App) event(e shy.Event) {
 				.w {
 					a.window.new_window(
 						title: 'New Shy Window'
-						w: 400
-						h: 300
+						width: 400
+						height: 300
 					) or { panic(err) }
 				}
 				else {}

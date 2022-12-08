@@ -171,16 +171,16 @@ pub fn (t Draw2DText) draw() {
 		mut p_r := Rect{}
 		for line in lines {
 			r := t.bounds(line)
-			if r.w > max_w {
-				max_w = r.w
+			if r.width > max_w {
+				max_w = r.width
 			}
 			max_h += line_height - 2 // 1 // lines.len
-			// max_h += line_height - (line_height - r.h) - 1
+			// max_h += line_height - (line_height - r.height) - 1
 			p_r = r
 		}
 		if lines.len == 1 {
-			max_w = p_r.w
-			max_h = p_r.h
+			max_w = p_r.width
+			max_h = p_r.height
 		}
 	}
 
@@ -208,13 +208,13 @@ pub fn (t Draw2DText) draw() {
 
 		// ymin, ymax := t.line_bounds(0)
 		// base_lh := '' // t.baseline_height(line)
-		// println('Origin: $t.origin $r.x,$r.y w$r.w h$r.h\nyMin $ymin,yMax $ymax\nMetrics: $fm\nBaseline height: $base_lh\nLine height: $line_height\nText: $line\nAlign: $t.align\n$max_w x $max_h ')
+		// println('Origin: $t.origin $r.x,$r.y w$r.width h$r.height\nyMin $ymin,yMax $ymax\nMetrics: $fm\nBaseline height: $base_lh\nLine height: $line_height\nText: $line\nAlign: $t.align\n$max_w x $max_h ')
 
 		// Tweak for which corner of the text we're drawing.
 		// per default, fontstash has chosen to let the drawing start from left at the font's baseline
 		// We compensate for that here:
 
-		off_compensate_y := -(r.y + r.h) + r.h
+		off_compensate_y := -(r.y + r.height) + r.height
 		off_y = off_compensate_y
 
 		align_off_x := if align.has(.center) {
@@ -281,8 +281,8 @@ pub fn (t Draw2DText) draw() {
 				t.dbg_draw_rect(Rect{
 					x: r.x - align_off_x / 2
 					y: r.y
-					w: max_w
-					h: max_h
+					width: max_w
+					height: max_h
 				})
 			}
 		}
@@ -304,11 +304,11 @@ fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
 fn (t Draw2DText) dbg_draw_rect(r Rect) {
 	gl.begin_line_strip()
 	gl.v2f(r.x, r.y)
-	gl.v2f(r.x + r.w, r.y)
-	gl.v2f(r.x + r.w, r.y)
-	gl.v2f(r.x + r.w, r.y + r.h)
-	gl.v2f(r.x + r.w, r.y + r.h)
-	gl.v2f(r.x, r.y + r.h)
+	gl.v2f(r.x + r.width, r.y)
+	gl.v2f(r.x + r.width, r.y)
+	gl.v2f(r.x + r.width, r.y + r.height)
+	gl.v2f(r.x + r.width, r.y + r.height)
+	gl.v2f(r.x, r.y + r.height)
 	gl.v2f(r.x, r.y)
 	gl.end()
 }
@@ -340,8 +340,8 @@ pub fn (t Draw2DText) bounds(s string) Rect {
 	return Rect{
 		x: buf[0]
 		y: buf[1]
-		w: buf[2] - buf[0]
-		h: buf[3] - buf[1]
+		width: buf[2] - buf[0]
+		height: buf[3] - buf[1]
 	}
 }
 

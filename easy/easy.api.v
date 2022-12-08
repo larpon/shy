@@ -143,8 +143,8 @@ pub fn (er &EasyRect) draw() {
 	mut r := d.rect()
 	r.x = er.x
 	r.y = er.y
-	r.w = er.w
-	r.h = er.h
+	r.width = er.width
+	r.height = er.height
 	r.stroke = er.stroke
 	r.rotation = er.rotation
 	r.scale = er.scale
@@ -461,10 +461,10 @@ pub fn (es &EasySound) stop() {
 }
 
 pub struct EasyImageConfigRect {
-	x f32
-	y f32
-	w f32 = -1
-	h f32 = -1
+	x      f32
+	y      f32
+	width  f32 = -1
+	height f32 = -1
 }
 
 // Image drawing sub-system
@@ -512,20 +512,20 @@ pub fn (ei &EasyImage) draw() {
 	mut i2d := d.image_2d(image)
 	i2d.x = ei.x
 	i2d.y = ei.y
-	i2d.w = ei.w
-	i2d.h = ei.h
+	i2d.width = ei.width
+	i2d.height = ei.height
 	i2d.color = ei.color
 	i2d.rotation = ei.rotation
 	i2d.scale = ei.scale
 	i2d.offset = ei.offset
 	i2d.origin = ei.origin
 
-	if ei.region.w >= 0 || ei.region.h >= 0 {
+	if ei.region.width >= 0 || ei.region.height >= 0 {
 		src := shy.Rect{
 			x: 0
 			y: 0
-			w: ei.w
-			h: ei.h
+			width: ei.width
+			height: ei.height
 		}
 		dst := ei.region
 		// println('$ei.uri:\nsrc: $src dst: $dst')
@@ -555,8 +555,8 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		x: eic.x
 		y: eic.y
 	}
-	r.w = if eic.w < 0 { f32(image.width) } else { eic.w }
-	r.h = if eic.h < 0 { f32(image.height) } else { eic.h }
+	r.width = if eic.width < 0 { f32(image.width) } else { eic.width }
+	r.height = if eic.height < 0 { f32(image.height) } else { eic.height }
 
 	// TODO WORKAROUND "...eic" spread doesn't work
 	// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
@@ -564,8 +564,8 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		shy: e.shy
 		Rect: r
 		// y: r.y
-		// w: r.w
-		// h: r.h
+		// w: r.width
+		// h: r.height
 		uri: eic.uri
 		color: eic.color
 		rotation: eic.rotation
