@@ -32,8 +32,8 @@ mut:
 
 struct Offscreen {
 mut:
-	width int
-	height int
+	width       int
+	height      int
 	pass        gfx.Pass
 	pass_desc   gfx.PassDesc
 	pass_action gfx.PassAction
@@ -320,7 +320,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 	w, h := win.drawable_wh()
 	if off.width != w || off.height != h {
 		mut mc := unsafe { g.get_active_context() }
-		mc.offscreen_reinit(w,h) or { panic(err) }
+		mc.offscreen_reinit(w, h) or { panic(err) }
 	}
 }
 
@@ -363,7 +363,7 @@ pub fn (mut g GFX) end_easy_frame() {
 
 	gl.push_matrix()
 
-	//gl.scale(2.5, 2.5, 1)
+	// gl.scale(2.5, 2.5, 1)
 
 	gl.c4b(255, 255, 255, 255)
 	g.draw_flipped_textured_plane(0, 0, w, h)

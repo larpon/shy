@@ -78,8 +78,6 @@ pub fn (i Draw2DImage) draw() {
 	w := i.w
 	h := i.h
 
-	// i.draw_region_at()
-
 	u0 := f32(0.0)
 	v0 := f32(0.0)
 	u1 := f32(1.0)
@@ -94,10 +92,14 @@ pub fn (i Draw2DImage) draw() {
 	gl.enable_texture()
 	gl.texture(i.image.gfx_image)
 
-	o_off_x, o_off_y := i.origin_offset()
+	mut o_off_x, mut o_off_y := i.origin_offset()
+	// o_off_x = int(o_off_x)
+	// o_off_y = int(o_off_y)
 
 	gl.translate(o_off_x, o_off_y, 0)
 	gl.translate(x + i.offset.x, y + i.offset.y, 0)
+
+	// println('${o_off_x} x: ${x} w: ${w} h: ${h}')
 
 	if i.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
@@ -158,7 +160,9 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	gl.enable_texture()
 	gl.texture(i.image.gfx_image)
 
-	o_off_x, o_off_y := i.origin_offset()
+	mut o_off_x, mut o_off_y := i.origin_offset()
+	// o_off_x = int(o_off_x)
+	// o_off_y = int(o_off_y)
 
 	gl.translate(o_off_x, o_off_y, 0)
 	gl.translate(x + i.offset.x, y + i.offset.y, 0)

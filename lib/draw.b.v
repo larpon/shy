@@ -21,7 +21,7 @@ pub fn (mut d Draw) init() ! {
 	alpha_pipdesc.label = c'alpha-pipeline'
 
 	alpha_pipdesc.depth = gfx.DepthState{
-		// pixel_format: .@none // .depth // .rgba8 //.@none // rgba8
+		pixel_format: .@none // .depth // .rgba8 //.@none // rgba8
 		write_enabled: true
 		// compare: .less_equal
 	}

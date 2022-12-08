@@ -112,16 +112,20 @@ pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
 
 [inline]
 pub fn (r DrawShape2DRect) draw() {
-	x := r.x
-	y := r.y
-	w := r.w
-	h := r.h
-	sx := 0 // x //* scale_factor
-	sy := 0 // y //* scale_factor
+	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
+	// this could/should maybe someday be switchable by a flag...?
+	x := f32(int(r.x))
+	y := f32(int(r.y))
+	w := f32(int(r.w)) - 0.5
+	h := f32(int(r.h)) - 1.0
+	sx := f32(0.5) // x //* scale_factor
+	sy := f32(0.5) // y //* scale_factor
+
+	mut o_off_x, mut o_off_y := r.origin_offset()
+	o_off_x = int(o_off_x)
+	o_off_y = int(o_off_y)
 
 	gl.push_matrix()
-	o_off_x, o_off_y := r.origin_offset()
-
 	gl.translate(o_off_x, o_off_y, 0)
 	gl.translate(x + r.offset.x, y + r.offset.y, 0)
 
@@ -130,6 +134,7 @@ pub fn (r DrawShape2DRect) draw() {
 		gl.rotate(r.rotation, 0, 0, 1.0)
 		gl.translate(o_off_x, o_off_y, 0)
 	}
+
 	if r.scale != 1 {
 		gl.translate(-o_off_x, -o_off_y, 0)
 		gl.scale(r.scale, r.scale, 1)
@@ -165,12 +170,12 @@ pub fn (r DrawShape2DRect) draw() {
 			gl.v2f((sx + w), sy)
 			gl.v2f((sx + w), (sy + h))
 			gl.v2f(sx, (sy + h))
-			gl.v2f(sx, sy) // TODO render error, lines should meet
+			gl.v2f(sx, sy)
 			gl.end()
 		}
 	}
 
-	gl.translate(-f32(x), -f32(y), 0)
+	gl.translate(-x, -y, 0)
 	gl.pop_matrix()
 }
 

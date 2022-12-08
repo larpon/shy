@@ -524,10 +524,12 @@ pub fn (ei &EasyImage) draw() {
 		src := shy.Rect{
 			x: 0
 			y: 0
-			w: ei.h
+			w: ei.w
 			h: ei.h
 		}
-		i2d.draw_region(src, ei.region)
+		dst := ei.region
+		// println('$ei.uri:\nsrc: $src dst: $dst')
+		i2d.draw_region(src, dst)
 	} else {
 		i2d.draw()
 	}
