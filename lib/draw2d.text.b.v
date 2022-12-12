@@ -11,6 +11,7 @@ import shy.wraps.sokol.sfons
 // DrawText
 pub struct DrawText {
 	ShyFrame
+	factor f32 = 1.0
 mut:
 	font_context &FontContext = null
 }
@@ -18,10 +19,12 @@ mut:
 pub fn (mut dt DrawText) begin() {
 	dt.ShyFrame.begin()
 	win := dt.shy.active_window()
-	w, h := win.drawable_wh()
+	// w, h := win.drawable_wh()
 
 	mut gfx := unsafe { dt.shy.api.gfx }
 	fc := gfx.get_font_context(win.gfx)
+
+	/*
 	// gl.set_context(fc.sgl)
 
 	// unsafe { dt.shy.api.draw.layer++ }
@@ -32,7 +35,7 @@ pub fn (mut dt DrawText) begin() {
 
 	gl.matrix_mode_projection()
 	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
-
+	*/
 	//¤ FLOOD dt.shy.log.gdebug('${@STRUCT}.${@FN}', 'begin ${ptr_str(fc.fsc)}...')
 	dt.font_context = fc
 	assert !isnil(fc), 'FontContext is null'
@@ -57,6 +60,7 @@ pub fn (mut dt DrawText) end() {
 pub fn (mut dt DrawText) text_2d() Draw2DText {
 	assert !isnil(dt.font_context), 'DrawText.font_context is null'
 	return Draw2DText{
+		factor: dt.factor
 		fc: dt.font_context
 	}
 }
@@ -119,7 +123,8 @@ pub fn (ta TextAlign) next() TextAlign {
 
 pub struct Draw2DText {
 	Vec2[f32]
-	fc &FontContext
+	fc     &FontContext
+	factor f32 = 1.0
 mut:
 	cur_align TextAlign = .baseline | .left // According to fontstash source code
 pub mut:

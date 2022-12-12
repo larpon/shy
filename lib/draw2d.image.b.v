@@ -11,24 +11,12 @@ import shy.wraps.sokol.gl
 // DrawImage
 pub struct DrawImage {
 	ShyFrame
-	draw &Draw
+	factor f32 = 1.0
+	draw   &Draw
 }
 
 pub fn (mut di DrawImage) begin() {
 	di.ShyFrame.begin()
-
-	win := di.shy.active_window()
-	w, h := win.drawable_wh()
-
-	// unsafe { di.shy.api.draw.layer++ }
-	// gl.set_context(gl.default_context)
-	// gl.layer(di.shy.api.draw.layer)
-
-	gl.defaults()
-
-	// gl.set_context(s_gl_context)
-	gl.matrix_mode_projection()
-	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 }
 
 pub fn (mut di DrawImage) end() {
@@ -41,6 +29,7 @@ pub fn (mut di DrawImage) end() {
 
 pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 	return Draw2DImage{
+		factor: di.factor
 		width: image.width
 		height: image.height
 		image: image
@@ -57,6 +46,7 @@ pub struct Draw2DImage {
 	Rect
 	image          Image
 	alpha_pipeline gl.Pipeline
+	factor         f32 = 1.0
 pub mut:
 	color    Color = rgb(255, 255, 255)
 	origin   Anchor
@@ -67,16 +57,16 @@ pub mut:
 
 [inline]
 pub fn (i Draw2DImage) origin_offset() (f32, f32) {
-	p_x, p_y := i.origin.pos_wh(i.width, i.height)
+	p_x, p_y := i.origin.pos_wh(i.width * i.factor, i.height * i.factor)
 	return -p_x, -p_y
 }
 
 [inline]
 pub fn (i Draw2DImage) draw() {
-	x := i.x
-	y := i.y
-	w := i.width
-	h := i.height
+	x := i.x * i.factor
+	y := i.y * i.factor
+	w := i.width * i.factor
+	h := i.height * i.factor
 
 	u0 := f32(0.0)
 	v0 := f32(0.0)
@@ -134,8 +124,8 @@ pub fn (i Draw2DImage) draw() {
 
 [inline]
 pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
-	x := i.x
-	y := i.y
+	x := i.x * i.factor
+	y := i.y * i.factor
 	w := i.image.width
 	h := i.image.height
 

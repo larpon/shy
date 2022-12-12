@@ -11,29 +11,15 @@ import shy.wraps.sokol.gl
 // DrawShape2D
 pub struct DrawShape2D {
 	ShyFrame
+	factor f32 = 1.0
 }
 
 pub fn (mut d2d DrawShape2D) begin() {
 	d2d.ShyFrame.begin()
-
-	win := d2d.shy.api.wm.active_window()
-	w, h := win.drawable_wh()
-	// ratio := f32(w)/f32(h)
-
-	// unsafe { d2d.shy.api.draw.layer++ }
-	// gl.set_context(gl.default_context)
-	// gl.layer(d2d.shy.api.draw.layer)
-
-	gl.defaults()
-
-	// gl.set_context(s_gl_context)
-	gl.matrix_mode_projection()
-	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
 }
 
 pub fn (mut d2d DrawShape2D) end() {
 	d2d.ShyFrame.end()
-	// gl.draw_layer(d2d.shy.api.draw.layer)
 }
 
 fn radius_to_segments(r f32) u32 {
@@ -53,27 +39,32 @@ fn radius_to_segments(r f32) u32 {
 }
 
 pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
-	return config
+	return DrawShape2DRect{
+		...config
+		factor: d2d.factor
+	}
 }
 
 pub fn (d2d &DrawShape2D) line_segment(config DrawShape2DLineSegment) DrawShape2DLineSegment {
-	return config
+	return DrawShape2DLineSegment{
+		...config
+		factor: d2d.factor
+	}
 }
 
 pub fn (d2d &DrawShape2D) circle(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
-	return config
-	/*
 	return DrawShape2DUniformPolygon{
 		...config
-		segments: d2d.radius_to_segments(config.radius)
+		factor: d2d.factor
+		// segments: d2d.radius_to_segments(config.radius)
 	}
-	*/
 }
 
 pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
 	segments := if config.segments <= 2 { u32(3) } else { config.segments }
 	return DrawShape2DUniformPolygon{
 		...config
+		factor: d2d.factor
 		segments: segments
 	}
 }
@@ -82,6 +73,7 @@ pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawSha
 [params]
 pub struct DrawShape2DRect {
 	Rect
+	factor f32 = 1.0
 pub mut:
 	visible  bool  = true
 	color    Color = colors.shy.red
@@ -106,7 +98,7 @@ pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 
 [inline]
 pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
-	p_x, p_y := r.origin.pos_wh(r.width, r.height)
+	p_x, p_y := r.origin.pos_wh(r.width * r.factor, r.height * r.factor)
 	return -p_x, -p_y
 }
 
@@ -114,10 +106,10 @@ pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
 pub fn (r DrawShape2DRect) draw() {
 	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
 	// this could/should maybe someday be switchable by a flag...?
-	x := f32(int(r.x))
-	y := f32(int(r.y))
-	w := f32(int(r.width)) - 0.5
-	h := f32(int(r.height)) - 1.0
+	x := f32(int(r.x * r.factor))
+	y := f32(int(r.y * r.factor))
+	w := f32(int(r.width * r.factor)) - 0.5
+	h := f32(int(r.height * r.factor)) - 1.0
 	sx := f32(0.5) // x //* scale_factor
 	sy := f32(0.5) // y //* scale_factor
 
@@ -190,6 +182,7 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 pub struct DrawShape2DLineSegment {
 	Line
 	Stroke
+	factor f32 = 1.0
 pub mut:
 	visible  bool = true
 	rotation f32
@@ -210,12 +203,12 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	if !l.visible {
 		return
 	}
-	x1 := l.a.x
-	y1 := l.a.y
-	x2 := l.b.x
-	y2 := l.b.y
+	x1 := l.a.x * l.factor
+	y1 := l.a.y * l.factor
+	x2 := l.b.x * l.factor
+	y2 := l.b.y * l.factor
 	scale_factor := l.scale //* sgldraw.dpi_scale()
-	stroke_width := l.Stroke.width
+	stroke_width := l.Stroke.width * l.factor
 
 	color := l.color
 	gl.c4b(color.r, color.g, color.b, color.a)
@@ -293,6 +286,7 @@ pub fn (l DrawShape2DLineSegment) draw() {
 [params]
 pub struct DrawShape2DUniformPolygon {
 	Circle
+	factor f32 = 1.0
 pub mut:
 	visible  bool = true
 	segments u32 // a value of 0 to 2 here will default to 3, use DrawShape2D.radius_to_segments() for automatic calculation
@@ -303,6 +297,17 @@ pub mut:
 	fills    Fill = .body | .outline
 	offset   Vec2[f32]
 	origin   Anchor = .center
+}
+
+[inline]
+pub fn (up &DrawShape2DUniformPolygon) bbox() Rect {
+	bb := up.Circle.bbox()
+	return Rect{
+		x: bb.x * up.factor
+		y: bb.y * up.factor
+		width: bb.width * up.factor
+		height: bb.height * up.factor
+	}
 }
 
 [inline]
@@ -317,9 +322,9 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	r := up.bbox()
 	// A sane default is to let uniform polygons (e.g. circles)
 	// draw from their origin, we compensate for that here
-	x := up.x + r.width * 0.5
-	y := up.y + r.height * 0.5
-	radius := up.radius
+	x := up.x * up.factor + r.width * 0.5
+	y := up.y * up.factor + r.height * 0.5
+	radius := up.radius * up.factor
 	mut segments := up.segments
 	if segments <= 2 {
 		// segments = 3

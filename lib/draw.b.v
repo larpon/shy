@@ -9,6 +9,7 @@ import shy.wraps.sokol.gfx
 pub struct Draw {
 	ShyStruct
 mut:
+	factor         f32 = 1.0
 	alpha_pipeline gl.Pipeline
 }
 
@@ -42,6 +43,24 @@ pub fn (mut d Draw) shutdown() ! {
 	gl.destroy_pipeline(d.alpha_pipeline)
 	d.ShyStruct.shutdown()!
 }
+
+pub fn (mut d Draw) begin_2d() {
+	win := d.shy.active_window()
+	w, h := win.drawable_wh()
+
+	d.factor = win.draw_factor()
+	// unsafe { di.shy.api.draw.layer++ }
+	// gl.set_context(gl.default_context)
+	// gl.layer(di.shy.api.draw.layer)
+
+	gl.defaults()
+
+	// gl.set_context(s_gl_context)
+	gl.matrix_mode_projection()
+	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+}
+
+pub fn (d &Draw) end_2d() {}
 
 pub fn (d &Draw) push_matrix() {
 	gl.push_matrix()
