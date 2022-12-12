@@ -37,7 +37,7 @@ pub fn gcd[T](a T, b T) T {
 }
 
 // reduce reduces a fraction by finding the Greatest Common Divisor and dividing by it.
-pub fn reduce[T](numerator T, denominator T) (T, T) {
+pub fn reduce_fraction[T](numerator T, denominator T) (T, T) {
 	g_c_d := gcd(numerator, denominator)
 	return numerator / g_c_d, denominator / g_c_d
 }
