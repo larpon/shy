@@ -161,6 +161,10 @@ pub fn (v Vec4[T]) mul(u Vec4[T]) Vec4[T] {
 	return Vec4[T]{v.x * u.x, v.y * u.y, v.z * u.z, v.w * u.w}
 }
 
+pub fn (v Vec4[T]) mul_scalar(scalar T) Vec4[T] {
+	return Vec4[T]{v.x * scalar, v.y * scalar, v.z * scalar, v.w * scalar}
+}
+
 pub fn (v Vec4[T]) mul_f64(scalar f64) Vec4[T] {
 	return Vec4[T]{v.x * scalar, v.y * scalar, v.z * scalar, v.w * scalar}
 }
@@ -237,6 +241,7 @@ pub fn (v Vec4[T]) unit() Vec4[T] {
 pub fn (v Vec4[T]) perp() Vec4[T] {
 	return Vec4[T]{ -v.y, v.x }
 }
+*/
 
 // perpendicular return the perpendicular vector of this
 pub fn (v Vec4[T]) perpendicular(u Vec4[T]) Vec4[T] {
@@ -246,9 +251,9 @@ pub fn (v Vec4[T]) perpendicular(u Vec4[T]) Vec4[T] {
 // project returns the projected vector
 pub fn (v Vec4[T]) project(u Vec4[T]) Vec4[T] {
 	percent := v.dot(u) / u.dot(v)
-	return u.mul_f64(percent)
+	return u.mul_scalar(percent)
 }
-*/
+
 // eq returns a bool indicating if the two vectors are equal
 pub fn (v Vec4[T]) eq(u Vec4[T]) bool {
 	return v.x == u.x && v.y == u.y && v.z == u.z && v.w == u.w
