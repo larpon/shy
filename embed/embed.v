@@ -74,9 +74,11 @@ pub fn (mut a EasyApp) shutdown() ! {
 pub fn (mut a EasyApp) frame_begin() {
 	a.App.frame_begin()
 	a.gfx.begin_easy_frame()
+	a.draw.begin_2d()
 }
 
 pub fn (mut a EasyApp) frame_end() {
+	a.draw.end_2d()
 	a.gfx.end_easy_frame()
 	a.App.frame_end()
 }

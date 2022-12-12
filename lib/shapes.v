@@ -21,6 +21,11 @@ pub mut:
 }
 
 [inline]
+pub fn (r &Rect) contains(x f32, y f32) bool {
+	return x >= r.x && y >= r.y && x <= r.x + r.width && y <= r.y + r.height
+}
+
+[inline]
 pub fn (mut r Rect) displace_from(origin Anchor) {
 	r.x, r.y = origin.displace_rect(r)
 }

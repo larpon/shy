@@ -229,7 +229,7 @@ pub fn (el &EasyLine) draw() {
 	l.offset = el.offset
 	l.origin = el.origin
 	l.draw()
-	// d.end()
+	d.end()
 }
 
 [inline]
