@@ -839,3 +839,8 @@ pub fn (w &Window) drawable_size() Size {
 		height: height
 	}
 }
+
+pub fn (w &Window) draw_factor() f32 {
+	dw, _ := w.drawable_wh()
+	return dw / w.width()
+}
