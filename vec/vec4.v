@@ -1,11 +1,15 @@
 // Copyright(C) 2020-2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
-
+//
+// NOTE a few of the following functions was adapted from Dario Deleddas excellent
+// work on the `gg.m4` vlib module. Here's the Copyright/license text covering that code:
+//
+// Copyright (c) 2021 Dario Deledda. All rights reserved.
+// Use of this source code is governed by an MIT license
+// that can be found in the LICENSE file.
 module vec
 
 import math
-
-// import math
 
 pub struct Vec4[T] {
 pub mut:
@@ -38,7 +42,7 @@ pub fn (mut v Vec4[T]) one() {
 	v.w = 1
 }
 
-pub fn (mut v Vec4[T]) copy() Vec4[T] {
+pub fn (v Vec4[T]) copy() Vec4[T] {
 	return Vec4[T]{v.x, v.y, v.z, v.w}
 }
 
@@ -56,7 +60,7 @@ pub fn (mut v Vec4[T]) from_vec2(u Vec2[T]) {
 	v.w = 0
 }
 
-pub fn (mut v Vec4[T]) as_vec2() Vec2[T] {
+pub fn (v Vec4[T]) as_vec2() Vec2[T] {
 	return Vec2[T]{v.x, v.y}
 }
 
@@ -67,8 +71,8 @@ pub fn (mut v Vec4[T]) from_vec3(u Vec3[T]) {
 	v.w = 0
 }
 
-pub fn (mut v Vec4[T]) as_vec3() Vec3[T] {
-	return Vec3[T]{v.x, v.y, v.z, 0}
+pub fn (v Vec4[T]) as_vec3() Vec3[T] {
+	return Vec3[T]{v.x, v.y, v.z}
 }
 
 //
@@ -214,16 +218,11 @@ pub fn (v Vec4[T]) length() f64 {
 	return math.sqrt((v.x*v.x) + (v.y*v.y))
 }
 */
-pub fn (v Vec4[T]) dot(u Vec4[T]) f64 {
-	return (v.x * u.x) + (v.y * u.y) + (v.z * u.z) + (v.w * u.w)
+pub fn (v Vec4[T]) dot(u Vec4[T]) T {
+	return T((v.x * u.x) + (v.y * u.y) + (v.z * u.z) + (v.w * u.w))
 }
 
 /*
-// cross returns the cross product of v and u
-pub fn (v Vec4[T]) cross(u Vec4[T]) f64 {
-	return (v.x * u.y) - (v.y*u.x)
-}
-
 // unit return this vector's unit vector
 pub fn (v Vec4[T]) unit() Vec4[T] {
 	length := v.length()
@@ -378,7 +377,7 @@ pub fn (v Vec4[T]) normalize() Vec4[T] {
 	if m == 0 {
 		return vec4[T](0, 0, 0, 0)
 	}
-	return Vec4{
+	return Vec4[T]{
 		x: v.x * (1 / m)
 		y: v.y * (1 / m)
 		z: v.z * (1 / m)
@@ -387,12 +386,12 @@ pub fn (v Vec4[T]) normalize() Vec4[T] {
 }
 
 //  normalize normalizes only the xyz components, w is set to 0
-pub fn (v Vec4[T]) normalize_xyz() Vec4 {
+pub fn (v Vec4[T]) normalize_xyz() Vec4[T] {
 	m := v.mod_xyz()
 	if m == 0 {
 		return vec4[T](0, 0, 0, 0)
 	}
-	return Vec4{
+	return Vec4[T]{
 		x: v.x * (1 / m)
 		y: v.y * (1 / m)
 		z: v.z * (1 / m)
@@ -407,7 +406,7 @@ pub fn (v Vec4[T]) sum() T {
 
 // cross returns the cross product of v and u's xyz components
 pub fn (v Vec4[T]) cross(u Vec4[T]) Vec4[T] {
-	return Vec3[T]{
+	return Vec4[T]{
 		x: (v.y * u.z) - (v.z * u.y)
 		y: (v.z * u.x) - (v.x * u.z)
 		z: (v.x * u.y) - (v.y * u.x)

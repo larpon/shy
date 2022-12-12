@@ -181,7 +181,7 @@ pub fn (v Vec3[T]) length() T {
 }
 
 pub fn (v Vec3[T]) dot(u Vec3[T]) T {
-	return (v.x * u.x) + (v.y * u.y) + (v.z * u.z)
+	return T((v.x * u.x) + (v.y * u.y) + (v.z * u.z))
 }
 
 // cross returns the cross product of v and u
