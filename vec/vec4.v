@@ -208,27 +208,32 @@ pub fn (mut v Vec4[T]) divide_f64(scalar f64) {
 	v.w /= scalar
 }
 
-/*
-TODO
 //
 // Utility
 //
-pub fn (v Vec4[T]) length() f64 {
-	if v.x == 0 && v.y == 0 { return 0.0 }
-	return math.sqrt((v.x*v.x) + (v.y*v.y))
+pub fn (v Vec4[T]) length() T {
+	if v.x == 0 && v.y == 0 {
+		return 0.0
+	}
+	return T(math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w)))
 }
-*/
+
 pub fn (v Vec4[T]) dot(u Vec4[T]) T {
 	return T((v.x * u.x) + (v.y * u.y) + (v.z * u.z) + (v.w * u.w))
 }
 
-/*
 // unit return this vector's unit vector
 pub fn (v Vec4[T]) unit() Vec4[T] {
 	length := v.length()
-	return Vec4[T]{ v.x/length, v.y/length }
+	return Vec4[T]{
+		x: v.x / length
+		y: v.y / length
+		z: v.z / length
+		w: v.w / length
+	}
 }
 
+/*
 pub fn (v Vec4[T]) perp() Vec4[T] {
 	return Vec4[T]{ -v.y, v.x }
 }
