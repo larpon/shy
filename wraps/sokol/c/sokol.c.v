@@ -10,9 +10,9 @@ pub const (
 
 #flag freebsd -I /usr/local/include
 #flag darwin -fobjc-arc
-#flag linux -lX11 -lGL // -lXcursor -lXi -lpthread
-#flag freebsd -L/usr/local/lib -lX11 -lGL // -lXcursor -lXi
-#flag openbsd -L/usr/X11R6/lib -lX11 -lGL // -lXcursor -lXi
+#flag linux -lX11 -lGL
+#flag freebsd -L/usr/local/lib -lX11 -lGL
+#flag openbsd -L/usr/X11R6/lib -lX11 -lGL
 // #flag windows -lgdi32
 
 $if prod {
@@ -55,7 +55,7 @@ $if emscripten ? {
 //#flag windows -DSOKOL_D3D11
 // for simplicity, all header includes are here because import order matters and we dont have any way
 // to ensure import order with V yet
-#define SOKOL_IMPL
+//
 // TODO should not be defined for android graphic (apk/aab using sokol) builds, but we have no ways to undefine
 //#define SOKOL_NO_ENTRY
 #flag linux   -DSOKOL_NO_ENTRY
