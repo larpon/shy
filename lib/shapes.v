@@ -30,6 +30,17 @@ pub fn (mut r Rect) displace_from(origin Anchor) {
 	r.x, r.y = origin.displace_rect(r)
 }
 
+[inline]
+pub fn (r &Rect) displaced_from(origin Anchor) Rect {
+	rx, ry := origin.displace_rect(r)
+	return Rect{
+		x: rx
+		y: ry
+		width: r.width
+		height: r.height
+	}
+}
+
 pub struct Ray {
 pub mut:
 	origin Vec2[f32] // origin point
