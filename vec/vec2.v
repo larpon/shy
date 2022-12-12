@@ -23,6 +23,11 @@ pub fn (mut v Vec2[T]) zero() {
 	v.y = 0
 }
 
+pub fn (mut v Vec2[T]) one() {
+	v.x = 1
+	v.y = 1
+}
+
 pub fn (mut v Vec2[T]) copy() Vec2[T] {
 	return Vec2[T]{v.x, v.y}
 }
@@ -191,11 +196,12 @@ pub fn (v Vec2[T]) eq(u Vec2[T]) bool {
 	return v.x == u.x && v.y == u.y
 }
 
+/*
 // eq_epsilon returns a bool indicating if the two vectors are equal within epsilon
-// TODO [markused]
-// pub fn (v Vec2<T>) eq_epsilon(u Vec2<T>) bool {
-// 	return v.x.eq_epsilon(u.x) && v.y.eq_epsilon(u.y)
-// }
+[markused]
+pub fn (v Vec2<T>) eq_epsilon(u Vec2<T>) bool {
+	return v.x.eq_epsilon(u.x) && v.y.eq_epsilon(u.y)
+}*/
 
 // eq_approx will return a bool indicating if vectors are approximately equal within the tolerance
 pub fn (v Vec2[T]) eq_approx(u Vec2[T], tolerance T) bool {
