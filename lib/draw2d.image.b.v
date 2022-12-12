@@ -12,7 +12,7 @@ import shy.wraps.sokol.gl
 pub struct DrawImage {
 	ShyFrame
 	factor f32 = 1.0
-	draw   &Draw
+	// draw   &Draw
 }
 
 pub fn (mut di DrawImage) begin() {
@@ -33,7 +33,7 @@ pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 		width: image.width
 		height: image.height
 		image: image
-		alpha_pipeline: di.draw.alpha_pipeline
+		// alpha_pipeline: di.draw.alpha_pipeline
 	}
 	/*
 	// TODO return small default image?
@@ -44,9 +44,9 @@ pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 
 pub struct Draw2DImage {
 	Rect
-	image          Image
-	alpha_pipeline gl.Pipeline
-	factor         f32 = 1.0
+	image Image
+	// alpha_pipeline gl.Pipeline
+	factor f32 = 1.0
 pub mut:
 	color    Color = rgb(255, 255, 255)
 	origin   Anchor
@@ -102,10 +102,10 @@ pub fn (i Draw2DImage) draw() {
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 
-	gl.push_pipeline()
-	if i.color.a < 255 {
-		gl.load_pipeline(i.alpha_pipeline)
-	}
+	// gl.push_pipeline()
+	// if i.color.a < 255 {
+	//	gl.load_pipeline(i.alpha_pipeline)
+	//}
 	gl.c4b(i.color.r, i.color.g, i.color.b, i.color.a)
 	gl.begin_quads()
 	gl.v2f_t2f(x0, y0, u0, v0)
@@ -117,7 +117,7 @@ pub fn (i Draw2DImage) draw() {
 	gl.translate(-f32(x), -f32(y), 0)
 	gl.disable_texture()
 
-	gl.pop_pipeline()
+	// gl.pop_pipeline()
 
 	gl.pop_matrix()
 }
@@ -178,10 +178,10 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 
-	gl.push_pipeline()
-	if i.color.a < 255 {
-		gl.load_pipeline(i.alpha_pipeline)
-	}
+	// gl.push_pipeline()
+	// if i.color.a < 255 {
+	//	gl.load_pipeline(i.alpha_pipeline)
+	//}
 	gl.c4b(i.color.r, i.color.g, i.color.b, i.color.a)
 	gl.begin_quads()
 	gl.v2f_t2f(x0, y0, u0, v0)
@@ -193,7 +193,7 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	gl.translate(-f32(x), -f32(y), 0)
 	gl.disable_texture()
 
-	gl.pop_pipeline()
+	// gl.pop_pipeline()
 
 	gl.pop_matrix()
 }

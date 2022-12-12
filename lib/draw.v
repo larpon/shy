@@ -89,7 +89,7 @@ pub fn (d &Draw) image() DrawImage {
 	mut di := DrawImage{
 		shy: s
 		factor: d.factor
-		draw: unsafe { d }
+		// draw: unsafe { d }
 	}
 	di.init() or {
 		msg := 'initializing DrawImage failed'

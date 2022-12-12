@@ -58,6 +58,8 @@ pub fn (mut d Draw) begin_2d() {
 	// gl.set_context(s_gl_context)
 	gl.matrix_mode_projection()
 	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+
+	gl.load_pipeline(d.alpha_pipeline)
 }
 
 pub fn (d &Draw) end_2d() {}
