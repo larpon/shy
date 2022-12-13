@@ -102,10 +102,7 @@ jobs:
       run: mv shy ~/.vmodules
 
     - name: Run tests
-      run: |
-        export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
-        export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
-        v test ~/.vmodules/shy
+      run: v test ~/.vmodules/shy
 
     - name: Build shy with -prod
       run: v -prod ~/.vmodules/shy
@@ -175,10 +172,7 @@ jobs:
       run: mv shy ~/.vmodules
 
     - name: Run tests
-      run: |
-        export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
-        export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
-        v test  ~/.vmodules/shy
+      run: v test  ~/.vmodules/shy
 
     - name: Build shy
       run: v -g ~/.vmodules/shy
