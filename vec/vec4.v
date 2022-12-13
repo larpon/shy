@@ -295,6 +295,11 @@ pub fn (v Vec4[T]) is_approx_zero(tolerance f64) bool {
 	return false
 }
 
+// eq_scalar returns a bool indicating if the x and y both equals the scalar
+pub fn (v Vec4[T]) eq_scalar(scalar T) bool {
+	return v.x == scalar && v.y == scalar && v.z == scalar && v.w == scalar
+}
+
 /*
 // eq_f64 returns a bool indicating if the x and y both equals the scalar
 pub fn (v Vec4[T]) eq_f64(scalar f64) bool {
