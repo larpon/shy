@@ -106,12 +106,12 @@ pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
 pub fn (r DrawShape2DRect) draw() {
 	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
 	// this could/should maybe someday be switchable by a flag...?
-	x := f32(int(r.x * r.factor))
-	y := f32(int(r.y * r.factor))
-	w := f32(int(r.width * r.factor)) - 0.5
-	h := f32(int(r.height * r.factor)) - 1.0
-	sx := f32(0.5) // x //* scale_factor
-	sy := f32(0.5) // y //* scale_factor
+	x := r.x * r.factor
+	y := r.y * r.factor
+	w := r.width * r.factor
+	h := r.height * r.factor
+	sx := f32(0.0)
+	sy := f32(0.0)
 
 	mut o_off_x, mut o_off_y := r.origin_offset()
 	o_off_x = int(o_off_x)
@@ -145,7 +145,11 @@ pub fn (r DrawShape2DRect) draw() {
 	}
 	if r.fills.has(.outline) {
 		stroke_width := r.stroke.width
-		if stroke_width > 1 {
+		color := r.stroke.color
+		gl.c4b(color.r, color.g, color.b, color.a)
+		if stroke_width <= 0 {
+			// Do nothing
+		} else if stroke_width > 1 {
 			m12x, m12y := midpoint(sx, sy, sx + w, sy)
 			m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
 			m34x, m34y := midpoint(sx + w, sy + h, sx, sy + h)
@@ -155,14 +159,21 @@ pub fn (r DrawShape2DRect) draw() {
 			r.draw_anchor(m34x, m34y, sx, sy + h, m41x, m41y)
 			r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
 		} else {
-			color := r.stroke.color
-			gl.c4b(color.r, color.g, color.b, color.a)
+			// NOTE pixel-perfect lines ... ouch
+			// More on pixel-perfect here: https://stackoverflow.com/a/10041050/1904615
+			// See also: tests/visual/pixel-perfect_rectangles.v
 			gl.begin_line_strip()
 			gl.v2f(sx, sy)
 			gl.v2f((sx + w), sy)
-			gl.v2f((sx + w), (sy + h))
-			gl.v2f(sx, (sy + h))
-			gl.v2f(sx, sy)
+			//
+			gl.v2f((sx + 0.5 + w - 1), sy + 0.5)
+			gl.v2f((sx + 0.5 + w - 1), (sy + 0.5 + h - 1))
+			//
+			gl.v2f((sx + 0.5 + w - 1), (sy + 0.5 + h - 1))
+			gl.v2f(sx + 0.5, (sy + 0.5 + h - 1.5))
+			//
+			gl.v2f(sx + 0.5, (sy + 0.5 + h - 1))
+			gl.v2f(sx + 0.5, sy + 0.5)
 			gl.end()
 		}
 	}

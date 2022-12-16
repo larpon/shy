@@ -174,8 +174,10 @@ fn (mut ip Input) poll_event() ?Event {
 	s := ip.shy
 	// TODO set mouse positions in each mouse in input.mice
 	// is_multi_mice := s.api.input.mice.len > 1
+	win := s.active_window()
 	mut shy_event := Event(UnkownEvent{
 		timestamp: s.ticks()
+		window: win
 	})
 
 	evt := sdl.Event{}
@@ -186,24 +188,26 @@ fn (mut ip Input) poll_event() ?Event {
 				//	s.shutdown = true
 				//}
 				wevid := unsafe { sdl.WindowEventID(int(evt.window.event)) }
-				win := s.active_window()
 				if wevid == .resized {
-					shy_event = WindowEvent{
+					shy_event = WindowResizeEvent{
 						timestamp: s.ticks()
-						kind: .resized
 						window: win // TODO multi-window support
+						width: win.width()
+						height: win.height()
 					}
 				}
 			}
 			.quit {
 				shy_event = QuitEvent{
 					timestamp: s.ticks()
+					window: win
 				}
 			}
 			.keyup {
 				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
 				shy_event = KeyEvent{
 					timestamp: s.ticks()
+					window: win
 					state: .up
 					key_code: shy_key_code
 				}
@@ -212,6 +216,7 @@ fn (mut ip Input) poll_event() ?Event {
 				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
 				shy_event = KeyEvent{
 					timestamp: s.ticks()
+					window: win
 					state: .down
 					key_code: unsafe { KeyCode(int(shy_key_code)) }
 				}
@@ -219,8 +224,6 @@ fn (mut ip Input) poll_event() ?Event {
 			.mousemotion {
 				// if !is_multi_mice {
 				buttons := map_sdl_button_mask_to_shy_mouse_buttons(evt.motion.state)
-				win := s.active_window()
-
 				which := default_mouse_id
 				// mut mouse := s.api.input.mouse(which) or { panic(err) }
 				// mouse.x = evt.motion.x
@@ -229,7 +232,8 @@ fn (mut ip Input) poll_event() ?Event {
 
 				shy_event = MouseMotionEvent{
 					timestamp: s.ticks()
-					window_id: win.id // TODO multi-window support
+					window: win // TODO multi-window support
+					// window_id: win.id // TODO multi-window support
 					which: which // evt.motion.which // TODO use own ID system??
 					buttons: buttons
 					x: evt.motion.x
@@ -244,10 +248,9 @@ fn (mut ip Input) poll_event() ?Event {
 				mut state := ButtonState.down
 				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
 				button := map_sdl_button_to_shy_mouse_button(evt.button.button)
-				win := s.active_window()
 				shy_event = MouseButtonEvent{
 					timestamp: s.ticks()
-					window_id: win.id // TODO
+					window: win // TODO multi-window support
 					which: default_mouse_id // evt.button.which // TODO use own ID system??
 					button: button
 					state: state
@@ -265,10 +268,9 @@ fn (mut ip Input) poll_event() ?Event {
 				} else {
 					.flipped
 				}
-				win := s.active_window()
 				shy_event = MouseWheelEvent{
 					timestamp: s.ticks()
-					window_id: win.id // TODO
+					window: win // TODO multi-window support
 					which: default_mouse_id // evt.wheel.which // TODO use own ID system??
 					x: evt.wheel.x
 					y: evt.wheel.y
@@ -279,6 +281,7 @@ fn (mut ip Input) poll_event() ?Event {
 			else {
 				shy_event = UnkownEvent{
 					timestamp: s.ticks()
+					window: win
 				}
 			}
 		}

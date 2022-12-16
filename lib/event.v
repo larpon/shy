@@ -10,26 +10,31 @@ pub type Event = KeyEvent
 	| QuitEvent
 	| UnkownEvent
 	| WindowEvent
+	| WindowResizeEvent
 
-pub struct UnkownEvent {
+pub struct ShyEvent {
 pub:
 	timestamp u64 // Value of Shy.ticks()
+	window    &Window
+}
+
+pub struct UnkownEvent {
+	ShyEvent
 }
 
 pub struct KeyEvent {
+	ShyEvent
 pub:
-	timestamp u64
-	which     u16 // The keyboard id
-	state     ButtonState
-	key_code  KeyCode
+	which    u16 // The keyboard id
+	state    ButtonState
+	key_code KeyCode
 }
 
 //
 pub struct WindowEvent {
+	ShyEvent
 pub:
-	timestamp u64
-	kind      WindowEventKind
-	window    &Window
+	kind WindowEventKind
 }
 
 pub enum WindowEventKind {
@@ -38,7 +43,7 @@ pub enum WindowEventKind {
 	hidden // Window has been hidden
 	exposed // Window has been exposed and should be redrawn
 	moved // Window has been moved to data1, data2
-	resized // Window has been resized
+	// resized // Window has been resized
 	// size_changed // The window size has changed, either as a result of an API call or through the system or user changing the window size.
 	minimized // Window has been minimized
 	maximized // Window has been maximized
@@ -52,35 +57,40 @@ pub enum WindowEventKind {
 	hit_test // Window had a hit test.
 }
 
+pub struct WindowResizeEvent {
+	ShyEvent
+	Size
+pub:
+	previous Size
+}
+
 //
 pub struct MouseMotionEvent {
+	ShyEvent
 pub:
-	timestamp u64
-	window_id u32 // The window with mouse focus, if any
-	which     u16 // The mouse id
-	buttons   MouseButtons // The current button state
-	x         int // X coordinate, relative to window
-	y         int // Y coordinate, relative to window
-	rel_x     int // The relative motion in the X direction
-	rel_y     int // The relative motion in the Y direction
+	// window_id u32 // The window with mouse focus, if any
+	which   u16 // The mouse id
+	buttons MouseButtons // The current button state
+	x       int // X coordinate, relative to window
+	y       int // Y coordinate, relative to window
+	rel_x   int // The relative motion in the X direction
+	rel_y   int // The relative motion in the Y direction
 }
 
 pub struct MouseButtonEvent {
+	ShyEvent
 pub:
-	timestamp u64
-	window_id u32 // The window with mouse focus, if any
-	which     u16 // The mouse id
-	button    MouseButton // The mouse button index
-	state     ButtonState
-	clicks    u8  // 1 for single-click, 2 for double-click, etc.
-	x         int // X coordinate, relative to window
-	y         int // Y coordinate, relative to window
+	which  u16 // The mouse id
+	button MouseButton // The mouse button index
+	state  ButtonState
+	clicks u8  // 1 for single-click, 2 for double-click, etc.
+	x      int // X coordinate, relative to window
+	y      int // Y coordinate, relative to window
 }
 
 pub struct MouseWheelEvent {
+	ShyEvent
 pub:
-	timestamp u64
-	window_id u32 // The window with mouse focus, if any
 	which     u16 // The mouse id
 	x         int // The amount scrolled horizontally, positive to the right and negative to the left
 	y         int // The amount scrolled vertically, positive away from the user and negative toward the user
@@ -89,7 +99,7 @@ pub:
 
 //
 pub struct QuitEvent {
+	ShyEvent
 pub:
-	timestamp u64
-	request   bool // Indicates if it's only a "nice" request to quit
+	request bool // Indicates if it's only a "nice" request to quit
 }

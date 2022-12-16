@@ -70,15 +70,11 @@ pub fn (mut v Vec2[T]) plus_scalar(scalar T) {
 //
 // Subtraction
 //
-pub fn (v1 Vec2[T]) - (v2 Vec2[T]) Vec2[T] {
-	return Vec2[T]{v1.x - v2.x, v1.y - v2.y}
-}
-
-pub fn (v Vec2[T]) sub(u Vec2[T]) Vec2[T] {
+pub fn (v Vec2[T]) - (u Vec2[T]) Vec2[T] {
 	return Vec2[T]{v.x - u.x, v.y - u.y}
 }
 
-pub fn (v Vec2[T]) sub_scalar(scalar T) Vec2[T] {
+pub fn (v Vec2[T]) sub(scalar T) Vec2[T] {
 	return Vec2[T]{v.x - scalar, v.y - scalar}
 }
 
@@ -153,8 +149,8 @@ pub fn (v Vec2[T]) length() T {
 		return math.sqrt((v.x * v.x) + (v.y * v.y))
 	} $else $if T is f32 {
 		return math.sqrtf((v.x * v.x) + (v.y * v.y))
-	} $else $if T is u32 {
-		return u32(math.sqrtf((v.x * v.x) + (v.y * v.y)))
+	} $else {
+		return T(math.sqrt(f64(v.x * v.x) + f64(v.y * v.y)))
 	}
 	panic('TODO ${@FN} not implemented for type')
 	return T(0.0)
@@ -244,16 +240,15 @@ pub fn (v Vec2[T]) distance(u Vec2[T]) T {
 		return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
 	} $else $if T is f32 {
 		return math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
-	} $else $if T is u32 {
-		return u32(math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y)))
+	} $else {
+		return T(math.sqrt(f64(v.x - u.x) * f64(v.x - u.x) + f64(v.y - u.y) * f64(v.y - u.y)))
 	}
-
 	panic('TODO ${@FN} not implemented for type')
 	return T(0.0)
 	// $compile_error('Type T in Vec2<T>.length() is not supported')
 }
 
-// manhattan_distance returns the Manhattan distance between the two vectors
+// manhattan_distance returns the Manhattan Distance between the two vectors
 pub fn (v Vec2[T]) manhattan_distance(u Vec2[T]) T {
 	return math.abs(v.x - u.x) + math.abs(v.y - u.y)
 }
@@ -264,8 +259,8 @@ pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 		return math.atan2((v.y - u.y), (v.x - u.x))
 	} $else $if T is f32 {
 		return f32(math.atan2((v.y - u.y), (v.x - u.x)))
-	} $else $if T is u32 {
-		return u32(math.atan2((v.y - u.y), (v.x - u.x)))
+	} $else {
+		return T(math.atan2(f64(v.y - u.y), f64(v.x - u.x)))
 	}
 
 	panic('TODO ${@FN} not implemented for type')
@@ -279,8 +274,8 @@ pub fn (v Vec2[T]) angle() T {
 		return math.atan2(v.y, v.x)
 	} $else $if T is f32 {
 		return f32(math.atan2(v.y, v.x))
-	} $else $if T is u32 {
-		return u32(math.atan2(v.y, v.x))
+	} $else {
+		return T(math.atan2(f64(v.y), f64(v.x)))
 	}
 
 	panic('TODO ${@FN} not implemented for type')

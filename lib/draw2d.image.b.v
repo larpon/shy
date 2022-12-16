@@ -65,6 +65,8 @@ pub fn (i Draw2DImage) origin_offset() (f32, f32) {
 pub fn (i Draw2DImage) draw() {
 	x := i.x * i.factor
 	y := i.y * i.factor
+	// x := f32(int(i.x * i.factor)) - 0.5
+	// y := f32(int(i.y * i.factor)) - 0.5
 	w := i.width * i.factor
 	h := i.height * i.factor
 
@@ -124,6 +126,8 @@ pub fn (i Draw2DImage) draw() {
 
 [inline]
 pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
+	// x := f32(int(i.x * i.factor))
+	// y := f32(int(i.y * i.factor))
 	x := i.x * i.factor
 	y := i.y * i.factor
 	w := i.image.width
@@ -140,10 +144,10 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	v1 = utils.remap(dst.y + dst.height, 0, h, 0, 1)
 	// eprintln('dst: ${dst.x},${dst.y},${dst.width},${dst.height} u0: $u0, v0: $v0, u1: $u1, v1: $v1')
 
-	mut x0 := f32(src.x)
-	mut y0 := f32(src.y)
-	mut x1 := f32(src.width)
-	mut y1 := f32(src.height)
+	mut x0 := f32(src.x) //- 0.5
+	mut y0 := f32(src.y) //- 0.5
+	mut x1 := f32(src.width) //- 0.5
+	mut y1 := f32(src.height) // - 0.5
 
 	gl.push_matrix()
 

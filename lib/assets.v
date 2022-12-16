@@ -217,3 +217,7 @@ pub fn (mut i Image) free() {
 		gfx.destroy_image(i.gfx_image)
 	}
 }
+
+pub fn (i &Image) uri() string {
+	return i.asset.ao.uri
+}
