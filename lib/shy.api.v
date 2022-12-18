@@ -93,6 +93,25 @@ pub fn vec2[T](x T, y T) vec.Vec2[T] {
 }
 
 [inline]
+pub fn vec3[T](x T, y T, z T) vec.Vec3[T] {
+	return vec.Vec3[T]{
+		x: x
+		y: y
+		z: z
+	}
+}
+
+[inline]
+pub fn vec4[T](x T, y T, z T, w T) vec.Vec4[T] {
+	return vec.Vec4[T]{
+		x: x
+		y: y
+		z: z
+		w: w
+	}
+}
+
+[inline]
 pub fn rect(x f32, y f32, w f32, h f32) Rect {
 	return Rect{
 		x: x

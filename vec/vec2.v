@@ -5,6 +5,8 @@ module vec
 
 import math
 
+pub const vec_epsilon = f32(10e-7)
+
 pub struct Vec2[T] {
 pub mut:
 	x T
@@ -41,8 +43,8 @@ pub fn (mut v Vec2[T]) from(u Vec2[T]) {
 // Addition
 //
 // + operator overload. Adds two vectors
-pub fn (v1 Vec2[T]) + (v2 Vec2[T]) Vec2[T] {
-	return Vec2[T]{v1.x + v2.x, v1.y + v2.y}
+pub fn (v Vec2[T]) + (u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x + u.x, v.y + u.y}
 }
 
 pub fn (v Vec2[T]) add(u Vec2[T]) Vec2[T] {
@@ -91,8 +93,8 @@ pub fn (mut v Vec2[T]) subtract_scalar[U](scalar U) {
 //
 // Multiplication
 //
-pub fn (v1 Vec2[T]) * (v2 Vec2[T]) Vec2[T] {
-	return Vec2[T]{v1.x * v2.x, v1.y * v2.y}
+pub fn (v Vec2[T]) * (u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x * u.x, v.y * u.y}
 }
 
 pub fn (v Vec2[T]) mul(u Vec2[T]) Vec2[T] {
@@ -116,8 +118,8 @@ pub fn (mut v Vec2[T]) multiply_scalar[U](scalar U) {
 //
 // Division
 //
-pub fn (v1 Vec2[T]) / (v2 Vec2[T]) Vec2[T] {
-	return Vec2[T]{v1.x / v2.x, v1.y / v2.y}
+pub fn (v Vec2[T]) / (u Vec2[T]) Vec2[T] {
+	return Vec2[T]{v.x / u.x, v.y / u.y}
 }
 
 pub fn (v Vec2[T]) div(u Vec2[T]) Vec2[T] {
@@ -192,15 +194,14 @@ pub fn (v Vec2[T]) eq(u Vec2[T]) bool {
 	return v.x == u.x && v.y == u.y
 }
 
-/*
-// eq_epsilon returns a bool indicating if the two vectors are equal within epsilon
+// eq_epsilon returns a bool indicating if the two vectors are equal within the module vec_epsilon const
 [markused]
-pub fn (v Vec2<T>) eq_epsilon(u Vec2<T>) bool {
-	return v.x.eq_epsilon(u.x) && v.y.eq_epsilon(u.y)
-}*/
+pub fn (v Vec2[T]) eq_epsilon(u Vec2[T]) bool {
+	return v.eq_approx[T, f32](u, vec.vec_epsilon)
+}
 
-// eq_approx will return a bool indicating if vectors are approximately equal within the tolerance
-pub fn (v Vec2[T]) eq_approx(u Vec2[T], tolerance T) bool {
+// eq_approx will return a bool indicating if vectors are approximately equal within `tolerance`
+pub fn (v Vec2[T]) eq_approx[T, U](u Vec2[T], tolerance U) bool {
 	diff_x := math.abs(v.x - u.x)
 	diff_y := math.abs(v.y - u.y)
 	if diff_x <= tolerance && diff_y <= tolerance {
@@ -240,7 +241,6 @@ pub fn (v Vec2[T]) distance(u Vec2[T]) T {
 	}
 	panic('TODO ${@FN} not implemented for type')
 	return T(0.0)
-	// $compile_error('Type T in Vec2<T>.length() is not supported')
 }
 
 // manhattan_distance returns the Manhattan Distance between the two vectors
@@ -252,30 +252,25 @@ pub fn (v Vec2[T]) manhattan_distance(u Vec2[T]) T {
 pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 	$if T is f64 {
 		return math.atan2((v.y - u.y), (v.x - u.x))
-	} $else $if T is f32 {
-		return f32(math.atan2((v.y - u.y), (v.x - u.x)))
 	} $else {
 		return T(math.atan2(f64(v.y - u.y), f64(v.x - u.x)))
 	}
-
 	panic('TODO ${@FN} not implemented for type')
-	return T(0.0)
-	// $compile_error('Type T in Vec2<T>.length() is not supported')
+	return T(0)
+	// $compile_error('Type T in Vec2<T>.angle() is not supported')
 }
 
 // angle returns the angle in radians of the vector
 pub fn (v Vec2[T]) angle() T {
 	$if T is f64 {
 		return math.atan2(v.y, v.x)
-	} $else $if T is f32 {
-		return f32(math.atan2(v.y, v.x))
 	} $else {
 		return T(math.atan2(f64(v.y), f64(v.x)))
 	}
 
 	panic('TODO ${@FN} not implemented for type')
-	return T(0.0)
-	// $compile_error('Type T in Vec2<T>.length() is not supported')
+	return T(0)
+	// $compile_error('Type T in Vec2<T>.angle() is not supported')
 }
 
 // abs will set x and y values to their absolute values
@@ -288,8 +283,8 @@ pub fn (mut v Vec2[T]) abs() {
 	}
 }
 
-// clean sets all components to zero (0) if they fall within `tolerance`.
-pub fn (v Vec2[T]) clean(tolerance f64) Vec2[T] {
+// clean returns a vector with all components of this vector set to zero (0) if they fall within `tolerance`.
+pub fn (v Vec2[T]) clean[U](tolerance U) Vec2[T] {
 	mut r := v.copy()
 	if math.abs(v.x) < tolerance {
 		r.x = 0
@@ -298,6 +293,16 @@ pub fn (v Vec2[T]) clean(tolerance f64) Vec2[T] {
 		r.y = 0
 	}
 	return r
+}
+
+// zero_tolerance sets all components to zero (0) if they fall within `tolerance`.
+pub fn (mut v Vec2[T]) zero_tolerance[U](tolerance U) {
+	if math.abs(v.x) < tolerance {
+		v.x = 0
+	}
+	if math.abs(v.y) < tolerance {
+		v.y = 0
+	}
 }
 
 // inv returns the reciprocal of the vector
