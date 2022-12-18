@@ -7,9 +7,9 @@ import math
 
 pub struct Vec3[T] {
 pub mut:
-	x f64
-	y f64
-	z f64
+	x T
+	y T
+	z T
 }
 
 pub fn vec3[T](x T, y T, z T) Vec3[T] {
@@ -21,9 +21,15 @@ pub fn vec3[T](x T, y T, z T) Vec3[T] {
 }
 
 pub fn (mut v Vec3[T]) zero() {
-	v.x = 0.0
-	v.y = 0.0
-	v.z = 0.0
+	v.x = 0
+	v.y = 0
+	v.z = 0
+}
+
+pub fn (mut v Vec3[T]) one() {
+	v.x = 1
+	v.y = 1
+	v.z = 1
 }
 
 pub fn (mut v Vec3[T]) copy() Vec3[T] {
@@ -36,39 +42,33 @@ pub fn (mut v Vec3[T]) from(u Vec3[T]) {
 	v.z = u.z
 }
 
-/*
-pub fn (mut v Vec3[T]) from_vec2(u Vec2) {
-	v.x = u.x
-	v.y = u.y
+pub fn (mut v Vec3[T]) from_vec2[U](u Vec2[U]) {
+	v.x = T(u.x)
+	v.y = T(u.y)
 }
 
-pub fn (mut v Vec3[T]) as_vec2() Vec2 {
-	return Vec2{v.x, v.y}
+pub fn (mut v Vec3[T]) as_vec2[T]() Vec2[T] {
+	return Vec2[T]{v.x, v.y}
 }
-*/
+
 //
 // Addition
 //
 // + operator overload. Adds two vectors
-pub fn (v1 Vec3[T]) + (v2 Vec3[T]) Vec3[T] {
-	return Vec3[T]{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
-}
-
-pub fn (v Vec3[T]) add(u Vec3[T]) Vec3[T] {
+pub fn (v Vec3[T]) + (u Vec3[T]) Vec3[T] {
 	return Vec3[T]{v.x + u.x, v.y + u.y, v.z + u.z}
 }
 
-/*
-pub fn (v Vec3[T]) add_vec2(u Vec2) Vec3[T] {
-	return Vec3[T]{v.x + u.x, v.y + u.y, v.z}
-}
-*/
-pub fn (v Vec3[T]) add_f64(scalar f64) Vec3[T] {
-	return Vec3[T]{v.x + scalar, v.y + scalar, v.z + scalar}
+pub fn (v Vec3[T]) add(u Vec3[T]) Vec3[T] {
+	return v + u
 }
 
-pub fn (v Vec3[T]) add_f32(scalar f32) Vec3[T] {
-	return Vec3[T]{v.x + scalar, v.y + scalar, v.z + scalar}
+pub fn (v Vec3[T]) add_vec2(u Vec2[U]) Vec3[T] {
+	return Vec3[T]{v.x + T(u.x), v.y + T(u.y), v.z}
+}
+
+pub fn (v Vec3[T]) add_scalar[U](scalar U) Vec3[T] {
+	return Vec3[T]{v.x + T(scalar), v.y + T(scalar), v.z + T(scalar)}
 }
 
 pub fn (mut v Vec3[T]) plus(u Vec3[T]) {
@@ -77,31 +77,30 @@ pub fn (mut v Vec3[T]) plus(u Vec3[T]) {
 	v.z += u.z
 }
 
-pub fn (mut v Vec3[T]) plus_f64(scalar f64) {
-	v.x += scalar
-	v.y += scalar
-	v.z += scalar
+pub fn (mut v Vec3[T]) plus_vec2[U](u Vec2[U]) {
+	v.x += T(u.x)
+	v.y += T(u.y)
 }
 
-pub fn (mut v Vec3[T]) plus_f32(scalar f32) {
-	v.x += scalar
-	v.y += scalar
-	v.z += scalar
+pub fn (mut v Vec3[T]) plus_scalar[U](scalar U) {
+	v.x += T(scalar)
+	v.y += T(scalar)
+	v.z += T(scalar)
 }
 
 //
 // Subtraction
 //
-pub fn (v1 Vec3[T]) - (v2 Vec3[T]) Vec3[T] {
-	return Vec3[T]{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
-}
-
-pub fn (v Vec3[T]) sub(u Vec3[T]) Vec3[T] {
+pub fn (v Vec3[T]) - (u Vec3[T]) Vec3[T] {
 	return Vec3[T]{v.x - u.x, v.y - u.y, v.z - u.z}
 }
 
-pub fn (v Vec3[T]) sub_f64(scalar f64) Vec3[T] {
-	return Vec3[T]{v.x - scalar, v.y - scalar, v.z - scalar}
+pub fn (v Vec3[T]) sub(u Vec3[T]) Vec3[T] {
+	return v - u
+}
+
+pub fn (v Vec3[T]) sub_scalar[U](scalar U) Vec3[T] {
+	return Vec3[T]{v.x - T(scalar), v.y - T(scalar), v.z - T(scalar)}
 }
 
 pub fn (mut v Vec3[T]) subtract(u Vec3[T]) {
@@ -110,29 +109,25 @@ pub fn (mut v Vec3[T]) subtract(u Vec3[T]) {
 	v.z -= u.z
 }
 
-pub fn (mut v Vec3[T]) subtract_f64(scalar f64) {
-	v.x -= scalar
-	v.y -= scalar
-	v.z -= scalar
+pub fn (mut v Vec3[T]) subtract_scalar[U](scalar U) {
+	v.x -= T(scalar)
+	v.y -= T(scalar)
+	v.z -= T(scalar)
 }
 
 //
 // Multiplication
 //
-pub fn (v1 Vec3[T]) * (v2 Vec3[T]) Vec3[T] {
-	return Vec3[T]{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}
-}
-
-pub fn (v Vec3[T]) mul(u Vec3[T]) Vec3[T] {
+pub fn (v Vec3[T]) * (u Vec3[T]) Vec3[T] {
 	return Vec3[T]{v.x * u.x, v.y * u.y, v.z * u.z}
 }
 
-pub fn (v Vec3[T]) mul_scalar(scalar T) Vec3[T] {
-	return Vec3[T]{v.x * scalar, v.y * scalar, v.z * scalar}
+pub fn (v Vec3[T]) mul(u Vec3[T]) Vec3[T] {
+	return v * u
 }
 
-pub fn (v Vec3[T]) mul_f64(scalar f64) Vec3[T] {
-	return Vec3[T]{v.x * scalar, v.y * scalar, v.z * scalar}
+pub fn (v Vec3[T]) mul_scalar[U](scalar U) Vec3[T] {
+	return Vec3[T]{v.x * T(scalar), v.y * T(scalar), v.z * T(scalar)}
 }
 
 pub fn (mut v Vec3[T]) multiply(u Vec3[T]) {
@@ -141,25 +136,25 @@ pub fn (mut v Vec3[T]) multiply(u Vec3[T]) {
 	v.z *= u.z
 }
 
-pub fn (mut v Vec3[T]) multiply_f64(scalar f64) {
-	v.x *= scalar
-	v.y *= scalar
-	v.z *= scalar
+pub fn (mut v Vec3[T]) multiply_scalar[U](scalar U) {
+	v.x *= T(scalar)
+	v.y *= T(scalar)
+	v.z *= T(scalar)
 }
 
 //
 // Division
 //
-pub fn (v1 Vec3[T]) / (v2 Vec3[T]) Vec3[T] {
-	return Vec3[T]{v1.x / v2.x, v1.y / v2.y, v1.z / v2.z}
-}
-
-pub fn (v Vec3[T]) div(u Vec3[T]) Vec3[T] {
+pub fn (v Vec3[T]) / (u Vec3[T]) Vec3[T] {
 	return Vec3[T]{v.x / u.x, v.y / u.y, v.z / u.z}
 }
 
-pub fn (v Vec3[T]) div_f64(scalar f64) Vec3[T] {
-	return Vec3[T]{v.x / scalar, v.y / scalar, v.z / scalar}
+pub fn (v Vec3[T]) div(u Vec3[T]) Vec3[T] {
+	return v / u
+}
+
+pub fn (v Vec3[T]) div_scalar[U](scalar U) Vec3[T] {
+	return Vec3[T]{v.x / T(scalar), v.y / T(scalar), v.z / T(scalar)}
 }
 
 pub fn (mut v Vec3[T]) divide(u Vec3[T]) {
@@ -168,10 +163,10 @@ pub fn (mut v Vec3[T]) divide(u Vec3[T]) {
 	v.z /= u.z
 }
 
-pub fn (mut v Vec3[T]) divide_f64(scalar f64) {
-	v.x /= scalar
-	v.y /= scalar
-	v.z /= scalar
+pub fn (mut v Vec3[T]) divide_scalar[U](scalar U) {
+	v.x /= T(scalar)
+	v.y /= T(scalar)
+	v.z /= T(scalar)
 }
 
 //
@@ -258,21 +253,12 @@ pub fn (v Vec3[T]) is_approx_zero(tolerance f64) bool {
 }
 
 // eq_scalar returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec3[T]) eq_scalar(scalar T) bool {
-	return v.x == scalar && v.y == scalar && v.z == scalar
+pub fn (v Vec3[T]) eq_scalar[U](scalar U) bool {
+	return v.x == T(scalar) && v.y == T(scalar) && v.z == T(scalar)
 }
 
 /*
-// eq_f64 returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec3[T]) eq_f64(scalar f64) bool {
-	return v.x == scalar && v.y == scalar
-}
-
-// eq_f32 returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec3[T]) eq_f32(scalar f32) bool {
-	return v.eq_f64(f64(scalar))
-}v.y /= scalar
-
+TODO
 // distance returns the distance between the two vectors
 pub fn (v Vec3[T]) distance(u Vec3[T]) f64 {
 	return math.sqrt( (v.x-u.x) * (v.x-u.x) + (v.y-u.y) * (v.y-u.y) )
@@ -293,6 +279,7 @@ pub fn (v Vec3[T]) angle() f64 {
 	return math.atan2(v.y, v.x)
 }
 */
+
 // abs will set x and y values to their absolute values
 pub fn (mut v Vec3[T]) abs() {
 	if v.x < 0 {
@@ -304,4 +291,69 @@ pub fn (mut v Vec3[T]) abs() {
 	if v.z < 0 {
 		v.z = math.abs(v.z)
 	}
+}
+
+// clean sets all components to zero (0) if they fall within `tolerance`.
+pub fn (v Vec3[T]) clean(tolerance f64) Vec3[T] {
+	mut r := v.copy()
+	if math.abs(v.x) < tolerance {
+		r.x = 0
+	}
+	if math.abs(v.y) < tolerance {
+		r.y = 0
+	}
+	if math.abs(v.z) < tolerance {
+		r.z = 0
+	}
+	return r
+}
+
+// inv returns the reciprocal of the vector
+pub fn (v Vec3[T]) inv() Vec3[T] {
+	return Vec3[T]{
+		x: if v.x != 0 { 1.0 / v.x } else { 0 }
+		y: if v.y != 0 { 1.0 / v.y } else { 0 }
+		z: if v.z != 0 { 1.0 / v.z } else { 0 }
+	}
+}
+
+// mod returns module of the vector xyz
+pub fn (v Vec3[T]) mod() T {
+	return T(math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z))
+}
+
+// mod_xy returns module for 2d vector xy, z ignored
+pub fn (v Vec3[T]) mod_xy() T {
+	return T(math.sqrt(v.x * v.x + v.y * v.y))
+}
+
+// normalize normalizes the vector
+pub fn (v Vec3[T]) normalize() Vec3[T] {
+	m := v.mod()
+	if m == 0 {
+		return vec3[T](0, 0, 0)
+	}
+	return Vec3[T]{
+		x: v.x * (1 / m)
+		y: v.y * (1 / m)
+		z: v.z * (1 / m)
+	}
+}
+
+//  normalize normalizes only the xy components, z is set to 0
+pub fn (v Vec3[T]) normalize_xy() Vec3[T] {
+	m := v.mod_xy()
+	if m == 0 {
+		return vec3[T](0, 0, 0)
+	}
+	return Vec3[T]{
+		x: v.x * (1 / m)
+		y: v.y * (1 / m)
+		z: 0
+	}
+}
+
+// sum returns a sum of all the elements
+pub fn (v Vec3[T]) sum() T {
+	return v.x + v.y + v.z
 }

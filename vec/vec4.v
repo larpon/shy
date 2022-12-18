@@ -60,44 +60,43 @@ pub fn (mut v Vec4[T]) from_vec2(u Vec2[T]) {
 	v.w = 0
 }
 
-pub fn (v Vec4[T]) as_vec2() Vec2[T] {
-	return Vec2[T]{v.x, v.y}
+pub fn (v Vec4[T]) as_vec2[U]() Vec2[U] {
+	return Vec2[U]{v.x, v.y}
 }
 
-pub fn (mut v Vec4[T]) from_vec3(u Vec3[T]) {
-	v.x = u.x
-	v.y = u.y
-	v.z = u.z
+pub fn (mut v Vec4[T]) from_vec3[U](u Vec3[U]) {
+	v.x = T(u.x)
+	v.y = T(u.y)
+	v.z = T(u.z)
 	v.w = 0
 }
 
-pub fn (v Vec4[T]) as_vec3() Vec3[T] {
-	return Vec3[T]{v.x, v.y, v.z}
+pub fn (v Vec4[T]) as_vec3[U]() Vec3[U] {
+	return Vec3[U]{v.x, v.y, v.z}
 }
 
 //
 // Addition
 //
 // + operator overload. Adds two vectors
-pub fn (v1 Vec4[T]) + (v2 Vec4[T]) Vec4[T] {
-	return Vec4[T]{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w}
-}
-
-pub fn (v Vec4[T]) add(u Vec4[T]) Vec4[T] {
+pub fn (v Vec4[T]) + (u Vec4[T]) Vec4[T] {
 	return Vec4[T]{v.x + u.x, v.y + u.y, v.z + u.z, v.w + u.w}
 }
 
-/*
-pub fn (v Vec4[T]) add_vec2(u Vec2) Vec4[T] {
-	return Vec4[T]{v.x + u.x, v.y + u.y, 0, 0}
-}
-*/
-pub fn (v Vec4[T]) add_f64(scalar f64) Vec4[T] {
-	return Vec4[T]{v.x + scalar, v.y + scalar, v.z + scalar, v.w + scalar}
+pub fn (v Vec4[T]) add(u Vec4[T]) Vec4[T] {
+	return v + u
 }
 
-pub fn (v Vec4[T]) add_f32(scalar f32) Vec4[T] {
-	return Vec4[T]{v.x + scalar, v.y + scalar, v.z + scalar, v.w + scalar}
+pub fn (v Vec4[T]) add_vec2[U](u Vec2[U]) Vec4[T] {
+	return Vec4[T]{v.x + u.x, v.y + u.y, 0, 0}
+}
+
+pub fn (v Vec4[T]) add_vec3[U](u Vec3[U]) Vec4[T] {
+	return Vec4[T]{v.x + u.x, v.y + u.y, v.z + u.z, 0}
+}
+
+pub fn (v Vec4[T]) add_scalar[U](scalar U) Vec4[T] {
+	return Vec4[T]{v.x + T(scalar), v.y + T(scalar), v.z + T(scalar), v.w + T(scalar)}
 }
 
 pub fn (mut v Vec4[T]) plus(u Vec4[T]) {
@@ -107,33 +106,26 @@ pub fn (mut v Vec4[T]) plus(u Vec4[T]) {
 	v.w += u.w
 }
 
-pub fn (mut v Vec4[T]) plus_f64(scalar f64) {
-	v.x += scalar
-	v.y += scalar
-	v.z += scalar
-	v.w += scalar
-}
-
-pub fn (mut v Vec4[T]) plus_f32(scalar f32) {
-	v.x += scalar
-	v.y += scalar
-	v.z += scalar
-	v.w += scalar
+pub fn (mut v Vec4[T]) plus_scalar[U](scalar U) {
+	v.x += T(scalar)
+	v.y += T(scalar)
+	v.z += T(scalar)
+	v.w += T(scalar)
 }
 
 //
 // Subtraction
 //
-pub fn (v1 Vec4[T]) - (v2 Vec4[T]) Vec4[T] {
-	return Vec4[T]{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w}
-}
-
-pub fn (v Vec4[T]) sub(u Vec4[T]) Vec4[T] {
+pub fn (v Vec4[T]) - (u Vec4[T]) Vec4[T] {
 	return Vec4[T]{v.x - u.x, v.y - u.y, v.z - u.z, v.w - u.w}
 }
 
-pub fn (v Vec4[T]) sub_f64(scalar f64) Vec4[T] {
-	return Vec4[T]{v.x - scalar, v.y - scalar, v.z - scalar, v.w - scalar}
+pub fn (v Vec4[T]) sub(u Vec4[T]) Vec4[T] {
+	return v - u
+}
+
+pub fn (v Vec4[T]) sub_scalar[U](scalar U) Vec4[T] {
+	return Vec4[T]{v.x - T(scalar), v.y - T(scalar), v.z - T(scalar), v.w - T(scalar)}
 }
 
 pub fn (mut v Vec4[T]) subtract(u Vec4[T]) {
@@ -143,30 +135,26 @@ pub fn (mut v Vec4[T]) subtract(u Vec4[T]) {
 	v.w -= u.w
 }
 
-pub fn (mut v Vec4[T]) subtract_f64(scalar f64) {
-	v.x -= scalar
-	v.y -= scalar
-	v.z -= scalar
-	v.w -= scalar
+pub fn (mut v Vec4[T]) subtract_scalar(scalar U) {
+	v.x -= T(scalar)
+	v.y -= T(scalar)
+	v.z -= T(scalar)
+	v.w -= T(scalar)
 }
 
 //
 // Multiplication
 //
-pub fn (v1 Vec4[T]) * (v2 Vec4[T]) Vec4[T] {
-	return Vec4[T]{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z, v1.w * v2.w}
-}
-
-pub fn (v Vec4[T]) mul(u Vec4[T]) Vec4[T] {
+pub fn (v Vec4[T]) * (u Vec4[T]) Vec4[T] {
 	return Vec4[T]{v.x * u.x, v.y * u.y, v.z * u.z, v.w * u.w}
 }
 
-pub fn (v Vec4[T]) mul_scalar(scalar T) Vec4[T] {
-	return Vec4[T]{v.x * scalar, v.y * scalar, v.z * scalar, v.w * scalar}
+pub fn (v Vec4[T]) mul(u Vec4[T]) Vec4[T] {
+	return v * u
 }
 
-pub fn (v Vec4[T]) mul_f64(scalar f64) Vec4[T] {
-	return Vec4[T]{v.x * scalar, v.y * scalar, v.z * scalar, v.w * scalar}
+pub fn (v Vec4[T]) mul_scalar[U](scalar U) Vec4[T] {
+	return Vec4[T]{v.x * T(scalar), v.y * T(scalar), v.z * T(scalar), v.w * T(scalar)}
 }
 
 pub fn (mut v Vec4[T]) multiply(u Vec4[T]) {
@@ -176,26 +164,26 @@ pub fn (mut v Vec4[T]) multiply(u Vec4[T]) {
 	v.w *= u.w
 }
 
-pub fn (mut v Vec4[T]) multiply_f64(scalar f64) {
-	v.x *= scalar
-	v.y *= scalar
-	v.z *= scalar
-	v.w *= scalar
+pub fn (mut v Vec4[T]) multiply_scalar[U](scalar U) {
+	v.x *= T(scalar)
+	v.y *= T(scalar)
+	v.z *= T(scalar)
+	v.w *= T(scalar)
 }
 
 //
 // Division
 //
-pub fn (v1 Vec4[T]) / (v2 Vec4[T]) Vec4[T] {
-	return Vec4[T]{v1.x / v2.x, v1.y / v2.y, v1.z / v2.z, v1.w / v2.w}
-}
-
-pub fn (v Vec4[T]) div(u Vec4[T]) Vec4[T] {
+pub fn (v Vec4[T]) / (u Vec4[T]) Vec4[T] {
 	return Vec4[T]{v.x / u.x, v.y / u.y, v.z / u.z, v.w / u.w}
 }
 
-pub fn (v Vec4[T]) div_f64(scalar f64) Vec4[T] {
-	return Vec4[T]{v.x / scalar, v.y / scalar, v.z / scalar, v.w / scalar}
+pub fn (v Vec4[T]) div(u Vec4[T]) Vec4[T] {
+	return v / u
+}
+
+pub fn (v Vec4[T]) div_scalar[U](scalar U) Vec4[T] {
+	return Vec4[T]{v.x / T(scalar), v.y / T(scalar), v.z / T(scalar), v.w / T(scalar)}
 }
 
 pub fn (mut v Vec4[T]) divide(u Vec4[T]) {
@@ -205,11 +193,11 @@ pub fn (mut v Vec4[T]) divide(u Vec4[T]) {
 	v.w /= u.w
 }
 
-pub fn (mut v Vec4[T]) divide_f64(scalar f64) {
-	v.x /= scalar
-	v.y /= scalar
-	v.z /= scalar
-	v.w /= scalar
+pub fn (mut v Vec4[T]) divide_scalar[U](scalar U) {
+	v.x /= T(scalar)
+	v.y /= T(scalar)
+	v.z /= T(scalar)
+	v.w /= T(scalar)
 }
 
 //
@@ -224,6 +212,16 @@ pub fn (v Vec4[T]) length() T {
 
 pub fn (v Vec4[T]) dot(u Vec4[T]) T {
 	return T((v.x * u.x) + (v.y * u.y) + (v.z * u.z) + (v.w * u.w))
+}
+
+// cross_xyz returns the cross product of v and u's xyz components
+pub fn (v Vec4[T]) cross_xyz(u Vec4[T]) Vec4[T] {
+	return Vec4[T]{
+		x: (v.y * u.z) - (v.z * u.y)
+		y: (v.z * u.x) - (v.x * u.z)
+		z: (v.x * u.y) - (v.y * u.x)
+		w: 0
+	}
 }
 
 // unit return this vector's unit vector
@@ -296,21 +294,12 @@ pub fn (v Vec4[T]) is_approx_zero(tolerance f64) bool {
 }
 
 // eq_scalar returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec4[T]) eq_scalar(scalar T) bool {
-	return v.x == scalar && v.y == scalar && v.z == scalar && v.w == scalar
+pub fn (v Vec4[T]) eq_scalar[U](scalar U) bool {
+	return v.x == scalar && v.y == T(scalar) && v.z == T(scalar) && v.w == T(scalar)
 }
 
 /*
-// eq_f64 returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec4[T]) eq_f64(scalar f64) bool {
-	return v.x == scalar && v.y == scalar
-}
-
-// eq_f32 returns a bool indicating if the x and y both equals the scalar
-pub fn (v Vec4[T]) eq_f32(scalar f32) bool {
-	return v.eq_f64(f64(scalar))
-}v.y /= scalar
-
+TODO
 // distance returns the distance between the two vectors
 pub fn (v Vec4[T]) distance(u Vec4[T]) f64 {
 	return math.sqrt( (v.x-u.x) * (v.x-u.x) + (v.y-u.y) * (v.y-u.y) )
@@ -348,7 +337,7 @@ pub fn (mut v Vec4[T]) abs() {
 	}
 }
 
-// clean removes all the raw zeros
+// clean sets all components to zero (0) if they fall within `tolerance`.
 pub fn (v Vec4[T]) clean(tolerance f64) Vec4[T] {
 	mut r := v.copy()
 	if math.abs(v.x) < tolerance {
@@ -417,14 +406,4 @@ pub fn (v Vec4[T]) normalize_xyz() Vec4[T] {
 // sum returns a sum of all the elements
 pub fn (v Vec4[T]) sum() T {
 	return v.x + v.y + v.z + v.w
-}
-
-// cross returns the cross product of v and u's xyz components
-pub fn (v Vec4[T]) cross(u Vec4[T]) Vec4[T] {
-	return Vec4[T]{
-		x: (v.y * u.z) - (v.z * u.y)
-		y: (v.z * u.x) - (v.x * u.z)
-		z: (v.x * u.y) - (v.y * u.x)
-		w: 0
-	}
 }
