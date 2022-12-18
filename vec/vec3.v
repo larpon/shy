@@ -1,6 +1,5 @@
 // Copyright(C) 2020-2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
-
 module vec
 
 import math
@@ -49,6 +48,16 @@ pub fn (mut v Vec3[T]) from_vec2[U](u Vec2[U]) {
 
 pub fn (mut v Vec3[T]) as_vec2[T]() Vec2[T] {
 	return Vec2[T]{v.x, v.y}
+}
+
+pub fn (mut v Vec3[T]) from_vec4[U](u Vec4[U]) {
+	v.x = T(u.x)
+	v.y = T(u.y)
+	v.z = T(u.z)
+}
+
+pub fn (mut v Vec3[T]) as_vec4[T]() Vec4[T] {
+	return Vec4[T]{v.x, v.y, v.z, 0}
 }
 
 //

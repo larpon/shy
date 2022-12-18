@@ -1,12 +1,5 @@
 // Copyright(C) 2020-2022 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
-//
-// NOTE a few of the following functions was adapted from Dario Deleddas excellent
-// work on the `gg.m4` vlib module. Here's the Copyright/license text covering that code:
-//
-// Copyright (c) 2021 Dario Deledda. All rights reserved.
-// Use of this source code is governed by an MIT license
-// that can be found in the LICENSE file.
 module vec
 
 import math
@@ -56,8 +49,6 @@ pub fn (mut v Vec4[T]) from(u Vec4[T]) {
 pub fn (mut v Vec4[T]) from_vec2(u Vec2[T]) {
 	v.x = u.x
 	v.y = u.y
-	v.z = 0
-	v.w = 0
 }
 
 pub fn (v Vec4[T]) as_vec2[U]() Vec2[U] {
@@ -68,7 +59,6 @@ pub fn (mut v Vec4[T]) from_vec3[U](u Vec3[U]) {
 	v.x = T(u.x)
 	v.y = T(u.y)
 	v.z = T(u.z)
-	v.w = 0
 }
 
 pub fn (v Vec4[T]) as_vec3[U]() Vec3[U] {
@@ -337,6 +327,13 @@ pub fn (mut v Vec4[T]) abs() {
 		v.w = math.abs(v.w)
 	}
 }
+
+// NOTE a few of the following functions was adapted and/or inspired from Dario Deleddas excellent
+// work on the `gg.m4` vlib module. Here's the Copyright/license text covering that code:
+//
+// Copyright (c) 2021 Dario Deledda. All rights reserved.
+// Use of this source code is governed by an MIT license
+// that can be found in the LICENSE file.
 
 // clean returns a vector with all components of this vector set to zero (0) if they fall within `tolerance`.
 pub fn (v Vec4[T]) clean[U](tolerance U) Vec4[T] {
