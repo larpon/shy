@@ -372,20 +372,7 @@ pub fn (v Vec3[T]) normalize() Vec3[T] {
 	}
 }
 
-//  normalize normalizes only the xy components, z is set to 0
-pub fn (v Vec3[T]) normalize_xy() Vec3[T] {
-	m := v.magnitude_xy()
-	if m == 0 {
-		return vec3[T](0, 0, 0)
-	}
-	return Vec3[T]{
-		x: v.x * (1 / m)
-		y: v.y * (1 / m)
-		z: 0
-	}
-}
-
-// sum returns a sum of all the elements
+// sum returns a sum of all the components.
 pub fn (v Vec3[T]) sum() T {
 	return v.x + v.y + v.z
 }

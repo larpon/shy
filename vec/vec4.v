@@ -404,21 +404,7 @@ pub fn (v Vec4[T]) normalize() Vec4[T] {
 	}
 }
 
-//  normalize normalizes only the xyz components, w is set to 0
-pub fn (v Vec4[T]) normalize_xyz() Vec4[T] {
-	m := v.magnitude_xyz()
-	if m == 0 {
-		return vec4[T](0, 0, 0, 0)
-	}
-	return Vec4[T]{
-		x: v.x * (1 / m)
-		y: v.y * (1 / m)
-		z: v.z * (1 / m)
-		w: 0
-	}
-}
-
-// sum returns a sum of all the elements
+// sum returns a sum of all the components.
 pub fn (v Vec4[T]) sum() T {
 	return v.x + v.y + v.z + v.w
 }

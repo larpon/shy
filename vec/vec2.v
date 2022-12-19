@@ -352,31 +352,7 @@ pub fn (v Vec2[T]) normalize() Vec2[T] {
 	}
 }
 
-// normalize_x normalizes only the x component, y is set to 0
-pub fn (v Vec2[T]) normalize_x() Vec2[T] {
-	m := v.magnitude_x()
-	if m == 0 {
-		return vec2[T](0, 0)
-	}
-	return Vec2[T]{
-		x: v.x * (1 / m)
-		y: 0
-	}
-}
-
-// normalize_y normalizes only the y component, x is set to 0
-pub fn (v Vec2[T]) normalize_y() Vec2[T] {
-	m := v.magnitude_y()
-	if m == 0 {
-		return vec2[T](0, 0)
-	}
-	return Vec2[T]{
-		x: 0
-		y: v.y * (1 / m)
-	}
-}
-
-// sum returns a sum of all the elements
+// sum returns a sum of all the components.
 pub fn (v Vec2[T]) sum() T {
 	return v.x + v.y
 }
