@@ -161,20 +161,30 @@ pub fn (mut v Vec2[T]) divide_scalar[U](scalar U) {
 //
 // Utility
 //
-pub fn (v Vec2[T]) length() T {
+
+// magnitude returns the magnitude, also known as the length, of the vector.
+pub fn (v Vec2[T]) magnitude() T {
 	if v.x == 0 && v.y == 0 {
-		return 0
+		return T(0)
 	}
 	$if T is f64 {
 		return math.sqrt((v.x * v.x) + (v.y * v.y))
-	} $else $if T is f32 {
-		return math.sqrtf((v.x * v.x) + (v.y * v.y))
 	} $else {
 		return T(math.sqrt(f64(v.x * v.x) + f64(v.y * v.y)))
 	}
 	panic('TODO ${@FN} not implemented for type')
 	return T(0.0)
-	// $compile_error('Type T in Vec2<T>.length() is not supported')
+	// $compile_error('Type T in Vec2<T>.magnitude() is not supported')
+}
+
+// magnitude_x returns the magnitude, also known as the length, of the 1D vector component x, y is ignored.
+pub fn (v Vec2[T]) magnitude_x() T {
+	return T(math.sqrt(v.x * v.x))
+}
+
+// magnitude_x returns the magnitude, also known as the length, of the 1D vector component y, x is ignored.
+pub fn (v Vec2[T]) magnitude_y() T {
+	return T(math.sqrt(v.y * v.y))
 }
 
 pub fn (v Vec2[T]) dot(u Vec2[T]) T {
@@ -186,17 +196,18 @@ pub fn (v Vec2[T]) cross(u Vec2[T]) T {
 	return (v.x * u.y) - (v.y * u.x)
 }
 
-// unit return this vector's unit vector
+// unit returns the unit vector.
+// unit vectors always have a magnitude, or length, of exactly 1.
 pub fn (v Vec2[T]) unit() Vec2[T] {
-	length := v.length()
-	return Vec2[T]{v.x / length, v.y / length}
+	m := v.magnitude()
+	return Vec2[T]{v.x / m, v.y / m}
 }
 
 pub fn (v Vec2[T]) perp() Vec2[T] {
 	return Vec2[T]{-v.y, v.x}
 }
 
-// perpendicular return the perpendicular vector of this
+// perpendicular returns the perpendicular vector to this vector.
 pub fn (v Vec2[T]) perpendicular(u Vec2[T]) Vec2[T] {
 	return v - v.project(u)
 }
@@ -252,8 +263,6 @@ pub fn (v Vec2[T]) eq_scalar[U](scalar U) bool {
 pub fn (v Vec2[T]) distance(u Vec2[T]) T {
 	$if T is f64 {
 		return math.sqrt((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
-	} $else $if T is f32 {
-		return math.sqrtf((v.x - u.x) * (v.x - u.x) + (v.y - u.y) * (v.y - u.y))
 	} $else {
 		return T(math.sqrt(f64(v.x - u.x) * f64(v.x - u.x) + f64(v.y - u.y) * f64(v.y - u.y)))
 	}
@@ -313,8 +322,8 @@ pub fn (v Vec2[T]) clean[U](tolerance U) Vec2[T] {
 	return r
 }
 
-// zero_tolerance sets all components to zero (0) if they fall within `tolerance`.
-pub fn (mut v Vec2[T]) zero_tolerance[U](tolerance U) {
+// clean_tolerance sets all components to zero (0) if they fall within `tolerance`.
+pub fn (mut v Vec2[T]) clean_tolerance[U](tolerance U) {
 	if math.abs(v.x) < tolerance {
 		v.x = 0
 	}
@@ -331,24 +340,9 @@ pub fn (v Vec2[T]) inv() Vec2[T] {
 	}
 }
 
-// mod returns module of the vector xy
-pub fn (v Vec2[T]) mod() T {
-	return T(math.sqrt(v.x * v.x + v.y * v.y))
-}
-
-// mod_x returns module for 1d vector x, y ignored
-pub fn (v Vec2[T]) mod_x() T {
-	return T(math.sqrt(v.x * v.x))
-}
-
-// mod_y returns module for 1d vector y, x ignored
-pub fn (v Vec2[T]) mod_y() T {
-	return T(math.sqrt(v.y * v.y))
-}
-
 // normalize normalizes the vector
 pub fn (v Vec2[T]) normalize() Vec2[T] {
-	m := v.mod()
+	m := v.magnitude()
 	if m == 0 {
 		return vec2[T](0, 0)
 	}
@@ -360,7 +354,7 @@ pub fn (v Vec2[T]) normalize() Vec2[T] {
 
 // normalize_x normalizes only the x component, y is set to 0
 pub fn (v Vec2[T]) normalize_x() Vec2[T] {
-	m := v.mod_x()
+	m := v.magnitude_x()
 	if m == 0 {
 		return vec2[T](0, 0)
 	}
@@ -372,7 +366,7 @@ pub fn (v Vec2[T]) normalize_x() Vec2[T] {
 
 // normalize_y normalizes only the y component, x is set to 0
 pub fn (v Vec2[T]) normalize_y() Vec2[T] {
-	m := v.mod_y()
+	m := v.magnitude_y()
 	if m == 0 {
 		return vec2[T](0, 0)
 	}

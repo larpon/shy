@@ -181,11 +181,21 @@ pub fn (mut v Vec3[T]) divide_scalar[U](scalar U) {
 //
 // Utility
 //
-pub fn (v Vec3[T]) length() T {
+
+// magnitude returns the magnitude, also known as the length, of the vector.
+pub fn (v Vec3[T]) magnitude() T {
 	if v.x == 0 && v.y == 0 && v.z == 0 {
 		return T(0)
 	}
 	return T(math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z)))
+}
+
+// magnitude_xy returns the magnitude, also known as the length, of the 2D vector components xy, z is ignored.
+pub fn (v Vec3[T]) magnitude_xy() T {
+	if v.x == 0 && v.y == 0 {
+		return T(0)
+	}
+	return T(math.sqrt(v.x * v.x + v.y * v.y))
 }
 
 pub fn (v Vec3[T]) dot(u Vec3[T]) T {
@@ -201,10 +211,11 @@ pub fn (v Vec3[T]) cross(u Vec3[T]) Vec3[T] {
 	}
 }
 
-// unit return this vector's unit vector
+// unit returns the unit vector.
+// unit vectors always have a magnitude, or length, of exactly 1.
 pub fn (v Vec3[T]) unit() Vec3[T] {
-	length := v.length()
-	return Vec3[T]{v.x / length, v.y / length, v.z / length}
+	m := v.magnitude()
+	return Vec3[T]{v.x / m, v.y / m, v.z / m}
 }
 
 /*
@@ -212,7 +223,7 @@ pub fn (v Vec3[T]) perp() Vec3[T] {
 	return Vec3[T]{ -v.y, v.x }
 }
 */
-// perpendicular return the perpendicular vector of this
+// perpendicular returns the perpendicular vector to this vector.
 pub fn (v Vec3[T]) perpendicular(u Vec3[T]) Vec3[T] {
 	return v - v.project(u)
 }
@@ -326,8 +337,8 @@ pub fn (v Vec3[T]) clean[U](tolerance U) Vec3[T] {
 	return r
 }
 
-// zero_tolerance sets all components to zero (0) if they fall within `tolerance`.
-pub fn (mut v Vec3[T]) zero_tolerance[U](tolerance U) {
+// clean_tolerance sets all components to zero (0) if they fall within `tolerance`.
+pub fn (mut v Vec3[T]) clean_tolerance[U](tolerance U) {
 	if math.abs(v.x) < tolerance {
 		v.x = 0
 	}
@@ -348,19 +359,9 @@ pub fn (v Vec3[T]) inv() Vec3[T] {
 	}
 }
 
-// mod returns module of the vector xyz
-pub fn (v Vec3[T]) mod() T {
-	return T(math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z))
-}
-
-// mod_xy returns module for 2d vector xy, z ignored
-pub fn (v Vec3[T]) mod_xy() T {
-	return T(math.sqrt(v.x * v.x + v.y * v.y))
-}
-
 // normalize normalizes the vector
 pub fn (v Vec3[T]) normalize() Vec3[T] {
-	m := v.mod()
+	m := v.magnitude()
 	if m == 0 {
 		return vec3[T](0, 0, 0)
 	}
@@ -373,7 +374,7 @@ pub fn (v Vec3[T]) normalize() Vec3[T] {
 
 //  normalize normalizes only the xy components, z is set to 0
 pub fn (v Vec3[T]) normalize_xy() Vec3[T] {
-	m := v.mod_xy()
+	m := v.magnitude_xy()
 	if m == 0 {
 		return vec3[T](0, 0, 0)
 	}

@@ -193,11 +193,21 @@ pub fn (mut v Vec4[T]) divide_scalar[U](scalar U) {
 //
 // Utility
 //
-pub fn (v Vec4[T]) length() T {
-	if v.x == 0 && v.y == 0 {
+
+// magnitude returns the magnitude, also known as the length, of the vector.
+pub fn (v Vec4[T]) magnitude() T {
+	if v.x == 0 && v.y == 0 && v.z == 0 && v.w == 0 {
 		return T(0)
 	}
 	return T(math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w)))
+}
+
+// magnitude_xyz returns the magnitude, also known as the length, of the 3D vector components xyz, w is ignored.
+pub fn (v Vec4[T]) magnitude_xyz() T {
+	if v.x == 0 && v.y == 0 && v.z == 0 {
+		return T(0)
+	}
+	return T(math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z)))
 }
 
 pub fn (v Vec4[T]) dot(u Vec4[T]) T {
@@ -214,14 +224,15 @@ pub fn (v Vec4[T]) cross_xyz(u Vec4[T]) Vec4[T] {
 	}
 }
 
-// unit return this vector's unit vector
+// unit returns the unit vector.
+// unit vectors always have a magnitude, or length, of exactly 1.
 pub fn (v Vec4[T]) unit() Vec4[T] {
-	length := v.length()
+	m := v.magnitude()
 	return Vec4[T]{
-		x: v.x / length
-		y: v.y / length
-		z: v.z / length
-		w: v.w / length
+		x: v.x / m
+		y: v.y / m
+		z: v.z / m
+		w: v.w / m
 	}
 }
 
@@ -231,7 +242,7 @@ pub fn (v Vec4[T]) perp() Vec4[T] {
 }
 */
 
-// perpendicular return the perpendicular vector of this
+// perpendicular returns the perpendicular vector to this vector.
 pub fn (v Vec4[T]) perpendicular(u Vec4[T]) Vec4[T] {
 	return v - v.project(u)
 }
@@ -353,8 +364,8 @@ pub fn (v Vec4[T]) clean[U](tolerance U) Vec4[T] {
 	return r
 }
 
-// zero_tolerance sets all components to zero (0) if they fall within `tolerance`.
-pub fn (mut v Vec4[T]) zero_tolerance[U](tolerance U) {
+// clean_tolerance sets all components to zero (0) if they fall within `tolerance`.
+pub fn (mut v Vec4[T]) clean_tolerance[U](tolerance U) {
 	if math.abs(v.x) < tolerance {
 		v.x = 0
 	}
@@ -379,19 +390,9 @@ pub fn (v Vec4[T]) inv() Vec4[T] {
 	}
 }
 
-// mod returns module of the vector xyzw
-pub fn (v Vec4[T]) mod() T {
-	return T(math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w))
-}
-
-// mod_xyz returns module for 3d vector xyz, w is ignored
-pub fn (v Vec4[T]) mod_xyz() T {
-	return T(math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z))
-}
-
 // normalize normalizes the vector
 pub fn (v Vec4[T]) normalize() Vec4[T] {
-	m := v.mod()
+	m := v.magnitude()
 	if m == 0 {
 		return vec4[T](0, 0, 0, 0)
 	}
@@ -405,7 +406,7 @@ pub fn (v Vec4[T]) normalize() Vec4[T] {
 
 //  normalize normalizes only the xyz components, w is set to 0
 pub fn (v Vec4[T]) normalize_xyz() Vec4[T] {
-	m := v.mod_xyz()
+	m := v.magnitude_xyz()
 	if m == 0 {
 		return vec4[T](0, 0, 0, 0)
 	}
