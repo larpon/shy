@@ -163,7 +163,8 @@ pub fn (t Draw2DText) draw() {
 	// color := sfons.rgba(255, 255, 255, 255)
 	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
 	font_context.set_color(color)
-	font_context.set_size(t.size)
+	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?
+	font_context.set_size(font_size)
 
 	lines := t.text.split('\n')
 
