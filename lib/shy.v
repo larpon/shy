@@ -137,9 +137,9 @@ pub fn (s Shy) assert_api_init() {
 	$if test {
 		return
 	}
-	assert !s.running, '${@STRUCT}.running is true'
-	assert !s.state.in_hot_code, '${@STRUCT} is in a hot code path'
-	assert !s.shutdown, '${@STRUCT} is shutting down'
+	assert !s.running, 'Shy.running is true'
+	assert !s.state.in_hot_code, 'Shy is in a hot code path'
+	assert !s.shutdown, 'Shy is shutting down'
 }
 
 [if !prod]
@@ -147,9 +147,9 @@ pub fn (s Shy) assert_api_shutdown() {
 	$if test {
 		return
 	}
-	assert !s.running, '${@STRUCT}.running is true'
-	assert !s.state.in_hot_code, '${@STRUCT} is in a hot code path'
-	assert s.shutdown, '${@STRUCT} is not set to shut down'
+	assert !s.running, 'Shy.running is true'
+	assert !s.state.in_hot_code, 'Shy is in a hot code path'
+	assert s.shutdown, 'Shy is not set to shut down'
 }
 
 pub enum VetCategory {
