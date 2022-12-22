@@ -844,3 +844,7 @@ pub fn (w &Window) draw_factor() f32 {
 	dw, _ := w.drawable_wh()
 	return dw / w.width()
 }
+
+pub fn (mut w Window) set_icon(image Image) {
+	// TODO https://caedesnotes.wordpress.com/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/
+}
