@@ -5,11 +5,13 @@ module lib
 
 import shy.wraps.miniaudio as ma
 
+pub const max_audio_engine_instances = 255
+
 pub struct Audio {
 	ShyStruct
 mut:
 	// Implementation specific
-	engine_id u8
+	engine_id u8 // 256 audio engine instances must be enough, eh?!
 	engines   map[u8]&AudioEngine
 }
 
@@ -36,6 +38,13 @@ pub fn (mut a Audio) init() ! {
 
 pub fn (mut a Audio) new_engine() !&AudioEngine {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data')
+	if a.engine_id >= lib.max_audio_engine_instances - 1 {
+		if a.engine_id == lib.max_audio_engine_instances - 1 {
+			a.shy.log.gwarn('${@STRUCT}.${@FN}', 'creating last AudioEngine instance')
+		} else {
+			return error('the maximum amount of audio engines (${lib.max_audio_engine_instances}) is reached')
+		}
+	}
 	ma_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
@@ -72,8 +81,9 @@ pub fn (a &Audio) engine(id u8) !&AudioEngine {
 [heap]
 pub struct AudioEngine {
 	ShyStruct
+	e &ma.Engine = null
+pub:
 	id u8
-	e  &ma.Engine = null
 mut:
 	sound_id u16
 	sounds   map[u16]&ma.Sound // sounds belonging to the ma.Engine instance.
