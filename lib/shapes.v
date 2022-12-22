@@ -41,6 +41,15 @@ pub fn (r &Rect) displaced_from(origin Anchor) Rect {
 	}
 }
 
+pub fn (r &Rect) mul_scalar(scalar f32) Rect {
+	return Rect{
+		x: r.x * scalar
+		y: r.y * scalar
+		width: r.width * scalar
+		height: r.height * scalar
+	}
+}
+
 pub struct Ray {
 pub mut:
 	origin Vec2[f32] // origin point
@@ -280,6 +289,22 @@ pub struct Size {
 pub mut:
 	width  f32 = 100
 	height f32 = 100
+}
+
+pub fn (s &Size) to_rect() Rect {
+	return Rect{
+		x: 0
+		y: 0
+		width: s.width
+		height: s.height
+	}
+}
+
+pub fn (s Size) mul_scalar(scalar f32) Size {
+	return Size{
+		width: s.width * scalar
+		height: s.height * scalar
+	}
 }
 
 pub enum Anchor {
