@@ -841,8 +841,8 @@ pub fn (w &Window) drawable_size() Size {
 }
 
 pub fn (w &Window) draw_factor() f32 {
-	dw, _ := w.drawable_wh()
-	return dw / w.width()
+	dw, dh := w.drawable_wh()
+	return mth.min(f32(dw) / w.width(), f32(dh) / w.height())
 }
 
 pub fn (mut w Window) set_icon(image Image) {

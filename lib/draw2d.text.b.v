@@ -165,6 +165,7 @@ pub fn (t Draw2DText) draw() {
 	font_context.set_color(color)
 	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?
 	font_context.set_size(font_size)
+	// eprintln('${@STRUCT}.${@FN} ${font_size}')
 
 	lines := t.text.split('\n')
 
