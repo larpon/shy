@@ -132,14 +132,14 @@ fn (s Shy) health() ! {
 	s.api.health()!
 }
 
-[if !prod]
+[if !prod; if !test]
 pub fn (s Shy) assert_api_init() {
 	assert !s.running, 'Shy.running is true'
 	assert !s.state.in_hot_code, 'Shy is in a hot code path'
 	assert !s.shutdown, 'Shy is shutting down'
 }
 
-[if !prod]
+[if !prod; if !test]
 pub fn (s Shy) assert_api_shutdown() {
 	assert !s.running, 'Shy.running is true'
 	assert !s.state.in_hot_code, 'Shy is in a hot code path'
