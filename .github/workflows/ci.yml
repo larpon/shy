@@ -59,7 +59,7 @@ jobs:
     #    shy test-cleancode ~/.vmodules/shy
 
   ubuntu-latest-bootstrap:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 # use 20.04 for now
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -130,7 +130,7 @@ jobs:
         v -d sdl_no_compile_flags ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-shy-can-live-anywhere:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 # use 20.04 for now
     timeout-minutes: 10
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -194,7 +194,7 @@ jobs:
         v -d sdl_no_compile_flags ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 # use 20.04 for now
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -262,7 +262,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04] # use 20.04 for now
         sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0]
     timeout-minutes: 20
     env:
