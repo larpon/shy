@@ -68,7 +68,6 @@ pub:
 pub struct MouseMotionEvent {
 	ShyEvent
 pub:
-	// window_id u32 // The window with mouse focus, if any
 	which   u16 // The mouse id
 	buttons MouseButtons // The current button state
 	x       int // X coordinate, relative to window
@@ -101,5 +100,5 @@ pub:
 pub struct QuitEvent {
 	ShyEvent
 pub:
-	request bool // Indicates if it's only a "nice" request to quit
+	request bool // Indicates if it's only a *request* to quit
 }

@@ -170,6 +170,124 @@ fn (mut ip Input) init_input() ! {
 	}
 }
 
+// sdl_to_shy_event translates a SDL event to a Shy event.
+// sdl_to_shy_event returns an UnknownEvent if `sdl_event` could not
+// be translated.
+fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
+	s := ip.shy
+	win := s.active_window()
+	mut shy_event := Event(UnkownEvent{
+		timestamp: s.ticks()
+		window: win
+	})
+
+	match sdl_event.@type {
+		.windowevent {
+			// if sdl.WindowEventID(int(sdl_event.window.event)) == .focus_lost {
+			//	s.shutdown = true
+			//}
+			wevid := unsafe { sdl.WindowEventID(int(sdl_event.window.event)) }
+			if wevid == .resized {
+				shy_event = WindowResizeEvent{
+					timestamp: s.ticks()
+					window: win // TODO multi-window support
+					width: win.width()
+					height: win.height()
+				}
+			}
+		}
+		.quit {
+			shy_event = QuitEvent{
+				timestamp: s.ticks()
+				window: win
+			}
+		}
+		.keyup {
+			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
+			shy_event = KeyEvent{
+				timestamp: s.ticks()
+				window: win
+				state: .up
+				key_code: shy_key_code
+			}
+		}
+		.keydown {
+			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
+			shy_event = KeyEvent{
+				timestamp: s.ticks()
+				window: win
+				state: .down
+				key_code: unsafe { KeyCode(int(shy_key_code)) }
+			}
+		}
+		.mousemotion {
+			// if !is_multi_mice {
+			buttons := map_sdl_button_mask_to_shy_mouse_buttons(sdl_event.motion.state)
+			which := default_mouse_id
+			// mut mouse := s.api.input.mouse(which) or { panic(err) }
+			// mouse.x = sdl_event.motion.x
+			// mouse.y = sdl_event.motion.y
+			// mouse.set_button_state(event.button, event.state)
+
+			shy_event = MouseMotionEvent{
+				timestamp: s.ticks()
+				window: win // TODO multi-window support
+				// window_id: win.id // TODO multi-window support
+				which: which // sdl_event.motion.which // TODO use own ID system??
+				buttons: buttons
+				x: sdl_event.motion.x
+				y: sdl_event.motion.y
+				rel_x: sdl_event.motion.xrel
+				rel_y: sdl_event.motion.yrel
+			}
+			// }
+		}
+		.mousebuttonup, .mousebuttondown {
+			// if !is_multi_mice {
+			mut state := ButtonState.down
+			state = if sdl_event.button.state == u8(sdl.pressed) { .down } else { .up }
+			button := map_sdl_button_to_shy_mouse_button(sdl_event.button.button)
+			shy_event = MouseButtonEvent{
+				timestamp: s.ticks()
+				window: win // TODO multi-window support
+				which: default_mouse_id // sdl_event.button.which // TODO use own ID system??
+				button: button
+				state: state
+				clicks: sdl_event.button.clicks
+				x: sdl_event.button.x
+				y: sdl_event.button.y
+			}
+			// }
+		}
+		.mousewheel {
+			// if !is_multi_mice {
+			mut dir := MouseWheelDirection.normal
+			dir = if sdl_event.wheel.direction == u32(sdl.MouseWheelDirection.normal) {
+				.normal
+			} else {
+				.flipped
+			}
+			shy_event = MouseWheelEvent{
+				timestamp: s.ticks()
+				window: win // TODO multi-window support
+				which: default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
+				x: sdl_event.wheel.x
+				y: sdl_event.wheel.y
+				direction: dir
+			}
+			// }
+		}
+		else {
+			shy_event = UnkownEvent{
+				timestamp: s.ticks()
+				window: win
+			}
+		}
+	}
+	return shy_event
+}
+
+// poll_event polls the next event from the OS event queue.
 fn (mut ip Input) poll_event() ?Event {
 	s := ip.shy
 	// TODO set mouse positions in each mouse in input.mice
@@ -180,111 +298,10 @@ fn (mut ip Input) poll_event() ?Event {
 		window: win
 	})
 
-	evt := sdl.Event{}
-	if 0 < sdl.poll_event(&evt) {
-		match evt.@type {
-			.windowevent {
-				// if sdl.WindowEventID(int(evt.window.event)) == .focus_lost {
-				//	s.shutdown = true
-				//}
-				wevid := unsafe { sdl.WindowEventID(int(evt.window.event)) }
-				if wevid == .resized {
-					shy_event = WindowResizeEvent{
-						timestamp: s.ticks()
-						window: win // TODO multi-window support
-						width: win.width()
-						height: win.height()
-					}
-				}
-			}
-			.quit {
-				shy_event = QuitEvent{
-					timestamp: s.ticks()
-					window: win
-				}
-			}
-			.keyup {
-				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
-				shy_event = KeyEvent{
-					timestamp: s.ticks()
-					window: win
-					state: .up
-					key_code: shy_key_code
-				}
-			}
-			.keydown {
-				shy_key_code := map_sdl_to_shy_keycode(evt.key.keysym.sym)
-				shy_event = KeyEvent{
-					timestamp: s.ticks()
-					window: win
-					state: .down
-					key_code: unsafe { KeyCode(int(shy_key_code)) }
-				}
-			}
-			.mousemotion {
-				// if !is_multi_mice {
-				buttons := map_sdl_button_mask_to_shy_mouse_buttons(evt.motion.state)
-				which := default_mouse_id
-				// mut mouse := s.api.input.mouse(which) or { panic(err) }
-				// mouse.x = evt.motion.x
-				// mouse.y = evt.motion.y
-				// mouse.set_button_state(event.button, event.state)
-
-				shy_event = MouseMotionEvent{
-					timestamp: s.ticks()
-					window: win // TODO multi-window support
-					// window_id: win.id // TODO multi-window support
-					which: which // evt.motion.which // TODO use own ID system??
-					buttons: buttons
-					x: evt.motion.x
-					y: evt.motion.y
-					rel_x: evt.motion.xrel
-					rel_y: evt.motion.yrel
-				}
-				// }
-			}
-			.mousebuttonup, .mousebuttondown {
-				// if !is_multi_mice {
-				mut state := ButtonState.down
-				state = if evt.button.state == u8(sdl.pressed) { .down } else { .up }
-				button := map_sdl_button_to_shy_mouse_button(evt.button.button)
-				shy_event = MouseButtonEvent{
-					timestamp: s.ticks()
-					window: win // TODO multi-window support
-					which: default_mouse_id // evt.button.which // TODO use own ID system??
-					button: button
-					state: state
-					clicks: evt.button.clicks
-					x: evt.button.x
-					y: evt.button.y
-				}
-				// }
-			}
-			.mousewheel {
-				// if !is_multi_mice {
-				mut dir := MouseWheelDirection.normal
-				dir = if evt.wheel.direction == u32(sdl.MouseWheelDirection.normal) {
-					.normal
-				} else {
-					.flipped
-				}
-				shy_event = MouseWheelEvent{
-					timestamp: s.ticks()
-					window: win // TODO multi-window support
-					which: default_mouse_id // evt.wheel.which // TODO use own ID system??
-					x: evt.wheel.x
-					y: evt.wheel.y
-					direction: dir
-				}
-				// }
-			}
-			else {
-				shy_event = UnkownEvent{
-					timestamp: s.ticks()
-					window: win
-				}
-			}
-		}
+	// Poll for SDL event here
+	sdl_event := sdl.Event{}
+	if 0 < sdl.poll_event(&sdl_event) {
+		shy_event = ip.sdl_to_shy_event(sdl_event)
 	}
 
 	// Important
@@ -370,13 +387,13 @@ fn (mut ip Input) poll_event() ?Event {
 					return MouseMotionEvent{
 						timestamp: s.ticks()
 						window_id: win.id // TODO multi-window support
-						which: which // evt.motion.which // TODO use own ID system??
+						which: which // sdl_event.motion.which // TODO use own ID system??
 						// buttons: buttons
 						x: mouse.x //if event.item == 0 {event.value } else {0}
 						y: mouse.y //if event.item != 0 {event.value } else {0}
 
-						//rel_x: evt.motion.xrel
-						//rel_y: evt.motion.yrel
+						//rel_x: sdl_event.motion.xrel
+						//rel_y: sdl_event.motion.yrel
 					}
 				}
 				.button {
@@ -384,17 +401,17 @@ fn (mut ip Input) poll_event() ?Event {
 					//println('Mouse #$event.device button $event.item $direction')
 					mut state := ButtonState.down
 					state = if event.value == 0 { .up } else { .down }
-					//button := map_sdl_button_to_shy_mouse_button(evt.button.button)
+					//button := map_sdl_button_to_shy_mouse_button(sdl_event.button.button)
 					win := s.active_window()
 					return MouseButtonEvent{
 						timestamp: s.ticks()
 						window_id: win.id // TODO
-						which: u16(event.device) // evt.button.which // TODO use own ID system??
+						which: u16(event.device) // sdl_event.button.which // TODO use own ID system??
 						// button: button
 						state: state
-						//clicks: evt.button.clicks
-						//x: evt.button.x
-						//y: evt.button.y
+						//clicks: sdl_event.button.clicks
+						//x: sdl_event.button.x
+						//y: sdl_event.button.y
 					}
 				}
 				.scroll {

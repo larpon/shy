@@ -21,6 +21,7 @@ mut:
 	wm      &WM      = null
 	gfx     &GFX     = null
 	draw    &Draw    = null
+	events  &Events  = null
 	assets  &Assets  = null
 	audio   &Audio   = null
 	input   &Input   = null
@@ -36,6 +37,11 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 		shy: s
 	}
 	a.wm = boot.init()!
+
+	a.events = &Events{
+		shy: s
+	}
+	a.events.init()!
 
 	a.system = &System{
 		shy: s
@@ -92,6 +98,7 @@ pub fn (mut a ShyAPI) shutdown() ! {
 	a.audio.shutdown()!
 	a.system.shutdown()!
 	a.wm.shutdown()!
+	a.events.shutdown()!
 	// a.gfx.shutdown()!
 	unsafe { a.free() }
 }
@@ -108,6 +115,7 @@ fn (mut a ShyAPI) free() {
 		free(a.audio)
 		free(a.system)
 		free(a.wm)
+		free(a.events)
 	}
 }
 
@@ -119,6 +127,9 @@ pub fn (a &ShyAPI) health() ! {
 	}
 	if isnil(a.scripts) {
 		return error('${@STRUCT}.${@FN} not all script api structs where set')
+	}
+	if isnil(a.events) {
+		return error('${@STRUCT}.${@FN} not all event api structs where set')
 	}
 	if isnil(a.audio) {
 		return error('${@STRUCT}.${@FN} not all audio api structs where set')
@@ -154,6 +165,10 @@ pub fn (a &ShyAPI) audio() &Audio {
 	return a.audio
 }
 
+pub fn (a &ShyAPI) events() &Events {
+	return a.events
+}
+
 pub fn (a &ShyAPI) input() &Input {
 	return a.input
 }
@@ -175,7 +190,7 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 	mut api := unsafe { s.api() }
 
 	wm := api.wm()
-	mut input := unsafe { api.input() }
+	mut events := unsafe { api.events() }
 
 	mut root := wm.root
 
@@ -189,14 +204,14 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 			continue
 		}
 
-		// TODO re-write event processing to be per window?
-		// Process system events
+		// Process events
 		for {
-			event := input.poll_event() or { break }
+			event := events.poll() or { break }
 			ctx.event(event)
 		}
 
-		// Windows will render their children, so this is a cascade action
+		// Since Shy is, currently, single threaded windows
+		// will render their children. So, this is a cascade action.
 		s.state.rendering = true
 		root.render[T](mut ctx)
 		s.state.rendering = false
