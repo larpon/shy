@@ -117,8 +117,8 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		mut display_mode := sdl.DisplayMode{}
 		sdl.get_current_display_mode(display_index, &display_mode)
 		dn := unsafe { cstring_to_vstring(sdl.get_display_name(display_index)) }
-		dw := display_bounds[display_index].width
-		dh := display_bounds[display_index].height
+		dw := display_bounds[display_index].w
+		dh := display_bounds[display_index].h
 		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen ${display_index} `${dn}` ${dw}x${dh}@${display_mode.refresh_rate}hz')
 	}
 
