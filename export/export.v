@@ -24,6 +24,7 @@ fn ensure_cache_dir() !string {
 pub enum Variant {
 	generic
 	steam
+	steam_runtime
 }
 
 pub enum Format {
@@ -144,10 +145,16 @@ pub fn string_to_export_format(str string) !Format {
 	}
 }
 
-fn export_appimage(opt Options) ! {
+fn (opt Options) ensure_appimagetool() !string {
 	appimagetool_url := 'https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage'
-	mut appimagetool := os.join_path(ensure_cache_dir()!, 'appimagetool')
-	if !os.exists(appimagetool) {
+	mut appimagetool_exe := os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
+	if !os.exists(appimagetool_exe) {
+		appimagetool := os.join_path(ensure_cache_dir()!, 'appimagetool')
+		if os.exists(appimagetool) {
+			os.rm(appimagetool) or {
+				return error('${@MOD}.${@FN}: failed to remove previous appimagetool at "${appimagetool}": ${err}')
+			}
+		}
 		if opt.verbosity > 0 {
 			eprintln('Downloading `appimagetool` to "${appimagetool}"...')
 		}
@@ -156,6 +163,8 @@ fn export_appimage(opt Options) ! {
 		}
 		os.chmod(appimagetool, 0o775)! // make it executable
 
+		// On some systems like Alpine the squashfs gimick doesn't work... *sigh*
+		// ... so we extract the entry point script and use that.
 		pwd := os.getwd()
 		os.chdir(ensure_cache_dir()!)!
 		appimagetool_extract_cmd := [
@@ -169,8 +178,18 @@ fn export_appimage(opt Options) ! {
 		}
 		os.chdir(pwd)!
 
-		appimagetool = os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
+		appimagetool_exe = os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
+
+		// Clean up after download as things are extracted
+		if os.exists(appimagetool) {
+			os.rm(appimagetool) or {}
+		}
 	}
+	return appimagetool_exe
+}
+
+fn export_appimage(opt Options) ! {
+	appimagetool_exe := opt.ensure_appimagetool()!
 
 	// Resolve and sanitize input path
 	input := os.real_path(opt.input).trim_string_right(os.path_separator)
@@ -277,7 +296,7 @@ Categories=Game;'
 	shy_icon := os.join_path(@VMODROOT, 'shy.svg')
 	app_icon := os.join_path(app_dir_path, '${app_name}' + os.file_ext(shy_icon))
 	os.cp(shy_icon, app_icon) or {
-		return error('failed to copy "${shy_icon}" to "${app_icon}": ${err}')
+		return error('${@MOD}.${@FN}: failed to copy "${shy_icon}" to "${app_icon}": ${err}')
 	}
 
 	// Create AppRun executable script
@@ -331,7 +350,7 @@ exec "${EXEC}" "$@"'
 		app_lib_dir := os.join_path(app_dir_path, os.dir(lib_path).all_after('/'))
 		mut app_lib := os.join_path(app_lib_dir, os.file_name(lib_path))
 		mut lib_real_path := lib_path
-		// Resolve symlinks. These are *very* common on all distros.
+		// Resolve symlinks. These are *very* common across distros.
 		if os.is_link(lib_real_path) {
 			lib_real_path = os.real_path(lib_real_path)
 		}
@@ -529,10 +548,13 @@ exec "${EXEC}" "$@"'
 		eprintln('Building AppImage "${output}"...')
 	}
 	appimagetool_cmd := [
-		appimagetool,
+		appimagetool_exe,
 		app_dir_path,
 		output,
 	]
+	if opt.verbosity > 2 {
+		eprintln('Running "${appimagetool_cmd}"...')
+	}
 	ait_res := os.execute(appimagetool_cmd.join(' '))
 	if ait_res.exit_code != 0 {
 		ait_cmd := appimagetool_cmd.join(' ')
@@ -697,7 +719,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 pub fn resolve_dependencies(config ResolveDependenciesConfig) !map[string]string {
 	mut deps := map[string]string{}
 	if config.verbosity > 0 {
-		eprintln('Resolving ${config.format.ext()} dependencies...')
+		eprintln('Resolving dependencies for executable "${config.exe}"...')
 	}
 	resolve_dependencies_recursively(mut deps, config)!
 	return deps
