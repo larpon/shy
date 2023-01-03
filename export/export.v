@@ -172,8 +172,8 @@ fn export_appimage(opt Options) ! {
 		appimagetool = os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
 	}
 
-	// Sanitize input path
-	input := opt.input.trim_string_right(os.path_separator)
+	// Resolve and sanitize input path
+	input := os.real_path(opt.input).trim_string_right(os.path_separator)
 
 	// Build V input app for host platform
 	v_app := os.join_path(opt.work_dir, 'v_app')
