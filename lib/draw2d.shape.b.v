@@ -163,17 +163,28 @@ pub fn (r DrawShape2DRect) draw() {
 			// More on pixel-perfect here: https://stackoverflow.com/a/10041050/1904615
 			// See also: tests/visual/pixel-perfect_rectangles.v
 			gl.begin_line_strip()
-			gl.v2f(sx, sy)
-			gl.v2f((sx + w), sy)
-			//
-			gl.v2f((sx + 0.5 + w - 1), sy + 0.5)
-			gl.v2f((sx + 0.5 + w - 1), (sy + 0.5 + h - 1))
-			//
-			gl.v2f((sx + 0.5 + w - 1), (sy + 0.5 + h - 1))
-			gl.v2f(sx + 0.5, (sy + 0.5 + h - 1.5))
-			//
-			gl.v2f(sx + 0.5, (sy + 0.5 + h - 1))
-			gl.v2f(sx + 0.5, sy + 0.5)
+			if r.rotation == 0 {
+				gl.v2f(sx, sy)
+				gl.v2f((sx + w), sy)
+				//
+				gl.v2f((sx + 0.5 + w - 1), sy + 0.5)
+				gl.v2f((sx + 0.5 + w - 1), (sy + 0.5 + h - 1))
+				//
+				gl.v2f((sx + 0.5 + w - 1), (sy + 0.5 + h - 1))
+				gl.v2f(sx + 0.5, (sy + 0.5 + h - 1.5))
+				//
+				gl.v2f(sx + 0.5, (sy + 0.5 + h - 1))
+				gl.v2f(sx + 0.5, sy + 0.5)
+			} else {
+				gl.v2f(sx, sy)
+				gl.v2f((sx + w), sy)
+				//
+				gl.v2f((sx + w), (sy + h))
+				//
+				gl.v2f(sx, (sy + h))
+				//
+				gl.v2f(sx, sy)
+			}
 			gl.end()
 		}
 	}
