@@ -70,12 +70,13 @@ pub mut:
 	is_prod bool
 	c_flags []string // flags passed to the C compiler(s)
 	v_flags []string // flags passed to the V compiler
+	assets  []string // list of (extra) paths to asset (roots) dirs to include
 }
 
 // resolve_output returns the path/file and format of the export.
 fn (opt &Options) resolve_output() !(string, Format) {
 	mut output := opt.output
-	// If no specific output file is given, we use the input file
+	// If no specific output file is given, we use the input file as a base
 	if output == '' {
 		output = opt.input
 	}
@@ -171,6 +172,9 @@ fn export_appimage(opt Options) ! {
 		appimagetool = os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
 	}
 
+	// Sanitize input path
+	input := opt.input.trim_string_right(os.path_separator)
+
 	// Build V input app for host platform
 	v_app := os.join_path(opt.work_dir, 'v_app')
 	if opt.verbosity > 0 {
@@ -186,7 +190,7 @@ fn export_appimage(opt Options) ! {
 	v_cmd << [
 		'-o',
 		v_app,
-		opt.input,
+		input,
 	]
 	v_res := os.execute(v_cmd.join(' '))
 	if v_res.exit_code != 0 {
@@ -194,12 +198,22 @@ fn export_appimage(opt Options) ! {
 		return error('${@MOD}.${@FN}: "${vcmd}" failed: ${v_res.output}')
 	}
 
+	// Infer app_name from input
+	mut app_name := os.file_name(input)
+	if os.is_file(input) {
+		app_name = app_name.all_before_last('.')
+	}
+	if app_name == '' {
+		return error('${@MOD}.${@FN}: failed resolving app name from ${input}')
+	}
+	if opt.verbosity > 1 {
+		eprintln('Resolved app name to "${app_name}"')
+	}
 	// Prepare AppDir directory. We do it manually because the "format",
 	// or rather, conventions - are fairly straight forward and appimage-builder is a mess.
 	// https://docs.appimage.org/packaging-guide/overview.html#manually-creating-an-appdir
 	// https://docs.appimage.org/packaging-guide/manual.html
 	//
-	app_name := os.file_name(opt.input).all_before_last('.')
 	app_dir_path := os.join_path(opt.work_dir, '${app_name}.AppDir')
 	if os.exists(app_dir_path) {
 		os.rmdir_all(app_dir_path)!
@@ -260,7 +274,7 @@ Categories=Game;'
 	// TODO desktop-file-validate your.desktop ??
 
 	// Copy icon TODO
-	shy_icon := os.join_path(@VMODROOT, 'logo.svg')
+	shy_icon := os.join_path(@VMODROOT, 'shy.svg')
 	app_icon := os.join_path(app_dir_path, '${app_name}' + os.file_ext(shy_icon))
 	os.cp(shy_icon, app_icon) or {
 		return error('failed to copy "${shy_icon}" to "${app_icon}": ${err}')
@@ -325,13 +339,130 @@ exec "${EXEC}" "$@"'
 			eprintln('Copying "${lib_real_path}" to "${app_lib}"')
 		}
 		os.cp(lib_real_path, app_lib) or {
-			return error('failed to copy "${lib_real_path}" to "${app_lib}": ${err}')
+			return error('${@MOD}.${@FN}: failed to copy "${lib_real_path}" to "${app_lib}": ${err}')
 		}
 	}
 
 	// Move v_app to .AppDir
 	app_exe := os.join_path(app_dir_path, 'usr', 'bin', app_name)
 	os.mv(v_app, app_exe)!
+
+	// Copy assets in place next to the executable in .AppDir/usr/bin/
+	// This is not very optimal in terms of Linux conventions and could
+	// probably be reconsidered at some point. But it works for now.
+	assets_path := os.join_path(app_dir_path, 'usr', 'bin', 'assets')
+	os.mkdir_all(assets_path) or {
+		return error('${@MOD}.${@FN}: failed to make dir "${assets_path}": ${err}')
+	}
+
+	mut included_asset_paths := []string{}
+
+	/*
+	NOTE kept for debugging purposes
+	test_asset := os.join_path(assets_path, 'test.txt')
+	os.rm(test_asset)
+	mut fh := open_file(test_asset, 'w+', 0o755) or { panic(err) }
+	fh.write('test')
+	fh.close()
+	*/
+
+	mut assets_by_side_path := input
+	if os.is_file(input) {
+		assets_by_side_path = os.dir(input)
+	}
+	// Look for "assets" dir in same location as input
+	assets_by_side := os.join_path(assets_by_side_path, 'assets')
+	if os.is_dir(assets_by_side) {
+		if opt.verbosity > 0 {
+			eprintln('Including assets from "${assets_by_side}"')
+		}
+		os.cp_all(assets_by_side, assets_path, false) or {
+			return error('${@MOD}.${@FN}: failed to copy "${assets_by_side}" to "${assets_path}": ${err}')
+		}
+		included_asset_paths << os.real_path(assets_by_side)
+	}
+	// Look for "assets" in dir above input dir.
+	// This is mostly an exception for the shared example assets in V examples and shy's own examples.
+	// For v/examples
+	if os.real_path(assets_by_side_path).contains(os.join_path('v', 'examples')) {
+		assets_above := os.real_path(os.join_path(assets_by_side_path, '..', 'assets'))
+		if os.is_dir(assets_above) {
+			if os.real_path(assets_above) in included_asset_paths {
+				if opt.verbosity > 1 {
+					eprintln('Skipping "${assets_above}" since it\'s already included')
+				}
+			} else {
+				if opt.verbosity > 0 {
+					eprintln('Including assets from "${assets_above}"')
+				}
+				os.cp_all(assets_above, assets_path, false) or {
+					return error('${@MOD}.${@FN}: failed to copy "${assets_above}" to "${assets_path}": ${err}')
+				}
+				included_asset_paths << assets_above
+			}
+		}
+	}
+	// For shy/examples
+	if os.real_path(assets_by_side_path).contains(os.join_path('shy', 'examples')) {
+		shy_example_assets := assets_by_side_path.all_before(os.join_path('shy', 'examples')) +
+			os.join_path('shy', 'assets')
+		if os.is_dir(shy_example_assets) {
+			if os.real_path(shy_example_assets) in included_asset_paths {
+				if opt.verbosity > 1 {
+					eprintln('Skipping "${shy_example_assets}" since it\'s already included')
+				}
+			} else {
+				if opt.verbosity > 0 {
+					eprintln('Including assets from "${shy_example_assets}"')
+				}
+				os.cp_all(shy_example_assets, assets_path, false) or {
+					return error('${@MOD}.${@FN}: failed to copy (assets in dir) "${shy_example_assets}" to "${assets_path}": ${err}')
+				}
+				included_asset_paths << os.real_path(shy_example_assets)
+			}
+		}
+	}
+	// Look for "assets" dir in current dir
+	assets_in_dir := 'assets'
+	if os.is_dir(assets_in_dir) {
+		assets_in_dir_resolved := os.real_path(os.join_path(os.getwd(), assets_in_dir))
+		if assets_in_dir_resolved in included_asset_paths {
+			if opt.verbosity > 1 {
+				eprintln('Skipping "${assets_in_dir}" since it\'s already included')
+			}
+		} else {
+			if opt.verbosity > 0 {
+				eprintln('Including assets from "${assets_in_dir}"')
+			}
+			os.cp_all(assets_in_dir, assets_path, false) or {
+				return error('${@MOD}.${@FN}: failed to copy (assets in dir) "${assets_in_dir}" to "${assets_path}": ${err}')
+			}
+			included_asset_paths << assets_in_dir_resolved
+		}
+	}
+	// Look in user provided dir(s)
+	for user_asset in opt.assets {
+		if os.is_dir(user_asset) {
+			user_asset_resolved := os.real_path(user_asset)
+			if user_asset_resolved in included_asset_paths {
+				if opt.verbosity > 1 {
+					eprintln('Skipping "${user_asset}" since it\'s already included')
+				}
+			} else {
+				if opt.verbosity > 0 {
+					eprintln('Including assets from "${user_asset}"')
+				}
+				os.cp_all(user_asset, assets_path, false) or {
+					return error('${@MOD}.${@FN}: failed to copy "${user_asset}" to "${assets_path}": ${err}')
+				}
+				included_asset_paths << user_asset_resolved
+			}
+		} else {
+			os.cp(user_asset, assets_path) or {
+				eprintln('Skipping invalid or non-existent asset file "${user_asset}"')
+			}
+		}
+	}
 
 	// strip exe
 	strip_exe := os.find_abs_path_of_executable('strip') or { '' }
@@ -492,7 +623,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 		so_name := parts[1]
 		if so_name in excludes {
 			if verbosity > 1 {
-				eprintln('${indents}${so_name}(exclude)')
+				eprintln('${indents}${so_name} (exclude)')
 			}
 			continue
 		}
@@ -549,7 +680,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 		if so_name in skip_resolve {
 			if verbosity > 1 {
-				eprintln('${indents}${so_name} (skip)')
+				eprintln('${indents}${so_name} (skip resolve)')
 			}
 			continue
 		}

@@ -25,7 +25,7 @@ pub mut:
 	is_prod         bool
 	c_flags         []string // flags passed to the C compiler(s)
 	v_flags         []string // flags passed to the V compiler
-	assets_extra    []string
+	assets_extra    []string // list of (extra) paths to assets dirs to include
 	libs_extra      []string
 }
 
@@ -160,6 +160,7 @@ pub fn (opt &Options) to_export_options() export.Options {
 		is_prod: opt.is_prod
 		c_flags: opt.c_flags
 		v_flags: opt.v_flags
+		assets: opt.assets_extra
 	}
 	return opts
 }
