@@ -31,7 +31,7 @@ pub enum AnimLoop {
 pub struct Anims {
 	ShyStruct
 mut:
-	running bool
+	// running bool
 	paused  bool
 	active  []&IAnimator     = []&IAnimator{cap: 1000} // Should match prealloc
 	f32pool []&Animator[f32] = []&Animator[f32]{cap: 1000} // Should match prealloc
@@ -50,6 +50,11 @@ pub fn (mut a Anims) init() ! {
 		a.f32pool << a.p_new_animator[f32]()
 		// a.f64_pool << a.p_new_animator<f64>()
 	}
+}
+
+pub fn (a &Anims) has_work() bool {
+	// a.running &&
+	return !a.paused && a.active.len > 0
 }
 
 [manualfree]
@@ -130,6 +135,7 @@ fn (mut a Anims) p_new_follow_animator[T](config FollowAnimatorConfig) &FollowAn
 		shy: a.shy
 		// TODO BUG ...config <- doesn't work for generics
 	}
+	animator.reset()
 	animator.config_update(config)
 	return animator
 }
@@ -139,6 +145,7 @@ pub fn (mut a Anims) new_animator[T](config AnimatorConfig) &Animator[T] {
 	$if T.typ is f32 {
 		if a.f32pool.len > 0 {
 			animator = a.f32pool.pop()
+			animator.reset()
 			animator.config_update(config)
 		} else {
 			animator = a.p_new_animator[T](config)
@@ -276,7 +283,8 @@ fn (mut a Animator[T]) ended() {
 	a.fire_event_fn(.end)
 	match a.loop {
 		.once {
-			a.reset()
+			a.running = false
+			// a.reset()
 		}
 		.loop {
 			if a.loops > 0 {
@@ -285,7 +293,8 @@ fn (mut a Animator[T]) ended() {
 			} else if a.loops == lib.infinite {
 				a.restart()
 			} else {
-				a.reset()
+				a.running = false
+				// a.reset()
 			}
 		}
 		.pingpong {
@@ -297,7 +306,8 @@ fn (mut a Animator[T]) ended() {
 				a.from, a.to = a.to, a.from
 				a.restart()
 			} else {
-				a.reset()
+				a.running = false
+				// a.reset()
 			}
 		}
 	}

@@ -21,10 +21,10 @@ pub enum TimerLoop {
 pub struct Timers {
 	ShyStruct
 mut:
-	running bool
-	paused  bool
-	active  []&Timer = []&Timer{cap: 1000} // Should match prealloc
-	pool    []&Timer = []&Timer{cap: 1000} // Should match prealloc
+	// running bool
+	paused bool
+	active []&Timer = []&Timer{cap: 1000} // Should match prealloc
+	pool   []&Timer = []&Timer{cap: 1000} // Should match prealloc
 }
 
 pub fn (mut t Timers) init() ! {
@@ -38,6 +38,11 @@ pub fn (mut t Timers) init() ! {
 		t.pool << t.p_new_timer()
 		// t.f64_pool << t.p_new_timer<f64>()
 	}
+}
+
+pub fn (t &Timers) has_work() bool {
+	// t.running &&
+	return !t.paused && t.active.len > 0
 }
 
 [manualfree]

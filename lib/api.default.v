@@ -211,7 +211,7 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 		}
 
 		// Since Shy is, currently, single threaded windows
-		// will render their children. So, this is a cascade action.
+		// will render their own children. So, this is a cascade action.
 		s.state.rendering = true
 		root.render[T](mut ctx)
 		s.state.rendering = false

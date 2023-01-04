@@ -267,6 +267,7 @@ pub fn (mut s Stepper) reset() {
 }
 
 pub fn (mut w Window) step(frames u16, rate f32) {
+	w.immediate = true
 	w.stepper.active = true
 	w.stepper.step = frames
 	w.stepper.rate = rate
@@ -274,6 +275,13 @@ pub fn (mut w Window) step(frames u16, rate f32) {
 
 pub fn (mut w Window) unstep() {
 	w.stepper.reset()
+}
+
+pub fn (mut w Window) dirty() {
+	if w.immediate {
+		return
+	}
+	w.is_dirty = true
 }
 
 // Credits to @spytheman (https://github.com/spytheman) for his
@@ -361,6 +369,7 @@ pub:
 	id u32
 mut:
 	ready    bool
+	is_dirty bool    = true // TODO
 	parent   &Window = null
 	children []&Window
 	anims    &Anims  = null
@@ -372,7 +381,8 @@ mut:
 	// id of GFX/Context this window has been given
 	gfx u32
 pub mut:
-	state FrameState
+	state     FrameState
+	immediate bool = true // TODO
 }
 
 pub fn (w &Window) find_window(id u32) ?&Window {
@@ -464,7 +474,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 	now := s.ticks()
 
 	// count fps in 1 sec (1000 ms)
-	if now >= w.state.fps_timer + 1000 {
+	if w.immediate && now >= w.state.fps_timer + 1000 {
 		w.state.fps_timer = now
 		w.state.fps_snapshot = w.state.fps_frame // - 1
 		w.state.fps_frame = 0
@@ -525,102 +535,163 @@ pub fn (mut w Window) render[T](mut ctx T) {
 
 	fixed_deltatime := w.state.fixed_deltatime
 
-	w.begin_frame()
-	ctx.frame_begin()
-	if !w.stepper.active {
-		// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
-		if !w.state.lock_framerate {
-			mut consumed_delta_time := delta_time
+	// non-immediate mode / GUI mode
+	// rendering is only done if w.dirty() is called.
+	// All this should probably also be in the stepper
+	// TODO the internals is messy, should be cleaned up
+	// Especially multi-window support and "vsync == .off" is broken - maybe have
+	// Shy orchestrate the update of each window instead?
+	if !w.immediate {
+		fixed_dt := 1 / w.state.update_rate
+		rate_sim_sleep := i64((fixed_dt * 1000 * 1000) / (w.children.len + 1))
 
-			for w.state.frame_accumulator >= desired_frametime {
-				// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
-				w.fixed_update(fixed_deltatime)
-				ctx.fixed_update(fixed_deltatime)
+		vsync := w.config.render.vsync
 
-				if consumed_delta_time > desired_frametime {
-					// cap variable update's dt to not be larger than fixed update,
-					// and interleave it (so game state can always get animation frames it needs)
+		w.state.fps_frame--
+		w.state.frame--
 
-					// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
-					w.variable_update(fixed_deltatime)
-					ctx.variable_update(fixed_deltatime)
+		do_sleep := !w.is_dirty
+		if w.is_dirty {
+			w.is_dirty = false
 
-					consumed_delta_time -= desired_frametime
-				}
-				w.state.frame_accumulator -= desired_frametime
+			w.begin_frame()
+			ctx.frame_begin()
+
+			w.state.fps_frame++
+			w.state.frame++
+
+			if now >= w.state.fps_timer + 1000 {
+				w.state.fps_timer = now
+				w.state.fps_snapshot = w.state.fps_frame // - 1
+				w.state.fps_frame = 0
 			}
 
-			c_dt := f64(consumed_delta_time) / s.performance_frequency()
-			// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
-			w.variable_update(c_dt)
-			ctx.variable_update(c_dt)
+			w.fixed_update(fixed_dt)
+			ctx.fixed_update(fixed_dt)
+			w.variable_update(fixed_dt)
+			ctx.variable_update(fixed_dt)
 
-			f_dt := f64(w.state.frame_accumulator) / desired_frametime
-			// eprintln('(unlocked) ctx.frame( $f_dt )')
 			w.state.in_frame_call = true
+
 			// TODO remove me again
-			s.scripts().on_frame(f_dt)
-			ctx.frame(f_dt)
-		} else { // LOCKED FRAMERATE, NO INTERPOLATION
-			for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
-				for i := 0; i < w.state.update_multiplicity; i++ {
-					// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+			s.scripts().on_frame(1.0)
+			ctx.frame(1.0)
+			ctx.frame_end()
+			w.end_frame()
+		}
+
+		if vsync != .off && do_sleep && !w.is_dirty {
+			sleep_for := rate_sim_sleep * time.microsecond
+			// for _ in 0 .. 10 {
+			//	if w.is_dirty {
+			//		break
+			//	}
+			time.sleep(sleep_for) // TODO ??
+			//}
+		}
+	} else {
+		w.begin_frame()
+		ctx.frame_begin()
+		if !w.stepper.active {
+			// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
+			if !w.state.lock_framerate {
+				mut consumed_delta_time := delta_time
+
+				for w.state.frame_accumulator >= desired_frametime {
+					// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
 					w.fixed_update(fixed_deltatime)
 					ctx.fixed_update(fixed_deltatime)
 
-					// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
-					w.variable_update(fixed_deltatime)
-					ctx.variable_update(fixed_deltatime)
+					if consumed_delta_time > desired_frametime {
+						// cap variable update's dt to not be larger than fixed update,
+						// and interleave it (so game state can always get the animation frames it needs)
+
+						// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
+						w.variable_update(fixed_deltatime)
+						ctx.variable_update(fixed_deltatime)
+
+						consumed_delta_time -= desired_frametime
+					}
 					w.state.frame_accumulator -= desired_frametime
 				}
+
+				c_dt := f64(consumed_delta_time) / s.performance_frequency()
+				// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
+				w.variable_update(c_dt)
+				ctx.variable_update(c_dt)
+
+				f_dt := f64(w.state.frame_accumulator) / desired_frametime
+				// eprintln('(unlocked) ctx.frame( $f_dt )')
+				w.state.in_frame_call = true
+				// TODO remove me again
+				s.scripts().on_frame(f_dt)
+				ctx.frame(f_dt)
+			} else { // LOCKED FRAMERATE, NO INTERPOLATION
+				for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
+					for i := 0; i < w.state.update_multiplicity; i++ {
+						// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
+						w.fixed_update(fixed_deltatime)
+						ctx.fixed_update(fixed_deltatime)
+
+						// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
+						w.variable_update(fixed_deltatime)
+						ctx.variable_update(fixed_deltatime)
+						w.state.frame_accumulator -= desired_frametime
+					}
+				}
+
+				// eprintln('(locked) ctx.frame( 1.0 )')
+				w.state.in_frame_call = true
+				// TODO remove me again
+				s.scripts().on_frame(1.0)
+				ctx.frame(1.0)
 			}
+		} else {
+			// MANUAL STEPPING via Window.step(...)
+			if w.stepper.active {
+				// w.state.fps_frame = u32(w.stepper.rate)
+				w.state.frame--
 
-			// eprintln('(locked) ctx.frame( 1.0 )')
-			w.state.in_frame_call = true
-			// TODO remove me again
-			s.scripts().on_frame(1.0)
-			ctx.frame(1.0)
-		}
-	} else {
-		// MANUAL STEPPING via Window.step(...)
-		if w.stepper.active {
-			// w.state.fps_frame = u32(w.stepper.rate)
-			w.state.frame--
+				fixed_dt := 1 / w.stepper.rate
+				// rate_sim_sleep := i64((fixed_dt * 1000 * 1000) / (w.children.len + 1))
 
-			fixed_dt := 1 / w.stepper.rate
-			rate_sim_sleep := i64(fixed_dt * 1000 * 1000)
+				if w.stepper.step > 0 {
+					// time.sleep(rate_sim_sleep * time.microsecond) // TODO ??
 
-			if w.stepper.step > 0 {
-				time.sleep(rate_sim_sleep * time.microsecond) // TODO ??
+					w.stepper.step--
+					w.state.frame++
 
-				w.stepper.step--
-				w.state.frame++
-
-				w.fixed_update(fixed_dt)
-				ctx.fixed_update(fixed_dt)
-				w.variable_update(fixed_dt)
-				ctx.variable_update(fixed_dt)
+					w.fixed_update(fixed_dt)
+					ctx.fixed_update(fixed_dt)
+					w.variable_update(fixed_dt)
+					ctx.variable_update(fixed_dt)
+				}
+				w.state.in_frame_call = true
+				// TODO remove me again
+				s.scripts().on_frame(1.0)
+				ctx.frame(1.0)
 			}
-			w.state.in_frame_call = true
-			// TODO remove me again
-			s.scripts().on_frame(1.0)
-			ctx.frame(1.0)
 		}
+		ctx.frame_end()
+		w.end_frame()
 	}
-	ctx.frame_end()
-	w.end_frame()
 
 	for mut cw in w.children {
 		cw.render[T](mut ctx)
 	}
 }
 
-pub fn (mut w Window) variable_update(dt f64) {
+fn (mut w Window) variable_update(dt f64) {
 	w.timers.update(dt)
 	w.anims.update(dt)
+	if !w.immediate {
+		if w.timers.has_work() || w.anims.has_work() {
+			w.dirty()
+		}
+	}
 }
 
-pub fn (mut w Window) fixed_update(dt f64) {
+fn (mut w Window) fixed_update(dt f64) {
 }
 
 pub fn (mut w Window) end_frame() {

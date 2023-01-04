@@ -10,11 +10,11 @@ pub:
 	verbosity int
 	work_dir  string = work_directory
 	//
-	run          bool
-	export       bool
-	parallel     bool = true // Run, what can be run, in parallel
-	cache        bool // defaults to false in os.args/flag parsing phase
-	gles_version int  // = android.default_gles_version
+	run        bool
+	export     bool
+	parallel   bool = true // Run, what can be run, in parallel
+	cache      bool // defaults to false in os.args/flag parsing phase
+	gl_version int  // TODO = android.default_gl_version
 	// Detected environment
 	dump_usage bool
 pub mut:
@@ -109,7 +109,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 		libs_extra: fp.string_multi('libs', `a`, 'Lib dir(s) to include in build')
 		v_flags: fp.string_multi('flag', `f`, 'Additional flags for the V compiler')
 		c_flags: fp.string_multi('cflag', `c`, 'Additional flags for the C compiler')
-		gles_version: fp.int('gles', 0, defaults.gles_version, 'GLES version to use from any of 2,3')
+		gl_version: fp.int('gles', 0, defaults.gl_version, 'GLES version to use from any of 2,3')
 		//
 		run: 'run' in cmd_flags
 		export: 'export' in cmd_flags
@@ -154,7 +154,7 @@ pub fn (opt &Options) to_export_options() export.Options {
 		work_dir: os.join_path(opt.work_dir, 'export')
 		parallel: opt.parallel
 		cache: opt.cache
-		gles_version: opt.gles_version
+		gl_version: opt.gl_version
 		input: opt.input
 		output: opt.output
 		is_prod: opt.is_prod

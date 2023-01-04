@@ -57,11 +57,11 @@ pub:
 	verbosity int
 	work_dir  string = tmp_work_dir()
 	//
-	run          bool
-	parallel     bool = true // Run, what can be run, in parallel
-	compress     bool // Run upx if the host has it installed
-	cache        bool // defaults to false in os.args/flag parsing phase
-	gles_version int  // = android.default_gles_version
+	run        bool
+	parallel   bool = true // Run, what can be run, in parallel
+	compress   bool // Run upx if the host has it installed
+	cache      bool // defaults to false in os.args/flag parsing phase
+	gl_version int  // = android.default_gl_version
 pub mut:
 	// I/O
 	input   string
