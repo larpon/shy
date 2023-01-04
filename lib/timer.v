@@ -100,7 +100,7 @@ pub fn (mut s Shy) once(callback TimerFn, delay u64) {
 }
 
 // once executes `callback` `loops` times, when `delay` milliseconds has passed.
-// NOTE the timer system is not accurate.
+// NOTE the timer system depends on the refresh rate, so it is not accurate.
 pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 	s.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'Starting a timer in the frame call (usually called 60 times per second) is usually a bad idea')
 
@@ -117,6 +117,7 @@ fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
 	mut timer := &Timer{
 		shy: t.shy
 	}
+	timer.reset()
 	timer.config_update(config)
 	return timer
 }
@@ -125,6 +126,7 @@ pub fn (mut t Timers) new_timer(config TimerConfig) &Timer {
 	mut timer := &Timer(0) // unsafe { nil }
 	if t.pool.len > 0 {
 		timer = t.pool.pop()
+		timer.reset()
 		timer.config_update(config)
 	} else {
 		timer = t.p_new_timer(config)
@@ -202,16 +204,18 @@ fn (mut t Timer) ended() {
 	t.fire_event_fn(.end)
 	match t.loop {
 		.once {
-			t.reset()
+			// t.reset()
 		}
 		.loop {
 			if t.loops > 0 {
 				t.loops--
 				t.restart()
-			} else if t.loops == infinite {
+				// vfmt off
+			} else if t.loops == lib.infinite {
+				// vfmt on
 				t.restart()
 			} else {
-				t.reset()
+				// t.reset()
 			}
 		}
 	}

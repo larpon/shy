@@ -255,32 +255,36 @@ pub mut:
 
 struct Stepper {
 mut:
-	active bool
-	step   u16
-	rate   f32 = 60.0
+	step u16
+	rate f32 = 60.0
 }
 
 pub fn (mut s Stepper) reset() {
-	s.active = false
 	s.step = 0
 	s.rate = 60.0
 }
 
 pub fn (mut w Window) step(frames u16, rate f32) {
-	w.immediate = true
-	w.stepper.active = true
+	w.mode = .step
 	w.stepper.step = frames
 	w.stepper.rate = rate
 }
 
 pub fn (mut w Window) unstep() {
+	w.mode = .immediate
 	w.stepper.reset()
 }
 
-pub fn (mut w Window) dirty() {
-	if w.immediate {
+[params]
+pub struct WindowRefreshConfig {
+	sleep time.Duration
+}
+
+pub fn (mut w Window) refresh(wdc WindowRefreshConfig) {
+	if w.mode != .ui {
 		return
 	}
+	w.refresh_config = wdc
 	w.is_dirty = true
 }
 
@@ -359,6 +363,20 @@ fn new_shy_frame_record_config() &FrameRecordConfig {
 	}
 }
 
+pub enum WindowRenderMode {
+	immediate
+	ui
+	step
+}
+
+pub fn (wm WindowRenderMode) next() WindowRenderMode {
+	return match wm {
+		.immediate { .ui }
+		.ui { .step }
+		.step { .immediate }
+	}
+}
+
 // Window
 [heap]
 pub struct Window {
@@ -368,21 +386,22 @@ pub struct Window {
 pub:
 	id u32
 mut:
-	ready    bool
-	is_dirty bool    = true // TODO
-	parent   &Window = null
-	children []&Window
-	anims    &Anims  = null
-	timers   &Timers = null
-	stepper  Stepper
+	ready          bool
+	is_dirty       bool    = true // TODO
+	parent         &Window = null
+	children       []&Window
+	anims          &Anims  = null
+	timers         &Timers = null
+	stepper        Stepper
+	refresh_config WindowRefreshConfig
 	// SDL / GL
 	handle     &sdl.Window = null
 	gl_context sdl.GLContext
 	// id of GFX/Context this window has been given
 	gfx u32
 pub mut:
-	state     FrameState
-	immediate bool = true // TODO
+	state FrameState
+	mode  WindowRenderMode
 }
 
 pub fn (w &Window) find_window(id u32) ?&Window {
@@ -474,7 +493,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 	now := s.ticks()
 
 	// count fps in 1 sec (1000 ms)
-	if w.immediate && now >= w.state.fps_timer + 1000 {
+	if w.mode == .immediate && now >= w.state.fps_timer + 1000 {
 		w.state.fps_timer = now
 		w.state.fps_snapshot = w.state.fps_frame // - 1
 		w.state.fps_frame = 0
@@ -535,30 +554,34 @@ pub fn (mut w Window) render[T](mut ctx T) {
 
 	fixed_deltatime := w.state.fixed_deltatime
 
+	// TODO the rendering internals is messy, should be cleaned up
+	//
 	// non-immediate mode / GUI mode
-	// rendering is only done if w.dirty() is called.
-	// All this should probably also be in the stepper
-	// TODO the internals is messy, should be cleaned up
-	// Especially multi-window support and "vsync == .off" is broken - maybe have
-	// Shy orchestrate the update of each window instead?
-	if !w.immediate {
+	// rendering is only done if w.refresh() is called.
+	// All this should probably also be in the stepper?
+	// Make Shy orchestrate the update of each window instead?
+	if w.mode == .ui {
 		fixed_dt := 1 / w.state.update_rate
-		rate_sim_sleep := i64((fixed_dt * 1000 * 1000) / (w.children.len + 1))
-
-		vsync := w.config.render.vsync
 
 		w.state.fps_frame--
 		w.state.frame--
 
-		do_sleep := !w.is_dirty
+		if w.refresh_config.sleep == 0 {
+			w.begin_frame()
+			ctx.frame_begin()
+		}
+
+		// do_sleep := !w.is_dirty
 		if w.is_dirty {
 			w.is_dirty = false
 
-			w.begin_frame()
-			ctx.frame_begin()
-
 			w.state.fps_frame++
 			w.state.frame++
+
+			if w.refresh_config.sleep > 0 {
+				w.begin_frame()
+				ctx.frame_begin()
+			}
 
 			if now >= w.state.fps_timer + 1000 {
 				w.state.fps_timer = now
@@ -571,8 +594,18 @@ pub fn (mut w Window) render[T](mut ctx T) {
 			w.variable_update(fixed_dt)
 			ctx.variable_update(fixed_dt)
 
-			w.state.in_frame_call = true
+			if w.refresh_config.sleep > 0 {
+				w.state.in_frame_call = true
+				// TODO remove me again
+				s.scripts().on_frame(1.0)
+				ctx.frame(1.0)
+				ctx.frame_end()
+				w.end_frame()
+			}
+		}
 
+		if w.refresh_config.sleep == 0 {
+			w.state.in_frame_call = true
 			// TODO remove me again
 			s.scripts().on_frame(1.0)
 			ctx.frame(1.0)
@@ -580,19 +613,13 @@ pub fn (mut w Window) render[T](mut ctx T) {
 			w.end_frame()
 		}
 
-		if vsync != .off && do_sleep && !w.is_dirty {
-			sleep_for := rate_sim_sleep * time.microsecond
-			// for _ in 0 .. 10 {
-			//	if w.is_dirty {
-			//		break
-			//	}
-			time.sleep(sleep_for) // TODO ??
-			//}
+		if w.refresh_config.sleep > 0 {
+			time.sleep(w.refresh_config.sleep) // TODO ??
 		}
 	} else {
 		w.begin_frame()
 		ctx.frame_begin()
-		if !w.stepper.active {
+		if w.mode == .immediate {
 			// UNLOCKED FRAMERATE, INTERPOLATION ENABLED
 			if !w.state.lock_framerate {
 				mut consumed_delta_time := delta_time
@@ -648,7 +675,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 			}
 		} else {
 			// MANUAL STEPPING via Window.step(...)
-			if w.stepper.active {
+			if w.mode == .step {
 				// w.state.fps_frame = u32(w.stepper.rate)
 				w.state.frame--
 
@@ -684,9 +711,9 @@ pub fn (mut w Window) render[T](mut ctx T) {
 fn (mut w Window) variable_update(dt f64) {
 	w.timers.update(dt)
 	w.anims.update(dt)
-	if !w.immediate {
+	if w.mode == .ui {
 		if w.timers.has_work() || w.anims.has_work() {
-			w.dirty()
+			w.refresh()
 		}
 	}
 }

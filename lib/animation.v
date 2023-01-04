@@ -284,6 +284,7 @@ fn (mut a Animator[T]) ended() {
 	match a.loop {
 		.once {
 			a.running = false
+			a.value = a.to
 			// a.reset()
 		}
 		.loop {
@@ -294,6 +295,7 @@ fn (mut a Animator[T]) ended() {
 				a.restart()
 			} else {
 				a.running = false
+				a.value = a.to
 				// a.reset()
 			}
 		}
@@ -307,6 +309,7 @@ fn (mut a Animator[T]) ended() {
 				a.restart()
 			} else {
 				a.running = false
+				a.value = a.to
 				// a.reset()
 			}
 		}
