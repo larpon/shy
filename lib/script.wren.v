@@ -175,7 +175,7 @@ pub fn (mut w WrenVM) eval2[T](wren_code string) ! {
 }
 
 pub fn wren_lookup_user(vm &wren.VM, mod string, class string, is_static bool, sig string) wren.ForeignMethodFn {
-	w := &WrenVM(vm.get_user_data())
+	w := unsafe { &WrenVM(vm.get_user_data()) }
 	assert !isnil(w), 'WrenVM is nil'
 	// s := &Shy(w.shy)
 	// assert !isnil(s), 'Shy is nil'
@@ -205,7 +205,7 @@ pub fn wren_lookup_user(vm &wren.VM, mod string, class string, is_static bool, s
 }
 
 fn wren_fn_user_call(vm &wren.VM) {
-	w := &WrenVM(vm.get_user_data())
+	w := unsafe { &WrenVM(vm.get_user_data()) }
 	assert !isnil(w), 'WrenVM is nil'
 	s := &Shy(w.shy)
 	assert !isnil(s), 'Shy is nil'
@@ -296,7 +296,7 @@ pub fn (mut w WrenVM) to_wren<T>(config WrenConvertConfig) ! {
 fn wren_write_fn(vm &wren.VM, const_text &char) {
 	msg := wren_c2v_string(const_text).trim_space()
 
-	w := &WrenVM(vm.get_user_data())
+	w := unsafe { &WrenVM(vm.get_user_data()) }
 	assert !isnil(w), 'WrenVM is nil'
 	s := w.shy
 	assert !isnil(s), 'Shy is nil'
@@ -327,7 +327,7 @@ fn wren_c2v_string(ch_ptr &char) string {
 fn wren_error_fn(vm &wren.VM, error_type wren.ErrorType, const_module &char, const_line int, const_msg &char) {
 	mod := wren_c2v_string(const_module).trim_space()
 	msg := wren_c2v_string(const_msg).trim_space()
-	w := &WrenVM(vm.get_user_data())
+	w := unsafe { &WrenVM(vm.get_user_data()) }
 	assert !isnil(w), 'WrenVM is nil'
 	s := w.shy
 	assert !isnil(s), 'Shy is nil'
@@ -444,7 +444,7 @@ fn wren_bind_foreign_method(vm &wren.VM, const_module &char, const_class_name &c
 }
 
 fn wren_fn_shy_log(vm &wren.VM) {
-	w := &WrenVM(vm.get_user_data())
+	w := unsafe { &WrenVM(vm.get_user_data()) }
 	assert !isnil(w), 'WrenVM is nil'
 	s := w.shy
 	assert !isnil(s), 'Shy is nil'
@@ -457,7 +457,7 @@ fn wren_fn_shy_log(vm &wren.VM) {
 }
 
 fn wren_fn_shy_sleep(vm &wren.VM) {
-	w := &WrenVM(vm.get_user_data())
+	w := unsafe { &WrenVM(vm.get_user_data()) }
 	assert !isnil(w), 'WrenVM is nil'
 	s := w.shy
 	assert !isnil(s), 'Shy is nil'
