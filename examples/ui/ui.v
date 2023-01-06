@@ -19,20 +19,19 @@ mut:
 	ui &ui.UI = shy.null
 }
 
-pub struct MyUIItem {
+struct MyUIItem {
 	ui.EventArea
 }
 
-pub fn (m &MyUIItem) parent() &ui.Node {
+fn (m &MyUIItem) parent() &ui.Node {
 	return m.EventArea.parent()
 }
 
-pub fn (m &MyUIItem) draw(ui &ui.UI) {
+fn (m &MyUIItem) draw(ui &ui.UI) {
 	m.EventArea.draw(ui)
 }
 
-pub fn (m &MyUIItem) event(e ui.Event) ?&ui.Node {
-	println('I received an event!')
+fn (m &MyUIItem) event(e ui.Event) ?&ui.Node {
 	return m.EventArea.event(e)
 }
 
@@ -61,15 +60,14 @@ pub fn (mut a App) init() ! {
 						width: 25
 						height: 25
 						body: [
-							/*
 							&MyUIItem{
 								on_event: [
 									fn (e ui.Event) bool {
-										println('MyUIItem on_event was called')
+										// println('MyUIItem on_event was called')
 										return true
 									},
 								]
-							}*/
+							},
 						]
 					},
 				]

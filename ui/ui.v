@@ -10,6 +10,7 @@ pub type ID = int | string | u64
 
 // pub const no_node = &Node(Item{}) // TODO
 
+// new returns a new UI instance located on the heap.
 pub fn new(config UIConfig) !&UI {
 	mut u := &UI{
 		shy: config.shy
@@ -93,6 +94,7 @@ pub fn (u UI) new[T](t T) &T {
 }
 */
 
+// find returns `T` with an id matching `n_id` or `none`.
 pub fn (u &UI) find[T](n_id u64) ?&T {
 	if u.root == unsafe { nil } {
 		return none
@@ -157,12 +159,14 @@ pub fn (i &Item) parent() &Node {
 	return i.parent
 }
 
+// draw draws the `Item` and/or any child nodes.
 pub fn (i &Item) draw(ui &UI) {
 	for child in i.body {
 		child.draw(ui)
 	}
 }
 
+// event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (i &Item) event(e Event) ?&Node {
 	// By sending the event on to the children nodes
 	// it's effectively *bubbling* the event upwards in the
@@ -197,10 +201,12 @@ pub struct Rectangle {
 	Item
 }
 
+// parent returns the parent Node.
 pub fn (r &Rectangle) parent() &Node {
 	return r.Item.parent()
 }
 
+// draw draws the `Item` and/or any child nodes.
 pub fn (r &Rectangle) draw(ui &UI) {
 	// println('${@STRUCT}.${@FN} ${ptr_str(r)}')
 	// println('${@STRUCT}.${@FN} ${r}')
@@ -215,6 +221,7 @@ pub fn (r &Rectangle) draw(ui &UI) {
 	r.Item.draw(ui)
 }
 
+// event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (r &Rectangle) event(e Event) ?&Node {
 	return r.Item.event(e)
 }
@@ -223,14 +230,17 @@ pub struct EventArea {
 	Item
 }
 
+// parent returns the parent Node.
 pub fn (ea &EventArea) parent() &Node {
 	return ea.Item.parent()
 }
 
+// draw draws the `Item` and/or any child nodes.
 pub fn (ea &EventArea) draw(ui &UI) {
 	ea.Item.draw(ui)
 }
 
+// event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (ea &EventArea) event(e Event) ?&Node {
 	return ea.Item.event(e)
 }
