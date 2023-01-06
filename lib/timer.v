@@ -40,7 +40,7 @@ pub fn (mut t Timers) init() ! {
 	}
 }
 
-pub fn (t &Timers) has_work() bool {
+pub fn (t &Timers) active() bool {
 	// t.running &&
 	return !t.paused && t.active.len > 0
 }

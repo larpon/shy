@@ -712,8 +712,8 @@ fn (mut w Window) variable_update(dt f64) {
 	w.timers.update(dt)
 	w.anims.update(dt)
 	if w.mode == .ui {
-		if w.timers.has_work() || w.anims.has_work() {
-			w.refresh()
+		if w.timers.active() || w.anims.active() {
+			w.refresh(w.refresh_config)
 		}
 	}
 }

@@ -52,7 +52,7 @@ pub fn (mut a Anims) init() ! {
 	}
 }
 
-pub fn (a &Anims) has_work() bool {
+pub fn (a &Anims) active() bool {
 	// a.running &&
 	return !a.paused && a.active.len > 0
 }
