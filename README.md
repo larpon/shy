@@ -15,18 +15,19 @@ Windows, macOS, Linux, Raspberry PI, Android and likely many many more
 
 * Get your creative ideas quickly up and running.
 * Rich examples directory.
-* Easy project export via the `shy export` command.
-* Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module with support for *custom* UI items.
+* Live coding and runtime experimenting via V's `-live` flag.
 * Neat animation and timer system - built right in.
 * Easy timers with `shy.once(...)` or `shy.every(...)` (supports closures!).
 * 2D shape drawing with several levels, layers of control and performance.
 * 2D shape collision detection.
 * 3D capable (via `sokol_gfx.h`)
 * Multiple render modes (immediate, UI, step).
-* Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
-music, sounds etc.
 * Fairly sub-system agnostic. Bring your own ECS, physics engine etc.
-* Designed to support multiple, replaceable and diverse backend/core systems (within V's limits).
+* [WIP] Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
+music, sounds etc.
+* [WIP] Export to different platforms via the `shy export` command.
+* [WIP] Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module with support for *custom* UI items.
+* [WIP] ... much more :)
 
 # Install
 
