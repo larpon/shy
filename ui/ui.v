@@ -121,7 +121,7 @@ pub struct Item {
 pub:
 	id u64
 mut:
-	parent &Node // = unsafe { nil } // TODO crash and burn
+	parent &Node = unsafe { nil } // TODO crash and burn
 	body   []&Node
 }
 
