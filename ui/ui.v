@@ -52,17 +52,16 @@ fn (mut u UI) init() ! {
 	})
 }
 
-/*
-pub fn id(cid ID) !u64 {
-	//unsafe { u.uiid++ }
-	sb := cid.str().bytes()
-
-	// unsafe { u.id_map[1] = u.uiid }
-	beid := binary.big_endian_u64(sha256.sum(sb))
-	println(sha256.sum(sb).len)
-	println(beid)
-	return beid //u.uiid
-}*/
+// pub fn id(cid ID) !u64 {
+// 	//unsafe { u.uiid++ }
+// 	sb := cid.str().bytes()
+//
+// 	// unsafe { u.id_map[1] = u.uiid }
+// 	beid := binary.big_endian_u64(sha256.sum(sb))
+// 	println(sha256.sum(sb).len)
+// 	println(beid)
+// 	return beid //u.uiid
+// }
 
 // collect collects all nodes where `filter(node)` returns `true`.
 pub fn (u UI) collect(filter fn (n &Node) bool) []&Node {
@@ -86,13 +85,11 @@ pub fn (mut u UI) visit(func fn (mut n Node)) {
 	}
 }
 
-/*
-pub fn (u UI) new[T](t T) &T {
-	return &T{
-		...t
-	}
-}
-*/
+// pub fn (u UI) new[T](t T) &T {
+// 	return &T{
+// 		...t
+// 	}
+// }
 
 // find returns `T` with an id matching `n_id` or `none`.
 pub fn (u &UI) find[T](n_id u64) ?&T {
