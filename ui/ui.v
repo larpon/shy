@@ -27,7 +27,7 @@ pub struct UIConfig {
 	root &Node
 }
 
-[noinit]
+[heap; noinit]
 pub struct UI {
 	shy.ShyStruct
 mut:
@@ -37,20 +37,16 @@ mut:
 	//
 	// uiid u64
 	// id_map map[u64]u64
-	event_listeners []&Node
 }
 
+// init initializes the UI.
 fn (mut u UI) init() ! {
 	u.root.parent = shy.null
 
-	// Traverse the tree via BFS and set all `parent` fields
-	u.visit(fn [mut u] (mut n Node) {
+	// Traverse the tree, root to leaves, set all `parent` fields
+	u.visit(fn (mut n Node) {
 		for mut node in n.body {
 			node.parent = unsafe { n }
-		}
-
-		if mut n is EventArea {
-			u.event_listeners << n
 		}
 	})
 }
@@ -67,7 +63,8 @@ pub fn id(cid ID) !u64 {
 	return beid //u.uiid
 }*/
 
-pub fn (mut u UI) collect(filter fn (n &Node) bool) []&Node {
+// collect collects all nodes where `filter(node)` returns `true`.
+pub fn (u UI) collect(filter fn (n &Node) bool) []&Node {
 	mut nodes := []&Node{}
 	if u.root == unsafe { nil } {
 		return nodes
@@ -76,6 +73,8 @@ pub fn (mut u UI) collect(filter fn (n &Node) bool) []&Node {
 	return nodes
 }
 
+// visit traverses the scene graph via BFS (Breath-First search).
+// visit allows modifying the visited `Node` via `func`.
 pub fn (mut u UI) visit(func fn (mut n Node)) {
 	if u.root == unsafe { nil } {
 		return
@@ -94,12 +93,35 @@ pub fn (u UI) new[T](t T) &T {
 }
 */
 
+pub fn (u &UI) find[T](n_id u64) ?&T {
+	if u.root == unsafe { nil } {
+		return none
+	}
+	// TODO lookup from cache first
+	nodes := u.collect(fn [n_id] (n &Node) bool {
+		if n.id == n_id {
+			// println('${n_id}')
+			return true
+		}
+		return false
+	})
+	if nodes.len > 0 {
+		node := nodes[0]
+		if node is T {
+			return node
+		}
+	}
+	return none
+}
+
+// shutdown shutdown the UI.
 pub fn (mut u UI) shutdown() ! {
 	// TODO memory leak en-masse
 	// u.root.free()
 	// unsafe { free(u.root) }
 }
 
+// draw draws the current frame of the UI's state.
 pub fn (u &UI) draw(dt f64) {
 	unsafe {
 		u.dt = dt
@@ -107,26 +129,31 @@ pub fn (u &UI) draw(dt f64) {
 	u.root.draw(u)
 }
 
+// event sends `event` to relevant node event handlers in the UI.
 pub fn (u &UI) event(e Event) ?&Node {
-	for el in u.event_listeners {
-		if node := el.event(e) {
-			return node
-		}
-	}
-	return none
+	// Start event bubbling
+	return u.root.event(e)
 }
 
+pub type OnEventFn = fn (event Event) bool
+
+// Item is the base type for all UI elements.
+// By embedding `Item` in a struct - the struct fulfills
+// the `Node` interface required for a type to be an UI item.
 pub struct Item {
 	shy.Rect
 pub:
 	id u64
 mut:
-	parent &Node = unsafe { nil } // TODO crash and burn
-	body   []&Node
+	parent   &Node = unsafe { nil } // TODO crash and burn
+	body     []&Node
+	on_event []OnEventFn
 }
 
+// parent returns this `Item`'s parent.
 pub fn (i &Item) parent() &Node {
 	assert i != unsafe { nil }
+	// TODO not possible currently: if isnil(i.parent) { return none }
 	return i.parent
 }
 
@@ -137,6 +164,22 @@ pub fn (i &Item) draw(ui &UI) {
 }
 
 pub fn (i &Item) event(e Event) ?&Node {
+	// By sending the event on to the children nodes
+	// it's effectively *bubbling* the event upwards in the
+	// tree / scene graph
+	for child in i.body {
+		if node := child.event(e) {
+			return node
+		}
+	}
+	for on_event in i.on_event {
+		assert !isnil(on_event)
+		// If `on_event` returns true, it means
+		// a listener on *this* item has accepted the event
+		if on_event(e) {
+			return i
+		}
+	}
 	return none
 }
 
@@ -173,7 +216,7 @@ pub fn (r &Rectangle) draw(ui &UI) {
 }
 
 pub fn (r &Rectangle) event(e Event) ?&Node {
-	return none
+	return r.Item.event(e)
 }
 
 pub struct EventArea {
@@ -189,16 +232,5 @@ pub fn (ea &EventArea) draw(ui &UI) {
 }
 
 pub fn (ea &EventArea) event(e Event) ?&Node {
-	match e {
-		KeyEvent {
-			match e.key_code {
-				.l {
-					return ea
-				}
-				else {}
-			}
-		}
-		else {}
-	}
-	return none
+	return ea.Item.event(e)
 }

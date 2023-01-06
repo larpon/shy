@@ -3,6 +3,8 @@
 // that can be found in the LICENSE file.
 module lib
 
+import shy.analyse
+
 type TimerEventFn = fn (TimerEvent)
 
 type TimerFn = fn ()
@@ -36,6 +38,7 @@ pub fn (mut t Timers) init() ! {
 	// unsafe { t.f64_pool.flags.set(.noslices | .noshrink) }
 	for i := 0; i < prealloc; i++ {
 		t.pool << t.p_new_timer()
+		analyse.count('${@STRUCT}_preallocate', 1)
 		// t.f64_pool << t.p_new_timer<f64>()
 	}
 }
@@ -92,6 +95,7 @@ pub fn (mut s Shy) new_timer(config TimerConfig) &Timer {
 // NOTE the timer system is not accurate.
 pub fn (mut s Shy) once(callback TimerFn, delay u64) {
 	s.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'Starting a timer in the frame call (usually called 60 times per second) is usually a bad idea')
+	analyse.count('${@STRUCT}.${@FN}', 1)
 
 	s.new_timer(
 		duration: delay
@@ -103,6 +107,7 @@ pub fn (mut s Shy) once(callback TimerFn, delay u64) {
 // NOTE the timer system depends on the refresh rate, so it is not accurate.
 pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 	s.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'Starting a timer in the frame call (usually called 60 times per second) is usually a bad idea')
+	analyse.count('${@STRUCT}.${@FN}', 1)
 
 	s.new_timer(
 		loop: .loop
@@ -114,6 +119,7 @@ pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 
 fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
 	t.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	analyse.count('${@STRUCT}.${@FN}', 1)
 	mut timer := &Timer{
 		shy: t.shy
 	}

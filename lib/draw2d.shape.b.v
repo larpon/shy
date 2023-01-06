@@ -3,6 +3,7 @@
 // that can be found in the LICENSE file.
 module lib
 
+import shy.analyse
 import shy.vec { Vec2 }
 import shy.mth
 import math
@@ -141,6 +142,8 @@ pub fn (r DrawShape2DRect) draw() {
 		gl.v2f((sx + w), sy)
 		gl.v2f((sx + w), (sy + h))
 		gl.v2f(sx, (sy + h))
+		analyse.count('${@STRUCT}.${@FN}/vertices', 4)
+		analyse.count('total_vertices', 4)
 		gl.end()
 	}
 	if r.fills.has(.outline) {
@@ -175,6 +178,8 @@ pub fn (r DrawShape2DRect) draw() {
 				//
 				gl.v2f(sx + 0.5, (sy + 0.5 + h - 1))
 				gl.v2f(sx + 0.5, sy + 0.5)
+				analyse.count('${@STRUCT}.${@FN}/vertices', 8)
+				analyse.count('total_vertices', 8)
 			} else {
 				gl.v2f(sx, sy)
 				gl.v2f((sx + w), sy)
@@ -184,6 +189,8 @@ pub fn (r DrawShape2DRect) draw() {
 				gl.v2f(sx, (sy + h))
 				//
 				gl.v2f(sx, sy)
+				analyse.count('${@STRUCT}.${@FN}/vertices', 5)
+				analyse.count('total_vertices', 5)
 			}
 			gl.end()
 		}
@@ -292,11 +299,15 @@ pub fn (l DrawShape2DLineSegment) draw() {
 		gl.v2f(br_x, br_y)
 		gl.v2f(bl_x, bl_y)
 		gl.end()
+		analyse.count('${@STRUCT}.${@FN}/vertices', 4)
+		analyse.count('total_vertices', 4)
 	} else {
 		gl.begin_line_strip()
 		gl.v2f(x1_, y1_)
 		gl.v2f(x2_, y2_)
 		gl.end()
+		analyse.count('${@STRUCT}.${@FN}/vertices', 2)
+		analyse.count('total_vertices', 2)
 	}
 
 	// gl.translate(-f32(x), -f32(y), 0)
@@ -393,7 +404,8 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 			gl.v2f(px, py)
 			gl.v2f(xx + sx, yy + sy)
 			gl.v2f(sx, sy)
-
+			analyse.count('${@STRUCT}.${@FN}/vertices', 3)
+			analyse.count('total_vertices', 3)
 			px = xx + sx
 			py = yy + sy
 		}
@@ -432,6 +444,8 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 
 				gl.v2f(px, py)
 				gl.v2f(xx, yy)
+				analyse.count('${@STRUCT}.${@FN}/vertices', 2)
+				analyse.count('total_vertices', 2)
 
 				px = xx + sx
 				py = yy + sy
@@ -467,6 +481,8 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 		gl.begin_line_strip()
 		gl.v2f(x1, y1)
 		gl.v2f(x2, y2)
+		analyse.count('${@MOD}.${@FN}/vertices', 2)
+		analyse.count('total_vertices', 2)
 		gl.end()
 		return
 	}
@@ -508,6 +524,8 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 		gl.v2f(vpp_x, vpp_y)
 		gl.v2f(t2r_x, t2r_y)
 		gl.v2f(t2_x, t2_y)
+		analyse.count('${@MOD}.${@FN}/vertices', 12)
+		analyse.count('total_vertices', 12)
 		gl.end()
 	} else if connect == .bevel {
 		gl.begin_triangles()
@@ -530,6 +548,9 @@ fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 		gl.v2f(vpp_x, vpp_y)
 		gl.v2f(t2_x, t2_y)
 		gl.v2f(t2r_x, t2r_y)
+
+		analyse.count('${@MOD}.${@FN}/vertices', 15)
+		analyse.count('total_vertices', 15)
 		gl.end()
 
 		/*

@@ -7,6 +7,7 @@ import os
 import sdl
 import time
 import shy.mth
+import shy.analyse
 // import shy.wraps.sokol.gfx
 
 // Some code found from
@@ -189,6 +190,7 @@ pub fn (mut wm WM) shutdown() ! {
 }
 
 fn (mut wm WM) new_window(config WindowConfig) !&Window {
+	analyse.count('${@STRUCT}.${@FN}', 1)
 	s := wm.shy
 
 	mut window_flags := u32(sdl.WindowFlags.hidden)
@@ -284,6 +286,7 @@ pub fn (mut w Window) refresh(wdc WindowRefreshConfig) {
 	if w.mode != .ui {
 		return
 	}
+	analyse.count('${@STRUCT}(${w.id}).${@FN}', 1)
 	w.refresh_config = wdc
 	w.is_dirty = true
 }
@@ -733,6 +736,7 @@ pub fn (mut w Window) end_frame() {
 
 pub fn (w &Window) swap() {
 	sdl.gl_swap_window(w.handle)
+	analyse.count('${@STRUCT}(${w.id}).${@FN}', 1)
 }
 
 pub fn (w Window) is_root() bool {

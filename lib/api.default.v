@@ -4,6 +4,7 @@
 module lib
 
 import time
+import shy.analyse
 
 // ShyAPI is the *default* API implementation.
 // The methods and members define what sub-systems
@@ -202,6 +203,10 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 			time.sleep(1 * time.second)
 			s.timer.restart()
 			continue
+		}
+		$if shy_analyse ? {
+			t := T{}
+			analyse.count('${@STRUCT}.${@FN}[${typeof(t).name}].running', 1)
 		}
 
 		// Process events

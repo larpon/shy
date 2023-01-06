@@ -19,6 +19,23 @@ mut:
 	ui &ui.UI = shy.null
 }
 
+pub struct MyUIItem {
+	ui.EventArea
+}
+
+pub fn (m &MyUIItem) parent() &ui.Node {
+	return m.EventArea.parent()
+}
+
+pub fn (m &MyUIItem) draw(ui &ui.UI) {
+	m.EventArea.draw(ui)
+}
+
+pub fn (m &MyUIItem) event(e ui.Event) ?&ui.Node {
+	println('I received an event!')
+	return m.EventArea.event(e)
+}
+
 [markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
@@ -43,6 +60,17 @@ pub fn (mut a App) init() ! {
 						y: 0
 						width: 25
 						height: 25
+						body: [
+							/*
+							&MyUIItem{
+								on_event: [
+									fn (e ui.Event) bool {
+										println('MyUIItem on_event was called')
+										return true
+									},
+								]
+							}*/
+						]
 					},
 				]
 			},
@@ -52,6 +80,15 @@ pub fn (mut a App) init() ! {
 				y: 50
 				width: 50
 				height: 50
+				on_event: [
+					fn [mut a] (e ui.Event) bool {
+						ea := a.ui.find[ui.EventArea](100) or { return false }
+						mut mea := unsafe { ea }
+						// println('EventArea ${mea.id} found')
+						mea.x += 1
+						return true
+					},
+				]
 			},
 		]
 	}
@@ -70,14 +107,14 @@ pub fn (mut a App) frame(dt f64) {
 
 [markused]
 pub fn (mut a App) event(e shy.Event) {
+	a.ExampleApp.event(e)
 	a.window.refresh() // In case we're running in UI mode signal that we want the screen to be re-drawn on next frame.
 
 	ui_event := ui.shy_to_ui_event(e) or { panic('${@STRUCT}.${@FN}: ${err}') }
-	if handled_by_node := a.ui.event(ui_event) {
+	if _ := a.ui.event(ui_event) {
 		// printing the whole node will make things crash at runtime...
-		println('Event was handled by ui.Node.id(${handled_by_node.id})')
+		// println('Event was handled by ui.Node.id(${handled_by_node.id})')
 	} else {
-		a.ExampleApp.event(e)
 	}
 
 	// Mutability test
@@ -90,8 +127,10 @@ pub fn (mut a App) event(e shy.Event) {
 					n.x = 200
 				}
 			}
+			// pid := n.parent() or { 0 }.id
 			// pid := n.parent().id
 			if n.id == 43 {
+				// ppid := n.parent() or { 0 }.id
 				// ppid := n.parent().id
 				// println('${pid} vs. ${ppid}')
 			}

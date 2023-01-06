@@ -5,6 +5,7 @@ module lib
 
 import shy.utils
 import shy.ease
+import shy.analyse
 import mth
 
 pub const infinite = -1
@@ -121,6 +122,10 @@ pub fn (mut s Shy) new_follow_animator[T](config FollowAnimatorConfig) &FollowAn
 
 fn (mut a Anims) p_new_animator[T](config AnimatorConfig) &Animator[T] {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	$if shy_analyse ? {
+		t := T{}
+		analyse.count('${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
+	}
 	mut animator := &Animator[T]{
 		shy: a.shy
 		// TODO BUG ...config <- doesn't work for generics
@@ -131,11 +136,15 @@ fn (mut a Anims) p_new_animator[T](config AnimatorConfig) &Animator[T] {
 
 fn (mut a Anims) p_new_follow_animator[T](config FollowAnimatorConfig) &FollowAnimator[T] {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	$if shy_analyse ? {
+		t := T{}
+		analyse.count('${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
+	}
 	mut animator := &FollowAnimator[T]{
 		shy: a.shy
 		// TODO BUG ...config <- doesn't work for generics
 	}
-	animator.reset()
+	// animator.reset()
 	animator.config_update(config)
 	return animator
 }
