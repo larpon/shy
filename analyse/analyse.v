@@ -22,7 +22,7 @@ mut:
 // increase it's value by `amount`.
 [if shy_analyse ?]
 pub fn count[T](key string, amount T) {
-	mut a := unsafe { analyse.hack }
+	mut a := unsafe { analyse.hack } // TODO
 	$if T is int {
 		a.entries[key] = '${a.entries[key].int() + amount}'
 	} $else $if T is f32 {
