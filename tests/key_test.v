@@ -19,7 +19,7 @@ fn test_keycode_from_string() {
 fn test_keycode_name() {
 	mut kc := shy.KeyCode{}
 
-	assert shy.keycode_name(kc) == 'unknown'
+	assert kc.name() == 'unknown'
 	kc = .kp_0
-	assert shy.keycode_name(kc) == 'keypad 0'
+	assert kc.name() == 'keypad 0'
 }

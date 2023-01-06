@@ -521,8 +521,8 @@ pub fn keycode_from_string(key_str string) KeyCode {
 	}
 }
 
-pub fn keycode_name(key_code KeyCode) string {
-	return match key_code {
+pub fn (kc KeyCode) name() string {
+	return match kc {
 		.unknown { 'unknown' }
 		.@return { 'return' }
 		.escape { 'escape' }
