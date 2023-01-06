@@ -3,7 +3,8 @@
 // that can be found in the LICENSE file.
 module lib
 
-//
+import analyse
+
 pub enum ButtonState {
 	up
 	down
@@ -57,6 +58,7 @@ pub fn (mut e Events) push(ev Event) ! {
 		return error('${@STRUCT}.${@FN}: pushing unknown events is not allowed')
 	}
 	if e.queue.len < e.queue.cap {
+		analyse.count('${@STRUCT}.${@FN}', 1)
 		e.queue << ev
 		return
 	}

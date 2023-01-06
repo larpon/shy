@@ -257,6 +257,14 @@ jobs:
         for example in "${shy_examples[@]}"; do
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
         done
+        echo "Compiling shy examples with "-d shy_analyse" ${shy_examples[@]}"
+        for example in "${shy_examples[@]}"; do
+          v -d sdl_no_compile_flags -d shy_analyse ~/.vmodules/shy/examples/$example
+        done
+        echo "Compiling shy examples with "-d shy_vet" ${shy_examples[@]}"
+        for example in "${shy_examples[@]}"; do
+          v -d sdl_no_compile_flags -d shy_vet ~/.vmodules/shy/examples/$example
+        done
 
   sdl-branch-versions:
     runs-on: ${{ matrix.os }}

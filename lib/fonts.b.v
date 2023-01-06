@@ -6,6 +6,7 @@
 module lib
 
 import os
+import shy.analyse
 import shy.wraps.fontstash
 import shy.wraps.sokol.sfons
 // import shy.wraps.sokol.gl
@@ -36,7 +37,7 @@ mut:
 
 pub fn (mut fs Fonts) load_font(name string, path string) ! {
 	fs.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-
+	analyse.count('${@STRUCT}.${@FN} ${name}', 1)
 	if bytes := os.read_bytes(path) {
 		fs.font_data[name] = bytes
 		fs.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded ${name}: "${path}"')

@@ -5,6 +5,7 @@ module lib
 
 import time
 import shy.log { Log }
+import shy.analyse
 
 pub const null = unsafe { nil }
 
@@ -101,6 +102,7 @@ pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.api.shutdown()!
 	s.log.shutdown()!
+	analyse.eprintln_report() // $if shy_analyse ?
 }
 
 // new returns a new, initialized, `Shy` struct allocated in heap memory.
