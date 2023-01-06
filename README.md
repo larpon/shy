@@ -9,7 +9,11 @@ The `shy` project works both as a V module and a standalone CLI tool.
 
 # Targets
 
-Windows, macOS, Linux, Raspberry PI, Android and likely many many more
+Please note that export and developing/building/running from some
+of these platforms are still work-in-progress, but we aim to support
+a wide range of targets like the following:
+
+Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely more.
 
 # Highlights
 
