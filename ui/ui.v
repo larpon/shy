@@ -8,8 +8,6 @@ import shy.easy
 
 pub type ID = int | string | u64
 
-// pub const no_node = &Node(Item{}) // TODO
-
 // new returns a new UI instance located on the heap.
 pub fn new(config UIConfig) !&UI {
 	mut u := &UI{
@@ -96,7 +94,7 @@ pub fn (u &UI) find[T](n_id u64) ?&T {
 	if u.root == unsafe { nil } {
 		return none
 	}
-	// TODO lookup from cache first
+	// TODO this can be made faster, e.g. lookup from cache
 	nodes := u.collect(fn [n_id] (n &Node) bool {
 		if n.id == n_id {
 			// println('${n_id}')
@@ -132,112 +130,4 @@ pub fn (u &UI) draw(dt f64) {
 pub fn (u &UI) event(e Event) ?&Node {
 	// Start event bubbling
 	return u.root.event(e)
-}
-
-pub type OnEventFn = fn (event Event) bool
-
-// Item is the base type for all UI elements.
-// By embedding `Item` in a struct - the struct fulfills
-// the `Node` interface required for a type to be an UI item.
-pub struct Item {
-	shy.Rect
-pub:
-	id u64
-mut:
-	parent   &Node = unsafe { nil } // TODO crash and burn
-	body     []&Node
-	on_event []OnEventFn
-}
-
-// parent returns this `Item`'s parent.
-pub fn (i &Item) parent() &Node {
-	assert i != unsafe { nil }
-	// TODO not possible currently: if isnil(i.parent) { return none }
-	return i.parent
-}
-
-// draw draws the `Item` and/or any child nodes.
-pub fn (i &Item) draw(ui &UI) {
-	for child in i.body {
-		child.draw(ui)
-	}
-}
-
-// event sends an `Event` any child nodes and/or it's own listeners.
-pub fn (i &Item) event(e Event) ?&Node {
-	// By sending the event on to the children nodes
-	// it's effectively *bubbling* the event upwards in the
-	// tree / scene graph
-	for child in i.body {
-		if node := child.event(e) {
-			return node
-		}
-	}
-	for on_event in i.on_event {
-		assert !isnil(on_event)
-		// If `on_event` returns true, it means
-		// a listener on *this* item has accepted the event
-		if on_event(e) {
-			return i
-		}
-	}
-	return none
-}
-
-/*
-fn (mut i Item) free() {
-	for child in i.body {
-		child.free()
-		unsafe { free(child) }
-	}
-	i.body.clear()
-	i.body.free()
-}*/
-
-pub struct Rectangle {
-	Item
-}
-
-// parent returns the parent Node.
-pub fn (r &Rectangle) parent() &Node {
-	return r.Item.parent()
-}
-
-// draw draws the `Item` and/or any child nodes.
-pub fn (r &Rectangle) draw(ui &UI) {
-	// println('${@STRUCT}.${@FN} ${ptr_str(r)}')
-	// println('${@STRUCT}.${@FN} ${r}')
-	er := ui.easy.rect(
-		x: r.x
-		y: r.y
-		width: r.width
-		height: r.height
-	)
-	er.draw()
-
-	r.Item.draw(ui)
-}
-
-// event sends an `Event` any child nodes and/or it's own listeners.
-pub fn (r &Rectangle) event(e Event) ?&Node {
-	return r.Item.event(e)
-}
-
-pub struct EventArea {
-	Item
-}
-
-// parent returns the parent Node.
-pub fn (ea &EventArea) parent() &Node {
-	return ea.Item.parent()
-}
-
-// draw draws the `Item` and/or any child nodes.
-pub fn (ea &EventArea) draw(ui &UI) {
-	ea.Item.draw(ui)
-}
-
-// event sends an `Event` any child nodes and/or it's own listeners.
-pub fn (ea &EventArea) event(e Event) ?&Node {
-	return ea.Item.event(e)
 }

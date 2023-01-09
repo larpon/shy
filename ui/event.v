@@ -5,6 +5,8 @@ module ui
 
 import shy.lib as shy
 
+pub type OnEventFn = fn (event Event) bool
+
 pub enum ButtonState {
 	up
 	down
