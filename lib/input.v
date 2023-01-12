@@ -20,8 +20,13 @@ pub fn (ip Input) keyboard(n u8) !&Keyboard {
 	return ip.keyboards[n]
 }
 
+pub const default_keyboard_id = u8(0)
+
+[heap]
 pub struct Keyboard {
 	ShyStruct
+pub:
+	id u8 // NOTE SDL doesn't really support multiple keyboard events, but who knows what the future holds?
 mut:
 	keys map[int]bool // key states
 }
@@ -47,4 +52,25 @@ pub fn (mut k Keyboard) set_key_state(key_code KeyCode, button_state ButtonState
 
 pub fn (mut k Keyboard) init() ! {
 	k.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	k.shy.api.events.on_event(k.on_event)
+}
+
+fn (mut k Keyboard) on_event(e Event) bool {
+	// Exit as early as possible
+	if e !is KeyEvent {
+		return false
+	}
+	match e {
+		KeyEvent {
+			if e.which == k.id {
+				// eprintln('Setting key event for keyboard ${k.id}')
+				k.set_key_state(e.key_code, e.state)
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
 }

@@ -3,6 +3,7 @@
 // that can be found in the LICENSE file.
 module lib
 
+// TODO factor WindowEvent out
 pub type Event = KeyEvent
 	| MouseButtonEvent
 	| MouseMotionEvent
@@ -25,7 +26,7 @@ pub struct UnkownEvent {
 pub struct KeyEvent {
 	ShyEvent
 pub:
-	which    u16 // The keyboard id
+	which    u8 // The keyboard id, NOTE SDL doesn't really support multiple keyboards. Long story
 	state    ButtonState
 	key_code KeyCode
 }
@@ -91,8 +92,10 @@ pub struct MouseWheelEvent {
 	ShyEvent
 pub:
 	which     u16 // The mouse id
-	x         int // The amount scrolled horizontally, positive to the right and negative to the left
-	y         int // The amount scrolled vertically, positive away from the user and negative toward the user
+	x         int // X coordinate, relative to window
+	y         int // Y coordinate, relative to window
+	scroll_x  int // The amount scrolled horizontally, positive to the right and negative to the left
+	scroll_y  int // The amount scrolled vertically, positive away from the user and negative toward the user
 	direction MouseWheelDirection // When .flipped the values in .x and .y will be opposite. Multiply by -1 to change them back
 }
 

@@ -8,12 +8,20 @@ import shy.lib as shy
 // Item is the base type for all UI elements.
 // By embedding `Item` in a struct - the struct fulfills
 // the `Node` interface required for a type to be an UI item.
+// Likewise any new types embedding `Item` thus also fulfill
+// the `Node` interface requirements - making them "automagically"
+// compliant with the scene graph - and allows for easy, user-land,
+// creation of new UI nodes that can be reused across code-bases.
+[heap]
 pub struct Item {
 	shy.Rect
 pub:
 	id u64
 mut:
-	parent   &Node = unsafe { nil } // TODO crash and burn
+	// NOTE The `unsafe { nil }` assignment once resulted in several V bugs: https://github.com/vlang/v/issues/16882
+	// ... which was quickly fixed but one of them couldn't be made as an MRE (minimal reproducible example) - so it's
+	// a target of regression: https://github.com/vlang/v/commit/2119a24 <- this commit has the fix.
+	parent   &Node = unsafe { nil }
 	body     []&Node
 	on_event []OnEventFn
 }
@@ -46,7 +54,7 @@ pub fn (i &Item) event(e Event) ?&Node {
 		assert !isnil(on_event)
 		// If `on_event` returns true, it means
 		// a listener on *this* item has accepted the event
-		if on_event(e) {
+		if on_event(i, e) {
 			return i
 		}
 	}
@@ -63,6 +71,7 @@ fn (mut i Item) free() {
 	i.body.free()
 }*/
 
+[heap]
 pub struct Rectangle {
 	Item
 }
@@ -92,6 +101,7 @@ pub fn (r &Rectangle) event(e Event) ?&Node {
 	return r.Item.event(e)
 }
 
+[heap]
 pub struct EventArea {
 	Item
 }
@@ -109,4 +119,57 @@ pub fn (ea &EventArea) draw(ui &UI) {
 // event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (ea &EventArea) event(e Event) ?&Node {
 	return ea.Item.event(e)
+}
+
+[heap]
+pub struct PointerEventArea {
+	EventArea
+	on_pointer_event []OnPointerEventFn
+}
+
+// parent returns the parent Node.
+pub fn (pea &PointerEventArea) parent() &Node {
+	return pea.EventArea.parent()
+}
+
+// draw draws the `Item` and/or any child nodes.
+pub fn (pea &PointerEventArea) draw(ui &UI) {
+	pea.EventArea.draw(ui)
+}
+
+// event sends an `Event` any child nodes and/or it's own listeners.
+pub fn (pea &PointerEventArea) event(e Event) ?&Node {
+	if e is MouseButtonEvent || e is MouseMotionEvent || e is MouseWheelEvent {
+		ex := match e {
+			MouseButtonEvent, MouseMotionEvent, MouseWheelEvent {
+				e.x
+			}
+			else {
+				0
+			}
+		}
+		ey := match e {
+			MouseButtonEvent, MouseMotionEvent, MouseWheelEvent {
+				e.y
+			}
+			else {
+				0
+			}
+		}
+		for on_pointer_event in pea.on_pointer_event {
+			assert !isnil(on_pointer_event)
+			mut pe := PointerEvent{
+				event: e
+				x: ex
+				y: ey
+			}
+
+			// If `on_pointer_event` returns true, it means
+			// a listener on *this* item has accepted the event
+			if on_pointer_event(pea, pe) {
+				return pea
+			}
+		}
+	}
+	return pea.EventArea.event(e)
 }

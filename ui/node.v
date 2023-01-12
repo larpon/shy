@@ -5,6 +5,7 @@ module ui
 
 // import shy.lib as shy
 
+[heap]
 pub interface Node {
 	id u64
 	draw(ui &UI)
@@ -27,13 +28,24 @@ pub fn (n &Node) collect(mut nodes []&Node, filter fn (n &Node) bool) {
 	}
 }
 
-// visit visits all `Node`s in a Breath-First search (BFS),
+// modify visits all `Node`s in a Breath-First search (BFS),
 // calling `func` with each `Node` as an argument.
-pub fn (n &Node) visit(func fn (mut n Node)) {
+pub fn (n &Node) modify(func fn (mut n Node)) {
 	assert n != unsafe { nil }
 	mut mn := unsafe { n }
 	func(mut mn)
 	for mut node in mn.body {
+		assert node != unsafe { nil }
+		node.modify(func)
+	}
+}
+
+// visit visits all `Node`s in a Breath-First search (BFS),
+// calling `func` with each `Node` as an argument.
+pub fn (n &Node) visit(func fn (n &Node)) {
+	assert n != unsafe { nil }
+	func(n)
+	for node in n.body {
 		assert node != unsafe { nil }
 		node.visit(func)
 	}

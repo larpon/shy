@@ -18,6 +18,7 @@ pub fn (mut m Mouse) init() ! {
 		m.x = mgx - w_x
 		m.y = mgy - w_y
 	}
+	m.shy.api.events.on_event(m.on_event)
 }
 
 pub fn (mut m Mouse) show() {
@@ -43,4 +44,66 @@ pub fn (m Mouse) position(position_type MousePositionType) (int, int) {
 			return mx, my
 		}
 	}
+}
+
+fn (mut m Mouse) on_event(e Event) bool {
+	if e !is MouseMotionEvent && e !is MouseButtonEvent && e !is MouseWheelEvent {
+		return false
+	}
+	match e {
+		MouseMotionEvent {
+			if e.which == m.id {
+				// eprintln('Setting mouse ${m.id} x,y from ${m.x},${m.y} to ${e.x},${e.y}')
+				m.x = e.x
+				m.y = e.y
+			}
+			return false
+		}
+		MouseButtonEvent {
+			if e.which == m.id {
+				p_state := m.is_button_down(e.button)
+				m.set_button_state(e.button, e.state)
+				state := m.is_button_down(e.button)
+
+				// A press/button down
+				if e.state == .down {
+					for handler in m.on_button_down {
+						assert !isnil(handler)
+						// If `handler` returns true, it means
+						// a listener has accepted/handled the event
+						if handler(e) {
+							return true
+						}
+					}
+				}
+
+				// A release/button up
+				if e.state == .up {
+					for handler in m.on_button_up {
+						assert !isnil(handler)
+						// If `handler` returns true, it means
+						// a listener has accepted/handled the event
+						if handler(e) {
+							return true
+						}
+					}
+				}
+
+				// A click is when the samme button was previously down
+				if p_state && !state {
+					for handler in m.on_button_click {
+						assert !isnil(handler)
+						if handler(e) {
+							return true
+						}
+					}
+				}
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
 }

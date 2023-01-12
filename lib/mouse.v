@@ -32,15 +32,34 @@ pub enum MouseWheelDirection {
 	flipped
 }
 
+pub type OnMouseButtonFn = fn (event MouseButtonEvent) bool
+
+[heap]
 pub struct Mouse {
 	ShyStruct
 pub:
 	id u8
 mut:
-	bs map[int]bool // button states
+	bs              map[int]bool // button states
+	on_button_click []OnMouseButtonFn
+	on_button_down  []OnMouseButtonFn
+	on_button_up    []OnMouseButtonFn
 pub mut:
+	// mouse position inside window (canvas/drawable area coordinate space)
 	x int
 	y int
+}
+
+pub fn (mut m Mouse) on_button_click(handler OnMouseButtonFn) {
+	m.on_button_click << handler
+}
+
+pub fn (mut m Mouse) on_button_down(handler OnMouseButtonFn) {
+	m.on_button_down << handler
+}
+
+pub fn (mut m Mouse) on_button_up(handler OnMouseButtonFn) {
+	m.on_button_up << handler
 }
 
 pub fn (mut m Mouse) set_button_state(button MouseButton, button_state ButtonState) {

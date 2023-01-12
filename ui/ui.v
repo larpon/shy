@@ -26,6 +26,10 @@ pub struct UIConfig {
 	root &Node
 }
 
+// UI is the base struct of a logical tree/collection of UI items
+// making up *one complete User Interface* for *one application*.
+// It holds the pointer to the root node of the tree/scene graph making
+// up the UI, from which any other node can be visited.
 [heap; noinit]
 pub struct UI {
 	shy.ShyStruct
@@ -42,8 +46,8 @@ mut:
 fn (mut u UI) init() ! {
 	u.root.parent = shy.null
 
-	// Traverse the tree, root to leaves, set all `parent` fields
-	u.visit(fn (mut n Node) {
+	// Traverse the tree, root to leaves, set all `parent` fields.
+	u.modify(fn (mut n Node) {
 		for mut node in n.body {
 			node.parent = unsafe { n }
 		}
@@ -71,14 +75,26 @@ pub fn (u UI) collect(filter fn (n &Node) bool) []&Node {
 	return nodes
 }
 
-// visit traverses the scene graph via BFS (Breath-First search).
-// visit allows modifying the visited `Node` via `func`.
-pub fn (mut u UI) visit(func fn (mut n Node)) {
+// modify traverses the complete tree/scene graph via BFS (Breath-First search).
+// modify allows modifying the visited `Node` via `func`.
+pub fn (mut u UI) modify(func fn (mut n Node)) {
 	if u.root == unsafe { nil } {
 		return
 	}
 	func(mut u.root)
 	for mut node in u.root.body {
+		node.modify(func)
+	}
+}
+
+// visit traverses the complete tree/scene graph via BFS (Breath-First search).
+// visit allows modifying the visited `Node` via `func`.
+pub fn (mut u UI) visit(func fn (n &Node)) {
+	if u.root == unsafe { nil } {
+		return
+	}
+	func(u.root)
+	for node in u.root.body {
 		node.visit(func)
 	}
 }
@@ -89,15 +105,17 @@ pub fn (mut u UI) visit(func fn (mut n Node)) {
 // 	}
 // }
 
-// find returns `T` with an id matching `n_id` or `none`.
-pub fn (u &UI) find[T](n_id u64) ?&T {
+// find returns `T` whos `id` field is matching `n_id`, otherwise `none`.
+// find is currently not `pub` since it can not find types outside the `ui` module :(.
+fn (u &UI) find[T](n_id u64) ?&T {
 	if u.root == unsafe { nil } {
 		return none
 	}
 	// TODO this can be made faster, e.g. lookup from cache
 	nodes := u.collect(fn [n_id] (n &Node) bool {
+		// println('${@FN}@${n.id} == ${n_id}?')
 		if n.id == n_id {
-			// println('${n_id}')
+			// println('${cast_node.id} == ${n_id}')
 			return true
 		}
 		return false
@@ -105,7 +123,7 @@ pub fn (u &UI) find[T](n_id u64) ?&T {
 	if nodes.len > 0 {
 		node := nodes[0]
 		if node is T {
-			return node
+			return &T(node)
 		}
 	}
 	return none

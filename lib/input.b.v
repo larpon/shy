@@ -205,6 +205,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		.keyup {
 			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
 			shy_event = KeyEvent{
+				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
 				timestamp: s.ticks()
 				window: win
 				state: .up
@@ -214,6 +215,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		.keydown {
 			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
 			shy_event = KeyEvent{
+				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
 				timestamp: s.ticks()
 				window: win
 				state: .down
@@ -267,12 +269,15 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			} else {
 				.flipped
 			}
+			mouse := ip.mouse(default_mouse_id) or { panic(err) }
 			shy_event = MouseWheelEvent{
 				timestamp: s.ticks()
 				window: win // TODO multi-window support
 				which: default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
-				x: sdl_event.wheel.x
-				y: sdl_event.wheel.y
+				x: mouse.x
+				y: mouse.y
+				scroll_x: sdl_event.wheel.x
+				scroll_y: sdl_event.wheel.y
 				direction: dir
 			}
 			// }
@@ -307,32 +312,6 @@ fn (mut ip Input) poll_event() ?Event {
 	// Important
 	if shy_event is UnkownEvent {
 		return none
-	}
-
-	match shy_event {
-		MouseMotionEvent {
-			event := shy_event as MouseMotionEvent
-			m_id := u8(event.which) // TODO see input handling
-			if mut mouse := s.api.input.mouse(m_id) {
-				mouse.x = event.x
-				mouse.y = event.y
-			}
-		}
-		MouseButtonEvent {
-			event := shy_event as MouseButtonEvent
-			m_id := u8(event.which) // TODO see input handling
-			if mut mouse := s.api.input.mouse(m_id) {
-				mouse.set_button_state(event.button, event.state)
-			}
-		}
-		KeyEvent {
-			event := shy_event as KeyEvent
-			k_id := u8(event.which) // TODO see input handling
-			if mut kb := s.api.input.keyboard(k_id) {
-				kb.set_key_state(event.key_code, event.state)
-			}
-		}
-		else {}
 	}
 
 	// TODO find out what coordinate positions that ManyMouse actually uses?

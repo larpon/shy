@@ -211,6 +211,7 @@ fn (mut t Timer) ended() {
 	match t.loop {
 		.once {
 			// t.reset()
+			t.running = false
 		}
 		.loop {
 			if t.loops > 0 {
@@ -222,6 +223,7 @@ fn (mut t Timer) ended() {
 				t.restart()
 			} else {
 				// t.reset()
+				t.running = false
 			}
 		}
 	}
