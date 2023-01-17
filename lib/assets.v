@@ -32,7 +32,7 @@ pub:
 	uri    string
 	async  bool = true
 	stream bool
-	cache bool
+	cache  bool
 }
 
 pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
@@ -209,8 +209,8 @@ mut:
 	height int
 	// cache   bool = true
 	mipmaps int
-	wrap_u ImageWrap = .clamp_to_edge
-	wrap_v ImageWrap = .clamp_to_edge
+	wrap_u  ImageWrap = .clamp_to_edge
+	wrap_v  ImageWrap = .clamp_to_edge
 }
 
 pub fn (mut i Image) free() {
