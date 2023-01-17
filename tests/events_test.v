@@ -17,7 +17,7 @@ fn test_pushing_max_number_of_events() {
 			timestamp: s.ticks()
 			window: shy.null
 		})
-		events.push(e)!
+		events.send(e)!
 		assert true
 	}
 
@@ -26,7 +26,7 @@ fn test_pushing_max_number_of_events() {
 		timestamp: s.ticks()
 		window: shy.null
 	})
-	events.push(e) or { assert true }
+	events.send(e) or { assert true }
 
 	events.shutdown()!
 }
