@@ -6,7 +6,6 @@ module main
 import os
 import flag
 import shy.cli
-import shy.export
 
 fn main() {
 	// Collect user flags in an extended manner.
@@ -57,6 +56,8 @@ fn main() {
 	input := fp.args.last()
 	opt.input = input
 
+	cli.validate_input(opt.input)!
+
 	opt.extend_from_dot_shy() or {
 		eprintln('Error while parsing `.shy`: ${err}')
 		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
@@ -69,14 +70,5 @@ fn main() {
 	// input_ext := os.file_ext(opt.input)
 	if opt.verbosity > 2 {
 		dump(opt)
-	}
-
-	// TODO move to separate external tool
-	if opt.export {
-		export_opts := opt.to_export_options()
-		export.export(export_opts) or {
-			eprintln('Error while exporting `${export_opts.input}`: ${err}')
-			exit(1)
-		}
 	}
 }

@@ -9,7 +9,7 @@ import sdl
 // TODO move
 pub struct Gamepad {
 	ShyStruct
-	id int
+	id u8
 mut:
 	name      string
 	handle    &sdl.GameController

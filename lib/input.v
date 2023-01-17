@@ -12,12 +12,18 @@ mut:
 	pads      []&Gamepad
 }
 
-pub fn (ip Input) mouse(n u8) !&Mouse {
-	return ip.mice[n]
+pub fn (ip Input) mouse(n u8) ?&Mouse {
+	if mouse := ip.mice[n] {
+		return mouse
+	}
+	return none
 }
 
-pub fn (ip Input) keyboard(n u8) !&Keyboard {
-	return ip.keyboards[n]
+pub fn (ip Input) keyboard(n u8) ?&Keyboard {
+	if keyboard := ip.keyboards[n] {
+		return keyboard
+	}
+	return none
 }
 
 pub const default_keyboard_id = u8(0)

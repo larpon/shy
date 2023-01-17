@@ -56,6 +56,14 @@ fn (mut m Mouse) on_event(e Event) bool {
 				// eprintln('Setting mouse ${m.id} x,y from ${m.x},${m.y} to ${e.x},${e.y}')
 				m.x = e.x
 				m.y = e.y
+				for handler in m.on_motion {
+					assert !isnil(handler)
+					// If `handler` returns true, it means
+					// a listener has accepted/handled the event
+					if handler(e) {
+						return true
+					}
+				}
 			}
 			return false
 		}

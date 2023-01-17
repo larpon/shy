@@ -1,18 +1,61 @@
-module cli
+// Copyright(C) 2019 Lars Pontoppidan. All rights reserved.
+// Use of this source code is governed by an MIT license file distributed with this software package
+//
+module main
 
 import os
 import flag
+// import shy.vxt
+import shy.cli
+import shy.export
+
+pub const (
+	exe_version          = '0.0.1' // version()
+	exe_name             = os.file_name(os.executable())
+	exe_short_name       = os.file_name(os.executable()).replace('.exe', '')
+	exe_dir              = os.dir(os.real_path(os.executable()))
+	exe_args_description = 'input
+or:    [options] input'
+	exe_description = 'export exports both plain V applications and shy-based applications.
+The exporter is based on the shy.export module.
+
+export can compile, package and deploy V apps for production use on a wide range of platforms like:
+Linux, macOS, Windows, Android and HTML5 (WASM).
+
+The following does the same as if they were passed to the "v" compiler:
+
+Flags:
+  -autofree, -gc <type>, -g, -cg, -showcc
+
+Sub-commands:
+  run                       Run the output package after successful export'
+	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', 'run', '-showcc']
+	accepted_input_files = ['.v']
+)
+
+pub const export_env_vars = [
+	'SHY_FLAGS',
+	'SHY_EXPORT_FLAGS',
+	'VEXE',
+	'VMODULES',
+]
+
+/*
+pub fn run(args []string) os.Result {
+	return os.execute(args.join(' '))
+}*/
 
 pub struct Options {
 pub:
 	// These fields would make little sense to change during a run
 	verbosity int
-	work_dir  string = work_directory
+	work_dir  string = export.work_dir()
 	//
 	run        bool
 	parallel   bool = true // Run, what can be run, in parallel
 	cache      bool // defaults to false in os.args/flag parsing phase
-	gl_version string = '3'
+	gl_version string = '2'
+	format     string
 	// Detected environment
 	dump_usage bool
 pub mut:
@@ -20,7 +63,7 @@ pub mut:
 	input           string
 	output          string
 	additional_args []string // additional_args passed via os.args
-	is_prod         bool
+	is_prod         bool = true
 	c_flags         []string // flags passed to the C compiler(s)
 	v_flags         []string // flags passed to the V compiler
 	assets_extra    []string // list of (extra) paths to assets dirs to include
@@ -28,12 +71,12 @@ pub mut:
 }
 
 // options_from_env returns an `Option` struct filled with flags set via
-// the `SHY_FLAGS` env variable otherwise it returns the `defaults` `Option` struct.
+// the `SHY_EXPORT_FLAGS` env variable otherwise it returns the `defaults` `Option` struct.
 pub fn options_from_env(defaults Options) !Options {
-	env_flags := os.getenv('SHY_FLAGS')
+	env_flags := os.getenv('SHY_EXPORT_FLAGS')
 	if env_flags != '' {
 		mut flags := [os.args[0]]
-		flags << string_to_args(env_flags)!
+		flags << cli.string_to_args(env_flags)!
 		opts, _ := args_to_options(flags, defaults)!
 		return opts
 	}
@@ -58,19 +101,6 @@ pub fn (opt &Options) validate_env() ! {
 pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.FlagParser) {
 	mut args := arguments.clone()
 
-	// Indentify sub-commands.
-	nocache := args.contains('--nocache')
-	for subcmd in subcmds {
-		if subcmd in args {
-			// First encountered known sub-command is executed on the spot.
-			launch_cmd(args[args.index(subcmd)..], nocache) or {
-				eprintln(err)
-				exit(1)
-			}
-			exit(0)
-		}
-	}
-
 	mut v_flags := []string{}
 	mut cmd_flags := []string{}
 	// Indentify special flags in args before FlagParser ruin them.
@@ -92,7 +122,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 
 	mut fp := flag.new_flag_parser(args)
 	fp.application(exe_short_name)
-	fp.version(version_full())
+	fp.version(exe_version)
 	fp.description(exe_description)
 	fp.arguments_description(exe_args_description)
 
@@ -111,6 +141,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 		gl_version: fp.string('gl', 0, defaults.gl_version, 'GL(ES) version to use from any of 2,3,es2,es3')
 		//
 		run: 'run' in cmd_flags
+		format: fp.string('format', 0, 'zip', 'Format of output (default is a .zip)')
 		dump_usage: fp.bool('help', `h`, defaults.dump_usage, 'Show this help message and exit')
 		cache: !fp.bool('nocache', 0, defaults.cache, 'Do not use build cache')
 		//
@@ -124,6 +155,11 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 
 	opt.additional_args = fp.finalize() or {
 		return error('${@FN}: flag parser failed finalizing: ${err}')
+	}
+
+	// Validate format
+	if opt.format != '' {
+		export.string_to_export_format(opt.format)!
 	}
 
 	mut c_flags := []string{}
@@ -144,4 +180,96 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 	opt.v_flags = v_flags
 
 	return opt, fp
+}
+
+pub fn (opt &Options) to_export_options() export.Options {
+	format := export.string_to_export_format(opt.format) or { export.Format.zip }
+	mut gl_version := opt.gl_version
+
+	opts := export.Options{
+		verbosity: opt.verbosity
+		work_dir: opt.work_dir
+		parallel: opt.parallel
+		cache: opt.cache
+		gl_version: gl_version
+		format: format
+		input: opt.input
+		output: opt.output
+		is_prod: opt.is_prod
+		c_flags: opt.c_flags
+		v_flags: opt.v_flags
+		assets: opt.assets_extra
+	}
+	return opts
+}
+
+fn main() {
+	// Collect user flags in an extended manner.
+	// Start with defaults -> merge over SHY_EXPORT_FLAGS -> merge over cmdline flags -> merge .shy entries.
+	mut opt := Options{}
+	mut fp := &flag.FlagParser(0)
+
+	opt = options_from_env(opt) or {
+		eprintln('Error while parsing `SHY_EXPORT_FLAGS`: ${err}')
+		eprintln('Use `${exe_short_name} -h` to see all flags')
+		exit(1)
+	}
+
+	opt, fp = args_to_options(os.args, opt) or {
+		eprintln('Error while parsing `os.args`: ${err}')
+		eprintln('Use `${exe_short_name} -h` to see all flags')
+		exit(1)
+	}
+
+	if opt.dump_usage {
+		println(fp.usage())
+		exit(0)
+	}
+
+	// All flags after this requires an input argument
+	if fp.args.len == 0 {
+		eprintln('No arguments given')
+		eprintln('Use `export -h` to see all flags')
+		exit(1)
+	}
+
+	// TODO
+	if opt.additional_args.len > 1 {
+		if opt.additional_args[0] == 'xxx' {
+			// xxx_arg := opt.additional_args[1]
+			exit(1)
+		}
+	}
+
+	input := fp.args.last()
+	opt.input = input
+
+	cli.validate_input(opt.input) or {
+		eprintln('${err}')
+		exit(1)
+	}
+
+	opt.extend_from_dot_shy() or {
+		eprintln('Error while parsing `.shy`: ${err}')
+		eprintln('Use `${exe_short_name} -h` to see all flags')
+		exit(1)
+	}
+
+	// Validate environment after options and input has been resolved
+	opt.validate_env() or {
+		eprintln('${err}')
+		exit(1)
+	}
+
+	// input_ext := os.file_ext(opt.input)
+	if opt.verbosity > 3 {
+		eprintln('--- ${exe_short_name} ---')
+		eprintln(opt)
+	}
+
+	export_opts := opt.to_export_options()
+	export.export(export_opts) or {
+		eprintln('Error while exporting `${export_opts.input}`: ${err}')
+		exit(1)
+	}
 }

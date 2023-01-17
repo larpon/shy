@@ -26,12 +26,13 @@ Flags:
 
 Sub-commands:
   run                       Run the V code
+  export                    Export shy based project
   doctor                    Display useful info about your system for bug reports'
 	exe_git_hash         = shy_commit_hash()
 	work_directory       = shy_tmp_work_dir()
 	cache_directory      = shy_cache_dir()
-	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', 'export', '-showcc']
-	subcmds              = ['complete', 'test-cleancode']
+	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', '-showcc']
+	subcmds              = ['complete', 'test-cleancode', 'export']
 	accepted_input_files = ['.v']
 )
 
@@ -70,15 +71,15 @@ pub fn dot_shy_path(file_or_dir_path string) string {
 }
 
 // launch_cmd launches an external command.
-pub fn launch_cmd(args []string) ! {
+pub fn launch_cmd(args []string, no_use_cache bool) ! {
 	mut cmd := args[0]
 	tool_args := args[1..]
 	if cmd.starts_with('test-') {
 		cmd = cmd.all_after('test-')
 	}
 	v := vxt.vexe()
-	tool_exe := os.join_path(cli.exe_dir, 'cmd', cmd)
-	mut tool_src := tool_exe
+	mut tool_src := os.join_path(cli.exe_dir, 'cmd', cmd)
+	tool_exe := tool_src + '.exe'
 	if !os.is_dir(tool_src) {
 		if os.is_file(tool_src + '.v') {
 			tool_src += '.v'
@@ -93,7 +94,7 @@ pub fn launch_cmd(args []string) ! {
 		if os.is_file(hash_file) {
 			hash = os.read_file(hash_file) or { '' }
 		}
-		if hash != cli.exe_git_hash {
+		if hash != cli.exe_git_hash || no_use_cache {
 			v_cmd := [
 				v,
 				'-o',

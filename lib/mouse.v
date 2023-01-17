@@ -32,6 +32,8 @@ pub enum MouseWheelDirection {
 	flipped
 }
 
+pub type OnMouseMotionFn = fn (event MouseMotionEvent) bool
+
 pub type OnMouseButtonFn = fn (event MouseButtonEvent) bool
 
 [heap]
@@ -44,10 +46,15 @@ mut:
 	on_button_click []OnMouseButtonFn
 	on_button_down  []OnMouseButtonFn
 	on_button_up    []OnMouseButtonFn
+	on_motion       []OnMouseMotionFn
 pub mut:
 	// mouse position inside window (canvas/drawable area coordinate space)
 	x int
 	y int
+}
+
+pub fn (mut m Mouse) on_motion(handler OnMouseMotionFn) {
+	m.on_motion << handler
 }
 
 pub fn (mut m Mouse) on_button_click(handler OnMouseButtonFn) {

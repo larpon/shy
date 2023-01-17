@@ -44,6 +44,7 @@ mut:
 	mouse             &shy.Mouse    = shy.null
 	kbd               &shy.Keyboard = shy.null
 	window            &shy.Window   = shy.null
+	canvas            shy.Size
 }
 
 pub fn (mut a EasyApp) init() ! {
@@ -60,9 +61,12 @@ pub fn (mut a EasyApp) init() ! {
 	}
 	a.assets = a.shy.assets()
 	a.draw = a.shy.draw()
-	a.mouse = api.input().mouse(0)!
-	a.kbd = api.input().keyboard(0)!
+	a.mouse = api.input().mouse(0) or { return error('${@STRUCT}.${@FN}: no default mouse found') }
+	a.kbd = api.input().keyboard(0) or {
+		return error('${@STRUCT}.${@FN}: no default keyboard found')
+	}
 	a.window = api.wm().active_window()
+	a.canvas = a.window.drawable_size()
 
 	a.easy.init()!
 }
@@ -116,6 +120,9 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 				}
 			}
 		}
+		shy.WindowResizeEvent {
+			a.canvas = a.window.drawable_size()
+		}
 		// MouseMotionEvent {
 		// 	a.shy.api.mouse.show()
 		// }
@@ -136,9 +143,11 @@ pub fn (ea ExampleApp) asset(path string) string {
 	return os.resource_abs_path(os.join_path('..', '..', 'assets', path))
 }
 
-// pub fn (mut ea ExampleApp) init()! {
-// 	ea.EasyApp.init() !
-// }
+/*
+pub fn (mut ea ExampleApp) init()! {
+ 	ea.EasyApp.init() !
+}
+*/
 
 // Developer app skeleton
 struct DevApp {

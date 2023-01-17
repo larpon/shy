@@ -6,14 +6,15 @@ module export
 import os
 import shy.vxt
 import net.http
+// import vab.cli
 
-pub const available_format_strings = ['zip', 'directory', 'appimage_dir', 'appimage']
+pub const available_format_strings = ['zip', 'directory', 'appimage_dir', 'appimage', 'apk', 'aab']
 
-fn tmp_work_dir() string {
+pub fn work_dir() string {
 	return os.join_path(os.temp_dir(), 'export')
 }
 
-fn ensure_cache_dir() !string {
+pub fn ensure_cache_dir() !string {
 	dir := os.join_path(os.cache_dir(), 'shy', 'export')
 	if !os.is_dir(dir) {
 		os.mkdir_all(dir)!
@@ -32,6 +33,8 @@ pub enum Format {
 	directory // /path/to/output
 	appimage_dir // .AppDir
 	appimage // .AppImage
+	android_apk // .apk
+	android_aab // .aab
 }
 
 pub fn (f Format) ext() string {
@@ -48,6 +51,12 @@ pub fn (f Format) ext() string {
 		.appimage {
 			'AppImage'
 		}
+		.android_apk {
+			'apk'
+		}
+		.android_aab {
+			'aab'
+		}
 	}
 }
 
@@ -55,13 +64,13 @@ pub struct Options {
 pub:
 	// These fields would make little sense to change during a run
 	verbosity int
-	work_dir  string = tmp_work_dir()
+	work_dir  string = work_dir()
 	//
 	run        bool
 	parallel   bool = true // Run, what can be run, in parallel
 	compress   bool // Run upx if the host has it installed
 	cache      bool // defaults to false in os.args/flag parsing phase
-	gl_version int  // = android.default_gl_version
+	gl_version string = '3'
 pub mut:
 	// I/O
 	input   string
@@ -74,21 +83,35 @@ pub mut:
 	assets  []string // list of (extra) paths to asset (roots) dirs to include
 }
 
-// resolve_output returns the path/file and format of the export.
-fn (opt &Options) resolve_output() !(string, Format) {
+// resolve_input returns the resolved path/file of the input.
+fn (opt &Options) resolve_input() !string {
+	mut input := opt.input
+	// If no specific output file is given, we use the input file as a base
+	if input == '' {
+		return error('${@MOD}.${@FN}: no input given')
+	}
+
+	if input in ['.', '..'] {
+		input = os.real_path(input)
+	}
+	return input
+}
+
+pub fn (opt &Options) resolve_io() !(string, string, Format) {
+	mut input := opt.resolve_input()!
 	mut output := opt.output
 	// If no specific output file is given, we use the input file as a base
 	if output == '' {
-		output = opt.input
+		output = input
 	}
 	mut format := opt.format
 	ext := os.file_ext(output).all_after('.').to_lower()
 	// If user has explicitly named the output. E.g.: '/tmp/out.apk'
 	if ext != '' {
 		format = string_to_export_format(ext)!
-		return output, format
+		return input, output, format
 	}
-	return output + '.' + format.ext(), format
+	return input, output + '.' + format.ext(), format
 }
 
 pub fn export(opt &Options) ! {
@@ -101,10 +124,11 @@ pub fn export(opt &Options) ! {
 	}
 
 	// Determine output path/file and format.
-	output, format := opt.resolve_output()!
+	input, output, format := opt.resolve_io()!
 
 	resolved_options := Options{
 		...opt
+		input: input
 		output: output
 		format: format
 	}
@@ -114,13 +138,20 @@ pub fn export(opt &Options) ! {
 	}
 	uos := os.user_os()
 	match format {
-		.zip {}
-		.directory {}
+		.zip {
+			return error('${@MOD}.${@FN}: zip export is not working yet')
+		}
+		.directory {
+			return error('${@MOD}.${@FN}: directory export is not working yet')
+		}
 		.appimage, .appimage_dir {
 			if uos != 'linux' {
 				return error('${@MOD}.${@FN}: AppImage format is only supported on Linux hosts')
 			}
 			export_appimage(resolved_options)!
+		}
+		.android_apk, .android_aab {
+			export_android(resolved_options)!
 		}
 	}
 }
@@ -138,6 +169,12 @@ pub fn string_to_export_format(str string) !Format {
 		}
 		'appimage_dir' {
 			.appimage_dir
+		}
+		'android_apk', 'apk' {
+			.android_apk
+		}
+		'android_aab', 'aab' {
+			.android_aab
 		}
 		else {
 			error('${@MOD}.${@FN}: unsupported format "${str}". Available: ${export.available_format_strings}')
@@ -189,6 +226,10 @@ fn (opt Options) ensure_appimagetool() !string {
 }
 
 fn export_appimage(opt Options) ! {
+	if opt.verbosity > 3 {
+		eprintln('--- ${@MOD}.${@FN} ---')
+		eprintln(opt)
+	}
 	appimagetool_exe := opt.ensure_appimagetool()!
 
 	// Resolve and sanitize input path
@@ -740,4 +781,31 @@ pub fn appimage_exclude_list(verbosity int) ![]string {
 	}
 	return os.read_lines(excludes_path) or { []string{} }.filter(it.trim_space() != ''
 		&& !it.trim_space().starts_with('#'))
+}
+
+fn export_android(opt Options) ! {
+	mut gl_version := opt.gl_version
+	match opt.format {
+		.android_apk, .android_aab {
+			if gl_version in ['3', '2'] {
+				mut auto_gl_version := 'es2'
+				if gl_version == '3' {
+					auto_gl_version = 'es3'
+				}
+				if opt.verbosity > 0 {
+					eprintln('Auto adjusting OpenGL version for Android from ${gl_version} to ${auto_gl_version}')
+				}
+				gl_version = auto_gl_version
+			}
+		}
+		else {}
+	}
+	adjusted_options := Options{
+		...opt
+		gl_version: gl_version
+	}
+	if opt.verbosity > 3 {
+		eprintln('--- ${@MOD}.${@FN} ---')
+		eprintln(adjusted_options)
+	}
 }
