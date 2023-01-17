@@ -25,16 +25,13 @@ pub:
 	status AssetStatus
 }
 
-[params]
-pub struct AssetOptions {
+pub type AssetOptions = AssetOption | ImageOptions | SoundOptions
+
+pub struct AssetOption {
 pub:
 	uri    string
 	async  bool = true
 	stream bool
-}
-
-pub struct AssetOption {
-pub:
 	cache bool
 }
 
@@ -69,8 +66,8 @@ pub fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		width: image.width
 		height: image.height
 		num_mipmaps: 0 // TODO image.mipmaps
-		wrap_u: .clamp_to_edge
-		wrap_v: .clamp_to_edge
+		wrap_u: opt.wrap_u // .clamp_to_edge
+		wrap_v: opt.wrap_v // .clamp_to_edge
 		// label: &u8(0)
 		pixel_format: .rgba8
 	}
@@ -202,6 +199,8 @@ mut:
 	gfx_image gfx.Image
 }
 
+pub type ImageWrap = gfx.Wrap
+
 [params]
 pub struct ImageOptions {
 	AssetOption
@@ -210,6 +209,8 @@ mut:
 	height int
 	// cache   bool = true
 	mipmaps int
+	wrap_u ImageWrap = .clamp_to_edge
+	wrap_v ImageWrap = .clamp_to_edge
 }
 
 pub fn (mut i Image) free() {
@@ -220,4 +221,9 @@ pub fn (mut i Image) free() {
 
 pub fn (i &Image) uri() string {
 	return i.asset.ao.uri
+}
+
+[params]
+pub struct SoundOptions {
+	AssetOption
 }
