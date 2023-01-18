@@ -48,11 +48,12 @@ pub struct Draw2DImage {
 	// alpha_pipeline gl.Pipeline
 	factor f32 = 1.0
 pub mut:
-	color    Color = rgb(255, 255, 255)
-	origin   Anchor
-	rotation f32
-	scale    f32 = 1.0
-	offset   Vec2[f32]
+	color     Color = rgb(255, 255, 255)
+	origin    Anchor
+	rotation  f32
+	scale     f32 = 1.0
+	offset    Vec2[f32]
+	fill_mode ImageFillMode
 }
 
 [inline]
@@ -72,12 +73,53 @@ pub fn (i Draw2DImage) draw() {
 
 	u0 := f32(0.0)
 	v0 := f32(0.0)
-	u1 := f32(1.0)
-	v1 := f32(1.0)
+	mut u1 := f32(1.0)
+	mut v1 := f32(1.0)
 	x0 := f32(0)
 	y0 := f32(0)
-	x1 := f32(w)
-	y1 := f32(h)
+	mut x1 := f32(w)
+	mut y1 := f32(h)
+
+	match i.fill_mode {
+		.stretch {
+			// default mode
+		}
+		.aspect_fit {
+			assert false, 'TODO .aspect_fit not implemented yet'
+		}
+		.aspect_crop {
+			assert false, 'TODO .aspect_crop not implemented yet'
+		}
+		.tile {
+			image := i.image
+			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
+			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
+			u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)
+			v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
+			x1 = i.width
+			y1 = i.height
+		}
+		.tile_vertically {
+			image := i.image
+			assert image.opt.wrap_u == .clamp_to_edge, 'Images used for fill_mode: .tile_vertically, must be loaded with wrap_u: .clamp_to_edge'
+			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .tile_vertically, must be loaded with wrap_v: .repeat'
+			v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
+			x1 = i.width
+			y1 = i.height
+		}
+		.tile_horizontally {
+			image := i.image
+			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile_horizontally, must be loaded with wrap_u: .repeat'
+			assert image.opt.wrap_v == .clamp_to_edge, 'Images used for fill_mode: .tile_horizontally, must be loaded with wrap_v: .clamp_to_edge'
+			u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)
+			x1 = i.width
+			y1 = i.height
+		}
+		.pad {
+			x1 = i.image.width
+			y1 = i.image.height
+		}
+	}
 
 	gl.push_matrix()
 
