@@ -292,8 +292,7 @@ pub mut:
 // play plays the sound.
 pub fn (s &Sound) play() {
 	assert !isnil(s.asset), 'Sound is not initialized'
-	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
-	assert !isnil(engine), 'Sound engine is not valid'
+	engine := s.engine()
 	engine.set_looping(s.id, s.loop)
 	mut id := s.id
 	if s.id_end > 0 {
@@ -307,12 +306,16 @@ pub fn (s &Sound) play() {
 	engine.play(id)
 }
 
+fn (s &Sound) engine() &AudioEngine {
+	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
+	assert !isnil(engine), 'Sound engine is not valid'
+	return engine
+}
+
 // is_looping returns `true` if the sound is looping, `false` otherwise.
 pub fn (s &Sound) is_looping() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
-	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
-	assert !isnil(engine), 'Sound engine is not valid'
-
+	engine := s.engine()
 	mut id := s.id
 	if s.id_end > 0 {
 		for i in id .. s.id_end {
@@ -327,8 +330,7 @@ pub fn (s &Sound) is_looping() bool {
 // is_playing returns `true` if the sound is playing, `false` otherwise.
 pub fn (s &Sound) is_playing() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
-	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
-	assert !isnil(engine), 'Sound engine is not valid'
+	engine := s.engine()
 
 	mut id := s.id
 	if s.id_end > 0 {
@@ -344,8 +346,7 @@ pub fn (s &Sound) is_playing() bool {
 // stop stops the sound, if it is playing.
 pub fn (s &Sound) stop() {
 	assert !isnil(s.asset), 'Sound is not initialized'
-	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
-	assert !isnil(engine), 'Sound engine is not valid'
+	engine := s.engine()
 	engine.stop(s.id)
 	engine.set_looping(s.id, s.loop)
 }
