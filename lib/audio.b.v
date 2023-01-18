@@ -113,6 +113,8 @@ pub fn (mut ae AudioEngine) load(path string) !u16 {
 	return ae.sound_id
 }
 
+// load_copies loads `copies` amount of copies of `path` into memory
+// load_copies returns the ids of the firat and last copy loaded.
 pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
 	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 	// See https://github.com/mackron/miniaudio/issues/517

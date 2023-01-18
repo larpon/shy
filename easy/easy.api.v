@@ -396,6 +396,7 @@ pub struct EasySoundConfig {
 	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
 }
 
+/*
 pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
@@ -415,50 +416,7 @@ pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
 		id_end: id_end
 		loop: esc.loop
 	}
-}
-
-pub fn (es &EasySound) play() {
-	es.engine.set_looping(es.id, es.loop)
-	mut id := es.id
-	if es.id_end > 0 {
-		for i in id .. es.id_end {
-			if !es.engine.is_playing(i) {
-				id = i
-				break
-			}
-		}
-	}
-	es.engine.play(id)
-}
-
-pub fn (es &EasySound) is_looping() bool {
-	mut id := es.id
-	if es.id_end > 0 {
-		for i in id .. es.id_end {
-			if es.engine.is_looping(i) {
-				return true
-			}
-		}
-	}
-	return es.engine.is_looping(id)
-}
-
-pub fn (es &EasySound) is_playing() bool {
-	mut id := es.id
-	if es.id_end > 0 {
-		for i in id .. es.id_end {
-			if es.engine.is_playing(i) {
-				return true
-			}
-		}
-	}
-	return es.engine.is_playing(id)
-}
-
-pub fn (es &EasySound) stop() {
-	es.engine.stop(es.id)
-	es.engine.set_looping(es.id, es.loop)
-}
+}*/
 
 pub struct EasyImageConfigRect {
 	x      f32
@@ -473,13 +431,14 @@ pub struct EasyImageConfig {
 	// shy.Rect: shy.Rect{0,0,-1,-1}
 	EasyImageConfigRect
 pub:
-	uri      string
-	color    shy.Color = shy.rgb(255, 255, 255)
-	rotation f32
-	scale    f32 = 1.0
-	offset   vec.Vec2[f32]
-	origin   shy.Anchor
-	region   shy.Rect = shy.Rect{0, 0, -1, -1}
+	uri       string
+	color     shy.Color = shy.rgb(255, 255, 255)
+	rotation  f32
+	scale     f32 = 1.0
+	offset    vec.Vec2[f32]
+	origin    shy.Anchor
+	region    shy.Rect = shy.Rect{0, 0, -1, -1}
+	fill_mode shy.ImageFillMode
 }
 
 [noinit]
@@ -487,17 +446,17 @@ pub struct EasyImage {
 	shy.ShyStruct
 	shy.Rect
 pub:
-	uri      string
-	color    shy.Color = shy.rgb(255, 255, 255)
-	rotation f32
-	scale    f32 = 1.0
-	offset   vec.Vec2[f32]
-	origin   shy.Anchor
-	region   shy.Rect = shy.Rect{0, 0, -1, -1}
+	uri       string
+	color     shy.Color = shy.rgb(255, 255, 255)
+	rotation  f32
+	scale     f32 = 1.0
+	offset    vec.Vec2[f32]
+	origin    shy.Anchor
+	region    shy.Rect = shy.Rect{0, 0, -1, -1}
+	fill_mode shy.ImageFillMode
 }
 
 pub fn (ei &EasyImage) draw() {
-	// TODO e.shy.assets.get_cached(...) ???
 	mut image := shy.Image{}
 	// if img := ei.shy.assets().get_cached<shy.Image>(ei.uri) {
 	if img := ei.shy.assets().get_cached_image(ei.uri) {
@@ -519,6 +478,7 @@ pub fn (ei &EasyImage) draw() {
 	i2d.scale = ei.scale
 	i2d.offset = ei.offset
 	i2d.origin = ei.origin
+	i2d.fill_mode = ei.fill_mode
 
 	if ei.region.width >= 0 || ei.region.height >= 0 {
 		src := shy.Rect{
@@ -573,6 +533,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		offset: eic.offset
 		origin: eic.origin
 		region: eic.region
+		fill_mode: eic.fill_mode
 	}
 }
 
@@ -583,23 +544,34 @@ pub fn (q &Quick) image(eic EasyImageConfig) {
 }
 
 // Assets
-pub fn (e &Easy) load(ao shy.AssetOptions) ! {
-	// TODO e.shy.assets.is_cached(...) ???
-	// if _ := e.shy.assets().get_cached<shy.Image>(ao.uri) {
-	if _ := e.shy.assets().get_cached_image(ao.uri) {
-		return
-	}
-	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
+// load returns a reference `shy.Asset`. Note that the asset may not be fully loaded
+// depending on the load options passed.
+pub fn (e &Easy) load(alo shy.AssetLoadOptions) !&shy.Asset {
 	mut assets := e.shy.assets()
-	mut asset := assets.load(ao)!
-	_ := asset.to_image(
-		cache: true
-		mipmaps: 4
-	)!
+	return assets.load(alo)!
 }
 
 [inline]
 pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
-	q.easy.load(ao)!
+	assets := q.easy.shy.assets()
+	mut asset := q.easy.load(ao.AssetLoadOptions)!
+	match ao {
+		shy.ImageOptions {
+			// TODO e.shy.assets.is_cached(...) ???
+			// if _ := e.shy.assets().get_cached<shy.Image>(ao.uri) {
+			if _ := assets.get_cached_image(ao.uri) {
+				// assets.get[&shy.Asset](ao.uri)
+				return
+			}
+			_ := asset.to[shy.Image](ao)!
+			// return image
+			return
+		}
+		shy.SoundOptions {
+			_ := asset.to[shy.Sound](ao)!
+			return
+		}
+	}
+	return error('${@STRUCT}.${@FN}: TODO ${ao} type not implemented yet')
 }
