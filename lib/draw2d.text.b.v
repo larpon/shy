@@ -131,7 +131,7 @@ pub mut:
 	text     string
 	rotation f32
 	font     string = defaults.font.name
-	color    Color  = colors.shy.white
+	color    Color  = defaults.font.color
 	origin   Anchor
 	align    TextAlign = .baseline | .left // TODO V BUG lib.defaults.font.align
 	size     f32       = defaults.font.size
@@ -160,7 +160,7 @@ pub fn (t Draw2DText) draw() {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
 	}
-	// color := sfons.rgba(255, 255, 255, 255)
+	// println('${@FN} ${t.color}')
 	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
 	font_context.set_color(color)
 	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?

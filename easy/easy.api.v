@@ -46,6 +46,7 @@ pub mut:
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
+	color    shy.Color = shy.rgba(255, 255, 255, 255) // BUG shy.defaults.font.color
 }
 
 [noinit]
@@ -61,6 +62,7 @@ pub mut:
 	origin   shy.Anchor
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
+	color    shy.Color = shy.defaults.font.color
 }
 
 [inline]
@@ -78,6 +80,7 @@ pub fn (et &EasyText) draw() {
 	t.origin = et.origin
 	t.align = et.align
 	t.offset = et.offset
+	t.color = et.color
 	t.draw()
 	dt.end()
 }
