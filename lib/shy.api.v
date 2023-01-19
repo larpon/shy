@@ -58,6 +58,13 @@ pub fn (s &Shy) gfx() &GFX {
 }
 
 [inline]
+pub fn (s &Shy) events() &Events {
+	assert !isnil(s.api)
+	assert !isnil(s.api.events)
+	return s.api.events
+}
+
+[inline]
 pub fn (s &Shy) draw() &Draw {
 	assert !isnil(s.api)
 	assert !isnil(s.api.draw)
