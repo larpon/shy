@@ -111,6 +111,8 @@ pub fn (q &Quick) text(etc EasyTextConfig) {
 
 // Shape drawing sub-system
 
+// Rect
+
 [params]
 pub struct EasyRectConfig {
 	shy.Rect
@@ -172,6 +174,77 @@ pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
 pub fn (q &Quick) rect(erc EasyRectConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.rect(erc).draw()
+}
+
+// Triangle
+
+[params]
+pub struct EasyTriangleConfig {
+pub mut:
+	a        vec.Vec2[f32]
+	b        vec.Vec2[f32]
+	c        vec.Vec2[f32]
+	stroke   shy.Stroke
+	rotation f32
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .body | .outline
+	offset   vec.Vec2[f32]
+	origin   shy.Anchor
+}
+
+[noinit]
+pub struct EasyTriangle {
+	shy.ShyStruct
+pub mut:
+	a        vec.Vec2[f32]
+	b        vec.Vec2[f32]
+	c        vec.Vec2[f32]
+	stroke   shy.Stroke
+	rotation f32
+	scale    f32       = 1.0
+	color    shy.Color = shy.colors.shy.red
+	fills    shy.Fill  = .body | .outline
+	offset   vec.Vec2[f32]
+	origin   shy.Anchor
+}
+
+[inline]
+pub fn (et &EasyTriangle) draw() {
+	draw := et.shy.draw()
+	mut d := draw.shape_2d()
+	d.begin()
+	mut t := d.triangle()
+	t.Triangle.a_x = et.a.x
+	t.Triangle.a_y = et.a.y
+	t.Triangle.b_x = et.b.x
+	t.Triangle.b_y = et.b.y
+	t.Triangle.c_x = et.c.x
+	t.Triangle.c_y = et.c.y
+	t.stroke = et.stroke
+	t.rotation = et.rotation
+	t.scale = et.scale
+	t.color = et.color
+	t.fills = et.fills
+	t.offset = et.offset
+	t.origin = et.origin
+	t.draw()
+	d.end()
+}
+
+[inline]
+pub fn (e &Easy) triangle(etc EasyTriangleConfig) EasyTriangle {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return EasyTriangle{
+		...etc
+		shy: e.shy
+	}
+}
+
+[inline]
+pub fn (q &Quick) triangle(etc EasyTriangleConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.triangle(etc).draw()
 }
 
 // Line

@@ -39,6 +39,13 @@ fn radius_to_segments(r f32) u32 {
 	return u32(mth.ceil(math.tau * r / div))
 }
 
+pub fn (d2d &DrawShape2D) triangle(config DrawShape2DTriangle) DrawShape2DTriangle {
+	return DrawShape2DTriangle{
+		...config
+		factor: d2d.factor
+	}
+}
+
 pub fn (d2d &DrawShape2D) rect(config DrawShape2DRect) DrawShape2DRect {
 	return DrawShape2DRect{
 		...config
@@ -68,6 +75,113 @@ pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawSha
 		factor: d2d.factor
 		segments: segments
 	}
+}
+
+// DrawShape2DTriangle
+[params]
+pub struct DrawShape2DTriangle {
+	Triangle
+	factor f32 = 1.0
+pub mut:
+	visible  bool  = true
+	color    Color = colors.shy.red
+	stroke   Stroke
+	rotation f32
+	scale    f32  = 1.0
+	fills    Fill = .body | .outline
+	offset   Vec2[f32]
+	origin   Anchor
+}
+
+[inline]
+pub fn (t &DrawShape2DTriangle) origin_offset() (f32, f32) {
+	bb := t.bbox()
+	p_x, p_y := t.origin.pos_wh(bb.width * t.factor, bb.height * t.factor)
+	return -p_x, -p_y
+}
+
+[inline]
+pub fn (t &DrawShape2DTriangle) draw() {
+	scale_factor := t.factor
+	x1_ := t.a_x * scale_factor
+	y1_ := t.a_y * scale_factor
+	dx := t.a_x - x1_
+	dy := t.a_y - y1_
+	x2_ := t.b_x - dx
+	y2_ := t.b_y - dy
+	x3_ := t.c_x - dx
+	y3_ := t.c_y - dy
+
+	mut o_off_x, mut o_off_y := t.origin_offset()
+	o_off_x = int(o_off_x)
+	o_off_y = int(o_off_y)
+
+	gl.push_matrix()
+	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(t.offset.x, t.offset.y, 0)
+
+	if t.rotation != 0 {
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.rotate(t.rotation, 0, 0, 1.0)
+		gl.translate(o_off_x, o_off_y, 0)
+	}
+
+	if t.scale != 1 {
+		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.scale(t.scale, t.scale, 1)
+		gl.translate(o_off_x, o_off_y, 0)
+	}
+
+	if t.fills.has(.body) {
+		color := t.color
+		gl.c4b(color.r, color.g, color.b, color.a)
+
+		gl.begin_triangles()
+		gl.v2f(x1_, y1_)
+		gl.v2f(x2_, y2_)
+		gl.v2f(x3_, y3_)
+		gl.end()
+
+		analyse.count('${@STRUCT}.${@FN}/vertices', 3)
+		analyse.count('total_vertices', 3)
+	}
+	if t.fills.has(.outline) {
+		stroke_width := t.stroke.width
+		color := t.stroke.color
+		gl.c4b(color.r, color.g, color.b, color.a)
+		if stroke_width <= 0 {
+			// Do nothing
+		} else if stroke_width > 1 {
+			m12x, m12y := midpoint(x1_, y1_, x2_, y2_)
+			m23x, m23y := midpoint(x2_, y2_, x3_, y3_)
+			m31x, m31y := midpoint(x3_, y3_, x1_, y1_)
+			t.draw_anchor(m12x, m12y, x2_, y2_, m23x, m23y)
+			t.draw_anchor(m23x, m23y, x3_, y3_, m31x, m31y)
+			t.draw_anchor(m31x, m31y, x1_, y1_, m12x, m12y)
+		} else {
+			gl.begin_line_strip()
+
+			gl.v2f(x1_, y1_)
+			gl.v2f(x2_, y2_)
+
+			gl.v2f(x2_, y2_)
+			gl.v2f(x3_, y3_)
+
+			gl.v2f(x3_, y3_)
+			gl.v2f(x1_, y1_)
+
+			gl.end()
+
+			analyse.count('${@STRUCT}.${@FN}/vertices', 6)
+			analyse.count('total_vertices', 6)
+		}
+	}
+	gl.pop_matrix()
+}
+
+[inline]
+fn (t &DrawShape2DTriangle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+	draw_anchor(t.stroke, x1, y1, x2, y2, x3, y3)
 }
 
 // DrawShape2DRect
@@ -104,7 +218,7 @@ pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
 }
 
 [inline]
-pub fn (r DrawShape2DRect) draw() {
+pub fn (r &DrawShape2DRect) draw() {
 	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
 	// this could/should maybe someday be switchable by a flag...?
 	x := r.x * r.factor

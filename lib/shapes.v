@@ -6,10 +6,65 @@
 module lib
 
 import math
-// import mth
+import mth
 import shy.vec { Vec2 }
 
 // basic primitives
+
+// Triangle represents the data structure of a triangle.
+pub struct Triangle {
+pub mut:
+	a_x f32
+	a_y f32
+	b_x f32 = 100
+	b_y f32
+	c_x f32 = 50
+	c_y f32 = 50
+}
+
+[inline]
+pub fn (t &Triangle) bbox() Rect {
+	a_x := t.a_x
+	a_y := t.a_y
+	b_x := t.b_x
+	b_y := t.b_y
+	c_x := t.c_x
+	c_y := t.c_y
+	max_x := mth.max(a_x, mth.max(b_x, c_x))
+	min_x := mth.min(a_x, mth.min(b_x, c_x))
+	max_y := mth.max(a_y, mth.max(b_y, c_y))
+	min_y := mth.min(a_y, mth.min(b_y, c_y))
+	return Rect{
+		x: min_x
+		y: min_y
+		width: max_x - min_x
+		height: max_y - min_y
+	}
+}
+
+// contains returns `true` if `Triangle` contains the point given by `x` and `y`.
+[inline]
+pub fn (t &Triangle) contains(x f32, y f32) bool {
+	a_x := t.a_x
+	a_y := t.a_y
+	b_x := t.b_x
+	b_y := t.b_y
+	c_x := t.c_x
+	c_y := t.c_y
+	// Found in the html source code here:
+	// http://2000clicks.com/MathHelp/GeometryPointAndTriangle.aspx
+	// by Graeme McRae - it seems.
+	f_ab := ((y - a_y) * (b_x - a_x) - (x - a_x) * (b_y - a_y))
+	f_bc := ((y - b_y) * (c_x - b_x) - (x - b_x) * (c_y - b_y))
+	f_ca := ((y - c_y) * (a_x - c_x) - (x - c_x) * (a_y - c_y))
+	return f_ab * f_bc > 0 && f_bc * f_ca > 0
+}
+
+// area returns the area of `Triangle`.
+[inline]
+pub fn (t &Triangle) area() f32 {
+	return 0.5 * ((t.a_x - t.c_x) * (t.b_y - t.c_y) - (t.a_y - t.c_y) * (t.b_x - t.c_x))
+}
 
 // Rect represents the data structure of a rectangle
 pub struct Rect {
@@ -20,6 +75,7 @@ pub mut:
 	height f32 = 100
 }
 
+// contains returns `true` if `Rect` contains the point given by `x` and `y`.
 [inline]
 pub fn (r &Rect) contains(x f32, y f32) bool {
 	return x >= r.x && y >= r.y && x <= r.x + r.width && y <= r.y + r.height

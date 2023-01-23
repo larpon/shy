@@ -19,8 +19,8 @@ struct App {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
-		x: (shy.half * a.window.width())
-		y: (shy.half * a.window.height())
+		x: (shy.half * a.canvas.width)
+		y: (shy.half * a.canvas.height)
 		width: 100
 		height: 100
 		origin: .center
