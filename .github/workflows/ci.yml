@@ -59,7 +59,7 @@ jobs:
     #    shy test-cleancode ~/.vmodules/shy
 
   ubuntu-latest-bootstrap:
-    runs-on: ubuntu-20.04 # use 20.04 for now
+    runs-on: ubuntu-20.04 # use 20.04 for now (SDL2 compile issue)
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -194,7 +194,7 @@ jobs:
         v -d sdl_no_compile_flags ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-build:
-    runs-on: ubuntu-20.04 # use 20.04 for now
+    runs-on: ubuntu-20.04 # use 20.04 for now (SDL2 compile issue)
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -252,7 +252,7 @@ jobs:
         export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
         export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
 
-        declare -a shy_examples=('anchors' 'hello_world' 'image' 'shapes/lines' 'shapes/rectangle' 'mouse' 'multi_window' 'sound' 'timers')
+        declare -a shy_examples=('anchors/anchors.v' 'anchors/triangle_anchors.v' 'hello_world' 'image' 'shapes/circle' 'shapes/lines' 'shapes/rectangle' 'shapes/triangle' 'shapes/uniform_polygon' 'mouse' 'multi_window' 'sound' 'timers')
         echo "Compiling shy examples ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
@@ -270,7 +270,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04] # use 20.04 for now
+        os: [ubuntu-20.04] # use 20.04 for now (SDL2 compile issue)
         sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0]
     timeout-minutes: 20
     env:
@@ -337,7 +337,7 @@ jobs:
         export CFLAGS="$(/tmp/sdl2-${{ matrix.sdl-version }}/bin/sdl2-config --cflags)"
         export LDFLAGS="$(/tmp/sdl2-${{ matrix.sdl-version }}/bin/sdl2-config --libs)"
 
-        declare -a shy_examples=('anchors' 'hello_world' 'image' 'shapes/lines' 'shapes/rectangle' 'mouse' 'multi_window' 'sound' 'timers')
+        declare -a shy_examples=('anchors/anchors.v' 'anchors/triangle_anchors.v' 'hello_world' 'image' 'shapes/circle' 'shapes/lines' 'shapes/rectangle' 'shapes/triangle' 'shapes/uniform_polygon' 'mouse' 'multi_window' 'sound' 'timers')
         echo "Compiling shy examples ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
           v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
