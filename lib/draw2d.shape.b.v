@@ -103,22 +103,26 @@ pub fn (t &DrawShape2DTriangle) origin_offset() (f32, f32) {
 [inline]
 pub fn (t &DrawShape2DTriangle) draw() {
 	scale_factor := t.factor
-	x1_ := t.a_x * scale_factor
-	y1_ := t.a_y * scale_factor
-	dx := t.a_x - x1_
-	dy := t.a_y - y1_
-	x2_ := t.b_x - dx
-	y2_ := t.b_y - dy
-	x3_ := t.c_x - dx
-	y3_ := t.c_y - dy
+
+	bb := t.Triangle.bbox()
+
+	x := bb.x
+	y := bb.y
+	x1 := (t.a.x - x)
+	y1 := (t.a.y - y)
+	x2 := (t.b.x - x) * scale_factor
+	y2 := (t.b.y - y) * scale_factor
+	x3 := (t.c.x - x) * scale_factor
+	y3 := (t.c.y - y) * scale_factor
 
 	mut o_off_x, mut o_off_y := t.origin_offset()
+
 	o_off_x = int(o_off_x)
 	o_off_y = int(o_off_y)
 
 	gl.push_matrix()
 	gl.translate(o_off_x, o_off_y, 0)
-	gl.translate(t.offset.x, t.offset.y, 0)
+	gl.translate(x + t.offset.x, y + t.offset.y, 0)
 
 	if t.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
@@ -137,9 +141,9 @@ pub fn (t &DrawShape2DTriangle) draw() {
 		gl.c4b(color.r, color.g, color.b, color.a)
 
 		gl.begin_triangles()
-		gl.v2f(x1_, y1_)
-		gl.v2f(x2_, y2_)
-		gl.v2f(x3_, y3_)
+		gl.v2f(x1, y1)
+		gl.v2f(x2, y2)
+		gl.v2f(x3, y3)
 		gl.end()
 
 		analyse.count('${@STRUCT}.${@FN}/vertices', 3)
@@ -152,30 +156,31 @@ pub fn (t &DrawShape2DTriangle) draw() {
 		if stroke_width <= 0 {
 			// Do nothing
 		} else if stroke_width > 1 {
-			m12x, m12y := midpoint(x1_, y1_, x2_, y2_)
-			m23x, m23y := midpoint(x2_, y2_, x3_, y3_)
-			m31x, m31y := midpoint(x3_, y3_, x1_, y1_)
-			t.draw_anchor(m12x, m12y, x2_, y2_, m23x, m23y)
-			t.draw_anchor(m23x, m23y, x3_, y3_, m31x, m31y)
-			t.draw_anchor(m31x, m31y, x1_, y1_, m12x, m12y)
+			m12x, m12y := midpoint(x1, y1, x2, y2)
+			m23x, m23y := midpoint(x2, y2, x3, y3)
+			m31x, m31y := midpoint(x3, y3, x1, y1)
+			t.draw_anchor(m12x, m12y, x2, y2, m23x, m23y)
+			t.draw_anchor(m23x, m23y, x3, y3, m31x, m31y)
+			t.draw_anchor(m31x, m31y, x1, y1, m12x, m12y)
 		} else {
 			gl.begin_line_strip()
 
-			gl.v2f(x1_, y1_)
-			gl.v2f(x2_, y2_)
+			gl.v2f(x1, y1)
+			gl.v2f(x2, y2)
 
-			gl.v2f(x2_, y2_)
-			gl.v2f(x3_, y3_)
+			// gl.v2f(x2_, y2_)
+			gl.v2f(x3, y3)
 
-			gl.v2f(x3_, y3_)
-			gl.v2f(x1_, y1_)
+			// gl.v2f(x3_, y3_)
+			gl.v2f(x1, y1)
 
 			gl.end()
 
-			analyse.count('${@STRUCT}.${@FN}/vertices', 6)
-			analyse.count('total_vertices', 6)
+			analyse.count('${@STRUCT}.${@FN}/vertices', 4)
+			analyse.count('total_vertices', 4)
 		}
 	}
+	gl.translate(-x, -y, 0)
 	gl.pop_matrix()
 }
 

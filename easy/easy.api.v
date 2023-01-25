@@ -210,17 +210,31 @@ pub mut:
 }
 
 [inline]
+pub fn (et &EasyTriangle) bbox() shy.Rect {
+	t := shy.Triangle{
+		a: et.a
+		b: et.b
+		c: et.c
+	}
+	bb := t.bbox()
+	mut p_x, mut p_y := et.origin.pos_wh(bb.width, bb.height)
+	return shy.Rect{
+		x: bb.x - p_x
+		y: bb.y - p_y
+		width: bb.width
+		height: bb.height
+	}
+}
+
+[inline]
 pub fn (et &EasyTriangle) draw() {
 	draw := et.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
 	mut t := d.triangle()
-	t.Triangle.a_x = et.a.x
-	t.Triangle.a_y = et.a.y
-	t.Triangle.b_x = et.b.x
-	t.Triangle.b_y = et.b.y
-	t.Triangle.c_x = et.c.x
-	t.Triangle.c_y = et.c.y
+	t.Triangle.a = et.a
+	t.Triangle.b = et.b
+	t.Triangle.c = et.c
 	t.stroke = et.stroke
 	t.rotation = et.rotation
 	t.scale = et.scale

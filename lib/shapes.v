@@ -11,29 +11,156 @@ import shy.vec { Vec2 }
 
 // basic primitives
 
+pub type Origin = Anchor | Vec2[f32]
+
+pub enum TriangleSegment {
+	ab
+	ba
+	bc
+	cb
+	ca
+	ac
+}
+
+pub fn (ts TriangleSegment) next() TriangleSegment {
+	return match ts {
+		.ab {
+			.bc
+		}
+		.bc {
+			.ca
+		}
+		.ca {
+			.ba
+		}
+		.ba {
+			.cb
+		}
+		.cb {
+			.ac
+		}
+		.ac {
+			.ab
+		}
+	}
+}
+
+pub fn (ts TriangleSegment) prev() TriangleSegment {
+	return match ts {
+		.ab {
+			.ac
+		}
+		.bc {
+			.ab
+		}
+		.ca {
+			.bc
+		}
+		.ba {
+			.ca
+		}
+		.cb {
+			.ba
+		}
+		.ac {
+			.cb
+		}
+	}
+}
+
+pub enum TriangleAnchor {
+	centroid
+	a
+	ab_midpoint
+	ba_midpoint
+	b
+	bc_midpoint
+	cb_midpoint
+	c
+	ca_midpoint
+	ac_midpoint
+}
+
+pub fn (ta TriangleAnchor) next() TriangleAnchor {
+	return match ta {
+		.centroid {
+			.a
+		}
+		.a {
+			.ab_midpoint
+		}
+		.ab_midpoint, .ba_midpoint {
+			.b
+		}
+		.b {
+			.bc_midpoint
+		}
+		.bc_midpoint, .cb_midpoint {
+			.c
+		}
+		.c {
+			.ca_midpoint
+		}
+		.ca_midpoint, .ac_midpoint {
+			.centroid
+		}
+	}
+}
+
+pub fn (ta TriangleAnchor) prev() TriangleAnchor {
+	return match ta {
+		.centroid {
+			.ca_midpoint
+		}
+		.a {
+			.centroid
+		}
+		.ab_midpoint, .ba_midpoint {
+			.a
+		}
+		.b {
+			.ab_midpoint
+		}
+		.bc_midpoint, .cb_midpoint {
+			.b
+		}
+		.c {
+			.bc_midpoint
+		}
+		.ca_midpoint, .ac_midpoint {
+			.c
+		}
+	}
+}
+
+pub type TriangleOrigin = Origin | TriangleAnchor
+
 // Triangle represents the data structure of a triangle.
 pub struct Triangle {
 pub mut:
-	a_x f32
-	a_y f32
-	b_x f32 = 100
-	b_y f32
-	c_x f32 = 50
-	c_y f32 = 50
+	a Vec2[f32]
+	b Vec2[f32] = Vec2[f32]{
+		x: 100
+		y: 0
+	}
+	c Vec2[f32] = Vec2[f32]{
+		x: 50
+		y: 50
+	}
 }
 
 [inline]
 pub fn (t &Triangle) bbox() Rect {
-	a_x := t.a_x
-	a_y := t.a_y
-	b_x := t.b_x
-	b_y := t.b_y
-	c_x := t.c_x
-	c_y := t.c_y
-	max_x := mth.max(a_x, mth.max(b_x, c_x))
+	a_x := t.a.x
+	a_y := t.a.y
+	b_x := t.b.x
+	b_y := t.b.y
+	c_x := t.c.x
+	c_y := t.c.y
 	min_x := mth.min(a_x, mth.min(b_x, c_x))
-	max_y := mth.max(a_y, mth.max(b_y, c_y))
+	max_x := mth.max(a_x, mth.max(b_x, c_x))
 	min_y := mth.min(a_y, mth.min(b_y, c_y))
+	max_y := mth.max(a_y, mth.max(b_y, c_y))
 	return Rect{
 		x: min_x
 		y: min_y
@@ -42,15 +169,67 @@ pub fn (t &Triangle) bbox() Rect {
 	}
 }
 
+[inline]
+pub fn (t &Triangle) centroid() (f32, f32) {
+	sx := t.a.x + t.b.x + t.c.x
+	sy := t.a.y + t.b.y + t.c.y
+	return sx / 3, sy / 3
+}
+
+[inline]
+pub fn (t &Triangle) segment_midpoint(segment TriangleSegment) (f32, f32) {
+	mut sx, mut sy := f32(0), f32(0)
+	match segment {
+		.ab, .ba {
+			sx = t.a.x + t.b.x
+			sy = t.a.y + t.b.y
+		}
+		.bc, .cb {
+			sx = t.b.x + t.c.x
+			sy = t.b.y + t.c.y
+		}
+		.ca, .ac {
+			sx = t.a.x + t.c.x
+			sy = t.a.y + t.c.y
+		}
+	}
+	return sx * 0.5, sy * 0.5
+}
+
+[inline]
+pub fn (t &Triangle) length() f32 {
+	mut l := t.segment_length(.ab)
+	l += t.segment_length(.bc)
+	l += t.segment_length(.ca)
+	return l
+}
+
+[inline]
+pub fn (t &Triangle) segment_length(segment TriangleSegment) f32 {
+	mut l := f32(0)
+	match segment {
+		.ab, .ba {
+			l = t.a.distance(t.b)
+		}
+		.bc, .cb {
+			l = t.b.distance(t.c)
+		}
+		.ca, .ac {
+			l = t.c.distance(t.a)
+		}
+	}
+	return l
+}
+
 // contains returns `true` if `Triangle` contains the point given by `x` and `y`.
 [inline]
 pub fn (t &Triangle) contains(x f32, y f32) bool {
-	a_x := t.a_x
-	a_y := t.a_y
-	b_x := t.b_x
-	b_y := t.b_y
-	c_x := t.c_x
-	c_y := t.c_y
+	a_x := t.a.x
+	a_y := t.a.y
+	b_x := t.b.x
+	b_y := t.b.y
+	c_x := t.c.x
+	c_y := t.c.y
 	// Found in the html source code here:
 	// http://2000clicks.com/MathHelp/GeometryPointAndTriangle.aspx
 	// by Graeme McRae - it seems.
@@ -63,7 +242,7 @@ pub fn (t &Triangle) contains(x f32, y f32) bool {
 // area returns the area of `Triangle`.
 [inline]
 pub fn (t &Triangle) area() f32 {
-	return 0.5 * ((t.a_x - t.c_x) * (t.b_y - t.c_y) - (t.a_y - t.c_y) * (t.b_x - t.c_x))
+	return 0.5 * ((t.a.x - t.c.x) * (t.b.y - t.c.y) - (t.a.y - t.c.y) * (t.b.x - t.c.x))
 }
 
 // Rect represents the data structure of a rectangle
@@ -78,7 +257,7 @@ pub mut:
 // contains returns `true` if `Rect` contains the point given by `x` and `y`.
 [inline]
 pub fn (r &Rect) contains(x f32, y f32) bool {
-	return x >= r.x && y >= r.y && x <= r.x + r.width && y <= r.y + r.height
+	return x > r.x && y > r.y && x < r.x + r.width && y < r.y + r.height
 }
 
 [inline]
