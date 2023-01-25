@@ -548,8 +548,8 @@ pub:
 
 pub fn (ei &EasyImage) draw() {
 	mut image := shy.Image{}
-	// if img := ei.shy.assets().get_cached<shy.Image>(ei.uri) {
-	if img := ei.shy.assets().get_cached_image(ei.uri) {
+	if img := ei.shy.assets().get[shy.Image](ei.uri) {
+		// if img := ei.shy.assets().get_cached_image(ei.uri) {
 		image = img
 	} else {
 		return
@@ -592,8 +592,8 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 
 	// TODO
 	mut image := shy.Image{}
-	// if img := ei.shy.assets().get_cached<shy.Image>(ei.uri) {
-	if img := e.shy.assets().get_cached_image(eic.uri) {
+	if img := e.shy.assets().get[shy.Image](eic.uri) {
+		// if img := e.shy.assets().get_cached_image(eic.uri) {
 		image = img
 	} else {
 		// return
@@ -649,8 +649,8 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 	match ao {
 		shy.ImageOptions {
 			// TODO e.shy.assets.is_cached(...) ???
-			// if _ := e.shy.assets().get_cached<shy.Image>(ao.uri) {
-			if _ := assets.get_cached_image(ao.uri) {
+			if _ := assets.get[shy.Image](ao.uri) {
+				// if _ := assets.get_cached_image(ao.uri) {
 				// assets.get[&shy.Asset](ao.uri)
 				return
 			}
