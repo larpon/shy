@@ -25,7 +25,7 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 * 2D shape drawing with several levels, layers of control and performance.
 * 2D shape collision detection.
 * 3D capable (via `sokol_gfx.h`)
-* Multiple render modes (immediate, UI, step).
+* Multiple, runtime switchable, render modes (immediate, UI, step).
 * Fairly sub-system agnostic. Bring your own ECS, physics engine etc.
 * [WIP] Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
 music, sounds etc.
@@ -37,21 +37,24 @@ music, sounds etc.
 
 ## Dependencies
 
-`shy`'s default backend, currently, depend on `sdl` and `vab` official V modules.
+`shy`, currently, depend on `sdl` and `vab` official V modules.
 
-The `sdl` dependency will likely be moved to be part of another backend or opt-in
-once `shy` matures - but for now you'll need SDL2 at build and runtime.
-
-`vab` is only used by `shy`'s export functionality and *does not* require
-you to have Java nor Android SDK/NDK installed.
-If you do not intend to export to the Android platform the aforementioned
-dependencies are thus only needed at *runtime* for `vab`, but the module code
-still needs to be present when using the `shy` CLI tool.
 
 ```bash
 v install sdl
+```
+The `sdl` dependency is needed for the default backend. It will likely
+be moved to be part of another backend or opt-in once `shy` matures
+but for now you'll need SDL2 at build and runtime.
+
+```bash
 v install vab
 ```
+`vab` is used by `shy export` and *does not* require you to have Java nor
+the Android SDK/NDK installed. `shy export` need only `vab` to be installed as a module.
+
+However if you intend to export your shy creations to the Android platform the aforementioned
+dependencies are thus needed at *runtime* for `vab` to work.
 
 ## Unix (Linux, macOS)
 ```bash
