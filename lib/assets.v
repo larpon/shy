@@ -29,6 +29,8 @@ pub fn (mut a Assets) shutdown() ! {
 	// Sounds are handled by the AudioEngine
 }
 
+// load loads a binary blob from a variety of sources and return
+// a reference to an `Asset`.
 pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	uri := alo.uri
 	if asset := a.ass[uri] {
@@ -38,14 +40,24 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 
 	// TODO enable network fetching etc.
 	if alo.async {
-	}
-	if !os.is_file(uri) {
-		return error('${@STRUCT}.${@FN}' + ': "${uri}" does not exist')
+		return error('${@STRUCT}.${@FN}: "${uri}" asynchronously loading not implemented')
+		/*
+		asset := &Asset{
+			shy: a.shy
+			lo: alo
+			status: .loading
+		}
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${uri}"')
+		a.ass[uri] = asset
+		return asset
+		*/
+	} else if !os.is_file(uri) {
+		return error('${@STRUCT}.${@FN}: "${uri}" does not exist on the file system')
 	}
 	bytes := os.read_bytes(uri) or {
-		return error('${@STRUCT}.${@FN}' + ': "${uri}" could not be loaded')
+		return error('${@STRUCT}.${@FN}: "${uri}" could not be loaded')
 	}
-	// TODO asset pool??
+	// TODO preallocated asset pool??
 	asset := &Asset{
 		shy: a.shy
 		data: bytes
