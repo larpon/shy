@@ -7,136 +7,7 @@ import os
 import shy.wraps.sokol.gfx
 import stbi
 
-pub enum AssetStatus {
-	unknown
-	error
-	loading
-	loaded
-	streaming
-	freed
-}
-
-pub type AssetOptions = ImageOptions | SoundOptions
-
-pub struct AssetLoadOptions {
-pub:
-	uri    string
-	async  bool = true
-	stream bool
-	cache  bool = true
-}
-
-[heap]
-pub struct Asset {
-	ShyStruct
-	data []u8
-pub:
-	lo     AssetLoadOptions
-	status AssetStatus
-}
-
-// to converts `Asset`'s `.data` into T and return it.
-pub fn (mut a Asset) to[T](ao AssetOptions) !T {
-	$if T is Image {
-		match ao {
-			ImageOptions {
-				return a.to_image(ao)!
-			}
-			else {}
-		}
-	} $else $if T is Sound {
-		match ao {
-			SoundOptions {
-				return a.to_sound(ao)!
-			}
-			else {}
-		}
-	}
-	t := T{}
-	return error('${@STRUCT}.${@FN}' +
-		': could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
-}
-
-fn (mut a Asset) to_image(opt ImageOptions) !Image {
-	if opt.cache {
-		if image := a.shy.assets().image_cache[a.lo.uri] {
-			return image
-		}
-	}
-	assert a.status == .loaded, 'Asset is not loaded'
-	assert a.data.len > 0, 'Asset.data appears empty'
-
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.uri}" to image')
-	stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
-		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${a.lo.uri}"')
-	}
-
-	mut image := Image{
-		asset: a
-		opt: opt
-		width: stb_img.width
-		height: stb_img.height
-		channels: stb_img.nr_channels
-		mipmaps: opt.mipmaps
-		// cache: opt.cache
-		ready: stb_img.ok
-		// data: stb_img.data
-		kind: .png // TODO stb_img.ext
-	}
-
-	// Sokol image
-	// eprintln('\n init sokol image ${img.path} ok=${img.sg_image_ok}')
-	mut img_desc := gfx.ImageDesc{
-		width: image.width
-		height: image.height
-		num_mipmaps: 0 // TODO image.mipmaps
-		wrap_u: opt.wrap_u // .clamp_to_edge
-		wrap_v: opt.wrap_v // .clamp_to_edge
-		// label: &u8(0)
-		pixel_format: .rgba8
-	}
-
-	// println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
-	// println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
-	img_desc.data.subimage[0][0] = gfx.Range{
-		ptr: stb_img.data
-		size: usize(4 * image.width * image.height) // NOTE 4 is not always equal to image.channels count, but sokol_gl contexts expect it
-	}
-
-	image.gfx_image = gfx.make_image(&img_desc)
-
-	stb_img.free()
-
-	if opt.cache {
-		unsafe {
-			a.shy.assets().image_cache[a.lo.uri] = image
-		}
-	}
-
-	return image
-}
-
-fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
-	assert !isnil(a.shy), 'Asset struct is not initialized'
-	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	mut engine := a.shy.audio().engine(opt.engine_id)!
-
-	mut id := u16(0)
-	mut id_end := u16(0)
-	if opt.max_repeats > 1 {
-		id, id_end = engine.load_copies(a.lo.uri, opt.max_repeats)!
-	} else {
-		id = engine.load(a.lo.uri)!
-	}
-	return Sound{
-		asset: a
-		id: id
-		id_end: id_end
-		loop: opt.loop
-	}
-}
-
-// TODO free resources etc.
+// Assets acts as a manager of `Asset` instances.
 [heap]
 pub struct Assets {
 	ShyStruct
@@ -151,6 +22,9 @@ pub fn (mut a Assets) init() ! {}
 pub fn (mut a Assets) shutdown() ! {
 	for _, mut image in a.image_cache {
 		image.free()
+	}
+	for _, mut asset in a.ass {
+		asset.shutdown()!
 	}
 	// Sounds are handled by the AudioEngine
 }
@@ -215,6 +89,154 @@ pub fn (a &Assets) get_cached[T](uri string) !T {
 		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
+// Asset
+
+pub enum AssetStatus {
+	unknown
+	error
+	loading
+	loaded
+	streaming
+	freed
+}
+
+pub type AssetOptions = ImageOptions | SoundOptions
+
+pub struct AssetLoadOptions {
+pub:
+	uri    string
+	async  bool
+	stream bool
+	cache  bool = true
+}
+
+// Asset represents an binary blob
+[heap]
+pub struct Asset {
+	ShyStruct
+	data []u8
+pub:
+	lo     AssetLoadOptions
+	status AssetStatus
+}
+
+pub fn (mut a Asset) shutdown() ! {
+	unsafe {
+		a.data.free()
+	}
+	a.ShyStruct.shutdown()!
+}
+
+// to converts `Asset`'s `.data` into T and return it.
+pub fn (mut a Asset) to[T](ao AssetOptions) !T {
+	$if T is Image {
+		match ao {
+			ImageOptions {
+				return a.to_image(ao)!
+			}
+			else {
+				t := T{}
+				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
+			}
+		}
+	} $else $if T is Sound {
+		match ao {
+			SoundOptions {
+				return a.to_sound(ao)!
+			}
+			else {
+				t := T{}
+				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
+			}
+		}
+	} $else {
+		$compile_error('Asset.to[T]: only convertion to Image and Sound is currently supported')
+	}
+	// This should never be reached
+	t := T{}
+	return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
+}
+
+fn (mut a Asset) to_image(opt ImageOptions) !Image {
+	if opt.cache {
+		if image := a.shy.assets().image_cache[a.lo.uri] {
+			return image
+		}
+	}
+	assert a.status == .loaded, 'Asset is not loaded'
+	assert a.data.len > 0, 'Asset.data appears empty'
+
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.uri}" to image')
+	stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
+		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${a.lo.uri}"')
+	}
+
+	mut image := Image{
+		asset: a
+		opt: opt
+		width: stb_img.width
+		height: stb_img.height
+		channels: stb_img.nr_channels
+		mipmaps: opt.mipmaps
+		ready: stb_img.ok
+		// data: stb_img.data
+		kind: .png // TODO stb_img.ext
+	}
+
+	// Sokol image
+	// eprintln('\n init sokol image ${img.path} ok=${img.sg_image_ok}')
+	mut img_desc := gfx.ImageDesc{
+		width: image.width
+		height: image.height
+		num_mipmaps: 0 // TODO image.mipmaps
+		wrap_u: opt.wrap_u // .clamp_to_edge
+		wrap_v: opt.wrap_v // .clamp_to_edge
+		// label: &u8(0)
+		pixel_format: .rgba8
+	}
+
+	// println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
+	// println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
+	img_desc.data.subimage[0][0] = gfx.Range{
+		ptr: stb_img.data
+		size: usize(4 * image.width * image.height) // NOTE 4 is not always equal to image.channels count, but sokol_gl contexts expect it
+	}
+
+	image.gfx_image = gfx.make_image(&img_desc)
+
+	stb_img.free()
+
+	if opt.cache {
+		unsafe {
+			a.shy.assets().image_cache[a.lo.uri] = image
+		}
+	}
+
+	return image
+}
+
+fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
+	assert !isnil(a.shy), 'Asset struct is not initialized'
+	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
+	mut engine := a.shy.audio().engine(opt.engine_id)!
+
+	mut id := u16(0)
+	mut id_end := u16(0)
+	if opt.max_repeats > 1 {
+		id, id_end = engine.load_copies(a.lo.uri, opt.max_repeats)!
+	} else {
+		id = engine.load(a.lo.uri)!
+	}
+	return Sound{
+		asset: a
+		id: id
+		id_end: id_end
+		loop: opt.loop
+	}
+}
+
+// Image
+
 pub enum ImageKind {
 	unknown
 	png
@@ -231,7 +253,7 @@ pub enum ImageFillMode {
 	pad // image is not transformed
 }
 
-[heap]
+[heap; noinit]
 pub struct Image {
 	asset &Asset = null // TODO removing this results in compiler warnings a few places
 	opt   ImageOptions
@@ -242,8 +264,7 @@ mut:
 	channels int
 	ready    bool
 	mipmaps  int
-	// data voidptr
-	kind ImageKind
+	kind     ImageKind
 	// Implementation specific
 	gfx_image gfx.Image
 }
@@ -279,7 +300,7 @@ pub struct SoundOptions {
 	max_repeats u8
 }
 
-[heap]
+[heap; noinit]
 pub struct Sound {
 	asset  &Asset = null // TODO removing this results in compiler warnings a few places
 	opt    SoundOptions
@@ -287,6 +308,12 @@ pub struct Sound {
 	id_end u16
 pub mut:
 	loop bool
+}
+
+fn (s &Sound) engine() &AudioEngine {
+	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
+	assert !isnil(engine), 'Sound engine is not valid'
+	return engine
 }
 
 // play plays the sound.
@@ -304,12 +331,6 @@ pub fn (s &Sound) play() {
 		}
 	}
 	engine.play(id)
-}
-
-fn (s &Sound) engine() &AudioEngine {
-	engine := s.asset.shy.audio().engine(s.opt.engine_id) or { unsafe { nil } }
-	assert !isnil(engine), 'Sound engine is not valid'
-	return engine
 }
 
 // is_looping returns `true` if the sound is looping, `false` otherwise.
