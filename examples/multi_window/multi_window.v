@@ -24,6 +24,7 @@ pub fn (mut a App) init() ! {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	mut win := a.shy.active_window()
+	win_size := win.drawable_size()
 	mouse := a.mouse
 
 	mut color := shy.rgb(255, 0, 0)
@@ -31,16 +32,16 @@ pub fn (mut a App) frame(dt f64) {
 		color = shy.colors.shy.blue
 	}
 	a.quick.rect(
-		x: (shy.half * win.width()) - 50
-		y: (shy.half * win.height()) - 50
+		x: (shy.half * win_size.width) - 50
+		y: (shy.half * win_size.height) - 50
 		width: 100
 		height: 100
 		color: color
 	)
 
 	a.quick.text(
-		x: (win.width() / 10)
-		y: (win.height() / 10)
+		x: win_size.width / 10
+		y: win_size.height / 10
 		text: 'Window ${win.id}\n(press W to open a new child window)\nMouse: ${mouse.x},${mouse.y}'
 	)
 }

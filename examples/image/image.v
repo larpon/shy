@@ -28,8 +28,8 @@ pub fn (mut a App) init() ! {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
-		x: shy.half * a.window.width()
-		y: shy.half * a.window.height()
+		x: shy.half * a.canvas.width
+		y: shy.half * a.canvas.height
 		uri: a.asset('images/shy.png')
 		origin: .center
 	)

@@ -18,9 +18,8 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	win_size := a.window.size()
-	win_w := f32(win_size.width)
-	win_h := f32(win_size.height)
+	win_w := f32(a.canvas.width)
+	win_h := f32(a.canvas.height)
 	a.quick.line_segment(
 		a: shy.vec2(win_w * 0.1, win_h * 0.1)
 		b: shy.vec2(win_w * 0.9, win_h * 0.9)

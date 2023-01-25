@@ -18,6 +18,7 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
+	// Draws a square at the center of the window
 	a.quick.rect(
 		x: (shy.half * a.canvas.width)
 		y: (shy.half * a.canvas.height)

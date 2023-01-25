@@ -18,9 +18,10 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
+	// Draws a hexagon at the center of the window
 	a.quick.uniform_poly(
-		x: shy.half * a.window.width()
-		y: shy.half * a.window.height()
+		x: shy.half * a.canvas.width
+		y: shy.half * a.canvas.height
 		radius: 100
 		segments: 6
 		stroke: shy.Stroke{

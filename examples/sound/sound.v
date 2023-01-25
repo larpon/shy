@@ -29,14 +29,6 @@ pub fn (mut a App) init() ! {
 	a.sound = asset.to[shy.Sound](shy.SoundOptions{
 		max_repeats: 4
 	})!
-
-	/*
-	a.sound = a.easy.new_sound(
-		path: a.asset('sfx/shy.wav')
-		// Allows for repeating the sound on top of itself `max_repeats` amount of times.
-		// NOTE consumes memory for each repeat instance.
-		max_repeats: 4
-	)!*/
 }
 
 [markused]

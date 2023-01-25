@@ -52,7 +52,6 @@ pub fn (mut a App) init() ! {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	win := a.window
 	mouse := a.mouse
 	mut text := a.easy.text()
 
@@ -86,17 +85,18 @@ pub fn (mut a App) frame(dt f64) {
 	}
 
 	a.quick.rect(
-		x: shy.half * win.width()
-		y: shy.half * win.height()
+		x: shy.half * a.canvas.width
+		y: shy.half * a.canvas.height
 		rotation: a.a_r.value() * shy.deg2rad
 		scale: a.a_s.value()
 		origin: .center
 	)
 
+	win := a.window
 	es := a.timer.elapsed().seconds()
 	a.quick.text(
-		x: f32(win.width()) * 0.01
-		y: f32(win.height()) * (1.0 - 0.01)
+		x: a.canvas.width * 0.01
+		y: a.canvas.height * (1.0 - 0.01)
 		origin: .bottom_left
 		text: 'Animation running for ${es:.1f} seconds
 Frame: ${win.state.frame}

@@ -22,11 +22,9 @@ mut:
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	win := a.window
-	win_w, win_h := win.wh()
 	a.quick.rect(
-		x: f32(win_w) * 0.5
-		y: f32(win_h) * 0.5
+		x: shy.half * a.canvas.width
+		y: shy.half * a.canvas.height
 		origin: a.origin
 		width: 50
 		height: 50
@@ -34,15 +32,15 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.text(
-		x: f32(win_w) * 0.5
-		y: f32(win_h) * 0.5
+		x: shy.half * a.canvas.width
+		y: shy.half * a.canvas.height
 		origin: .bottom_center
 		// align: .left | .bottom
 		offset: vec.vec2[f32](0, -50 - 20)
 		text: 'Current draw origin:\n${a.origin}'
 	)
 
-	tx, ty := a.origin.pos_wh(win.Rect.width, win.Rect.height)
+	tx, ty := a.origin.pos_wh(a.canvas.width, a.canvas.height)
 	a.quick.text(
 		x: tx
 		y: ty
@@ -62,8 +60,8 @@ pub fn (mut a App) frame(dt f64) {
 
 	// Mark center of window
 	a.quick.rect(
-		x: win_w / 2
-		y: win_h / 2
+		x: shy.half * a.canvas.width
+		y: shy.half * a.canvas.height
 		origin: .center
 		width: 2
 		height: 2
@@ -75,8 +73,8 @@ Line 1
 line 2
 line 3'
 
-	at_x := f32(win_w) * 0.15
-	at_y := f32(win_h) * 0.15
+	at_x := a.canvas.width * 0.15
+	at_y := a.canvas.height * 0.15
 	a.quick.text(
 		x: at_x
 		y: at_y
