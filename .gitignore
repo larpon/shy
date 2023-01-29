@@ -1,9 +1,29 @@
-# Binaries for programs and plugins
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
+# Ignore ~ file endings
+*.*~
+# Ignore known binaries for programs and plugins
 main
 shy
 *.exe
-*.exe~
+*.o
 *.so
-*.dylib
+.*.c
+*.obj
+*.exp
+*.ilk
+*.pdb
 *.dll
-vls.log
+*.lib
+*.bak
+*.dylib
+a.out
+# Ignore hidden .hash files (mainly found in cmd/)
+.*.hash
+# Ignore temp directories
+/temp
+/tmp
