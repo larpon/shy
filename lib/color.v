@@ -4,6 +4,8 @@
 module lib
 
 import shy.utils
+import shy.mth
+import rand
 
 pub const (
 	colors = BaseColors{}
@@ -23,6 +25,39 @@ pub mut:
 	g f32
 	b f32
 	a f32
+}
+
+pub struct ColorVariation {
+pub mut:
+	r f32
+	g f32
+	b f32
+	a f32
+}
+
+pub fn (mut cv ColorVariation) set_all(value f32) {
+	cv.r = value
+	cv.g = value
+	cv.b = value
+	cv.a = value
+}
+
+pub fn (mut cv ColorVariation) set(r f32, g f32, b f32, a f32) {
+	cv.r = r
+	cv.g = g
+	cv.b = b
+	cv.a = a
+}
+
+pub fn (mut cv ColorVariation) max(max f32) {
+	cv.r = f32(mth.min(max, cv.r))
+	cv.g = f32(mth.min(max, cv.g))
+	cv.b = f32(mth.min(max, cv.b))
+	cv.a = f32(mth.min(max, cv.a))
+}
+
+pub fn (cv ColorVariation) has_variation() bool {
+	return cv.r + cv.g + cv.b + cv.a != 0.0
 }
 
 // ShyColors holds the official project colors,
@@ -89,6 +124,24 @@ pub fn (c &Color) a_as[T]() T {
 		return utils.remap_u8_to_f32(c.a, 0, 255, 0.0, 1.0)
 	}
 	panic('A shy TODO :)')
+}
+
+pub fn (mut c Color) variate(cv ColorVariation) {
+	if !cv.has_variation() {
+		return
+	}
+	if cv.r > 0 {
+		c.r = u8(c.r * (1 - cv.r) + rand.f32_in_range(0, 255) or { 255 } * cv.r)
+	}
+	if cv.g > 0 {
+		c.g = u8(c.g * (1 - cv.g) + rand.f32_in_range(0, 255) or { 0 } * cv.g)
+	}
+	if cv.b > 0 {
+		c.b = u8(c.b * (1 - cv.b) + rand.f32_in_range(0, 255) or { 0 } * cv.b)
+	}
+	if cv.a > 0 {
+		c.a = u8(c.a * (1 - cv.a) + rand.f32_in_range(0, 255) or { 255 } * cv.a)
+	}
 }
 
 [inline]
