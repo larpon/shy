@@ -41,3 +41,15 @@ fn version() string {
 	}
 	return v
 }
+
+// run_subcommand runs any sub-command detected in `args`.
+pub fn run_subcommand(args []string) ! {
+	nocache := args.contains('--nocache')
+	for subcmd in subcmds {
+		if subcmd in args {
+			// First encountered known sub-command is executed on the spot.
+			launch_cmd(args[args.index(subcmd)..], nocache)!
+			exit(0)
+		}
+	}
+}

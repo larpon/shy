@@ -8,6 +8,11 @@ import flag
 import shy.cli
 
 fn main() {
+	// Run any sub-commands on the spot if found in args
+	cli.run_subcommand(os.args) or {
+		eprintln(err)
+		exit(1)
+	}
 	// Collect user flags in an extended manner.
 	// Start with defaults -> merge over SHY_FLAGS -> merge over cmdline flags -> merge .shy entries.
 	mut opt := cli.Options{}

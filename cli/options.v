@@ -58,19 +58,6 @@ pub fn (opt &Options) validate_env() ! {
 pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.FlagParser) {
 	mut args := arguments.clone()
 
-	// Indentify sub-commands.
-	nocache := args.contains('--nocache')
-	for subcmd in subcmds {
-		if subcmd in args {
-			// First encountered known sub-command is executed on the spot.
-			launch_cmd(args[args.index(subcmd)..], nocache) or {
-				eprintln(err)
-				exit(1)
-			}
-			exit(0)
-		}
-	}
-
 	mut v_flags := []string{}
 	mut cmd_flags := []string{}
 	// Indentify special flags in args before FlagParser ruin them.
