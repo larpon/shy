@@ -6,6 +6,7 @@ module lib
 import os
 import shy.wraps.sokol.gfx
 import stbi
+import v.embed_file
 
 // Assets acts as a manager of `Asset` instances.
 [heap]
@@ -32,31 +33,42 @@ pub fn (mut a Assets) shutdown() ! {
 // load loads a binary blob from a variety of sources and return
 // a reference to an `Asset`.
 pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
-	uri := alo.uri
-	if asset := a.ass[uri] {
+	source := alo.source
+	if asset := a.ass[source.str()] {
 		return asset
 	}
-	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${uri}"')
+	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
 
 	// TODO enable network fetching etc.
 	if alo.async {
-		return error('${@STRUCT}.${@FN}: "${uri}" asynchronously loading not implemented')
+		return error('${@STRUCT}.${@FN}: "${source}" asynchronously loading not implemented')
 		/*
 		asset := &Asset{
 			shy: a.shy
 			lo: alo
 			status: .loading
 		}
-		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${uri}"')
-		a.ass[uri] = asset
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${source}"')
+		a.ass[source.str()] = asset
 		return asset
 		*/
-	} else if !os.is_file(uri) {
-		return error('${@STRUCT}.${@FN}: "${uri}" does not exist on the file system')
 	}
-	bytes := os.read_bytes(uri) or {
-		return error('${@STRUCT}.${@FN}: "${uri}" could not be loaded')
+
+	mut bytes := []u8{}
+	match source {
+		string {
+			if !os.is_file(source) {
+				return error('${@STRUCT}.${@FN}: "${source}" does not exist on the file system')
+			}
+			bytes = os.read_bytes(source) or {
+				return error('${@STRUCT}.${@FN}: "${source}" could not be loaded')
+			}
+		}
+		embed_file.EmbedFileData {
+			bytes = source.to_bytes()
+		}
 	}
+
 	// TODO preallocated asset pool??
 	asset := &Asset{
 		shy: a.shy
@@ -64,31 +76,31 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		lo: alo
 		status: .loaded
 	}
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${uri}"')
-	a.ass[uri] = asset
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${source}"')
+	a.ass[source.str()] = asset
 	return asset
 }
 
-pub fn (a &Assets) get[T](uri string) !T {
+pub fn (a &Assets) get[T](source AssetSource) !T {
 	$if T is Image {
-		return a.get_cached_image(uri)
+		return a.get_cached_image(source)
 	} $else $if T is Asset {
-		return a.ass[uri]
+		return a.ass[source.str()]
 	} $else {
 		// t := T{}
 		// tof := typeof(t).name
 		tof := 'TODO'
-		return error('${@STRUCT}.${@FN}' + ': "${uri}" of type ${tof} is not supported')
+		return error('${@STRUCT}.${@FN}' + ': "${source}" of type ${tof} is not supported')
 	}
 }
 
 // TODO clean up this mess
-fn (a &Assets) get_cached_image(uri string) !Image {
-	if image := a.image_cache[uri] {
+fn (a &Assets) get_cached_image(source AssetSource) !Image {
+	if image := a.image_cache[source.str()] {
 		return image
 	}
 	return error('${@STRUCT}.${@FN}' +
-		': "${uri}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+		': "${source}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
 // Asset
@@ -102,11 +114,24 @@ pub enum AssetStatus {
 	freed
 }
 
+pub type AssetSource = embed_file.EmbedFileData | string
+
+pub fn (a AssetSource) str() string {
+	return match a {
+		string {
+			a
+		}
+		embed_file.EmbedFileData {
+			a.path
+		}
+	}
+}
+
 pub type AssetOptions = ImageOptions | SoundOptions
 
 pub struct AssetLoadOptions {
 pub:
-	uri    string
+	source AssetSource
 	async  bool
 	stream bool
 	cache  bool = true
@@ -138,7 +163,7 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 			}
 			else {
 				t := T{}
-				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
+				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.source}" to ${typeof(t).name}')
 			}
 		}
 	} $else $if T is Sound {
@@ -148,7 +173,7 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 			}
 			else {
 				t := T{}
-				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
+				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.source}" to ${typeof(t).name}')
 			}
 		}
 	} $else {
@@ -156,21 +181,21 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 	}
 	// This should never be reached
 	t := T{}
-	return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.uri}" to ${typeof(t).name}')
+	return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.source}" to ${typeof(t).name}')
 }
 
 fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	if opt.cache {
-		if image := a.shy.assets().image_cache[a.lo.uri] {
+		if image := a.shy.assets().image_cache[a.lo.source.str()] {
 			return image
 		}
 	}
 	assert a.status == .loaded, 'Asset is not loaded'
 	assert a.data.len > 0, 'Asset.data appears empty'
 
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.uri}" to image')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.source}" to image')
 	stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
-		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${a.lo.uri}"')
+		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${a.lo.source}"')
 	}
 
 	mut image := Image{
@@ -210,7 +235,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 
 	if opt.cache {
 		unsafe {
-			a.shy.assets().image_cache[a.lo.uri] = image
+			a.shy.assets().image_cache[a.lo.source.str()] = image
 		}
 	}
 
@@ -225,9 +250,9 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	mut id := u16(0)
 	mut id_end := u16(0)
 	if opt.max_repeats > 1 {
-		id, id_end = engine.load_copies(a.lo.uri, opt.max_repeats)!
+		id, id_end = engine.load_copies(a.lo.source, opt.max_repeats)!
 	} else {
-		id = engine.load(a.lo.uri)!
+		id = engine.load(a.lo.source)!
 	}
 	return Sound{
 		asset: a
@@ -290,8 +315,8 @@ pub fn (mut i Image) free() {
 	}
 }
 
-pub fn (i &Image) uri() string {
-	return i.asset.lo.uri
+pub fn (i &Image) source() AssetSource {
+	return i.asset.lo.source
 }
 
 [params]

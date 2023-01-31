@@ -87,6 +87,11 @@ pub fn (mut a EasyApp) frame_end() {
 	a.App.frame_end()
 }
 
+pub fn (mut a EasyApp) variable_update(dt f64) {
+	a.App.variable_update(dt)
+	a.easy.variable_update(dt)
+}
+
 pub fn (mut a EasyApp) event(e shy.Event) {
 	match e {
 		shy.QuitEvent {

@@ -21,7 +21,7 @@ pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
 	a.quick.load(shy.ImageOptions{
-		uri: a.asset('images/shy.png')
+		source: a.asset('images/shy.png')
 	})!
 }
 
@@ -35,7 +35,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
 		x: cx
 		y: cy
-		uri: a.asset('images/shy.png')
+		source: a.asset('images/shy.png')
 		origin: .bottom_right
 		offset: shy.vec2(-margin, -margin)
 		region: shy.Rect{0, 0, 256, 256}
@@ -43,7 +43,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
 		x: cx
 		y: cy
-		uri: a.asset('images/shy.png')
+		source: a.asset('images/shy.png')
 		origin: .bottom_left
 		offset: shy.vec2(margin, -margin)
 		region: shy.Rect{256, 0, 256, 256}
@@ -52,7 +52,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
 		x: cx
 		y: cy
-		uri: a.asset('images/shy.png')
+		source: a.asset('images/shy.png')
 		origin: .top_left
 		offset: shy.vec2(margin, margin)
 		region: shy.Rect{256, 256, 256, 256}
@@ -61,7 +61,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
 		x: cx
 		y: cy
-		uri: a.asset('images/shy.png')
+		source: a.asset('images/shy.png')
 		origin: .top_right
 		offset: shy.vec2(-margin, margin)
 		region: shy.Rect{0, 256, 256, 256}

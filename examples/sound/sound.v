@@ -24,7 +24,7 @@ pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
 	mut asset := a.easy.load(
-		uri: a.asset('sfx/shy.wav')
+		source: a.asset('sfx/shy.wav')
 	)!
 	a.sound = asset.to[shy.Sound](shy.SoundOptions{
 		max_repeats: 4

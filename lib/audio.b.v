@@ -4,6 +4,7 @@
 module lib
 
 import shy.wraps.miniaudio as ma
+import v.embed_file
 
 pub const max_audio_engine_instances = 255
 
@@ -104,9 +105,17 @@ fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
 	return sound
 }
 
-pub fn (mut ae AudioEngine) load(path string) !u16 {
+pub fn (mut ae AudioEngine) load(source AssetSource) !u16 {
 	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${path}"')
+	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${source}"')
+	path := source.str()
+	match source {
+		embed_file.EmbedFileData {
+			// TODO
+			return error('${@STRUCT}.${@FN}: TODO support loading of embedded files')
+		}
+		else {}
+	}
 	s := ae.load_file(path)!
 	ae.sound_id++
 	ae.sounds[ae.sound_id] = s
@@ -115,17 +124,25 @@ pub fn (mut ae AudioEngine) load(path string) !u16 {
 
 // load_copies loads `copies` amount of copies of `path` into memory
 // load_copies returns the ids of the firat and last copy loaded.
-pub fn (mut ae AudioEngine) load_copies(path string, copies u8) !(u16, u16) {
+pub fn (mut ae AudioEngine) load_copies(source AssetSource, copies u8) !(u16, u16) {
 	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
+	path := source.str()
+	match source {
+		embed_file.EmbedFileData {
+			// TODO
+			return error('${@STRUCT}.${@FN}: TODO support loading of embedded files')
+		}
+		else {}
+	}
 	// See https://github.com/mackron/miniaudio/issues/517
 	s := ae.load_file(path)!
 	ae.sound_id++
 	id_start := ae.sound_id
 	ae.sounds[id_start] = s
 	if copies > 1 {
-		ae.shy.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', 'keep in mind that instancing the same sound (${path}) ${copies} times, also duplicate the memory for the sound ${copies} times')
+		ae.shy.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', 'keep in mind that instancing the same sound (${source}) ${copies} times, also duplicate the memory for the sound ${copies} times')
 		for _ in 0 .. copies {
-			ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'duplicating "${path}"')
+			ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'duplicating "${source}"')
 			copy_sound := &ma.Sound{}
 			ma.sound_init_copy(ae.e, s, 0, ma.null, copy_sound)
 			ae.sound_id++

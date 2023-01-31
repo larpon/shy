@@ -6,6 +6,7 @@ module easy
 import shy.lib as shy
 import shy.vec
 import shy.mth
+import shy.particle
 // High-level as-easy-as-it-gets API
 
 // $if !shy_easy ? {
@@ -23,16 +24,30 @@ pub mut: // TODO error: field ... is not public - make this just "pub" to caller
 pub struct Easy {
 	shy.ShyStruct
 mut:
-	quick        Quick
-	audio_engine &shy.AudioEngine = shy.null
+	quick            Quick
+	audio_engine     &shy.AudioEngine = shy.null
+	particle_systems []&particle.System
 }
 
 pub fn (mut e Easy) init() ! {
 	e.quick.easy = e
 	e.audio_engine = e.shy.audio().engine(0)!
+	// e.particle_systems TODO init a limited amount of systems
 }
 
-pub fn (mut e Easy) shutdown() ! {}
+pub fn (mut e Easy) shutdown() ! {
+	for mut ps in e.particle_systems {
+		ps.free()
+		// free(ps)
+	}
+	e.particle_systems.clear()
+}
+
+pub fn (mut e Easy) variable_update(dt f64) {
+	for mut ps in e.particle_systems {
+		ps.update(dt)
+	}
+}
 
 [params]
 pub struct EasyTextConfig {
@@ -521,7 +536,7 @@ pub struct EasyImageConfig {
 	// shy.Rect: shy.Rect{0,0,-1,-1}
 	EasyImageConfigRect
 pub:
-	uri       string
+	source    shy.AssetSource
 	color     shy.Color = shy.rgb(255, 255, 255)
 	rotation  f32
 	scale     f32 = 1.0
@@ -536,7 +551,7 @@ pub struct EasyImage {
 	shy.ShyStruct
 	shy.Rect
 pub:
-	uri       string
+	source    shy.AssetSource
 	color     shy.Color = shy.rgb(255, 255, 255)
 	rotation  f32
 	scale     f32 = 1.0
@@ -548,8 +563,8 @@ pub:
 
 pub fn (ei &EasyImage) draw() {
 	mut image := shy.Image{}
-	if img := ei.shy.assets().get[shy.Image](ei.uri) {
-		// if img := ei.shy.assets().get_cached_image(ei.uri) {
+	if img := ei.shy.assets().get[shy.Image](ei.source) {
+		// if img := ei.shy.assets().get_cached_image(ei.source) {
 		image = img
 	} else {
 		return
@@ -578,7 +593,7 @@ pub fn (ei &EasyImage) draw() {
 			height: ei.height
 		}
 		dst := ei.region
-		// println('$ei.uri:\nsrc: $src dst: $dst')
+		// println('$ei.source:\nsrc: $src dst: $dst')
 		i2d.draw_region(src, dst)
 	} else {
 		i2d.draw()
@@ -592,13 +607,13 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 
 	// TODO
 	mut image := shy.Image{}
-	if img := e.shy.assets().get[shy.Image](eic.uri) {
-		// if img := e.shy.assets().get_cached_image(eic.uri) {
+	if img := e.shy.assets().get[shy.Image](eic.source) {
+		// if img := e.shy.assets().get_cached_image(eic.source) {
 		image = img
 	} else {
 		// return
 		// TODO
-		panic('${@STRUCT}.${@FN}: "${eic.uri}" not found in cache, please load it')
+		panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
 	}
 
 	mut r := shy.Rect{
@@ -616,7 +631,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		// y: r.y
 		// w: r.width
 		// h: r.height
-		uri: eic.uri
+		source: eic.source
 		color: eic.color
 		rotation: eic.rotation
 		scale: eic.scale
@@ -649,9 +664,9 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 	match ao {
 		shy.ImageOptions {
 			// TODO e.shy.assets.is_cached(...) ???
-			if _ := assets.get[shy.Image](ao.uri) {
-				// if _ := assets.get_cached_image(ao.uri) {
-				// assets.get[&shy.Asset](ao.uri)
+			if _ := assets.get[shy.Image](ao.source) {
+				// if _ := assets.get_cached_image(ao.source) {
+				// assets.get[&shy.Asset](ao.source)
 				return
 			}
 			_ := asset.to[shy.Image](ao)!

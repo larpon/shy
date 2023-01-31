@@ -60,7 +60,7 @@ pub fn (mut s System) new_particle() &Particle {
 }
 
 pub struct ParticleState {
-mut:
+pub mut:
 	position     vec.Vec2[f64]
 	velocity     vec.Vec2[f64]
 	acceleration vec.Vec2[f64]
@@ -78,19 +78,19 @@ fn (p ParticleState) eq(pa ParticleState) bool {
 		&& p.life_time == pa.life_time
 }
 
-/*
-* Particle
-*/
+// Particle is the data structure representing one particle in a `System`.
 [heap]
 pub struct Particle {
 mut:
 	system &System
 	// mut:
-	init      ParticleState
-	end       ParticleState
+
 	group     string
 	need_init bool
 	// State
+pub mut:
+	end          ParticleState
+	init         ParticleState
 	position     vec.Vec2[f64]
 	velocity     vec.Vec2[f64]
 	acceleration vec.Vec2[f64]
