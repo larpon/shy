@@ -87,58 +87,89 @@ pub:
 	id u8
 mut:
 	sound_id u16
-	sounds   map[u16]&ma.Sound // sounds belonging to the ma.Engine instance.
+	sounds   map[u16]&ma.Sound   // sounds belonging to the ma.Engine instance.
+	decoders map[u16]&ma.Decoder // sound decoders for sounds loaded from memory
 }
 
 pub fn (mut e AudioEngine) shutdown() ! {
 	for _, sound in e.sounds {
-		ma.sound_uninit(sound)
+		if !isnil(sound) {
+			ma.sound_uninit(sound)
+		}
 	}
+	e.sounds.clear()
+	for _, decoder in e.decoders {
+		if !isnil(decoder) {
+			ma.decoder_uninit(decoder)
+		}
+	}
+	e.decoders.clear()
 	ma.engine_uninit(e.e)
+}
+
+// load loads an `AssetSource` with this `AudioEngine` and returns the ID of the sound.
+pub fn (mut ae AudioEngine) load(source AssetSource) !u16 {
+	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
+	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${source}"')
+	s := match source {
+		string {
+			ae.load_file(source)!
+		}
+		embed_file.EmbedFileData {
+			ae.load_bytes(source.to_bytes()) or {
+				return error('${@STRUCT}.${@FN}: failed loading "${source}": ${err}')
+			}
+		}
+	}
+	ae.sound_id++
+	ae.sounds[ae.sound_id] = s
+	return ae.sound_id
 }
 
 fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
 	sound := &ma.Sound{}
 	if ma.sound_init_from_file(ae.e, path.str, 0, ma.null, ma.null, sound) != .success {
-		return error('${@STRUCT}.${@FN}' + ' failed to load sound "${path}"')
+		return error('${@STRUCT}.${@FN}: failed to load "${path}"')
 	}
 	return sound
 }
 
-pub fn (mut ae AudioEngine) load(source AssetSource) !u16 {
-	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${source}"')
-	path := source.str()
-	match source {
-		embed_file.EmbedFileData {
-			// TODO
-			return error('${@STRUCT}.${@FN}: TODO support loading of embedded files')
-		}
-		else {}
+fn (mut ae AudioEngine) load_bytes(bytes []u8) !&ma.Sound {
+	sound := &ma.Sound{}
+
+	decoder_config := ma.decoder_config_init(.f32, 2, 44100)
+	// Init decoder
+	decoder := &ma.Decoder{}
+	if ma.decoder_init_memory(bytes.data, usize(bytes.len), &decoder_config, decoder) != .success {
+		return error('${@STRUCT}.${@FN} failed to initialize decoder from memory data, maybe the format is not supported')
 	}
-	s := ae.load_file(path)!
-	ae.sound_id++
-	ae.sounds[ae.sound_id] = s
-	return ae.sound_id
+
+	if ma.sound_init_from_data_source(ae.e, voidptr(decoder), 0, ma.null, sound) != .success {
+		return error('${@STRUCT}.${@FN} failed to load sound from memory buffer')
+	}
+	// NOTE this is a bit hazardous since the sound id is handed out after this function
+	ae.decoders[ae.sound_id + 1] = decoder
+	return sound
 }
 
 // load_copies loads `copies` amount of copies of `path` into memory
 // load_copies returns the ids of the firat and last copy loaded.
 pub fn (mut ae AudioEngine) load_copies(source AssetSource, copies u8) !(u16, u16) {
 	ae.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	path := source.str()
-	match source {
-		embed_file.EmbedFileData {
-			// TODO
-			return error('${@STRUCT}.${@FN}: TODO support loading of embedded files')
+	s := match source {
+		string {
+			ae.load_file(source)!
 		}
-		else {}
+		embed_file.EmbedFileData {
+			ae.load_bytes(source.to_bytes()) or {
+				return error('${@STRUCT}.${@FN}: failed loading "${source}": ${err}')
+			}
+		}
 	}
-	// See https://github.com/mackron/miniaudio/issues/517
-	s := ae.load_file(path)!
 	ae.sound_id++
 	id_start := ae.sound_id
 	ae.sounds[id_start] = s
+	// See https://github.com/mackron/miniaudio/issues/517
 	if copies > 1 {
 		ae.shy.vet_issue(.warn, .misc, '${@STRUCT}.${@FN}', 'keep in mind that instancing the same sound (${source}) ${copies} times, also duplicate the memory for the sound ${copies} times')
 		for _ in 0 .. copies {
