@@ -9,17 +9,17 @@ import shy.vec
 
 pub struct Emitter {
 pub mut:
-	enabled bool
+	enabled bool = true
 
-	position vec.Vec2[f64] // Center position of the emitter
-	size     vec.Vec2[f64] // Max size of the emitter
+	position vec.Vec2[f32] // Center position of the emitter
+	size     vec.Vec2[f32] // Max size of the emitter
 
 	velocity     StochasticDirection
 	acceleration StochasticDirection
 
-	start_size            vec.Vec2[f64] = default_size // Emitted particles start their life in this size
-	end_size              vec.Vec2[f64] // Emitted particles end their life in this size
-	size_variation        vec.Vec2[f64] // Particle size will vary up/down to a maximum of this value
+	start_size            vec.Vec2[f32] = default_size // Emitted particles start their life in this size
+	end_size              vec.Vec2[f32] // Emitted particles end their life in this size
+	size_variation        vec.Vec2[f32] // Particle size will vary up/down to a maximum of this value
 	emit_size_keep_aspect bool = true
 
 	life_time           f32 = 1000 // How long the particles emitted will last
@@ -38,19 +38,19 @@ pub mut:
 	movement_velocity      f32
 	movement_velocity_flip bool
 mut:
-	position_last_frame vec.Vec2[f64]
+	position_last_frame vec.Vec2[f32]
 
 	system  &System = unsafe { nil }
 	dt      f64   // current delta time this frame
 	elapsed f32 // Elapsed time accumulator
 
-	burst_position vec.Vec2[f64] // Center position of the burst
+	burst_position vec.Vec2[f32] // Center position of the burst
 	burst_amount   int
 	pulse_duration int
 }
 
 /*
-pub fn (mut e Emitter) move_to(v vec.Vec2[f64]) {
+pub fn (mut e Emitter) move_to(v vec.Vec2[f32]) {
 	e.position.from(v)
 }*/
 
@@ -58,7 +58,7 @@ pub fn (mut e Emitter) burst(amount int) {
 	e.burst_amount = amount
 }
 
-pub fn (mut e Emitter) burst_at(amount int, position vec.Vec2[f64]) {
+pub fn (mut e Emitter) burst_at(amount int, position vec.Vec2[f32]) {
 	e.burst_position.from(position)
 	e.burst(amount)
 }
@@ -147,13 +147,13 @@ fn (mut e Emitter) emit() {
 			sv.abs()
 			if e.emit_size_keep_aspect {
 				sv_aspect := math.max(sv.x, sv.y)
-				p.size.plus_scalar(rand.f64_in_range(-sv_aspect, sv_aspect) or { -sv_aspect })
+				p.size.plus_scalar(rand.f32_in_range(-sv_aspect, sv_aspect) or { -sv_aspect })
 			} else {
 				if sv.x > 0 {
-					p.size.x += rand.f64_in_range(-sv.x, sv.x) or { -sv.x }
+					p.size.x += rand.f32_in_range(-sv.x, sv.x) or { -sv.x }
 				}
 				if sv.y > 0 {
-					p.size.y += rand.f64_in_range(-sv.y, sv.y) or { -sv.y }
+					p.size.y += rand.f32_in_range(-sv.y, sv.y) or { -sv.y }
 				}
 			}
 		}
@@ -171,19 +171,19 @@ fn (mut e Emitter) emit() {
 	}
 }
 
-fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2[f64], sd StochasticDirection) {
+fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2[f32], sd StochasticDirection) {
 	match sd {
 		PointDirection {
 			v.from(sd.point)
 
 			if !sd.point_variation.eq_scalar(0.0) {
-				mut pv := sd.point_variation + vec.Vec2[f64]{0, 0} //.copy()
+				mut pv := sd.point_variation + vec.Vec2[f32]{0, 0} //.copy()
 				pv.abs()
 				if pv.x > 0 {
-					v.x += rand.f64_in_range(-pv.x, pv.x) or { -pv.x }
+					v.x += rand.f32_in_range(-pv.x, pv.x) or { -pv.x }
 				}
 				if pv.y > 0 {
-					v.y += rand.f64_in_range(-pv.y, pv.y) or { -pv.y }
+					v.y += rand.f32_in_range(-pv.y, pv.y) or { -pv.y }
 				}
 			}
 
@@ -197,39 +197,39 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2[f64], sd Stochastic
 				angle_rad := d.angle()
 				magnitude := f32(e.position.manhattan_distance(d))
 
-				v.x += fvm * (magnitude * math.cos(angle_rad)) * e.dt
-				v.y += fvm * (magnitude * math.sin(angle_rad)) * e.dt
+				v.x += fvm * (magnitude * math.cosf(angle_rad)) * f32(e.dt)
+				v.y += fvm * (magnitude * math.sinf(angle_rad)) * f32(e.dt)
 			}
 		}
 		AngleDirection {
 			mut angle := sd.angle
 			if sd.angle_variation != 0.0 {
 				av := math.abs(sd.angle_variation)
-				angle += f32(rand.f64_in_range(-av, av) or { -av })
+				angle += rand.f32_in_range(-av, av) or { -av }
 			}
 			mut magnitude := sd.magnitude
 			if sd.magnitude_variation != 0.0 {
 				mv := math.abs(sd.magnitude_variation)
-				magnitude += f32(rand.f64_in_range(-mv, mv) or { -mv })
+				magnitude += rand.f32_in_range(-mv, mv) or { -mv }
 			}
-			v.x = magnitude * math.cos(math.radians(angle))
-			v.y = magnitude * math.sin(math.radians(angle))
+			v.x = magnitude * math.cosf(f32(math.radians(angle)))
+			v.y = magnitude * math.sinf(f32(math.radians(angle)))
 		}
 		TargetDirection {
 			mut target := e.position - sd.target
 			if !sd.target_variation.eq_scalar(0.0) {
-				mut tv := sd.target_variation + vec.Vec2[f64]{0, 0} // .copy()
+				mut tv := sd.target_variation + vec.Vec2[f32]{0, 0} // .copy()
 				tv.abs()
 				if tv.x > 0 {
-					target.x += rand.f64_in_range(-tv.x, tv.x) or { -tv.x }
+					target.x += rand.f32_in_range(-tv.x, tv.x) or { -tv.x }
 				}
 				if tv.y > 0 {
-					target.y += rand.f64_in_range(-tv.y, tv.y) or { -tv.y }
+					target.y += rand.f32_in_range(-tv.y, tv.y) or { -tv.y }
 				}
 			}
-			mut angle_rad := f64(0)
+			mut angle_rad := f32(0)
 			if target.x != 0.0 {
-				angle_rad = math.atan2(-target.y, -target.x) // flip (-) values to reach screen coordinates
+				angle_rad = f32(math.atan2(-target.y, -target.x)) // flip (-) values to reach screen coordinates
 			}
 
 			mut magnitude := sd.magnitude
@@ -238,10 +238,10 @@ fn (mut e Emitter) apply_stochastic_direction(mut v vec.Vec2[f64], sd Stochastic
 			}
 			if sd.magnitude_variation != 0.0 {
 				mv := math.abs(sd.magnitude_variation)
-				magnitude += f32(rand.f64_in_range(-mv, mv) or { -mv })
+				magnitude += f32(rand.f32_in_range(-mv, mv) or { -mv })
 			}
-			v.x = magnitude * math.cos(angle_rad)
-			v.y = magnitude * math.sin(angle_rad)
+			v.x = magnitude * math.cosf(angle_rad)
+			v.y = magnitude * math.sinf(angle_rad)
 		}
 	}
 }

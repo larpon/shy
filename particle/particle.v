@@ -8,7 +8,7 @@ import shy.vec
 import shy.utils
 
 const (
-	default_size      = vec.Vec2[f64]{6, 6}
+	default_size      = vec.Vec2[f32]{6, 6}
 	default_life_time = 1000.0
 	default_color     = shy.Color{255, 255, 255, 255}
 )
@@ -18,9 +18,9 @@ pub fn (mut s System) new_particle() &Particle {
 		// init: particle.null
 		// end: particle.null
 		// system: s
-		position: vec.Vec2[f64]{0, 0}
-		velocity: vec.Vec2[f64]{0, 0}
-		acceleration: vec.Vec2[f64]{0, 0}
+		position: vec.Vec2[f32]{0, 0}
+		velocity: vec.Vec2[f32]{0, 0}
+		acceleration: vec.Vec2[f32]{0, 0}
 		size: particle.default_size
 		rotation: 0
 		scale: 1
@@ -61,10 +61,10 @@ pub fn (mut s System) new_particle() &Particle {
 
 pub struct ParticleState {
 pub mut:
-	position     vec.Vec2[f64]
-	velocity     vec.Vec2[f64]
-	acceleration vec.Vec2[f64]
-	size         vec.Vec2[f64]
+	position     vec.Vec2[f32]
+	velocity     vec.Vec2[f32]
+	acceleration vec.Vec2[f32]
+	size         vec.Vec2[f32]
 	rotation     f32
 	scale        f32
 	color        shy.Color
@@ -91,10 +91,10 @@ mut:
 pub mut:
 	end          ParticleState
 	init         ParticleState
-	position     vec.Vec2[f64]
-	velocity     vec.Vec2[f64]
-	acceleration vec.Vec2[f64]
-	size         vec.Vec2[f64]
+	position     vec.Vec2[f32]
+	velocity     vec.Vec2[f32]
+	acceleration vec.Vec2[f32]
+	size         vec.Vec2[f32]
 	rotation     f32
 	scale        f32
 	color        shy.Color
@@ -133,15 +133,15 @@ pub fn (mut p Particle) update(dt f64) {
 
 	p.life_time -= f32(1000 * dt)
 	if p.life_time > 0 {
-		p.size.x = f32(utils.remap[f64](p.life_time, p.init.life_time, p.end.life_time,
-			p.init.size.x, p.end.size.x))
-		p.size.y = f32(utils.remap[f64](p.life_time, p.init.life_time, p.end.life_time,
-			p.init.size.y, p.end.size.y))
+		p.size.x = utils.remap(p.life_time, p.init.life_time, p.end.life_time, p.init.size.x,
+			p.end.size.x)
+		p.size.y = utils.remap(p.life_time, p.init.life_time, p.end.life_time, p.init.size.y,
+			p.end.size.y)
 
-		p.rotation = f32(utils.remap[f64](p.life_time, p.init.life_time, p.end.life_time,
-			p.init.rotation, p.end.rotation)) // * f32(dt)
-		p.scale = f32(utils.remap[f64](p.life_time, p.init.life_time, p.end.life_time,
-			p.init.scale, p.end.scale)) // * f32(dt)
+		p.rotation = utils.remap(p.life_time, p.init.life_time, p.end.life_time, p.init.rotation,
+			p.end.rotation) // * f32(dt)
+		p.scale = utils.remap(p.life_time, p.init.life_time, p.end.life_time, p.init.scale,
+			p.end.scale) // * f32(dt)
 		// println('lt ${p.life_time}/${p.init.life_time} s ${p.scale} a ${p.color.a}')
 	} else {
 		p.life_time = 0

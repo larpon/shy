@@ -31,8 +31,8 @@ pub struct GravityAffector {
 pub mut:
 	enabled bool
 
-	position vec.Vec2[f64] // Center position of the affector
-	size     vec.Vec2[f64] // Max size of the affector
+	position vec.Vec2[f32] // Center position of the affector
+	size     vec.Vec2[f32] // Max size of the affector
 
 	groups []string // Leave empty to affect all particles
 
@@ -69,18 +69,18 @@ fn (mut ga GravityAffector) affect(mut p Particle) {
 	//}
 	// if (need_recalc) {
 	//	need_recalc = false
-	dx := ga.magnitude * math.cos((ga.angle - 90) * rad_pi_div_180)
-	dy := ga.magnitude * math.sin((ga.angle - 90) * rad_pi_div_180)
+	dx := ga.magnitude * math.cosf((ga.angle - 90) * rad_pi_div_180)
+	dy := ga.magnitude * math.sinf((ga.angle - 90) * rad_pi_div_180)
 	//}
-	p.velocity.x += dx * p.system.dt
-	p.velocity.y += dy * p.system.dt
+	p.velocity.x += dx * f32(p.system.dt)
+	p.velocity.y += dy * f32(p.system.dt)
 }
 
 pub struct AttractorAffector {
 pub mut:
 	enabled bool
 
-	position vec.Vec2[f64] // Center position of the affector
+	position vec.Vec2[f32] // Center position of the affector
 	strength f32
 
 	groups []string // Leave empty to affect all particles
@@ -98,30 +98,30 @@ fn (mut aa AttractorAffector) affect(mut p Particle) {
 	mut dx := aa.position.x - p.position.x
 	mut dy := aa.position.y - p.position.y
 
-	r := math.sqrt((dx * dx) + (dy * dy))
-	theta := math.atan2(dy, dx)
-	mut ds := 0.0
+	r := math.sqrtf((dx * dx) + (dy * dy))
+	theta := f32(math.atan2(dy, dx))
+	mut ds := f32(0.0)
 
 	match aa.proportional_to_distance {
 		.inverse_quadratic {
-			ds = (aa.strength / math.max(1.0, r * r))
+			ds = (aa.strength / math.max[f32](1.0, r * r))
 		}
 		.inverse_linear {
-			ds = (aa.strength / math.max(1.0, r))
+			ds = (aa.strength / math.max[f32](1.0, r))
 		}
 		.quadratic {
-			ds = (aa.strength * math.max(1.0, r * r))
+			ds = (aa.strength * math.max[f32](1.0, r * r))
 		}
 		.linear {
-			ds = (aa.strength * math.max(1.0, r))
+			ds = (aa.strength * math.max[f32](1.0, r))
 		}
 		.constant { // default
 			ds = aa.strength
 		}
 	}
-	ds *= p.system.dt
-	dx = ds * math.cos(theta)
-	dy = ds * math.sin(theta)
+	ds *= f32(p.system.dt)
+	dx = ds * math.cosf(theta)
+	dy = ds * math.sinf(theta)
 
 	match aa.affected_parameter {
 		.position {

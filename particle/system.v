@@ -5,7 +5,7 @@ module particle
 import shy.lib as shy
 
 const (
-	rad_pi_div_180 = 0.017453292520444443 // ~ pi/180 in radians
+	rad_pi_div_180 = f32(0.017453292520444443) // ~ pi/180 in radians
 )
 
 type Component = Affector | Emitter
@@ -98,11 +98,25 @@ pub fn (mut s System) add_painter(p Painter) {
 	s.painters << p
 }
 
-pub fn (mut s System) get_emitter(index int) &Emitter {
-	return &s.emitters[index]
+pub fn (s &System) emitter_at(index int) ?&Emitter {
+	unsafe {
+		if mut emitter := s.emitters[index] {
+			return &emitter
+		}
+	}
+	return none
 }
 
-pub fn (s &System) get_emitters(groups []string) []&Emitter {
+pub fn (s &System) emitters() []&Emitter {
+	mut collected := []&Emitter{}
+	for i := 0; i < s.emitters.len; i++ {
+		emitter := &s.emitters[i]
+		collected << emitter
+	}
+	return collected
+}
+
+pub fn (s &System) emitters_in_groups(groups []string) []&Emitter {
 	mut collected := []&Emitter{}
 	for i := 0; i < s.emitters.len; i++ {
 		emitter := &s.emitters[i]

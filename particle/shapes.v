@@ -9,17 +9,17 @@ type Shape = Ellipse | Point | Rect
 
 pub struct Point {
 pub mut:
-	position vec.Vec2[f64]
+	position vec.Vec2[f32]
 }
 
 pub struct Rect {
 pub mut:
-	position vec.Vec2[f64]
-	size     vec.Vec2[f64]
+	position vec.Vec2[f32]
+	size     vec.Vec2[f32]
 }
 
 pub struct Ellipse {
 pub mut:
-	position vec.Vec2[f64]
+	position vec.Vec2[f32]
 	radius   f32
 }
