@@ -255,7 +255,7 @@ jobs:
         declare -a shy_examples=('particles/simple.v' 'anchors/anchors.v' 'anchors/triangle_anchors.v' 'hello_world' 'image' 'shapes/circle' 'shapes/lines' 'shapes/rectangle' 'shapes/triangle' 'shapes/uniform_polygon' 'mouse' 'multi_window' 'sound' 'timers')
         echo "Compiling shy examples ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
-          v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
+          v -skip-unused -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
         done
         echo "Compiling shy examples with "-d shy_analyse" ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
@@ -340,5 +340,5 @@ jobs:
         declare -a shy_examples=('particles/simple.v' 'anchors/anchors.v' 'anchors/triangle_anchors.v' 'hello_world' 'image' 'shapes/circle' 'shapes/lines' 'shapes/rectangle' 'shapes/triangle' 'shapes/uniform_polygon' 'mouse' 'multi_window' 'sound' 'timers')
         echo "Compiling shy examples ${shy_examples[@]}"
         for example in "${shy_examples[@]}"; do
-          v -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
+          v -skip-unused -d sdl_no_compile_flags ~/.vmodules/shy/examples/$example
         done
