@@ -329,12 +329,32 @@ pub struct SoundOptions {
 
 [heap; noinit]
 pub struct Sound {
+pub:
 	asset  &Asset = null // TODO removing this results in compiler warnings a few places
 	opt    SoundOptions
 	id     u16
 	id_end u16
+mut:
+	alarm AlarmID
 pub mut:
-	loop bool
+	loop     bool
+	on_end   fn (Sound)
+	on_start fn (Sound)
+}
+
+fn sound_alarm_check(sound voidptr) bool {
+	assert !isnil(sound)
+	s := unsafe { &Sound(sound) }
+	ended := !s.is_playing() && !s.is_looping()
+	if ended {
+		if !isnil(s.on_end) {
+			s.on_end(Sound{
+				...s
+			})
+		}
+		return true
+	}
+	return false
 }
 
 fn (s &Sound) engine() &AudioEngine {
@@ -355,6 +375,24 @@ pub fn (s &Sound) play() {
 				id = i
 				break
 			}
+		}
+	}
+
+	// This check prevents double fires if sound is stop()/play() in same time frame.
+	if !s.is_playing() {
+		if !isnil(s.on_start) {
+			s.on_start(Sound{
+				...s
+			})
+		}
+		// Create an alarm to watch for changes to the sound's state
+		// TODO this could probably be made smarter
+		aid := s.asset.shy.make_alarm(
+			check: sound_alarm_check
+			user_data: voidptr(s)
+		)
+		unsafe {
+			s.alarm = aid
 		}
 	}
 	engine.play(id)

@@ -215,6 +215,9 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 			ctx.event(event)
 		}
 
+		// Update alarms
+		s.alarms.update()
+
 		// Since Shy is, currently, single threaded windows
 		// will render their own children. So, this is a cascade action.
 		s.state.rendering = true

@@ -70,8 +70,9 @@ mut:
 	ready   bool
 	running bool
 	//
-	state State
-	timer time.StopWatch = time.new_stopwatch()
+	state  State
+	timer  time.StopWatch = time.new_stopwatch()
+	alarms &Alarms        = unsafe { nil }
 	//
 	app voidptr = unsafe { nil }
 	// user_data voidptr = unsafe { nil }
@@ -91,6 +92,10 @@ pub fn (mut s Shy) init() ! {
 		s.log.set(.debug)
 	}
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
+	s.alarms = &Alarms{
+		shy: s
+	}
+	s.alarms.init()!
 	s.api.init(s)!
 	s.health()!
 	s.ready = true
@@ -100,7 +105,9 @@ pub fn (mut s Shy) init() ! {
 [inline]
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
+	s.alarms.paused = true // Pause so no alarms will fire during shutdown
 	s.api.shutdown()!
+	s.alarms.shutdown()!
 	s.log.shutdown()!
 	analyse.eprintln_report() // $if shy_analyse ?
 }
