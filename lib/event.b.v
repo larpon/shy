@@ -79,6 +79,7 @@ pub fn (mut e Events) send(ev Event) ! {
 	if ev is UnkownEvent {
 		return error('${@STRUCT}.${@FN}: sending unknown events is not allowed')
 	}
+	analyse.max('${@STRUCT}.max_in_queue', e.queue.len + 1)
 	if e.queue.len < e.queue.cap {
 		analyse.count('${@STRUCT}.${@FN}', 1)
 		e.queue << ev

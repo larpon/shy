@@ -77,6 +77,7 @@ pub fn (mut a Anims) update(dt f64) {
 	if a.paused {
 		return
 	}
+	analyse.max('${@STRUCT}.max_in_use', a.active.len)
 	for i := 0; i < a.active.len; i++ {
 		animator := a.active[i]
 

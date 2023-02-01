@@ -38,7 +38,7 @@ pub fn (mut t Timers) init() ! {
 	// unsafe { t.f64_pool.flags.set(.noslices | .noshrink) }
 	for i := 0; i < prealloc; i++ {
 		t.pool << t.p_new_timer()
-		analyse.count('${@STRUCT}_preallocate', 1)
+		analyse.count('${@STRUCT}.preallocate', 1)
 		// t.f64_pool << t.p_new_timer<f64>()
 	}
 }
@@ -67,6 +67,7 @@ pub fn (mut t Timers) update(dt f64) {
 	if t.paused {
 		return
 	}
+	analyse.max('${@STRUCT}.max_in_use', t.active.len)
 	for i := 0; i < t.active.len; i++ {
 		mut timer := t.active[i]
 		// timer.touch()
