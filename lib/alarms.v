@@ -26,7 +26,7 @@ mut:
 	pool   []&Alarm = []&Alarm{cap: 2000} // Should match prealloc
 }
 
-pub fn (mut a Alarms) init() ! {
+fn (mut a Alarms) init() ! {
 	// TODO make configurable
 	prealloc := 2000
 	unsafe { a.active.flags.set(.noslices | .noshrink) }
@@ -38,9 +38,20 @@ pub fn (mut a Alarms) init() ! {
 	}
 }
 
-pub fn (a &Alarms) active() bool {
+pub fn (a &Alarms) is_active() bool {
 	// a.running &&
 	return !a.paused && a.active.len > 0
+}
+
+pub fn (a &Alarms) pause(alarm_id AlarmID, pause bool) {
+	for i := 0; i < a.active.len; i++ {
+		mut alarm := a.active[i]
+		if alarm.id == alarm_id {
+			unsafe {
+				alarm.paused = pause
+			}
+		}
+	}
 }
 
 pub fn (a &Alarms) cancel(alarm_id AlarmID) {
@@ -57,7 +68,7 @@ pub fn (a &Alarms) cancel(alarm_id AlarmID) {
 }
 
 [manualfree]
-pub fn (mut a Alarms) shutdown() ! {
+fn (mut a Alarms) shutdown() ! {
 	for alarm in a.active {
 		unsafe {
 			free(alarm)
@@ -96,8 +107,20 @@ fn (s &Shy) make_alarm(config AlarmConfig) AlarmID {
 	return AlarmID(alarms.new_alarm(config).id)
 }
 
+fn (s &Shy) pause_alarm(alarm_id AlarmID, pause bool) {
+	assert !isnil(s.alarms), 'Shy has not initialized alarm support'
+	if alarm_id <= 0 {
+		return
+	}
+	mut alarms := s.alarms
+	alarms.pause(alarm_id, pause)
+}
+
 fn (s &Shy) cancel_alarm(alarm_id AlarmID) {
 	assert !isnil(s.alarms), 'Shy has not initialized alarm support'
+	if alarm_id <= 0 {
+		return
+	}
 	mut alarms := s.alarms
 	alarms.cancel(alarm_id)
 }
