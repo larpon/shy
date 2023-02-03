@@ -8,24 +8,25 @@ import shy.vec
 import shy.utils
 import shy.particle
 
-const dot_image = $embed_file('../assets/images/dot.png')
+const default_particle_image = $embed_file('../assets/images/dot.png')
 
-pub fn (mut e Easy) new_particle_system(epsc ParticleSystemConfig) &ParticleSystem {
+pub fn (mut e Easy) new_particle_system(psc ParticleSystemConfig) &ParticleSystem {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 
 	mut system := particle.new_system(
-		Rect: epsc.Rect
-		pool: epsc.pool
+		Rect: psc.Rect
+		pool: psc.pool
 	)
 	default_painter := default_particle_painter(mut e)
-	system.add_painter(default_painter)
+	default_painter_id := system.add_painter(default_painter)
 	e.particle_systems << system
 	return &ParticleSystem{
 		shy: e.shy
 		system: system
-		rotation: epsc.rotation
-		scale: epsc.scale
-		offset: epsc.offset
+		default_painter_id: default_painter_id
+		rotation: psc.rotation
+		scale: psc.scale
+		offset: psc.offset
 	}
 }
 
@@ -43,7 +44,8 @@ pub mut:
 pub struct ParticleSystem {
 	shy.ShyStruct
 mut:
-	system &particle.System
+	system             &particle.System
+	default_painter_id int
 pub mut:
 	rotation f32
 	scale    f32 = 1.0
@@ -51,15 +53,15 @@ pub mut:
 }
 
 [inline]
-pub fn (eps &ParticleSystem) draw() {
-	// draw := eps.shy.draw()
+pub fn (ps &ParticleSystem) draw() {
+	// draw := ps.shy.draw()
 
 	// TODO transforms on the whole system
-	eps.system.draw(1.0) // NOTE doesn't support frame deltas yet, it's not a problem so far
+	ps.system.draw(1.0) // NOTE doesn't support frame deltas yet, it's not a problem so far
 }
 
 [inline]
-pub fn (mut eps ParticleSystem) add(component particle.Component) {
+pub fn (mut ps ParticleSystem) add(component particle.Component) {
 	match component {
 		particle.Emitter {
 			mut group := 'default'
@@ -70,48 +72,67 @@ pub fn (mut eps ParticleSystem) add(component particle.Component) {
 				...component
 				group: group
 			}
-			eps.system.add(shim)
+			ps.system.add(shim)
 		}
 		else {
-			eps.system.add(component)
+			ps.system.add(component)
 		}
 	}
 }
 
-pub fn (eps &ParticleSystem) emitter_at(index int) ?&particle.Emitter {
-	return eps.system.emitter_at(index)
+pub fn (ps &ParticleSystem) emitter_at_index(index int) ?&particle.Emitter {
+	return ps.system.emitter_at(index)
 }
 
-pub fn (eps &ParticleSystem) emitters() []&particle.Emitter {
-	return eps.system.emitters()
+pub fn (ps &ParticleSystem) emitters() []&particle.Emitter {
+	return ps.system.emitters()
 }
 
 [inline]
-pub fn (eps &ParticleSystem) emitters_in_groups(groups []string) []&particle.Emitter {
-	return eps.system.emitters_in_groups(groups)
+pub fn (ps &ParticleSystem) emitters_in_groups(groups []string) []&particle.Emitter {
+	return ps.system.emitters_in_groups(groups)
+}
+
+pub fn (mut ps ParticleSystem) replace_default_painter(painter particle.Painter) {
+	ps.system.remove_painter_at(ps.default_painter_id)
+	ps.default_painter_id = ps.system.add_painter(painter)
+}
+
+pub fn (mut e Easy) image_particle_painter(config ImageParticlePainterConfig) ImageParticlePainter {
+	return ImageParticlePainter{
+		...config
+		easy: e
+	}
 }
 
 fn default_particle_painter(mut e Easy) ImageParticlePainter {
 	e.quick.load(shy.ImageOptions{
-		source: easy.dot_image
+		source: easy.default_particle_image
 	}) or { panic(err) }
 
-	return ImageParticlePainter{
-		easy: e
-		source: easy.dot_image
-		groups: ['default']
-		color: shy.colors.shy.red
+	return e.image_particle_painter(
+		source: easy.default_particle_image
 		color_variation: shy.ColorVariation{0, 0, 0, 0.3}
-	}
+	)
 }
 
+[params]
+pub struct ImageParticlePainterConfig {
+mut:
+	groups          []string  = ['default']
+	color           shy.Color = shy.colors.shy.white
+	color_variation shy.ColorVariation
+	source          shy.AssetSource = easy.default_particle_image
+}
+
+[noinit: 'Easy.make_image_particle_painter']
 pub struct ImageParticlePainter {
 	easy &Easy
 mut:
-	groups          []string
-	color           shy.Color
+	groups          []string  = ['default']
+	color           shy.Color = shy.colors.shy.white
 	color_variation shy.ColorVariation
-	source          shy.AssetSource
+	source          shy.AssetSource = easy.default_particle_image
 }
 
 fn (mut ip ImageParticlePainter) init(mut p particle.Particle) {
