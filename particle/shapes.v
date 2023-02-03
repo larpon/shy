@@ -3,8 +3,15 @@
 
 module particle
 
-import shy.vec
+// import shy.vec
 
+pub enum Shape {
+	point
+	rectangle
+	// TODO ellipse
+}
+
+/*
 type Shape = Ellipse | Point | Rect
 
 pub struct Point {
@@ -23,3 +30,4 @@ pub mut:
 	position vec.Vec2[f32]
 	radius   f32
 }
+*/

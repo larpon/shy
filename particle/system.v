@@ -69,6 +69,7 @@ pub fn (mut s System) add(cp Component) {
 			// e := c as Emitter
 			c.system = s
 			s.emitters << c
+			// e := s.emitter_at(0) or {panic(err)}
 		}
 		Affector {
 			mut a := c
@@ -106,6 +107,7 @@ pub fn (mut s System) remove_painter_at(index int) {
 pub fn (s &System) emitter_at(index int) ?&Emitter {
 	unsafe {
 		if mut emitter := s.emitters[index] {
+			// TODO println('ggg${ptr_str(emitter)}')
 			return &emitter
 		}
 	}

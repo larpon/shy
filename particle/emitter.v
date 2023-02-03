@@ -5,6 +5,7 @@ module particle
 
 import math
 import rand
+import shy.lib as shy
 import shy.vec
 
 pub struct Emitter {
@@ -12,7 +13,8 @@ pub mut:
 	enabled bool = true
 
 	position vec.Vec2[f32] // Center position of the emitter
-	size     vec.Vec2[f32] // Max size of the emitter
+	// Size of the emitter. when shape == .point the size has no effect
+	size shy.Size = shy.Size{100, 100}
 
 	velocity     StochasticDirection
 	acceleration StochasticDirection
@@ -29,7 +31,7 @@ pub mut:
 
 	group string // Logical group the emitted particles belong to
 
-	shape Shape  // TODO
+	shape Shape = .point
 	/*
 	Provide an additional starting velocity to the emitted particles based on the emitter's movement.
 	The added velocity vector will have the same angle as the emitter's movement,
@@ -41,7 +43,7 @@ mut:
 	position_last_frame vec.Vec2[f32]
 
 	system  &System = unsafe { nil }
-	dt      f64   // current delta time this frame
+	dt      f64    // current delta time this frame
 	elapsed f32 // Elapsed time accumulator
 
 	burst_position vec.Vec2[f32] // Center position of the burst
@@ -55,12 +57,13 @@ pub fn (mut e Emitter) move_to(v vec.Vec2[f32]) {
 }*/
 
 pub fn (mut e Emitter) burst(amount int) {
+	// e.burst_position.from(e.position)
 	e.burst_amount = amount
 }
 
 pub fn (mut e Emitter) burst_at(amount int, position vec.Vec2[f32]) {
-	e.burst_position.from(position)
 	e.burst(amount)
+	e.burst_position.from(position)
 }
 
 pub fn (mut e Emitter) pulse(duration_ms int) {
@@ -93,6 +96,7 @@ pub fn (mut e Emitter) update(dt f64) {
 	e.position_last_frame.from(e.position)
 }
 
+// emit initializes and sends particles into the system.
 fn (mut e Emitter) emit() {
 	mut s := e.system
 	dt := e.dt
@@ -125,10 +129,39 @@ fn (mut e Emitter) emit() {
 		p.group = e.group
 
 		if bursting && !e.burst_position.eq_scalar(0.0) {
-			p.position.from(e.burst_position)
+			match e.shape {
+				.point {
+					p.position.from(e.burst_position)
+				}
+				.rectangle {
+					area := shy.rect(e.position.x, e.position.y, e.size.width, e.size.height).displaced_from(.center)
+					p.position.x = rand.f32_in_range(area.x, area.x + area.width) or {
+						e.position.x
+					}
+					p.position.y = rand.f32_in_range(area.y, area.y + area.height) or {
+						e.position.y
+					}
+				}
+			}
 			e.position_last_frame.from(p.position) // Stop movement_velocity this frame
 		} else {
-			p.position.from(e.position)
+			match e.shape {
+				.point {
+					p.position.from(e.position)
+				}
+				// .ellipse {
+				// 	panic('TODO implement this')
+				// }
+				.rectangle {
+					area := shy.rect(e.position.x, e.position.y, e.size.width, e.size.height).displaced_from(.center)
+					p.position.x = rand.f32_in_range(area.x, area.x + area.width) or {
+						e.position.x
+					}
+					p.position.y = rand.f32_in_range(area.y, area.y + area.height) or {
+						e.position.y
+					}
+				}
+			}
 		}
 
 		e.apply_stochastic_direction(mut p.velocity, e.velocity)
