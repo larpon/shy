@@ -127,3 +127,11 @@ pub fn rect(x f32, y f32, w f32, h f32) Rect {
 		height: h
 	}
 }
+
+[inline]
+pub fn size(w f32, h f32) Size {
+	return Size{
+		width: w
+		height: h
+	}
+}
