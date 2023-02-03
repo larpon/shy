@@ -86,9 +86,9 @@ pub fn (s &Shy) scripts() &Scripts {
 }
 
 [inline]
-pub fn (s &Shy) app() voidptr {
+pub fn (s &Shy) app[T]() &T {
 	assert !isnil(s.app)
-	return s.app
+	return unsafe { &T(s.app) }
 }
 
 [inline]
