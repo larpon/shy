@@ -515,9 +515,12 @@ pub struct EasySoundPlayOptions {
 pub fn (q &Quick) play(opt EasySoundPlayOptions) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 
-	mut sound := unsafe { q.easy.shy.assets().get[shy.Sound](opt.source) or {
-		panic('${@STRUCT}.${@FN}: TODO ${err}')
-	} }
+	// TODO
+	mut sound := unsafe {
+		q.easy.shy.assets().get[shy.Sound](opt.source) or {
+			panic('${@STRUCT}.${@FN}: TODO ${err}')
+		}
+	}
 
 	sound.pitch = opt.pitch
 	// TODO sounds.loop = true - but the counter needs state?
