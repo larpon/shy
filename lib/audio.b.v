@@ -227,3 +227,39 @@ pub fn (ae &AudioEngine) set_looping(id u16, loop bool) {
 		ma.sound_set_looping(sound, u32(b))
 	}
 }
+
+pub fn (ae &AudioEngine) set_pitch(id u16, pitch f32) {
+	sound_id := id
+	if sound := ae.sounds[sound_id] {
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'set pitch = ${pitch:.3f} on sound ${sound_id} in engine ${ae.id}')
+		ma.sound_set_pitch(sound, pitch)
+	}
+}
+
+pub fn (ae &AudioEngine) seek_to_pcm_frame(id u16, frame u64) {
+	sound_id := id
+	if sound := ae.sounds[sound_id] {
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'seek to PCM frame ${frame} on sound ${sound_id} in engine ${ae.id}')
+		_ := ma.sound_seek_to_pcm_frame(sound, frame)
+		// TODO check result?
+	}
+}
+
+/*
+pub fn (ae &AudioEngine) get_length(id u16) u64 {
+	sound_id := id
+	mut length := f32(0)
+	if sound := ae.sounds[sound_id] {
+		_ := ma.sound_get_length_in_seconds(sound, &length)
+	}
+	return length
+}*/
+
+pub fn (ae &AudioEngine) get_length_in_pcm_frames(id u16) u64 {
+	sound_id := id
+	mut length := u64(0)
+	if sound := ae.sounds[sound_id] {
+		_ := ma.sound_get_length_in_pcm_frames(sound, &length)
+	}
+	return length
+}
