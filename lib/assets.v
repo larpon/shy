@@ -8,7 +8,7 @@ import shy.wraps.sokol.gfx
 import stbi
 import v.embed_file
 
-// Assets acts as a manager of `Asset` instances.
+// Assets is a manager of `Asset` instances.
 [heap]
 pub struct Assets {
 	ShyStruct
@@ -16,6 +16,7 @@ mut:
 	ass map[string]&Asset // Uuuh huh huh, hey Beavis... uhuh huh huh
 
 	image_cache map[string]Image
+	sound_cache map[string]Sound
 }
 
 pub fn (mut a Assets) init() ! {}
@@ -24,10 +25,12 @@ pub fn (mut a Assets) shutdown() ! {
 	for _, mut image in a.image_cache {
 		image.free()
 	}
+	a.image_cache.clear()
 	for _, mut asset in a.ass {
 		asset.shutdown()!
 	}
 	// Sounds are handled by the AudioEngine
+	a.sound_cache.clear()
 }
 
 // load loads a binary blob from a variety of sources and return
@@ -83,7 +86,13 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
 	$if T is Image {
-		return a.get_cached_image(source)
+		if image := a.image_cache[source.str()] {
+			return image
+		}
+	} $else $if T is Sound {
+		if sound := a.sound_cache[source.str()] {
+			return sound
+		}
 	} $else $if T is Asset {
 		return a.ass[source.str()]
 	} $else {
@@ -92,15 +101,7 @@ pub fn (a &Assets) get[T](source AssetSource) !T {
 		tof := 'TODO'
 		return error('${@STRUCT}.${@FN}' + ': "${source}" of type ${tof} is not supported')
 	}
-}
-
-// TODO clean up this mess
-fn (a &Assets) get_cached_image(source AssetSource) !Image {
-	if image := a.image_cache[source.str()] {
-		return image
-	}
-	return error('${@STRUCT}.${@FN}' +
-		': "${source}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+	return error('${@STRUCT}.${@FN}: "${source}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
 
 // Asset
@@ -244,6 +245,11 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 
 fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	assert !isnil(a.shy), 'Asset struct is not initialized'
+	if opt.cache {
+		if sound := a.shy.assets().sound_cache[a.lo.source.str()] {
+			return sound
+		}
+	}
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 	mut engine := a.shy.audio().engine(opt.engine_id)!
 
@@ -254,12 +260,19 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	} else {
 		id = engine.load(a.lo.source)!
 	}
-	return Sound{
+	sound := Sound{
 		asset: a
 		id: id
 		id_end: id_end
 		loop: opt.loop
 	}
+	if opt.cache {
+		unsafe {
+			a.shy.assets().sound_cache[a.lo.source.str()] = sound
+		}
+	}
+
+	return sound
 }
 
 // Image
@@ -278,6 +291,58 @@ pub enum ImageFillMode {
 	tile_vertically // image is stretched horizontally and tiled vertically
 	tile_horizontally // image is stretched vertically and tiled horizontally
 	pad // image is not transformed
+}
+
+pub fn (ifm ImageFillMode) next() ImageFillMode {
+	return match ifm {
+		.stretch {
+			.aspect_fit
+		}
+		.aspect_fit {
+			.aspect_crop
+		}
+		.aspect_crop {
+			.tile
+		}
+		.tile {
+			.tile_vertically
+		}
+		.tile_vertically {
+			.tile_horizontally
+		}
+		.tile_horizontally {
+			.pad
+		}
+		.pad {
+			.stretch
+		}
+	}
+}
+
+pub fn (ifm ImageFillMode) prev() ImageFillMode {
+	return match ifm {
+		.stretch {
+			.pad
+		}
+		.aspect_fit {
+			.stretch
+		}
+		.aspect_crop {
+			.aspect_fit
+		}
+		.tile {
+			.aspect_crop
+		}
+		.tile_vertically {
+			.tile
+		}
+		.tile_horizontally {
+			.tile_vertically
+		}
+		.pad {
+			.tile_horizontally
+		}
+	}
 }
 
 [heap; noinit]
@@ -335,17 +400,20 @@ pub:
 	id     u16
 	id_end u16
 mut:
-	alarm AlarmID
+	alarm  AlarmID
+	paused bool // TODO
 pub mut:
+	pitch    f32
 	loop     bool
 	on_end   fn (Sound)
 	on_start fn (Sound)
+	on_pause fn (Sound, bool)
 }
 
 fn sound_alarm_check(sound voidptr) bool {
 	assert !isnil(sound)
 	s := unsafe { &Sound(sound) }
-	ended := !s.is_playing() && !s.is_looping()
+	ended := !s.is_playing() && !s.is_looping() && !s.paused
 	if ended {
 		if !isnil(s.on_end) {
 			s.on_end(Sound{
@@ -368,6 +436,9 @@ pub fn (s &Sound) play() {
 	assert !isnil(s.asset), 'Sound is not initialized'
 	engine := s.engine()
 	engine.set_looping(s.id, s.loop)
+	if s.pitch != 0 {
+		engine.set_pitch(s.id, s.pitch)
+	}
 	mut id := s.id
 	if s.id_end > 0 {
 		for i in id .. s.id_end {
@@ -396,6 +467,39 @@ pub fn (s &Sound) play() {
 		}
 	}
 	engine.play(id)
+}
+
+// is_paused returns true if the sound is paused.
+pub fn (s &Sound) is_paused() bool {
+	return s.paused
+}
+
+// pause pauses the sound.
+pub fn (s &Sound) pause(pause bool) {
+	assert !isnil(s.asset), 'Sound is not initialized'
+	engine := s.engine()
+
+	// TODO doesn't work as expected currently
+	// since all this shit is on the stack maybe check where the cursor is instead?
+	already_paused := s.paused
+	// This check prevents double fires.
+	if already_paused == pause {
+		return
+	}
+	unsafe {
+		s.paused = pause
+	}
+	if !isnil(s.on_pause) {
+		s.on_pause(Sound{
+			...s
+		}, s.paused)
+	}
+	unsafe { s.asset.shy.pause_alarm(s.alarm, s.paused) }
+	if s.paused {
+		engine.stop(s.id)
+	} else {
+		engine.play(s.id)
+	}
 }
 
 // is_looping returns `true` if the sound is looping, `false` otherwise.
@@ -434,5 +538,6 @@ pub fn (s &Sound) stop() {
 	assert !isnil(s.asset), 'Sound is not initialized'
 	engine := s.engine()
 	engine.stop(s.id)
+	engine.seek_to_pcm_frame(s.id, 0)
 	engine.set_looping(s.id, s.loop)
 }
