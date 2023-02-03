@@ -11,20 +11,16 @@ pub const (
 	colors = BaseColors{}
 )
 
-pub struct Color {
-pub mut:
-	r u8
-	g u8
-	b u8
-	a u8
-}
-
 pub struct Colorf32 {
 pub mut:
 	r f32
 	g f32
 	b f32
 	a f32
+}
+
+pub fn (c &Colorf32) is_opaque() bool {
+	return c.a == 1.0
 }
 
 pub struct ColorVariation {
@@ -69,6 +65,7 @@ pub:
 	blue   Color = rgb(15, 75, 215)
 	yellow Color = rgb(210, 200, 15)
 	white  Color = rgb(255, 255, 255) // Same white as used in the logo
+	black  Color = rgb(0, 0, 0) // Back in black
 }
 
 pub struct BaseColors {
@@ -78,15 +75,76 @@ pub:
 	blue   Color = rgb(0, 0, 255)
 	yellow Color = rgb(255, 255, 0)
 	white  Color = rgb(255, 255, 255)
+	black  Color = rgb(0, 0, 0) // Back in black
 	shy    ShyColors
+}
+
+pub struct Color {
+pub mut:
+	r u8
+	g u8
+	b u8
+	a u8
+}
+
+pub fn (c &Color) is_transparent() bool {
+	return c.a == 0
 }
 
 pub fn (c &Color) is_opaque() bool {
 	return c.a == 255
 }
 
-pub fn (c &Colorf32) is_opaque() bool {
-	return c.a == 1.0
+/*
+pub fn (c &Color) r(value u8) Color {
+	return Color{
+		...c
+		r: value
+	}
+}
+pub fn (c &Color) g(value u8) Color {
+	return Color{
+		...c
+		g: value
+	}
+}
+pub fn (c &Color) b(value u8) Color {
+	return Color{
+		...c
+		b: value
+	}
+}
+
+pub fn (c &Color) a(value u8) Color {
+	return Color{
+		...c
+		a: value
+	}
+}
+*/
+pub fn (c &Color) darker() Color {
+	return c.blend_with(Color{0, 0, 0, 255}, 0.1)
+}
+
+pub fn (c &Color) lighter() Color {
+	return c.blend_with(Color{255, 255, 255, 255}, 0.1)
+}
+
+pub fn (c &Color) darker_by(amount f32) Color {
+	return c.blend_with(Color{0, 0, 0, 255}, amount)
+}
+
+pub fn (c &Color) lighter_by(amount f32) Color {
+	return c.blend_with(Color{255, 255, 255, 255}, amount)
+}
+
+pub fn (c &Color) blend_with(color Color, blend f32) Color {
+	return Color{
+		r: u8(color.r * blend + c.r * (1 - blend))
+		g: u8(color.g * blend + c.g * (1 - blend))
+		b: u8(color.b * blend + c.b * (1 - blend))
+		a: c.a // color.a * (1 - blend) + c.a * blend
+	}
 }
 
 pub fn (c &Color) as_f32() Colorf32 {
