@@ -38,16 +38,17 @@ pub fn (mut a App) init() ! {
 			point: shy.vec2[f32](0.0, -0.5 * scale * 0.5)
 			point_variation: shy.vec2[f32](0.2, 0.5)
 		}
-		acceleration: particle.PointDirection{
-			point: shy.vec2[f32](0.0, -1.5 * scale * 0.5)
-			point_variation: shy.vec2[f32](0.4, 0.7)
-		}
-		start_size: shy.vec2[f32](30.0 * scale, 35 * scale)
 		size_variation: shy.vec2[f32](10.0 * scale, 10 * scale)
 		life_time: 2000
 		life_time_variation: 1000
 		movement_velocity: 40
 	})
+
+	// For demo purposes, replace the default particle painter
+	// with one that paints in red <3
+	a.eps.replace_default_painter(a.easy.image_particle_painter(
+		color: shy.colors.shy.red
+	))
 }
 
 [markused]
