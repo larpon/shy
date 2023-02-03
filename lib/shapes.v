@@ -276,6 +276,12 @@ pub fn (r &Rect) displaced_from(origin Anchor) Rect {
 	}
 }
 
+[inline]
+pub fn (r Rect) point_at(anchor Anchor) Vec2[f32] {
+	x, y := anchor.pos_wh(r.width, r.height)
+	return vec2(r.x + x, r.y + y)
+}
+
 pub fn (r &Rect) mul_scalar(scalar f32) Rect {
 	return Rect{
 		x: r.x * scalar
