@@ -94,8 +94,13 @@ pub fn (mut s System) add(cp Component) {
 	}
 }
 
-pub fn (mut s System) add_painter(p Painter) {
+pub fn (mut s System) add_painter(p Painter) int {
 	s.painters << p
+	return s.painters.len - 1
+}
+
+pub fn (mut s System) remove_painter_at(index int) {
+	s.painters.delete(int(index))
 }
 
 pub fn (s &System) emitter_at(index int) ?&Emitter {
