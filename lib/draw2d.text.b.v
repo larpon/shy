@@ -136,8 +136,9 @@ pub mut:
 	align    TextAlign = .baseline | .left // TODO V BUG lib.defaults.font.align
 	size     f32       = defaults.font.size
 	scale    f32       = 1.0
-	fills    Fill      = .body | .outline
+	fills    Fill      = .body | .stroke
 	offset   Vec2[f32]
+	blur     f32
 }
 
 [inline]
@@ -153,7 +154,6 @@ pub fn (t Draw2DText) draw() {
 	/*
 	font_context.set_alignment(.left | .baseline)
 	font_context.set_spacing(5.0)
-	font_context.set_blur(6.0)
 	*/
 
 	if t.font != defaults.font.name {
@@ -166,6 +166,10 @@ pub fn (t Draw2DText) draw() {
 	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?
 	font_context.set_size(font_size)
 	// eprintln('${@STRUCT}.${@FN} ${font_size}')
+
+	if t.blur > 0 {
+		font_context.set_blur(t.blur)
+	}
 
 	lines := t.text.split('\n')
 

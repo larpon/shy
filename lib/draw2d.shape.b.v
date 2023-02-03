@@ -88,7 +88,7 @@ pub mut:
 	stroke   Stroke
 	rotation f32
 	scale    f32  = 1.0
-	fills    Fill = .body | .outline
+	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
 	origin   Anchor
 }
@@ -149,7 +149,7 @@ pub fn (t &DrawShape2DTriangle) draw() {
 		analyse.count[u64]('${@STRUCT}.${@FN}/vertices', 3)
 		analyse.count[u64]('total_vertices', 3)
 	}
-	if t.fills.has(.outline) {
+	if t.fills.has(.stroke) {
 		stroke_width := t.stroke.width
 		color := t.stroke.color
 		gl.c4b(color.r, color.g, color.b, color.a)
@@ -200,7 +200,7 @@ pub mut:
 	stroke   Stroke
 	rotation f32
 	scale    f32  = 1.0
-	fills    Fill = .body | .outline
+	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
 	origin   Anchor
 }
@@ -265,7 +265,7 @@ pub fn (r &DrawShape2DRect) draw() {
 		analyse.count[u64]('total_vertices', 4)
 		gl.end()
 	}
-	if r.fills.has(.outline) {
+	if r.fills.has(.stroke) {
 		stroke_width := r.stroke.width
 		color := r.stroke.color
 		gl.c4b(color.r, color.g, color.b, color.a)
@@ -446,7 +446,7 @@ pub mut:
 	stroke   Stroke
 	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
 	scale    f32  = 1.0
-	fills    Fill = .body | .outline
+	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
 	origin   Anchor = .center
 }
@@ -530,7 +530,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 		}
 		gl.end()
 	}
-	if up.fills.has(.outline) {
+	if up.fills.has(.stroke) {
 		if up.stroke.width > 1 {
 			for i := 0; i < segments; i++ {
 				theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)

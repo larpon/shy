@@ -5,7 +5,7 @@ module lib
 
 [flag]
 pub enum Fill {
-	outline
+	stroke
 	body
 }
 

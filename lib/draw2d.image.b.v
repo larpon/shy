@@ -79,19 +79,32 @@ pub fn (i Draw2DImage) draw() {
 	y0 := f32(0)
 	mut x1 := f32(w)
 	mut y1 := f32(h)
+	image := i.image
 
+	mut o_off_x, mut o_off_y := i.origin_offset()
 	match i.fill_mode {
 		.stretch {
 			// default mode
 		}
 		.aspect_fit {
-			assert false, 'TODO .aspect_fit not implemented yet'
+			ratio := mth.min(f32(i.height) / (image.height), f32(i.width) / (image.width))
+			x1 = image.width * ratio
+			y1 = image.height * ratio
+			i_x, i_y := i.origin.pos_wh(w, h)
+			x1x, y1y := i.origin.pos_wh(x1, y1)
+			o_off_x += i_x - x1x
+			o_off_y += i_y - y1y
 		}
 		.aspect_crop {
-			assert false, 'TODO .aspect_crop not implemented yet'
+			ratio := mth.max(f32(i.height) / (image.height), f32(i.width) / (image.width))
+			// u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)i
+			// v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
+			x1 = image.width * ratio
+			y1 = image.height * ratio
+			// TODO do actual crop
+			assert false, 'TODO .aspect_crop needs work still'
 		}
 		.tile {
-			image := i.image
 			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
 			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
 			u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)
@@ -100,7 +113,6 @@ pub fn (i Draw2DImage) draw() {
 			y1 = i.height
 		}
 		.tile_vertically {
-			image := i.image
 			assert image.opt.wrap_u == .clamp_to_edge, 'Images used for fill_mode: .tile_vertically, must be loaded with wrap_u: .clamp_to_edge'
 			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .tile_vertically, must be loaded with wrap_v: .repeat'
 			v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
@@ -108,7 +120,6 @@ pub fn (i Draw2DImage) draw() {
 			y1 = i.height
 		}
 		.tile_horizontally {
-			image := i.image
 			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile_horizontally, must be loaded with wrap_u: .repeat'
 			assert image.opt.wrap_v == .clamp_to_edge, 'Images used for fill_mode: .tile_horizontally, must be loaded with wrap_v: .clamp_to_edge'
 			u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)
@@ -126,7 +137,6 @@ pub fn (i Draw2DImage) draw() {
 	gl.enable_texture()
 	gl.texture(i.image.gfx_image)
 
-	mut o_off_x, mut o_off_y := i.origin_offset()
 	// o_off_x = int(o_off_x)
 	// o_off_y = int(o_off_y)
 

@@ -62,6 +62,7 @@ pub mut:
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
 	color    shy.Color = shy.rgba(255, 255, 255, 255) // BUG shy.defaults.font.color
+	blur     f32
 }
 
 [noinit]
@@ -78,6 +79,7 @@ pub mut:
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
 	color    shy.Color = shy.defaults.font.color
+	blur     f32
 }
 
 [inline]
@@ -96,6 +98,7 @@ pub fn (et &EasyText) draw() {
 	t.align = et.align
 	t.offset = et.offset
 	t.color = et.color
+	t.blur = et.blur
 	t.draw()
 	dt.end()
 }
@@ -136,7 +139,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
@@ -150,7 +153,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
@@ -203,7 +206,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
@@ -219,7 +222,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor
 }
@@ -362,7 +365,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
@@ -376,7 +379,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
@@ -427,7 +430,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
@@ -442,7 +445,7 @@ pub mut:
 	rotation f32
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
-	fills    shy.Fill  = .body | .outline
+	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
 	origin   shy.Anchor = .center
 }
@@ -484,44 +487,64 @@ pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
 
 // Audio sub-system
 
-[noinit]
-pub struct EasySound {
-	shy.ShyStruct
-	engine &shy.AudioEngine
-	id     u16
-	id_end u16
-pub mut:
-	loop bool
-}
+// [noinit]
+// pub struct EasySound {
+// 	shy.ShyStruct
+// 	engine &shy.AudioEngine
+// 	id     u16
+// 	id_end u16
+// pub mut:
+// 	loop bool
+// }
+
+// [params]
+// pub struct EasySoundConfig {
+// 	source      shy.AssetSource
+// 	loop        bool
+//  	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
+// }
 
 [params]
-pub struct EasySoundConfig {
-	path        string
-	loop        bool
-	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
+pub struct EasySoundPlayOptions {
+	source shy.AssetSource [required]
+	loops  u16
+	pitch  f32
 }
 
-/*
-pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
-	assert !isnil(e.shy), 'Easy struct is not initialized'
-	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
-	mut audio := e.audio_engine
+[inline]
+pub fn (q &Quick) play(opt EasySoundPlayOptions) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
 
-	mut id := u16(0)
-	mut id_end := u16(0)
-	if esc.max_repeats > 1 {
-		id, id_end = audio.load_copies(esc.path, esc.max_repeats)!
-	} else {
-		id = audio.load(esc.path)!
-	}
-	return &EasySound{
-		shy: e.shy
-		engine: e.audio_engine
-		id: id
-		id_end: id_end
-		loop: esc.loop
-	}
-}*/
+	mut sound := unsafe { q.easy.shy.assets().get[shy.Sound](opt.source) or {
+		panic('${@STRUCT}.${@FN}: TODO ${err}')
+	} }
+
+	sound.pitch = opt.pitch
+	// TODO sounds.loop = true - but the counter needs state?
+	// sound.loops
+	sound.play()
+}
+
+// pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
+// 	assert !isnil(e.shy), 'Easy struct is not initialized'
+// 	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
+// 	mut audio := e.audio_engine
+
+// 	mut id := u16(0)
+// 	mut id_end := u16(0)
+// 	if esc.max_repeats > 1 {
+// 		id, id_end = audio.load_copies(esc.path, esc.max_repeats)!
+// 	} else {
+// 		id = audio.load(esc.path)!
+// 	}
+// 	return &EasySound{
+// 		shy: e.shy
+// 		engine: e.audio_engine
+// 		id: id
+// 		id_end: id_end
+// 		loop: esc.loop
+// 	}
+// }
 
 pub struct EasyImageConfigRect {
 	x      f32
