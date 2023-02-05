@@ -12,7 +12,7 @@ import shy.wraps.sokol.gl
 pub struct DrawImage {
 	ShyFrame
 	factor f32 = 1.0
-	// draw   &Draw
+	draw   &Draw
 }
 
 pub fn (mut di DrawImage) begin() {
@@ -33,6 +33,7 @@ pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 		width: image.width
 		height: image.height
 		image: image
+		draw: di.draw
 		// alpha_pipeline: di.draw.alpha_pipeline
 	}
 	/*
@@ -47,6 +48,8 @@ pub struct Draw2DImage {
 	image Image
 	// alpha_pipeline gl.Pipeline
 	factor f32 = 1.0
+mut:
+	draw &Draw // For scissor state restoring
 pub mut:
 	color     Color = rgb(255, 255, 255)
 	origin    Anchor
@@ -81,6 +84,7 @@ pub fn (i Draw2DImage) draw() {
 	mut y1 := f32(h)
 	image := i.image
 
+	mut scissor_rect := Rect{0, 0, -1, -1}
 	mut o_off_x, mut o_off_y := i.origin_offset()
 	match i.fill_mode {
 		.stretch {
@@ -101,8 +105,21 @@ pub fn (i Draw2DImage) draw() {
 			// v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
 			x1 = image.width * ratio
 			y1 = image.height * ratio
-			// TODO do actual crop
-			assert false, 'TODO .aspect_crop needs work still'
+
+			i_x, i_y := i.origin.pos_wh(w, h)
+			x1x, y1y := i.origin.pos_wh(x1, y1)
+			o_off_x += i_x - x1x
+			o_off_y += i_y - y1y
+
+			scissor_rect = i.draw.scissor_rect
+			mut scissor := Rect{
+				x: x
+				y: y
+				width: w
+				height: h
+			}
+			scissor = scissor.displaced_from(i.origin)
+			i.draw.scissor(scissor)
 		}
 		.tile {
 			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
@@ -133,7 +150,6 @@ pub fn (i Draw2DImage) draw() {
 	}
 
 	gl.push_matrix()
-
 	gl.enable_texture()
 	gl.texture(i.image.gfx_image)
 
@@ -174,6 +190,9 @@ pub fn (i Draw2DImage) draw() {
 	// gl.pop_pipeline()
 
 	gl.pop_matrix()
+	if scissor_rect.width >= 0 {
+		i.draw.scissor(scissor_rect)
+	}
 }
 
 [inline]

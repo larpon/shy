@@ -11,6 +11,8 @@ pub struct Draw {
 mut:
 	factor         f32 = 1.0
 	alpha_pipeline gl.Pipeline
+	viewport       Rect
+	scissor_rect   Rect
 }
 
 pub fn (mut d Draw) init() ! {
@@ -55,6 +57,11 @@ pub fn (mut d Draw) begin_2d() {
 
 	gl.defaults()
 
+	// According to sokol_gfx.h documentation the viewport and scissor rects are reset
+	// to the size of the full framebuffer - so we can assume that here:
+	d.viewport = Rect{0, 0, w, h}
+	d.scissor_rect = d.viewport
+
 	// gl.set_context(s_gl_context)
 	gl.matrix_mode_projection()
 	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
@@ -63,6 +70,20 @@ pub fn (mut d Draw) begin_2d() {
 }
 
 pub fn (d &Draw) end_2d() {}
+
+pub fn (d &Draw) viewport(rect Rect) {
+	gl.viewportf(rect.x, rect.y, rect.width, rect.height, true)
+	unsafe {
+		d.viewport = rect
+	}
+}
+
+pub fn (d &Draw) scissor(rect Rect) {
+	gl.scissor_rectf(rect.x, rect.y, rect.width, rect.height, true)
+	unsafe {
+		d.scissor_rect = rect
+	}
+}
 
 pub fn (d &Draw) push_matrix() {
 	gl.push_matrix()
