@@ -115,8 +115,8 @@ pub fn (i Draw2DImage) draw() {
 			mut scissor := Rect{
 				x: x
 				y: y
-				width: w
-				height: h
+				width: w * i.scale
+				height: h * i.scale
 			}
 			scissor = scissor.displaced_from(i.origin)
 			i.draw.scissor(scissor)
