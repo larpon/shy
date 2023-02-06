@@ -291,6 +291,11 @@ pub fn (r &Rect) mul_scalar(scalar f32) Rect {
 	}
 }
 
+// area returns the area of the `Rect`, which is calculated as `width * height`
+pub fn (r &Rect) area() f32 {
+	return r.width * r.height
+}
+
 pub struct Ray {
 pub mut:
 	origin Vec2[f32] // origin point
@@ -532,6 +537,7 @@ pub mut:
 	height f32 = 100
 }
 
+// to_rect converts `Size` to `Rect` with `x` and `y` fields sat to 0.
 pub fn (s &Size) to_rect() Rect {
 	return Rect{
 		x: 0
@@ -539,6 +545,11 @@ pub fn (s &Size) to_rect() Rect {
 		width: s.width
 		height: s.height
 	}
+}
+
+// area returns the area of the `Size`, which is calculated as `width * height`
+pub fn (s &Size) area() f32 {
+	return s.width * s.height
 }
 
 pub fn (s Size) mul_scalar(scalar f32) Size {
