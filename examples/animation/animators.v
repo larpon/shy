@@ -60,7 +60,7 @@ pub fn (mut a App) frame(dt f64) {
 
 	text.x = a.a_x.value() + a.fa_x.value() + 10
 	text.y = a.a_y.value() + a.fa_y.value() + 10
-	text.rotation = a.a_r.value()
+	text.rotation = a.a_r.value() * shy.deg2rad
 	text.scale = a.a_s.value()
 	text.text = 'Hello Shy Animated World!'
 	text.draw()

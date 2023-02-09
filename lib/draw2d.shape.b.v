@@ -376,7 +376,7 @@ pub fn (l DrawShape2DLineSegment) draw() {
 
 	if l.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
-		gl.rotate(l.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.rotate(l.rotation, 0, 0, 1.0)
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if l.scale != 1 {
@@ -493,7 +493,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 
 	if up.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
-		gl.rotate(up.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.rotate(up.rotation, 0, 0, 1.0)
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if up.scale != 1 {

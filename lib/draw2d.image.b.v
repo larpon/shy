@@ -163,7 +163,7 @@ pub fn (i Draw2DImage) draw() {
 
 	if i.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
-		gl.rotate(i.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.rotate(i.rotation, 0, 0, 1.0)
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if i.scale != 1 {
@@ -234,7 +234,7 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 
 	if i.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
-		gl.rotate(i.rotation * mth.deg2rad, 0, 0, 1.0)
+		gl.rotate(i.rotation, 0, 0, 1.0)
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 	if i.scale != 1 {

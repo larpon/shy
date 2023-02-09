@@ -4,7 +4,6 @@
 module lib
 
 import shy.vec { Vec2 }
-import shy.mth
 import shy.wraps.sokol.gl
 import shy.wraps.sokol.sfons
 
@@ -278,7 +277,7 @@ pub fn (t Draw2DText) draw() {
 		gl.translate(x, y, 0)
 
 		if t.rotation != 0 {
-			gl.rotate(t.rotation * mth.deg2rad, 0, 0, 1)
+			gl.rotate(t.rotation, 0, 0, 1)
 		}
 		if t.scale != 1 {
 			gl.scale(t.scale, t.scale, 0)
