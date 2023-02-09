@@ -4,7 +4,11 @@
 module lib
 
 // TODO factor WindowEvent out
-pub type Event = KeyEvent
+pub type Event = DropBeginEvent
+	| DropEndEvent
+	| DropFileEvent
+	| DropTextEvent
+	| KeyEvent
 	| MouseButtonEvent
 	| MouseMotionEvent
 	| MouseWheelEvent
@@ -97,6 +101,26 @@ pub:
 	scroll_x  int // The amount scrolled horizontally, positive to the right and negative to the left
 	scroll_y  int // The amount scrolled vertically, positive away from the user and negative toward the user
 	direction MouseWheelDirection // When .flipped the values in .x and .y will be opposite. Multiply by -1 to change them back
+}
+
+pub struct DropBeginEvent {
+	ShyEvent
+}
+
+pub struct DropEndEvent {
+	ShyEvent
+}
+
+pub struct DropFileEvent {
+	ShyEvent
+pub:
+	path string // the path to the file or directory being dropped
+}
+
+pub struct DropTextEvent {
+	ShyEvent
+pub:
+	text string // the text being dropped
 }
 
 //

@@ -282,7 +282,52 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			}
 			// }
 		}
+		.dropbegin {
+			shy_event = DropBeginEvent{
+				timestamp: s.ticks()
+				window: win
+			}
+		}
+		.dropcomplete {
+			shy_event = DropEndEvent{
+				timestamp: s.ticks()
+				window: win
+			}
+		}
+		.dropfile {
+			// See https://wiki.libsdl.org/SDL2/SDL_DropEvent
+			dropped_path := sdl_event.drop.file
+			path := unsafe { cstring_to_vstring(dropped_path) }
+			defer {
+				// 	sdl.free(dropped_path) // TODO Crashes?!
+				unsafe { free(dropped_path) }
+			}
+			shy_event = DropFileEvent{
+				timestamp: s.ticks()
+				window: win
+				path: path
+			}
+		}
+		.droptext {
+			// According to https://discourse.libsdl.org/t/what-is-sdl-droptext-and-what-does-it-require-to-work/25337
+			// This is an X11/Linux feature only
+			dropped_text := sdl_event.drop.file
+
+			text := unsafe { cstring_to_vstring(dropped_text) }
+			defer {
+				// sdl.free(dropped_text) // TODO Crashes?!
+				unsafe { free(dropped_text) }
+			}
+			shy_event = DropTextEvent{
+				timestamp: s.ticks()
+				window: win
+				text: text
+			}
+		}
 		else {
+			$if shy_debug_sdl_events ? {
+				eprintln('${@STRUCT}.${@FN} Unknown SDL event ${sdl_event.@type}.')
+			}
 			shy_event = UnkownEvent{
 				timestamp: s.ticks()
 				window: win
