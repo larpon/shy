@@ -7,6 +7,7 @@ import os
 import shy.wraps.sokol.gfx
 import stbi
 import v.embed_file
+import shy.analyse
 
 // Assets is a manager of `Asset` instances.
 [heap]
@@ -36,6 +37,7 @@ pub fn (mut a Assets) shutdown() ! {
 // load loads a binary blob from a variety of sources and return
 // a reference to an `Asset`.
 pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	source := alo.source
 	if asset := a.ass[source.str()] {
 		return asset
@@ -63,15 +65,17 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 			if !os.is_file(source) {
 				return error('${@STRUCT}.${@FN}: "${source}" does not exist on the file system')
 			}
+			analyse.count('${@MOD}.${@STRUCT}.${@FN}(filesystem)', 1)
 			bytes = os.read_bytes(source) or {
 				return error('${@STRUCT}.${@FN}: "${source}" could not be loaded')
 			}
 		}
 		embed_file.EmbedFileData {
+			analyse.count('${@MOD}.${@STRUCT}.${@FN}(embedded)', 1)
 			bytes = source.to_bytes()
 		}
 	}
-
+	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@bytes', u64(bytes.len))
 	// TODO preallocated asset pool??
 	asset := &Asset{
 		shy: a.shy
@@ -80,9 +84,33 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		status: .loaded
 	}
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${source}"')
+	// a.cache[&Asset](asset)! // TODO
 	a.ass[source.str()] = asset
 	return asset
 }
+
+/*
+pub fn (mut a Assets) cache[T](asset T) ! {
+	$if T is Image {
+		ass := asset // as Image
+		assert !isnil(ass.asset)
+		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
+		a.image_cache[ass.asset.lo.source.str()] = asset
+	} $else $if T is Sound {
+		ass := asset //as Image
+		assert !isnil(ass.asset)
+		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
+		a.sound_cache[ass.asset.lo.source.str()] = asset
+	} $else $if T is &Asset {
+		ass := asset //as &Asset
+		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
+		a.ass[asset.lo.source.str()] = ass
+	} $else {
+		return error('${@STRUCT}.${@FN}: caching of type ${typeof(asset).name} is not supported')
+	}
+	// return error('${@STRUCT}.${@FN}: Assets can be loaded with ${@STRUCT}.load(...)')
+}
+*/
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
 	$if T is Image {
@@ -93,7 +121,7 @@ pub fn (a &Assets) get[T](source AssetSource) !T {
 		if sound := a.sound_cache[source.str()] {
 			return sound
 		}
-	} $else $if T is Asset {
+	} $else $if T is &Asset {
 		return a.ass[source.str()]
 	} $else {
 		// t := T{}
@@ -186,8 +214,10 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 }
 
 fn (mut a Asset) to_image(opt ImageOptions) !Image {
+	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
+	assert !isnil(a.shy), 'Asset struct is not initialized'
 	if opt.cache {
-		if image := a.shy.assets().image_cache[a.lo.source.str()] {
+		if image := a.shy.assets().get[Image](a.lo.source) {
 			return image
 		}
 	}
@@ -236,17 +266,19 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 
 	if opt.cache {
 		unsafe {
-			a.shy.assets().image_cache[a.lo.source.str()] = image
+			mut assets := a.shy.assets()
+			// assets.cache[Image](image)! // TODO
+			assets.image_cache[a.lo.source.str()] = image
 		}
 	}
-
 	return image
 }
 
 fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
+	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 	if opt.cache {
-		if sound := a.shy.assets().sound_cache[a.lo.source.str()] {
+		if sound := a.shy.assets().get[Sound](a.lo.source) {
 			return sound
 		}
 	}
@@ -268,7 +300,9 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	}
 	if opt.cache {
 		unsafe {
-			a.shy.assets().sound_cache[a.lo.source.str()] = sound
+			mut assets := a.shy.assets()
+			assets.sound_cache[a.lo.source.str()] = sound
+			// assets.cache[Sound](sound)!
 		}
 	}
 
@@ -347,9 +381,9 @@ pub fn (ifm ImageFillMode) prev() ImageFillMode {
 
 [heap; noinit]
 pub struct Image {
-	asset &Asset = null // TODO removing this results in compiler warnings a few places
-	opt   ImageOptions
+	opt ImageOptions
 pub:
+	asset  &Asset = null // TODO removing this results in compiler warnings a few places
 	width  int
 	height int
 mut:

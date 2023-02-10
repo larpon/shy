@@ -190,7 +190,7 @@ pub fn (mut wm WM) shutdown() ! {
 }
 
 fn (mut wm WM) new_window(config WindowConfig) !&Window {
-	analyse.count('${@STRUCT}.${@FN}', 1)
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
 	s := wm.shy
 
 	mut window_flags := u32(sdl.WindowFlags.hidden)
@@ -286,7 +286,7 @@ pub fn (mut w Window) refresh(wdc WindowRefreshConfig) {
 	if w.mode != .ui {
 		return
 	}
-	analyse.count('${@STRUCT}(${w.id}).${@FN}', 1)
+	analyse.count('${@MOD}.${@STRUCT}(${w.id}).${@FN}', 1)
 	w.refresh_config = wdc
 	w.is_dirty = true
 }
@@ -420,6 +420,47 @@ pub fn (w &Window) find_window(id u32) ?&Window {
 pub fn (mut w Window) begin_frame() {
 	// Make *this* window's context the current
 	w.set_current()
+}
+
+// title returns the title of the window
+pub fn (w &Window) title() string {
+	c_str := sdl.get_window_title(w.handle)
+	return unsafe { cstring_to_vstring(c_str) }
+}
+
+// set_title sets the title of the window.
+pub fn (mut w Window) set_title(title string) {
+	sdl.set_window_title(w.handle, title.str)
+}
+
+// set_icon sets the icon of window.
+pub fn (mut w Window) set_icon(source AssetSource) ! {
+	// TODO https://caedesnotes.wordpress.com/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/
+
+	// stbi -> SDL2 surface loading see:
+	// https://github.com/DanielGibson/Snippets/blob/master/SDL_stbimage.h#L248
+	// SDL_WM_SetIcon(SDL_LoadBMP("icon.bmp"), NULL);
+	// SDL_SetWindowIcon(SDL_Window * window, SDL_Surface * icon)
+
+	mut assets := w.shy.assets()
+
+	mut asset := assets.load(
+		source: source
+	)!
+
+	/*
+	image := asset.to[Image](ImageOptions{
+		source: source
+	})!*/
+
+	// TODO surf should be freed when program ends... :( ...
+	// That's a bit yuk if we want to keep Assets agnostic from SDL2
+	mut surf := asset.to_sdl_surface(ImageOptions{
+		source: source
+	})!
+
+	sdl.set_window_icon(w.handle, surf)
+	unsafe { free(surf) }
 }
 
 [inline]
@@ -736,7 +777,7 @@ pub fn (mut w Window) end_frame() {
 
 pub fn (w &Window) swap() {
 	sdl.gl_swap_window(w.handle)
-	analyse.count('${@STRUCT}(${w.id}).${@FN}', 1)
+	analyse.count('${@MOD}.${@STRUCT}(${w.id}).${@FN}', 1)
 }
 
 pub fn (w Window) is_root() bool {
@@ -945,8 +986,4 @@ pub fn (w &Window) drawable_size() Size {
 pub fn (w &Window) draw_factor() f32 {
 	dw, dh := w.drawable_wh()
 	return mth.min(f32(dw) / w.width(), f32(dh) / w.height())
-}
-
-pub fn (mut w Window) set_icon(image Image) {
-	// TODO https://caedesnotes.wordpress.com/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/
 }

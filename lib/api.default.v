@@ -206,7 +206,7 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 		}
 		$if shy_analyse ? {
 			t := T{}
-			analyse.count('${@STRUCT}.${@FN}[${typeof(t).name}].running', 1)
+			analyse.count('${@MOD}.${@STRUCT}.${@FN}[${typeof(t).name}].running', 1)
 		}
 
 		// Process events
