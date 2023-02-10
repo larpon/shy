@@ -6,6 +6,7 @@ module particle
 import shy.lib as shy
 import shy.vec
 import shy.utils
+import shy.analyse
 
 const (
 	default_size      = vec.Vec2[f32]{6, 6}
@@ -14,6 +15,7 @@ const (
 )
 
 pub fn (mut s System) new_particle() &Particle {
+	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	ip := ParticleState{
 		// init: particle.null
 		// end: particle.null

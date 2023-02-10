@@ -3,6 +3,7 @@
 module particle
 
 import shy.lib as shy
+import shy.analyse
 
 const (
 	rad_pi_div_180 = f32(0.017453292520444443) // ~ pi/180 in radians
@@ -149,6 +150,7 @@ pub fn (mut s System) update(dt f64) {
 	for i := 0; i < s.emitters.len; i++ {
 		s.emitters[i].update(dt)
 	}
+	analyse.max('${@MOD}.${@STRUCT}.pool.len', s.pool.len)
 	// Run through the pool of currently active particles
 	mut p := &Particle(0)
 	for i := 0; i < s.pool.len; i++ {

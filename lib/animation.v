@@ -77,7 +77,7 @@ pub fn (mut a Anims) update(dt f64) {
 	if a.paused {
 		return
 	}
-	analyse.max('${@STRUCT}.max_in_use', a.active.len)
+	analyse.max('${@MOD}.${@STRUCT}.max_in_use', a.active.len)
 	for i := 0; i < a.active.len; i++ {
 		animator := a.active[i]
 
@@ -125,7 +125,7 @@ fn (mut a Anims) p_new_animator[T](config AnimatorConfig) &Animator[T] {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
 	$if shy_analyse ? {
 		t := T{}
-		analyse.count('${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
+		analyse.count('${@MOD}.${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
 	}
 	mut animator := &Animator[T]{
 		shy: a.shy
@@ -139,7 +139,7 @@ fn (mut a Anims) p_new_follow_animator[T](config FollowAnimatorConfig) &FollowAn
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
 	$if shy_analyse ? {
 		t := T{}
-		analyse.count('${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
+		analyse.count('${@MOD}.${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
 	}
 	mut animator := &FollowAnimator[T]{
 		shy: a.shy

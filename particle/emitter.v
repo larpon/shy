@@ -7,6 +7,7 @@ import math
 import rand
 import shy.lib as shy
 import shy.vec
+import shy.analyse
 
 pub struct Emitter {
 pub mut:
@@ -106,6 +107,7 @@ fn (mut e Emitter) emit() {
 
 	mut bursting := false
 	if e.burst_amount > 0 {
+		analyse.max('${@MOD}.${@STRUCT}.burst_amount', e.burst_amount)
 		bursting = true
 		if s.bin.len >= e.burst_amount {
 			reserve = e.burst_amount

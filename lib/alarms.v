@@ -34,8 +34,8 @@ fn (mut a Alarms) init() ! {
 	// unsafe { a.f64_pool.flags.set(.noslices | .noshrink) }
 	for i := 0; i < prealloc; i++ {
 		a.pool << a.p_new_alarm()
-		analyse.count('${@STRUCT}.preallocated', 1)
 	}
+	analyse.max('${@MOD}.${@STRUCT}.pool.len', a.pool.len)
 }
 
 pub fn (a &Alarms) is_active() bool {
@@ -62,6 +62,7 @@ pub fn (a &Alarms) cancel(alarm_id AlarmID) {
 				alarm.running = false
 				a.pool << alarm
 				a.active.delete(i)
+				analyse.max('${@MOD}.${@STRUCT}.pool.len', a.pool.len)
 			}
 		}
 	}
@@ -85,7 +86,6 @@ pub fn (mut a Alarms) update() {
 	if a.paused {
 		return
 	}
-	analyse.max('${@STRUCT}.max_in_use', a.active.len)
 	for i := 0; i < a.active.len; i++ {
 		mut alarm := a.active[i]
 		if alarm.paused {
@@ -95,6 +95,7 @@ pub fn (mut a Alarms) update() {
 			// TODO see if this is all worth it
 			a.pool << alarm
 			a.active.delete(i)
+			analyse.max('${@MOD}.${@STRUCT}.pool.len', a.pool.len)
 			continue
 		}
 		alarm.step()
@@ -127,7 +128,7 @@ fn (s &Shy) cancel_alarm(alarm_id AlarmID) {
 
 fn (mut a Alarms) p_new_alarm(config AlarmConfig) &Alarm {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
-	analyse.count('${@STRUCT}.${@FN}', 1)
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	mut alarm := &Alarm{
 		shy: a.shy
 	}
@@ -151,6 +152,7 @@ fn (mut a Alarms) new_alarm(config AlarmConfig) &Alarm {
 	a.ids++
 	alarm.id = a.ids
 	a.active << alarm
+	analyse.max('${@MOD}.${@STRUCT}.active.len', a.active.len)
 	return alarm
 }
 

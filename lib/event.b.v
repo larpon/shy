@@ -30,6 +30,7 @@ pub fn (mut e Events) init() ! {
 	}
 	e.queue = []Event{len: 0, cap: 10000, init: lib.empty_event}
 	unsafe { e.queue.flags.set(.noslices | .noshrink | .nogrow) }
+	analyse.max('${@MOD}.${@STRUCT}.queue.cap', e.queue.cap)
 }
 
 pub fn (mut e Events) shutdown() ! {
@@ -38,7 +39,7 @@ pub fn (mut e Events) shutdown() ! {
 
 // listen registers the `listener` event handler.
 pub fn (mut e Events) on_event(listener OnEventFn) {
-	analyse.count('${@STRUCT}.${@FN}', 1)
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	e.on_events << listener
 }
 
@@ -76,12 +77,24 @@ fn (mut e Events) pop() ?Event {
 
 // send pushes an event to the event queue.
 pub fn (mut e Events) send(ev Event) ! {
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
+	$if shy_analyse ? {
+		if ev is KeyEvent {
+			// Count key events for all states (up/down)
+			analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ev).name}(${ev.state}))',
+				1)
+		} else if ev is UnkownEvent {
+			analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ev).name})', 1)
+		} else {
+			analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ev).name})', 1)
+		}
+	}
 	if ev is UnkownEvent {
 		return error('${@STRUCT}.${@FN}: sending unknown events is not allowed')
 	}
-	analyse.max('${@STRUCT}.max_in_queue', e.queue.len + 1)
+	analyse.max('${@MOD}.${@STRUCT}.queue.len', e.queue.len + 1)
 	if e.queue.len < e.queue.cap {
-		analyse.count('${@STRUCT}.${@FN}', 1)
+		analyse.count('${@MOD}.${@STRUCT}.queue <<', 1)
 		e.queue << ev
 		return
 	}
