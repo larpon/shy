@@ -345,8 +345,29 @@ pub fn (t Draw2DText) baseline_height(s string) f32 {
 
 [inline]
 pub fn (t Draw2DText) bounds(s string) Rect {
+	fc := t.fc
+	font_context := fc.fsc
+	assert !isnil(font_context), '${@STRUCT}.${@FN}' + ': no font context'
+
+	/*
+	font_context.set_alignment(.left | .baseline)
+	font_context.set_spacing(5.0)
+	*/
+
+	if t.font != defaults.font.name {
+		font_id := fc.fonts[t.font]
+		font_context.set_font(font_id)
+	}
+	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
+	font_context.set_color(color)
+	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?
+	font_context.set_size(font_size)
+	// eprintln('${@STRUCT}.${@FN} ${font_size}')
+	if t.blur > 0 {
+		font_context.set_blur(t.blur)
+	}
 	mut buf := [4]f32{}
-	t.fc.fsc.text_bounds(0, 0, s, &buf[0])
+	font_context.text_bounds(0, 0, s, &buf[0])
 	return Rect{
 		x: buf[0]
 		y: buf[1]

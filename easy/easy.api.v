@@ -104,6 +104,29 @@ pub fn (et &EasyText) draw() {
 }
 
 [inline]
+pub fn (et &EasyText) bounds() shy.Rect {
+	draw := et.shy.draw()
+	mut dt := draw.text()
+	dt.begin()
+	defer {
+		dt.end()
+	}
+	mut t := dt.text_2d()
+	t.text = et.text
+	t.x = et.x
+	t.y = et.y
+	t.rotation = et.rotation
+	t.scale = et.scale
+	t.size = et.size
+	t.origin = et.origin
+	t.align = et.align
+	t.offset = et.offset
+	t.color = et.color
+	t.blur = et.blur
+	return t.bounds(t.text)
+}
+
+[inline]
 pub fn (e &Easy) new_text(etc EasyTextConfig) &EasyText {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return &EasyText{
@@ -509,6 +532,7 @@ pub struct EasySoundPlayOptions {
 	source shy.AssetSource [required]
 	loops  u16
 	pitch  f32
+	volume f32 = 1.0
 }
 
 [inline]
@@ -523,6 +547,7 @@ pub fn (q &Quick) play(opt EasySoundPlayOptions) {
 	}
 
 	sound.pitch = opt.pitch
+	sound.volume = opt.volume
 	// TODO sounds.loop = true - but the counter needs state?
 	// sound.loops
 	sound.play()
