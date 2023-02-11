@@ -437,6 +437,7 @@ mut:
 	alarm  AlarmID
 	paused bool // TODO
 pub mut:
+	volume   f32 = 1.0
 	pitch    f32
 	loop     bool
 	on_end   fn (Sound)
@@ -470,8 +471,9 @@ pub fn (s &Sound) play() {
 	assert !isnil(s.asset), 'Sound is not initialized'
 	engine := s.engine()
 	engine.set_looping(s.id, s.loop)
+	s.set_volume(s.volume)
 	if s.pitch != 0 {
-		engine.set_pitch(s.id, s.pitch)
+		s.set_pitch(s.pitch)
 	}
 	mut id := s.id
 	if s.id_end > 0 {
@@ -501,6 +503,19 @@ pub fn (s &Sound) play() {
 		}
 	}
 	engine.play(id)
+}
+
+// set_volume sets the volume of the `Sound`.
+// See also: `AudioEngine.set_master_volume`.
+pub fn (s &Sound) set_volume(volume f32) {
+	engine := s.engine()
+	engine.set_volume(s.id, volume)
+}
+
+// set_pitch sets the pitch for the `Sound`.
+pub fn (s &Sound) set_pitch(pitch f32) {
+	engine := s.engine()
+	engine.set_pitch(s.id, pitch)
 }
 
 // is_paused returns true if the sound is paused.
@@ -555,7 +570,7 @@ pub fn (s &Sound) is_looping() bool {
 pub fn (s &Sound) is_playing() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
 	engine := s.engine()
-
+	assert !isnil(engine), 'Sound engine is not initialized'
 	mut id := s.id
 	if s.id_end > 0 {
 		for i in id .. s.id_end {

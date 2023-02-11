@@ -236,6 +236,18 @@ pub fn (ae &AudioEngine) set_pitch(id u16, pitch f32) {
 	}
 }
 
+pub fn (ae &AudioEngine) set_master_volume(volume f32) {
+	ma.engine_set_volume(ae.e, volume)
+}
+
+pub fn (ae &AudioEngine) set_volume(id u16, volume f32) {
+	sound_id := id
+	if sound := ae.sounds[sound_id] {
+		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'set volume = ${volume:.3f} on sound ${sound_id} in engine ${ae.id}')
+		ma.sound_set_volume(sound, volume)
+	}
+}
+
 pub fn (ae &AudioEngine) seek_to_pcm_frame(id u16, frame u64) {
 	sound_id := id
 	if sound := ae.sounds[sound_id] {
