@@ -53,3 +53,19 @@ pub fn run_subcommand(args []string) ! {
 		}
 	}
 }
+
+// is_windows_running_in_virtual_box returns `true` if the host system is
+// Windows and it is running under VirtualBox.
+pub fn is_windows_running_in_virtual_box() bool {
+	mut cmd := ''
+	$if windows {
+		cmd = 'WMIC COMPUTERSYSTEM GET MODEL'
+	}
+	if cmd != '' {
+		res := os.execute(cmd)
+		if res.exit_code == 0 {
+			return res.output.contains('VirtualBox')
+		}
+	}
+	return false
+}
