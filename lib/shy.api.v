@@ -13,23 +13,36 @@ pub const (
 	rad2deg = f32(57.29577951308232) // TODO BUG with `-live` mth.rad2deg
 )
 
+// ticks returns the amount of milliseconds passed since the app was started.
 [inline]
 pub fn (s &Shy) ticks() u64 {
 	return u64(s.timer.elapsed().milliseconds())
 }
 
+// active_window returns a reference to the window currently being rendered.
 [inline]
 pub fn (s &Shy) active_window() &Window {
 	assert !isnil(s.api)
-	return s.api.wm.active_window()
+	win := s.api.wm.active_window()
+	assert !isnil(win)
+	return win
 }
 
+// performance_counter returns the current value of the high resolution counter.
+// This function is typically used for profiling.
+// Counter values are only meaningful relative to each other.
+// Differences between values can be converted to times by using `performance_frequency()`.
+// See also: performance_frequency().
 [inline]
 pub fn (s &Shy) performance_counter() u64 {
 	assert !isnil(s.api)
 	return s.api.system.performance_counter()
 }
 
+// performance_frequency returns a platform-specific high resolution count per second.
+// This function is typically used for profiling.
+// Differences between values can be converted to times by using `performance_counter()`.
+// See also: performance_counter().
 [inline]
 pub fn (s &Shy) performance_frequency() u64 {
 	assert !isnil(s.api)
