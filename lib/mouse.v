@@ -11,6 +11,7 @@ pub enum MouseButton {
 	middle
 	x1
 	x2
+	unknown // Only used as a last resort. I.e when converting from an external system fails.
 }
 
 [flag]

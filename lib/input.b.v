@@ -728,8 +728,8 @@ fn map_sdl_to_shy_keycode(kc sdl.Keycode) KeyCode {
 }
 
 fn map_sdl_button_mask_to_shy_mouse_buttons(mask u32) MouseButtons {
-	mut buttons := MouseButtons{}
-
+	mut buttons := MouseButtons.x2
+	buttons.toggle(.x2)
 	if mask & u32(sdl.button(sdl.button_left)) == sdl.button_lmask {
 		buttons.set(.left)
 	}
@@ -749,8 +749,7 @@ fn map_sdl_button_mask_to_shy_mouse_buttons(mask u32) MouseButtons {
 }
 
 fn map_sdl_button_to_shy_mouse_button(sdl_button byte) MouseButton {
-	mut button := MouseButton{}
-
+	mut button := MouseButton.unknown
 	if sdl_button == sdl.button_left {
 		button = .left
 	}
