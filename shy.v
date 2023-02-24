@@ -76,4 +76,10 @@ fn main() {
 	if opt.verbosity > 2 {
 		dump(opt)
 	}
+
+	// `shy /path/to/some/v/source/code`
+	opt.shy_v() or {
+		eprintln('Error while building V code: ${err}')
+		exit(1)
+	}
 }

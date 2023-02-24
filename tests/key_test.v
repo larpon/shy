@@ -17,7 +17,7 @@ fn test_keycode_from_string() {
 }
 
 fn test_keycode_name() {
-	mut kc := shy.KeyCode{}
+	mut kc := shy.KeyCode.unknown
 
 	assert kc.name() == 'unknown'
 	kc = .kp_0
