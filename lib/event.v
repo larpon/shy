@@ -20,7 +20,7 @@ pub type Event = DropBeginEvent
 pub struct ShyEvent {
 pub:
 	timestamp u64 // Value of Shy.ticks()
-	window    &Window
+	window    &Window = unsafe { nil }
 }
 
 pub struct UnkownEvent {
