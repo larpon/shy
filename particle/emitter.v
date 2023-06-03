@@ -123,7 +123,7 @@ fn (mut e Emitter) emit() {
 	}
 	e.elapsed = 0
 	// eprintln('Reserving ${reserve} particles from pool of ${s.bin.len}')
-	mut p := &Particle(0)
+	mut p := &Particle(unsafe { nil })
 	for i := 0; i < s.bin.len && reserve > 0; i++ {
 		p = s.bin[i]
 		p.reset()

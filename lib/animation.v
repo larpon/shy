@@ -151,7 +151,7 @@ fn (mut a Anims) p_new_follow_animator[T](config FollowAnimatorConfig) &FollowAn
 }
 
 pub fn (mut a Anims) new_animator[T](config AnimatorConfig) &Animator[T] {
-	mut animator := &Animator[T](0) // unsafe { nil }
+	mut animator := &Animator[T](unsafe { nil }) // unsafe { nil }
 	$if T.typ is f32 {
 		if a.f32pool.len > 0 {
 			animator = a.f32pool.pop()
@@ -169,7 +169,7 @@ pub fn (mut a Anims) new_animator[T](config AnimatorConfig) &Animator[T] {
 }
 
 pub fn (mut a Anims) new_follow_animator[T](config FollowAnimatorConfig) &FollowAnimator[T] {
-	mut animator := &FollowAnimator[T](0) // unsafe { nil }
+	mut animator := &FollowAnimator[T](unsafe { nil }) // unsafe { nil }
 	/*
 	$if T.typ is f32 {
 		if a.f32pool.len > 0 {

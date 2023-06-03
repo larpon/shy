@@ -152,7 +152,7 @@ pub fn (mut s System) update(dt f64) {
 	}
 	analyse.max('${@MOD}.${@STRUCT}.pool.len', s.pool.len)
 	// Run through the pool of currently active particles
-	mut p := &Particle(0)
+	mut p := &Particle(unsafe { nil })
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]
 		if p.is_dead() {
@@ -200,7 +200,7 @@ pub fn (mut s System) update(dt f64) {
 }
 
 pub fn (s System) draw(f_dt f64) {
-	mut p := &Particle(0)
+	mut p := &Particle(unsafe { nil })
 	// for mut p in s.pool {
 	for i := 0; i < s.pool.len; i++ {
 		p = s.pool[i]

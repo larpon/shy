@@ -130,7 +130,7 @@ fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
 }
 
 pub fn (mut t Timers) new_timer(config TimerConfig) &Timer {
-	mut timer := &Timer(0) // unsafe { nil }
+	mut timer := &Timer(unsafe { nil }) // unsafe { nil }
 	if t.pool.len > 0 {
 		timer = t.pool.pop()
 		timer.reset()

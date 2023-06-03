@@ -16,7 +16,7 @@ fn main() {
 	// Collect user flags in an extended manner.
 	// Start with defaults -> merge over SHY_FLAGS -> merge over cmdline flags -> merge .shy entries.
 	mut opt := cli.Options{}
-	mut fp := &flag.FlagParser(0)
+	mut fp := &flag.FlagParser(unsafe { nil })
 
 	opt = cli.options_from_env(opt) or {
 		eprintln('Error while parsing `SHY_FLAGS`: ${err}')

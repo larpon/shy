@@ -138,7 +138,7 @@ fn (mut a Alarms) p_new_alarm(config AlarmConfig) &Alarm {
 }
 
 fn (mut a Alarms) new_alarm(config AlarmConfig) &Alarm {
-	mut alarm := &Alarm(0) // unsafe { nil }
+	mut alarm := &Alarm(unsafe { nil }) // unsafe { nil }
 	if isnil(config.check) {
 		panic('${@STRUCT}.${@FN}: The check function *must* be provided')
 	}
