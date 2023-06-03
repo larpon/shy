@@ -613,84 +613,76 @@ pub:
 }
 
 pub fn (ei &EasyImage) draw() {
-	mut image := shy.Image{}
-	if img := ei.shy.assets().get[shy.Image](ei.source) {
+	if image := ei.shy.assets().get[shy.Image](ei.source) {
 		// if img := ei.shy.assets().get_cached_image(ei.source) {
-		image = img
-	} else {
-		return
-	}
 
-	draw := ei.shy.draw()
-	mut d := draw.image()
-	d.begin()
-	mut i2d := d.image_2d(image)
-	i2d.x = ei.x
-	i2d.y = ei.y
-	i2d.width = ei.width
-	i2d.height = ei.height
-	i2d.color = ei.color
-	i2d.rotation = ei.rotation
-	i2d.scale = ei.scale
-	i2d.offset = ei.offset
-	i2d.origin = ei.origin
-	i2d.fill_mode = ei.fill_mode
 
-	if ei.region.width >= 0 || ei.region.height >= 0 {
-		src := shy.Rect{
-			x: 0
-			y: 0
-			width: ei.width
-			height: ei.height
+		draw := ei.shy.draw()
+		mut d := draw.image()
+		d.begin()
+		mut i2d := d.image_2d(image)
+		i2d.x = ei.x
+		i2d.y = ei.y
+		i2d.width = ei.width
+		i2d.height = ei.height
+		i2d.color = ei.color
+		i2d.rotation = ei.rotation
+		i2d.scale = ei.scale
+		i2d.offset = ei.offset
+		i2d.origin = ei.origin
+		i2d.fill_mode = ei.fill_mode
+
+		if ei.region.width >= 0 || ei.region.height >= 0 {
+			src := shy.Rect{
+				x: 0
+				y: 0
+				width: ei.width
+				height: ei.height
+			}
+			dst := ei.region
+			// println('$ei.source:\nsrc: $src dst: $dst')
+			i2d.draw_region(src, dst)
+		} else {
+			i2d.draw()
 		}
-		dst := ei.region
-		// println('$ei.source:\nsrc: $src dst: $dst')
-		i2d.draw_region(src, dst)
-	} else {
-		i2d.draw()
+		d.end()
 	}
-	d.end()
 }
 
 [inline]
 pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 
-	// TODO
-	mut image := shy.Image{}
-	if img := e.shy.assets().get[shy.Image](eic.source) {
+	if image := e.shy.assets().get[shy.Image](eic.source) {
 		// if img := e.shy.assets().get_cached_image(eic.source) {
-		image = img
-	} else {
-		// return
-		// TODO
-		panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
-	}
+		mut r := shy.Rect{
+			x: eic.x
+			y: eic.y
+		}
+		r.width = if eic.width < 0 { f32(image.width) } else { eic.width }
+		r.height = if eic.height < 0 { f32(image.height) } else { eic.height }
 
-	mut r := shy.Rect{
-		x: eic.x
-		y: eic.y
+		// TODO WORKAROUND "...eic" spread does not work
+		// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
+		return EasyImage{
+			shy: e.shy
+			Rect: r
+			// y: r.y
+			// w: r.width
+			// h: r.height
+			source: eic.source
+			color: eic.color
+			rotation: eic.rotation
+			scale: eic.scale
+			offset: eic.offset
+			origin: eic.origin
+			region: eic.region
+			fill_mode: eic.fill_mode
+		}
 	}
-	r.width = if eic.width < 0 { f32(image.width) } else { eic.width }
-	r.height = if eic.height < 0 { f32(image.height) } else { eic.height }
-
-	// TODO WORKAROUND "...eic" spread doesn't work
-	// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
-	return EasyImage{
-		shy: e.shy
-		Rect: r
-		// y: r.y
-		// w: r.width
-		// h: r.height
-		source: eic.source
-		color: eic.color
-		rotation: eic.rotation
-		scale: eic.scale
-		offset: eic.offset
-		origin: eic.origin
-		region: eic.region
-		fill_mode: eic.fill_mode
-	}
+	// return
+	// TODO
+	panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
 }
 
 [inline]
