@@ -616,7 +616,6 @@ pub fn (ei &EasyImage) draw() {
 	if image := ei.shy.assets().get[shy.Image](ei.source) {
 		// if img := ei.shy.assets().get_cached_image(ei.source) {
 
-
 		draw := ei.shy.draw()
 		mut d := draw.image()
 		d.begin()
