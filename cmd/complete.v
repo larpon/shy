@@ -95,7 +95,7 @@ const (
 		'-g',
 		'-cg',
 		'-prod',
-		'-showcc'
+		'-showcc',
 		// shy flags
 		'--verbosity',
 		'-v',
