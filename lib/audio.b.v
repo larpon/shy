@@ -22,18 +22,19 @@ mut:
 pub fn (mut a Audio) init() ! {
 	a.shy.assert_api_init()
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	// NOTE V BUG / Regression renaming the `mini_audio_engine` variable to just `ma_engine` results in a compile error
 	// Initialize default playback engine
-	ma_engine := &ma.Engine{}
+	mini_audio_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
 	//    May lead to memory leak and poor performance
-	if ma.engine_init(ma.null, ma_engine) != .success {
+	if ma.engine_init(ma.null, mini_audio_engine) != .success {
 		return error('failed to initialize audio engine')
 	}
 	a.engines[0] = &AudioEngine{
 		shy: a.shy
 		id: 0
-		e: ma_engine
+		e: mini_audio_engine
 	}
 }
 
@@ -46,18 +47,18 @@ pub fn (mut a Audio) new_engine() !&AudioEngine {
 			return error('the maximum amount of audio engines (${lib.max_audio_engine_instances}) is reached')
 		}
 	}
-	ma_engine := &ma.Engine{}
+	mini_audio_engine := &ma.Engine{}
 	// TODO with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
 	//    May lead to memory leak and poor performance
-	if ma.engine_init(ma.null, ma_engine) != .success {
+	if ma.engine_init(ma.null, mini_audio_engine) != .success {
 		return error('failed to initialize audio engine')
 	}
 	a.engine_id++
 	engine := &AudioEngine{
 		shy: a.shy
 		id: a.engine_id
-		e: ma_engine
+		e: mini_audio_engine
 	}
 	a.engines[a.engine_id] = engine
 	return engine
