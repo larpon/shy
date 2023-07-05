@@ -2,6 +2,13 @@ module sfons
 
 import shy.wraps.fontstash
 import shy.wraps.sokol.f
+import shy.wraps.sokol.memory
+
+const default_allocator = Allocator{
+	alloc: memory.salloc
+	free: memory.sfree
+	user_data: voidptr(0x100005f0)
+}
 
 /*
 sfonst_allocator_t
@@ -17,9 +24,11 @@ sfonst_allocator_t
 [typedef]
 struct C.sfons_allocator_t {
 	// void* (*alloc)(size_t size, void* user_data);
-	alloc fn (size usize, user_data voidptr) voidptr
+	alloc memory.FnAllocatorAlloc
+	// alloc fn (size usize, user_data voidptr) voidptr
 	// void (*free)(void* ptr, void* user_data);
-	free      fn (ptr voidptr, user_data voidptr)
+	free memory.FnAllocatorFree
+	// free      fn (ptr voidptr, user_data voidptr)
 	user_data voidptr
 }
 
@@ -29,7 +38,7 @@ pub type Allocator = C.sfons_allocator_t
 struct C.sfons_desc_t {
 	width     int       // initial width of font atlas texture (default: 512, must be power of 2)
 	height    int       // initial height of font atlas texture (default: 512, must be power of 2)
-	allocator Allocator // optional memory allocation overrides
+	allocator Allocator = sfons.default_allocator // optional memory allocation overrides
 }
 
 pub type Desc = C.sfons_desc_t

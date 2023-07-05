@@ -91,10 +91,10 @@ pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	//{
 	// for _ in 0 .. config.prealloc_contexts {
 	// TODO configurable size:
+
 	fons_desc := sfons.Desc{
 		width: 4 * 1024 // NOTE 256 is definitely too small
 		height: 4 * 1024
-		allocator: unsafe { nil }
 	}
 	fons_context := sfons.create(&fons_desc)
 	// gl_context := gl.make_context(&gl_context_desc)
