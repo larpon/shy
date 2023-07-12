@@ -66,10 +66,31 @@ pub fn (mut g GFX) init() ! {
 	// g.shy.assert_api_init()
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
+
+	// TODO(lmp) do a better logger
+	mut logger := gfx.Logger{
+		func: fn (const_tag &char, log_level u32, log_item_id u32, message_or_null &char, line_nr u32, filename_or_null &char, user_data voidptr) {
+			mut output := ''
+			if !isnil(const_tag) {
+				output += '[' + unsafe { cstring_to_vstring(const_tag) } + ']'
+			}
+			if !isnil(filename_or_null) {
+				output += ' ' + unsafe { cstring_to_vstring(filename_or_null) } + ':' +
+					line_nr.str()
+			}
+			if !isnil(message_or_null) {
+				output += ' ' + unsafe { cstring_to_vstring(message_or_null) }
+			}
+			eprintln(output)
+		}
+		// user_data: s
+	}
+
 	mut gfx_desc := gfx.Desc{
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		context_pool_size: 4 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 4 * 1024 // default 64, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		logger: logger
 	}
 	gfx_desc.context.sample_count = s.config.render.msaa
 	gfx.setup(&gfx_desc)

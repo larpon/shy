@@ -192,12 +192,6 @@ pub fn run(desc &Desc) {
 	C.sapp_run(desc)
 }
 
-// GL: return true when GLES2 fallback is active (to detect fallback from GLES3)
-[inline]
-pub fn gles2() bool {
-	return C.sapp_gles2()
-}
-
 // HTML5: enable or disable the hardwired "Leave Site?" dialog box
 [inline]
 pub fn html5_ask_leave_site(ask bool) {

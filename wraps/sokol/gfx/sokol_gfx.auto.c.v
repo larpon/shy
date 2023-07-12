@@ -115,7 +115,6 @@ pub type Color = C.sg_color
 // Backend is C.sg_backend
 pub enum Backend {
 	glcore33 = C.SG_BACKEND_GLCORE33
-	gles2 = C.SG_BACKEND_GLES2
 	gles3 = C.SG_BACKEND_GLES3
 	d3d11 = C.SG_BACKEND_D3D11
 	metal_ios = C.SG_BACKEND_METAL_IOS
@@ -151,6 +150,7 @@ pub enum PixelFormat {
 	rg16si = C.SG_PIXELFORMAT_RG16SI
 	rg16f = C.SG_PIXELFORMAT_RG16F
 	rgba8 = C.SG_PIXELFORMAT_RGBA8
+	srgb8a8 = C.SG_PIXELFORMAT_SRGB8A8
 	rgba8sn = C.SG_PIXELFORMAT_RGBA8SN
 	rgba8ui = C.SG_PIXELFORMAT_RGBA8UI
 	rgba8si = C.SG_PIXELFORMAT_RGBA8SI
@@ -204,7 +204,10 @@ pub type PixelformatInfo = C.sg_pixelformat_info
 [typedef]
 struct C.sg_features {
 pub mut:
-	instancing bool
+	origin_top_left             bool // framebuffer and texture origin is in top left corner
+	image_clamp_to_border       bool // border color and clamp-to-border UV-wrap mode is supported
+	mrt_independent_blend_state bool // multiple-render-target rendering can use per-render-target blend state
+	mrt_independent_write_mask  bool // multiple-render-target rendering can use per-render-target color write masks
 }
 
 pub type Features = C.sg_features
@@ -499,21 +502,28 @@ pub enum ColorMask {
 	force_u32 = C._SG_COLORMASK_FORCE_U32 // 0x7FFFFFFF,
 }
 
-// Action is C.sg_action
-pub enum Action {
-	default = C._SG_ACTION_DEFAULT
-	clear = C.SG_ACTION_CLEAR
-	load = C.SG_ACTION_LOAD
-	dontcare = C.SG_ACTION_DONTCARE
-	num = C._SG_ACTION_NUM
-	force_u32 = C._SG_ACTION_FORCE_U32 // 0x7FFFFFFF,
+// LoadAction is C.sg_load_action
+pub enum LoadAction {
+	default = C._SG_LOADACTION_DEFAULT
+	clear = C.SG_LOADACTION_CLEAR
+	load = C.SG_LOADACTION_LOAD
+	dontcare = C.SG_LOADACTION_DONTCARE
+	force_u32 = C._SG_LOADACTION_FORCE_U32 // 0x7FFFFFFF,
+}
+
+// StoreAction is C.sg_store_action
+pub enum StoreAction {
+	default = C._SG_STOREACTION_DEFAULT
+	store = C.SG_STOREACTION_STORE
+	dontcare = C.SG_STOREACTION_DONTCARE
+	force_u32 = C._SG_STOREACTION_FORCE_U32 // 0x7FFFFFFF,
 }
 
 [typedef]
 struct C.sg_color_attachment_action {
 pub mut:
-	action Action
-	value  Color
+	load_action LoadAction
+	clear_value Color
 }
 
 pub type ColorAttachmentAction = C.sg_color_attachment_action
@@ -521,8 +531,8 @@ pub type ColorAttachmentAction = C.sg_color_attachment_action
 [typedef]
 struct C.sg_depth_attachment_action {
 pub mut:
-	action Action
-	value  f32
+	load_action LoadAction
+	clear_value f32
 }
 
 pub type DepthAttachmentAction = C.sg_depth_attachment_action
@@ -530,8 +540,8 @@ pub type DepthAttachmentAction = C.sg_depth_attachment_action
 [typedef]
 struct C.sg_stencil_attachment_action {
 pub mut:
-	action Action
-	value  u8
+	load_action LoadAction
+	clear_value u8
 }
 
 pub type StencilAttachmentAction = C.sg_stencil_attachment_action
@@ -964,14 +974,6 @@ pub mut:
 pub type PassInfo = C.sg_pass_info
 
 [typedef]
-struct C.sg_gl_context_desc {
-pub mut:
-	force_gles2 bool
-}
-
-pub type GlContextDesc = C.sg_gl_context_desc
-
-[typedef]
 struct C.sg_metal_context_desc {
 pub mut:
 	device                            voidptr
@@ -1019,13 +1021,20 @@ pub mut:
 	color_format PixelFormat
 	depth_format PixelFormat
 	sample_count int
-	gl           GlContextDesc
 	metal        MetalContextDesc
 	d3d11        D3d11ContextDesc
 	wgpu         WgpuContextDesc
 }
 
 pub type ContextDesc = C.sg_context_desc
+
+[typedef]
+struct C.sg_commit_listener {
+	func      fn (user_data voidptr)
+	user_data voidptr
+}
+
+pub type CommitListener = C.sg_commit_listener
 
 [typedef]
 struct C.sg_allocator {
@@ -1036,6 +1045,27 @@ pub mut:
 }
 
 pub type Allocator = C.sg_allocator
+
+pub type LoggerFn = fn (const_tag &char, log_level u32, log_item_id u32, message_or_null &char, line_nr u32, filename_or_null &char, user_data voidptr)
+
+/*
+sg_logger
+
+    Used in sg_desc to provide a logging function. Please be aware
+    that without logging function, sokol-gfx will be completely
+    silent, e.g. it will not report errors, warnings and
+    validation layer messages. For maximum error verbosity,
+    compile in debug mode (e.g. NDEBUG *not* defined) and install
+    a logger (for instance the standard logging function from sokol_log.h).
+*/
+[typedef]
+struct C.sg_logger {
+pub mut:
+	func      LoggerFn
+	user_data voidptr
+}
+
+pub type Logger = C.sg_logger
 
 [typedef]
 struct C.sg_desc {
@@ -1051,6 +1081,7 @@ pub mut:
 	staging_buffer_size int
 	sampler_cache_size  int
 	allocator           Allocator
+	logger              Logger // optional log function override
 	context             ContextDesc
 	_end_canary         u32
 }
@@ -1111,6 +1142,22 @@ fn C.sg_pop_debug_group()
 // pop_debug_group is currently undocumented
 pub fn pop_debug_group() {
 	C.sg_pop_debug_group()
+}
+
+// C: `SOKOL_GFX_API_DECL bool sg_add_commit_listener(sg_commit_listener listener)`
+fn C.sg_add_commit_listener(listener CommitListener) bool
+
+// add_commit_listener is currently undocumented
+pub fn add_commit_listener(listener CommitListener) bool {
+	return C.sg_add_commit_listener(listener)
+}
+
+// C: `SOKOL_GFX_API_DECL bool sg_remove_commit_listener(sg_commit_listener listener)`
+fn C.sg_remove_commit_listener(listener CommitListener) bool
+
+// remove_commit_listener is currently undocumented
+pub fn remove_commit_listener(listener CommitListener) bool {
+	return C.sg_remove_commit_listener(listener)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_buffer sg_make_buffer(const sg_buffer_desc* desc)`
@@ -1455,6 +1502,46 @@ fn C.sg_query_pass_info(pass Pass) PassInfo
 // query_pass_info is currently undocumented
 pub fn query_pass_info(pass Pass) PassInfo {
 	return C.sg_query_pass_info(pass)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_buffer_desc sg_query_buffer_desc(sg_buffer buf)`
+fn C.sg_query_buffer_desc(buf Buffer) BufferDesc
+
+// query_buffer_desc gets desc structs matching a specific resource (NOTE that not all creation attributes may be provided)
+pub fn query_buffer_desc(buf Buffer) BufferDesc {
+	return C.sg_query_buffer_desc(buf)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_image_desc sg_query_image_desc(sg_image img)`
+fn C.sg_query_image_desc(img Image) ImageDesc
+
+// query_image_desc is currently undocumented
+pub fn query_image_desc(img Image) ImageDesc {
+	return C.sg_query_image_desc(img)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_shader_desc sg_query_shader_desc(sg_shader shd)`
+fn C.sg_query_shader_desc(shd Shader) ShaderDesc
+
+// query_shader_desc is currently undocumented
+pub fn query_shader_desc(shd Shader) ShaderDesc {
+	return C.sg_query_shader_desc(shd)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_pipeline_desc sg_query_pipeline_desc(sg_pipeline pip)`
+fn C.sg_query_pipeline_desc(pip Pipeline) PipelineDesc
+
+// query_pipeline_desc is currently undocumented
+pub fn query_pipeline_desc(pip Pipeline) PipelineDesc {
+	return C.sg_query_pipeline_desc(pip)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_pass_desc sg_query_pass_desc(sg_pass pass)`
+fn C.sg_query_pass_desc(pass Pass) PassDesc
+
+// query_pass_desc is currently undocumented
+pub fn query_pass_desc(pass Pass) PassDesc {
+	return C.sg_query_pass_desc(pass)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_buffer_desc sg_query_buffer_defaults(const sg_buffer_desc* desc)`

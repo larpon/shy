@@ -38,11 +38,12 @@ $if ios {
 }
 
 $if emscripten ? {
-	#flag -DSOKOL_GLES2
+	#flag -DSOKOL_GLES3
 	#flag -DSOKOL_NO_ENTRY
 	#flag -s ERROR_ON_UNDEFINED_SYMBOLS=0
 	#flag -s ASSERTIONS=1
 	#flag -s MODULARIZE
+	#flag -s USE_WEBGL2=1
 }
 
 // OPENGL

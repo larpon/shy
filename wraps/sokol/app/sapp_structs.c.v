@@ -65,7 +65,6 @@ pub:
 	max_dropped_file_path_length int   // max length in bytes of a dropped UTF-8 file path (default: 2048)
 	icon                         IconDesc
 	// backend-specific options
-	gl_force_gles2                bool  // if true, setup GLES2/WebGL even if GLES3/WebGL2 is available
 	win32_console_utf8            bool  // if true, set the output console codepage to UTF-8
 	win32_console_create          bool  // if true, attach stdout/stderr to a new console window
 	win32_console_attach          bool  // if true, attach stdout/stderr to parent process
