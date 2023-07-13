@@ -4,6 +4,7 @@ import shy.wraps.fontstash
 import shy.wraps.sokol.f
 import shy.wraps.sokol.memory
 
+[markused]
 const default_allocator = Allocator{
 	alloc: memory.salloc
 	free: memory.sfree
