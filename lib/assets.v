@@ -418,6 +418,9 @@ pub fn (i &Image) source() AssetSource {
 	return i.asset.lo.source
 }
 
+[markused]
+pub const no_sound = Sound{}
+
 [params]
 pub struct SoundOptions {
 	AssetLoadOptions

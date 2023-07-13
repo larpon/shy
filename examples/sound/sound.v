@@ -16,7 +16,7 @@ fn main() {
 struct App {
 	embed.ExampleApp
 mut:
-	sound shy.Sound
+	sound shy.Sound = shy.no_sound
 }
 
 [markused]
