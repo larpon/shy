@@ -7,6 +7,8 @@ creative coding written in V.
 
 The `shy` project works both as a V module and a standalone CLI tool.
 
+`shy` aims to be a solid foundation with which you can build and distribute small to medium sized 2D games or applications with ease.
+
 # Targets
 
 Please note that export and developing/building/running from some
@@ -17,11 +19,11 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 
 # Highlights
 
-* Get your creative ideas quickly up and running.
+* Get your creative ideas up and running relatively quick.
 * Rich examples directory.
 * Live coding and runtime experimenting via V's `-live` flag.
-* Neat animation and timer system - built right in.
-* Easy timers with `shy.once(...)` or `shy.every(...)` (supports closures!).
+* Animation and timer system - built right in.
+* Easy timers with `shy.once(...)` or `shy.every(...)`.
 * 2D shape drawing with several levels, layers of control and performance.
 * 2D shape collision detection.
 * 3D capable (via `sokol_gfx.h`)
@@ -30,15 +32,26 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 * [WIP] Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
 music, sounds etc.
 * [WIP] Export to different platforms via the `shy export` command.
-* [WIP] Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module supporting *custom* UI items.
+* [WIP] [BUGGY] Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module supporting *custom* UI items.
 * [WIP] ... much more :)
+
+# Known downsides
+
+The following points may turn you away from using `shy` at this point in time, use `shy` at your own risk and expense.
+
+* Multi-window rendering support has relatively low priority and may never be supported.
+* The `shy.ui` module's design goals can not currently be met 100% due to very-hard-to-reproduce bugs in the V compiler - mileage may vary until these bugs are squashed.
+* Exporting of finished games, for real world distribution, can currently be complex.
+  It has high priority to get the exporters working as painless as possible but it takes time and developers have a real life to attend to also.
+* Currently it's not very likely that you will ever be able to develop AAA game titles with `shy`. Shy is not aiming to be Godot, Unity or Unreal etc.
+* No editor, at the moment. Hopefully it'll come quick when the `ui` module matures.
+* Export currently requires to be done from the target platform(s).
 
 # Install
 
 ## Dependencies
 
 `shy`, currently, depend on `sdl` and `vab` official V modules.
-
 
 ```bash
 v install sdl
