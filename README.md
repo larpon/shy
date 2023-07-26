@@ -47,6 +47,7 @@ in time so use `shy` at your own risk and expense.
   It has high priority to get the exporters working as painless as possible but it takes time.
 * No visual editor(s), at the moment. Hopefully it'll come quick when the `ui` module matures.
 * Export currently requires to be done from the target platform(s).
+* Documentation is far from complete. Use the `examples` for guidance.
 
 # Install
 
