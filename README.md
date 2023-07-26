@@ -2,12 +2,11 @@
 
 # Shy
 
-An intuitive, opinionated and solid foundation for game development and
-creative coding written in V.
+Aims to be an intuitive, opinionated and solid foundation for game development and
+creative coding written in [V](https://vlang.io) with which you can easily build and distribute small
+to medium sized 2D games or applications.
 
 The `shy` project works both as a V module and a standalone CLI tool.
-
-`shy` aims to be a solid foundation with which you can build and distribute small to medium sized 2D games or applications with ease.
 
 # Targets
 
@@ -37,28 +36,29 @@ music, sounds etc.
 
 # Known downsides
 
-The following points may turn you away from using `shy` at this point in time, use `shy` at your own risk and expense.
+The following points may turn you away from using `shy` at this point
+in time so use `shy` at your own risk and expense.
 
 * Multi-window rendering support has relatively low priority and may never be supported.
-* The `shy.ui` module's design goals can not currently be met 100% due to very-hard-to-reproduce bugs in the V compiler - mileage may vary until these bugs are squashed.
+* The `shy.ui` module's design goals can not currently be met 100% due to
+  very-hard-to-reproduce bugs in the V compiler - mileage may vary until these bugs are squashed.
 * Exporting of finished games, for real world distribution, can currently be complex.
-  It has high priority to get the exporters working as painless as possible but it takes time and developers have a real life to attend to also.
-* Currently it's not very likely that you will ever be able to develop AAA game titles with `shy`. Shy is not aiming to be Godot, Unity or Unreal etc.
-* No editor, at the moment. Hopefully it'll come quick when the `ui` module matures.
+  It has high priority to get the exporters working as painless as possible but it takes time.
+* No visual editor(s), at the moment. Hopefully it'll come quick when the `ui` module matures.
 * Export currently requires to be done from the target platform(s).
 
 # Install
 
 ## Dependencies
 
-`shy`, currently, depend on `sdl` and `vab` official V modules.
+`shy` currently depend on `sdl` and `vab` official V modules.
 
 ```bash
 v install sdl
 ```
 The `sdl` dependency is needed for the default backend. It will likely
 be moved to be part of another backend or opt-in once `shy` matures
-but for now you'll need SDL2 at build and runtime.
+but for now you'll need the SDL2 library at build and runtime.
 
 ```bash
 v install vab
@@ -72,13 +72,13 @@ dependencies are thus needed at *runtime* for `vab` to work.
 ## Unix (Linux, macOS)
 ```bash
 git clone git@github.com:Larpon/shy.git ~/.vmodules/shy
-v ~/.vmodules/shy # Build the `shy` CLI tool
+v ~/.vmodules/shy # Builds the `shy` CLI tool
 ```
 
 ## Windows
 ```bash
 git clone git@github.com:Larpon/shy.git %USERPROFILE%/.vmodules/shy
-v %USERPROFILE%\.vmodules\shy # Build the `shy` CLI tool
+v %USERPROFILE%\.vmodules\shy # Builds the `shy` CLI tool
 ```
 
 ## Symlink (optional)
