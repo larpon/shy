@@ -328,6 +328,7 @@ pub fn (mut c Context) shutdown() ! {
 
 pub fn (g GFX) commit() {
 	gfx.commit()
+	// TODO multi-window support gfx.reset_state_cache()
 }
 
 pub fn (mut g GFX) begin_easy_frame() {
