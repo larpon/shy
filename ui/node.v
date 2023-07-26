@@ -31,7 +31,7 @@ pub fn (n &Node) collect(mut nodes []&Node, filter fn (n &Node) bool) {
 // modify visits all `Node`s in a Breath-First search (BFS),
 // calling `func` with each `Node` as an argument.
 pub fn (n &Node) modify(func fn (mut n Node)) {
-	assert n != unsafe { nil }
+	assert n != unsafe { nil }, 'Node is null'
 	mut mn := unsafe { n }
 	func(mut mn)
 	for mut node in mn.body {

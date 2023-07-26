@@ -121,7 +121,7 @@ pub fn (mut a App) init() ! {
 					},
 				]
 			},
-		/*
+			/*
 			&ui.PointerEventArea{
 				id: 100
 				x: 50

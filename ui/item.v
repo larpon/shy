@@ -52,9 +52,9 @@ pub fn (i &Item) event(e Event) ?&Node {
 	}
 	for on_event in i.on_event {
 		assert !isnil(on_event)
-		// If `on_event` returns true, it means
-		// a listener on *this* item has accepted the event
 		if on_event(i, e) {
+			// If `on_event` returns true, it means
+			// a listener on *this* item has accepted the event
 			return i
 		}
 	}
@@ -164,9 +164,28 @@ pub fn (pea &PointerEventArea) event(e Event) ?&Node {
 				y: ey
 			}
 
-			// If `on_pointer_event` returns true, it means
-			// a listener on *this* item has accepted the event
+			// TODO BUG pea pointer address is not the same in userspace callbacks?!
+			/*
+			eprintln('${@STRUCT}.${@FN} ea: ${ptr_str(pea.EventArea)}')
+			eprintln('${@STRUCT}.${@FN} ea.this: ${ptr_str(pea.EventArea.this)}')
+			eprintln('${@STRUCT}.${@FN} pea: ${ptr_str(pea)}')
+			eprintln('${@STRUCT}.${@FN} id: ${pea.id}')
+			eprintln('${@STRUCT}.${@FN} this: ${ptr_str(pea.this)}')
+
+			//unsafe { pea.this = pea }
+			//if on_pointer_event(pea.EventArea, pe) {
+			mut copy := &PointerEventArea{...pea}
+			unsafe { copy.this = copy }
+			eprintln('${@STRUCT}.${@FN} copy ea: ${ptr_str(copy.EventArea)}')
+			eprintln('${@STRUCT}.${@FN} copy ea.this: ${ptr_str(copy.EventArea.this)}')
+			eprintln('${@STRUCT}.${@FN} copy pea: ${ptr_str(copy)}')
+			eprintln('${@STRUCT}.${@FN} copy id: ${copy.id}')
+			eprintln('${@STRUCT}.${@FN} copy this: ${ptr_str(copy.this)}')
+			*/
+
 			if on_pointer_event(pea, pe) {
+				// If `on_pointer_event` returns true, it means
+				// a listener on *this* item has accepted the event
 				return pea
 			}
 		}

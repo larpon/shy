@@ -45,7 +45,7 @@ mut:
 // init initializes the UI.
 fn (mut u UI) init() ! {
 	u.root.parent = shy.null
-
+	eprintln('[WIP] UI module is still subject to change, use at own risk :)')
 	// Traverse the tree, root to leaves, set all `parent` fields.
 	u.modify(fn (mut n Node) {
 		for mut node in n.body {
@@ -141,6 +141,7 @@ pub fn (u &UI) draw(dt f64) {
 	unsafe {
 		u.dt = dt
 	}
+	// TODO surround in a separate render pass?
 	u.root.draw(u)
 }
 
