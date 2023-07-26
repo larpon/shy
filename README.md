@@ -31,7 +31,8 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 * [WIP] Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
 music, sounds etc.
 * [WIP] Export to different platforms via the `shy export` command.
-* [WIP] [BUGGY] Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module supporting *custom* UI items.
+* [WIP] Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module
+  supporting *custom* UI items (currently full of BUGS).
 * [WIP] ... much more :)
 
 # Known downsides
