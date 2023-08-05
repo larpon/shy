@@ -443,9 +443,9 @@ pub mut:
 	volume   f32 = 1.0
 	pitch    f32
 	loop     bool
-	on_end   fn (Sound)
-	on_start fn (Sound)
-	on_pause fn (Sound, bool)
+	on_end   ?fn (Sound)
+	on_start ?fn (Sound)
+	on_pause ?fn (Sound, bool)
 }
 
 fn sound_alarm_check(sound voidptr) bool {
@@ -453,8 +453,8 @@ fn sound_alarm_check(sound voidptr) bool {
 	s := unsafe { &Sound(sound) }
 	ended := !s.is_playing() && !s.is_looping() && !s.paused
 	if ended {
-		if !isnil(s.on_end) {
-			s.on_end(Sound{
+		if on_end := s.on_end {
+			on_end(Sound{
 				...s
 			})
 		}
@@ -490,8 +490,8 @@ pub fn (s &Sound) play() {
 
 	// This check prevents double fires if sound is stop()/play() in same time frame.
 	if !s.is_playing() {
-		if !isnil(s.on_start) {
-			s.on_start(Sound{
+		if on_start := s.on_start {
+			on_start(Sound{
 				...s
 			})
 		}
@@ -541,8 +541,8 @@ pub fn (s &Sound) pause(pause bool) {
 	unsafe {
 		s.paused = pause
 	}
-	if !isnil(s.on_pause) {
-		s.on_pause(Sound{
+	if on_pause := s.on_pause {
+		on_pause(Sound{
 			...s
 		}, s.paused)
 	}

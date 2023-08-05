@@ -35,17 +35,17 @@ pub struct Ease {
 pub mut:
 	kind         Kind
 	mode         Mode
-	blend_in_fn  EaseBlendFn
-	blend_out_fn EaseBlendFn
-	custom_fn    CustomEaseFn
+	blend_in_fn  ?EaseBlendFn
+	blend_out_fn ?EaseBlendFn
+	custom_fn    ?CustomEaseFn
 }
 
 pub fn (e &Ease) ease(time f64) f64 {
 	kind := e.kind
 	mode := e.mode
 	mut t := time
-	if !isnil(e.blend_in_fn) {
-		t = e.blend_in_fn(t)
+	if blend_in_fn := e.blend_in_fn {
+		t = blend_in_fn(t)
 	}
 	t = match kind {
 		.linear {
@@ -82,15 +82,15 @@ pub fn (e &Ease) ease(time f64) f64 {
 			bounce(t, mode)
 		}
 		.custom {
-			if !isnil(e.custom_fn) {
-				e.custom_fn(t, mode)
+			if custom_fn := e.custom_fn {
+				custom_fn(t, mode)
 			} else {
 				0
 			}
 		}
 	}
-	if !isnil(e.blend_out_fn) {
-		t = e.blend_out_fn(t)
+	if blend_out_fn := e.blend_out_fn {
+		t = blend_out_fn(t)
 	}
 	return t
 }

@@ -149,8 +149,8 @@ pub mut:
 	paused      bool
 	loop        TimerLoop
 	loops       i64 // -1 = infinite, 0/1 = once, > 1 = X loops
-	on_event_fn TimerEventFn
-	callback    TimerFn
+	on_event_fn ?TimerEventFn
+	callback    ?TimerFn
 	duration    u64 = 1000
 }
 
@@ -162,8 +162,8 @@ pub mut:
 	paused      bool
 	loop        TimerLoop
 	loops       i64 // shy.infinite = infinite, 0/1 = once, > 1 = X loops
-	on_event_fn TimerEventFn
-	callback    TimerFn
+	on_event_fn ?TimerEventFn
+	callback    ?TimerFn
 	duration    u64 = 1000
 mut:
 	elapsed f64
@@ -194,11 +194,13 @@ pub fn (t &Timer) run() {
 }
 
 fn (t &Timer) fire_event_fn(event TimerEvent) {
-	if !isnil(t.on_event_fn) {
-		t.on_event_fn(event)
+	if on_event_fn := t.on_event_fn {
+		on_event_fn(event)
 	}
 	if event == .end {
-		t.callback()
+		if callback := t.callback {
+			callback()
+		}
 	}
 }
 

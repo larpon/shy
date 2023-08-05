@@ -21,7 +21,7 @@ pub struct WrenClass {
 mut:
 	// fields  map[string]&wren.Handle
 	methods map[string]&wren.Handle
-	fn_ptr  wren.ForeignMethodFn
+	fn_ptr  ?wren.ForeignMethodFn
 }
 
 fn (w WrenVM) on_frame(dt f64) {

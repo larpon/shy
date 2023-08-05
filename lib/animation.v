@@ -206,7 +206,7 @@ pub mut:
 	loop        AnimLoop
 	loops       i64 // -1 = infinite, 0/1 = once, > 1 = X loops
 	user        voidptr
-	on_event_fn AnimEventFn
+	on_event_fn ?AnimEventFn
 	duration    i64 = 1000
 }
 
@@ -222,7 +222,7 @@ pub mut:
 	loop        AnimLoop
 	loops       i64 // shy.infinite = infinite, 0/1 = once, > 1 = X loops
 	user        voidptr
-	on_event_fn AnimEventFn
+	on_event_fn ?AnimEventFn
 	duration    i64 = 1000
 	prev_value  T
 mut:
@@ -268,8 +268,8 @@ pub fn (a &Animator[T]) run() {
 }
 
 fn (a &Animator[T]) fire_event_fn(event AnimEvent) {
-	if !isnil(a.on_event_fn) {
-		a.on_event_fn(a.user, event)
+	if on_event_fn := a.on_event_fn {
+		on_event_fn(a.user, event)
 	}
 }
 
@@ -356,7 +356,7 @@ pub mut:
 	// ease        ease.Ease
 	multiply    f32 = 1.0
 	user        voidptr
-	on_event_fn AnimEventFn
+	on_event_fn ?AnimEventFn
 }
 
 pub struct FollowAnimator[T] {
@@ -369,7 +369,7 @@ pub mut:
 	// ease        ease.Ease
 	multiply    f32 = 1.0
 	user        voidptr
-	on_event_fn AnimEventFn
+	on_event_fn ?AnimEventFn
 	prev_value  T
 mut:
 	target T

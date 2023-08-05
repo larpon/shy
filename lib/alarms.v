@@ -139,9 +139,8 @@ fn (mut a Alarms) p_new_alarm(config AlarmConfig) &Alarm {
 
 fn (mut a Alarms) new_alarm(config AlarmConfig) &Alarm {
 	mut alarm := &Alarm(unsafe { nil }) // unsafe { nil }
-	if isnil(config.check) {
-		panic('${@STRUCT}.${@FN}: The check function *must* be provided')
-	}
+	config.check or { panic('${@STRUCT}.${@FN}: The check function *must* be provided') }
+
 	if a.pool.len > 0 {
 		alarm = a.pool.pop()
 		alarm.reset()
@@ -161,8 +160,8 @@ pub struct AlarmConfig {
 pub mut:
 	running   bool = true
 	paused    bool
-	callback  AlarmFn
-	check     AlarmCheckFn // [required] TODO BUG
+	callback  ?AlarmFn
+	check     ?AlarmCheckFn // [required] TODO BUG
 	user_data voidptr
 }
 
@@ -174,8 +173,8 @@ mut:
 pub mut:
 	running   bool
 	paused    bool
-	callback  AlarmFn
-	check     AlarmCheckFn
+	callback  ?AlarmFn
+	check     ?AlarmCheckFn
 	user_data voidptr
 }
 
@@ -202,8 +201,8 @@ pub fn (a &Alarm) run() {
 }
 
 fn (a &Alarm) fire_event_fn(event AlarmEvent) {
-	if !isnil(a.callback) {
-		a.callback(a.user_data, event)
+	if callback := a.callback {
+		callback(a.user_data, event)
 	}
 }
 
@@ -217,8 +216,10 @@ fn (mut a Alarm) ended() {
 }
 
 fn (mut a Alarm) step() {
-	if a.check(a.user_data) {
-		a.ended()
+	if check_fn := a.check {
+		if check_fn(a.user_data) {
+			a.ended()
+		}
 		return
 	}
 }
