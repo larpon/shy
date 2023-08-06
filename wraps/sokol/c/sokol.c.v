@@ -91,8 +91,3 @@ $if gcboehm ? {
 // sokol_fontstash.h support
 #define SOKOL_FONTSTASH_IMPL
 #include "util/sokol_fontstash.h"
-
-// sokol_gp support
-#flag -I @VMODROOT/thirdparty/sokol_gp
-
-#include "sokol_gp.h"
