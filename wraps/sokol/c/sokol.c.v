@@ -15,6 +15,15 @@ pub const (
 #flag openbsd -L/usr/X11R6/lib -lX11 -lGL
 // #flag windows -lgdi32
 
+// Note that -lm is needed *only* for sokol_gl.h's usage of sqrtf(),
+// but without -lm, this fails:
+// `v -cc gcc ~/.vmodules/sdl/examples/sdl_opengl_and_sokol/`
+// With tcc, this succeeds with or without -lm:
+// `v ~/.vmodules/sdl/examples/sdl_opengl_and_sokol/`
+$if !tinyc {
+	#flag linux -lm
+}
+
 $if prod {
 	#define NDEBUG 1
 }
