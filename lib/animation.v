@@ -402,8 +402,8 @@ fn (mut a FollowAnimator[T]) config_update(config FollowAnimatorConfig) {
 }
 
 fn (a &FollowAnimator[T]) fire_event_fn(event AnimEvent) {
-	if !isnil(a.on_event_fn) {
-		a.on_event_fn(a.user, event)
+	if on_event_fn := a.on_event_fn {
+		on_event_fn(a.user, event)
 	}
 }
 
