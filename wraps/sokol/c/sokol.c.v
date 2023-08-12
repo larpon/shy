@@ -34,11 +34,11 @@ $if debug {
 
 // METAL
 $if macos {
-	$if darwin_sokol_glcore33 ? {
-		#flag darwin -DSOKOL_GLCORE33 -framework OpenGL -framework Cocoa -framework QuartzCore
-	} $else {
+	$if metal ? {
 		#flag -DSOKOL_METAL
 		#flag -framework Metal -framework Cocoa -framework MetalKit -framework QuartzCore
+	} $else {
+		#flag darwin -DSOKOL_GLCORE33 -framework OpenGL -framework Cocoa -framework QuartzCore
 	}
 }
 $if ios {
