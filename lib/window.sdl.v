@@ -965,6 +965,7 @@ pub fn (w &Window) width() int {
 pub fn (w &Window) drawable_wh() (int, int) {
 	mut width := 0
 	mut height := 0
+	// TODO on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
 	// $if opengl ? {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
@@ -974,6 +975,7 @@ pub fn (w &Window) drawable_wh() (int, int) {
 pub fn (w &Window) drawable_size() Size {
 	mut width := 0
 	mut height := 0
+	// TODO on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
 	// $if opengl ? {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
@@ -983,7 +985,16 @@ pub fn (w &Window) drawable_size() Size {
 	}
 }
 
+pub fn (w &Window) draw_factor_xy() (f32, f32) {
+	ww, wh := w.wh()
+	dw, dh := w.drawable_wh()
+	if ww != dw || wh != dh {
+		return f32(ww) / dw, f32(wh) / dh
+	}
+	return 1, 1
+}
+
 pub fn (w &Window) draw_factor() f32 {
 	dw, dh := w.drawable_wh()
-	return mth.min(f32(dw) / w.width(), f32(dh) / w.height())
+	return mth.min(f32(w.width()) / dw, f32(w.height()) / dh)
 }

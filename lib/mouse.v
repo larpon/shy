@@ -49,7 +49,7 @@ mut:
 	on_button_up    []OnMouseButtonFn
 	on_motion       []OnMouseMotionFn
 pub mut:
-	// mouse position inside window (canvas/drawable area coordinate space)
+	// mouse position inside window (**not** canvas/drawable area coordinate space)
 	x int
 	y int
 }

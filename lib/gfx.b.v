@@ -348,7 +348,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 
 pub fn (mut g GFX) end_easy_frame() {
 	win := g.shy.active_window()
-	w, h := win.drawable_wh()
+	dw, dh := win.drawable_wh()
 
 	c := g.get_active_context()
 	off := c.offscreen
@@ -381,14 +381,12 @@ pub fn (mut g GFX) end_easy_frame() {
 
 	// Flat 2D version
 	gl.matrix_mode_projection()
-	gl.ortho(0.0, w, h, 0.0, -1.0, 1.0)
+	gl.ortho(0.0, dw, dh, 0.0, -1.0, 1.0)
 
 	gl.push_matrix()
 
-	// gl.scale(2.5, 2.5, 1)
-
 	gl.c4b(255, 255, 255, 255)
-	g.draw_flipped_textured_plane(0, 0, w, h)
+	g.draw_flipped_textured_plane(0, 0, dw, dh)
 	gl.pop_matrix()
 
 	gl.disable_texture()
@@ -400,7 +398,7 @@ pub fn (mut g GFX) end_easy_frame() {
 	gl.draw()
 	gfx.end_pass()
 
-	gfx.begin_default_pass(&dis.pass_action, int(w), int(h))
+	gfx.begin_default_pass(&dis.pass_action, int(dw), int(dh))
 	// Alternative: gl.context_draw(gl.default_context)
 	gl.set_context(gl.default_context)
 	gl.draw()
