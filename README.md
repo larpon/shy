@@ -8,6 +8,10 @@ to medium sized 2D games or applications.
 
 The `shy` project works both as a V module and a standalone CLI tool.
 
+# Games made with Shy
+
+[Puzzle Vibes](https://blackgrain.itch.io/puzzle-vibes) ([Source](https://github.com/Larpon/puzzle_vibes))
+
 # Targets
 
 Please note that export and developing/building/running from some
