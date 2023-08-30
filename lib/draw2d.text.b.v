@@ -150,6 +150,10 @@ pub fn (t Draw2DText) draw() {
 
 	assert !isnil(font_context), '${@STRUCT}.${@FN}' + ': no font context'
 
+	text_x := t.x * t.factor
+	text_y := t.y * t.factor
+	text_size := t.size * t.factor
+	text_offset := t.offset.mul_scalar(t.factor)
 	/*
 	font_context.set_alignment(.left | .baseline)
 	font_context.set_spacing(5.0)
@@ -162,7 +166,7 @@ pub fn (t Draw2DText) draw() {
 	// println('${@FN} ${t.color}')
 	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
 	font_context.set_color(color)
-	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?
+	font_size := f32(int(text_size)) // TODO rendering errors/artefacts on (some) float values?
 	font_context.set_size(font_size)
 	// eprintln('${@STRUCT}.${@FN} ${font_size}')
 
@@ -270,8 +274,8 @@ pub fn (t Draw2DText) draw() {
 		prev_line_height = line_height - 2 // lines.len
 
 		// Rounding x and y off (f32(int(...))) is important to prevent the rendering being smeared
-		x := f32(int(t.x + t.offset.x + off_x))
-		y := f32(int(t.y + t.offset.y + off_y + y_accu))
+		x := f32(int(text_x + text_offset.x + off_x))
+		y := f32(int(text_y + text_offset.y + off_y + y_accu))
 
 		gl.push_matrix()
 		gl.translate(x, y, 0)
