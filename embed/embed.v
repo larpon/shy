@@ -60,13 +60,17 @@ pub fn (mut a EasyApp) init() ! {
 		a.quick.easy = a.easy
 	}
 	a.assets = a.shy.assets()
-	a.draw = a.shy.draw()
 	a.mouse = api.input().mouse(0) or { return error('${@STRUCT}.${@FN}: no default mouse found') }
 	a.kbd = api.input().keyboard(0) or {
 		return error('${@STRUCT}.${@FN}: no default keyboard found')
 	}
+	a.draw = a.shy.draw()
 	a.window = api.wm().active_window()
-	a.canvas = a.window.drawable_size()
+	// TODO figure out if we want to let the Draw backend do the scaling or
+	// if we should report the actual size of the pixel buffer here (larger on Retina screens)
+	// a.canvas = a.window.drawable_size()
+	a.canvas = a.window.size()
+	a.draw.scale_factor(a.window.draw_factor())
 
 	a.easy.init()!
 }

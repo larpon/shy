@@ -989,12 +989,12 @@ pub fn (w &Window) draw_factor_xy() (f32, f32) {
 	ww, wh := w.wh()
 	dw, dh := w.drawable_wh()
 	if ww != dw || wh != dh {
-		return f32(ww) / dw, f32(wh) / dh
+		return f32(dw) / ww, f32(dh) / wh
 	}
 	return 1, 1
 }
 
 pub fn (w &Window) draw_factor() f32 {
 	dw, dh := w.drawable_wh()
-	return mth.min(f32(w.width()) / dw, f32(w.height()) / dh)
+	return mth.min(f32(dw) / w.width(), f32(dh) / w.height())
 }

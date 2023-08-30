@@ -57,18 +57,34 @@ in time so use `shy` at your own risk and expense.
 
 ## Dependencies
 
-`shy` currently depend on `sdl` and `vab` official V modules.
+`shy` currently depend on [`sdl`](https://github.com/vlang/sdl.git) and [`vab`](https://github.com/vlang/vab.git) official V modules.
+
+**sdl**
+
+Due to V's package management being in it's infancy it is recommended to install
+the `sdl` module via `git`:
 
 ```bash
-v install sdl
+git clone https://github.com/vlang/sdl.git ~/.vmodules/sdl
+v ~/.vmodules/sdl/setup.vsh # this will try and detect the system installed version of SDL2
 ```
+on Windows via `cmd.exe`:
+
+```cmd
+git clone https://github.com/vlang/sdl.git %HOMEPATH%/.vmodules/sdl
+git -C %HOMEPATH%/.vmodules/sdl checkout 2.26.0
+```
+
 The `sdl` dependency is needed for the default backend. It will likely
 be moved to be part of another backend or opt-in once `shy` matures
 but for now you'll need the SDL2 library at build and runtime.
 
+**vab**
+
 ```bash
 v install vab
 ```
+
 `vab` is used by `shy export` and *does not* require you to have Java nor
 the Android SDK/NDK installed. `shy export` need only `vab` to be installed as a module.
 

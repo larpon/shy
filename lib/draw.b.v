@@ -46,11 +46,19 @@ pub fn (mut d Draw) shutdown() ! {
 	d.ShyStruct.shutdown()!
 }
 
+pub fn (mut d Draw) scale_factor(scale_factor f32) {
+	d.factor = scale_factor
+}
+
 pub fn (mut d Draw) begin_2d() {
 	win := d.shy.active_window()
 	w, h := win.drawable_wh()
 
-	d.factor = win.draw_factor()
+	// Don't "automagically" set any factor here.
+	// Let the callers decide when it is applied
+	// d.factor = win.draw_factor()
+
+	// Keep around for while:
 	// unsafe { di.shy.api.draw.layer++ }
 	// gl.set_context(gl.default_context)
 	// gl.layer(di.shy.api.draw.layer)
