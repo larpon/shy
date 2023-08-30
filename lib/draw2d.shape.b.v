@@ -95,8 +95,8 @@ pub mut:
 
 [inline]
 pub fn (t &DrawShape2DTriangle) origin_offset() (f32, f32) {
-	bb := t.bbox()
-	p_x, p_y := t.origin.pos_wh(bb.width * t.factor, bb.height * t.factor)
+	bb := t.bbox().mul_scalar(t.factor)
+	p_x, p_y := t.origin.pos_wh(bb.width, bb.height)
 	return -p_x, -p_y
 }
 
@@ -104,16 +104,17 @@ pub fn (t &DrawShape2DTriangle) origin_offset() (f32, f32) {
 pub fn (t &DrawShape2DTriangle) draw() {
 	scale_factor := t.factor
 
-	bb := t.Triangle.bbox()
+	mut bb := t.Triangle.bbox().mul_scalar(scale_factor)
 
 	x := bb.x
 	y := bb.y
-	x1 := (t.a.x - x)
-	y1 := (t.a.y - y)
-	x2 := (t.b.x - x) * scale_factor
-	y2 := (t.b.y - y) * scale_factor
-	x3 := (t.c.x - x) * scale_factor
-	y3 := (t.c.y - y) * scale_factor
+	x1 := (t.a.x * scale_factor - x)
+	y1 := (t.a.y * scale_factor - y)
+	x2 := (t.b.x * scale_factor - x)
+	y2 := (t.b.y * scale_factor - y)
+	x3 := (t.c.x * scale_factor - x)
+	y3 := (t.c.y * scale_factor - y)
+	offset := t.offset.mul_scalar(scale_factor)
 
 	mut o_off_x, mut o_off_y := t.origin_offset()
 
@@ -122,7 +123,7 @@ pub fn (t &DrawShape2DTriangle) draw() {
 
 	gl.push_matrix()
 	gl.translate(o_off_x, o_off_y, 0)
-	gl.translate(x + t.offset.x, y + t.offset.y, 0)
+	gl.translate(x + offset.x, y + offset.y, 0)
 
 	if t.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
@@ -149,7 +150,7 @@ pub fn (t &DrawShape2DTriangle) draw() {
 		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 3)
 	}
 	if t.fills.has(.stroke) {
-		stroke_width := t.stroke.width
+		stroke_width := t.stroke.width * scale_factor
 		color := t.stroke.color
 		gl.c4b(color.r, color.g, color.b, color.a)
 		if stroke_width <= 0 {
@@ -184,7 +185,11 @@ pub fn (t &DrawShape2DTriangle) draw() {
 
 [inline]
 fn (t &DrawShape2DTriangle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
-	draw_anchor(t.stroke, x1, y1, x2, y2, x3, y3)
+	draw_anchor_config := DrawAnchorConfig{
+		...t.stroke
+		width: t.stroke.width * t.factor
+	}
+	draw_anchor(x1, y1, x2, y2, x3, y3, draw_anchor_config)
 }
 
 // DrawShape2DRect
@@ -224,10 +229,11 @@ pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
 pub fn (r &DrawShape2DRect) draw() {
 	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
 	// this could/should maybe someday be switchable by a flag...?
-	x := r.x * r.factor
-	y := r.y * r.factor
-	w := r.width * r.factor
-	h := r.height * r.factor
+	scale_factor := r.factor
+	x := r.x * scale_factor
+	y := r.y * scale_factor
+	w := r.width * scale_factor
+	h := r.height * scale_factor
 	sx := f32(0.0)
 	sy := f32(0.0)
 
@@ -263,7 +269,7 @@ pub fn (r &DrawShape2DRect) draw() {
 		gl.end()
 	}
 	if r.fills.has(.stroke) {
-		stroke_width := r.stroke.width
+		stroke_width := r.stroke.width * scale_factor
 		color := r.stroke.color
 		gl.c4b(color.r, color.g, color.b, color.a)
 		if stroke_width <= 0 {
@@ -316,7 +322,11 @@ pub fn (r &DrawShape2DRect) draw() {
 
 [inline]
 fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
-	draw_anchor(r.stroke, x1, y1, x2, y2, x3, y3)
+	draw_anchor_config := DrawAnchorConfig{
+		...r.stroke
+		width: r.stroke.width * r.factor
+	}
+	draw_anchor(x1, y1, x2, y2, x3, y3, draw_anchor_config)
 }
 
 // DrawShape2DLineSegment
@@ -350,14 +360,13 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	y1 := l.a.y * l.factor
 	x2 := l.b.x * l.factor
 	y2 := l.b.y * l.factor
-	scale_factor := l.scale //* sgldraw.dpi_scale()
 	stroke_width := l.Stroke.width * l.factor
 
 	color := l.color
 	gl.c4b(color.r, color.g, color.b, color.a)
 
-	x1_ := x1 * scale_factor
-	y1_ := y1 * scale_factor
+	x1_ := x1
+	y1_ := y1
 	dx := x1 - x1_
 	dy := y1 - y1_
 	x2_ := x2 - dx
@@ -446,13 +455,7 @@ pub mut:
 
 [inline]
 pub fn (up &DrawShape2DUniformPolygon) bbox() Rect {
-	bb := up.Circle.bbox()
-	return Rect{
-		x: bb.x * up.factor
-		y: bb.y * up.factor
-		width: bb.width * up.factor
-		height: bb.height * up.factor
-	}
+	return up.Circle.bbox().mul_scalar(up.factor)
 }
 
 [inline]
@@ -469,6 +472,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	// draw from their origin, we compensate for that here
 	x := up.x * up.factor + r.width * 0.5
 	y := up.y * up.factor + r.height * 0.5
+	offset := up.offset.mul_scalar(up.factor)
 	radius := up.radius * up.factor
 	mut segments := up.segments
 	if segments <= 2 {
@@ -482,7 +486,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	gl.push_matrix()
 
 	gl.translate(o_off_x, o_off_y, 0)
-	gl.translate(x + up.offset.x, y + up.offset.y, 0)
+	gl.translate(x + offset.x, y + offset.y, 0)
 
 	if up.rotation != 0 {
 		gl.translate(-o_off_x, -o_off_y, 0)
@@ -523,7 +527,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 		gl.end()
 	}
 	if up.fills.has(.stroke) {
-		if up.stroke.width > 1 {
+		if up.stroke.width * up.factor > 1 {
 			for i := 0; i < segments; i++ {
 				theta = 2.0 * f32(mth.pi) * f32(i) / f32(segments)
 				x1 := sx + (radius * math.cosf(theta))
@@ -570,33 +574,50 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 
 [inline]
 fn (up &DrawShape2DUniformPolygon) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
-	draw_anchor(up.stroke, x1, y1, x2, y2, x3, y3)
+	draw_anchor_config := DrawAnchorConfig{
+		...up.stroke
+		width: up.stroke.width * up.factor
+	}
+	draw_anchor(x1, y1, x2, y2, x3, y3, draw_anchor_config)
 }
 
 // Utils
 
+[params]
+struct DrawAnchorConfig {
+	width   f32     = 1.0
+	connect Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
+	cap     Cap     = .butt
+	color   Color   = colors.shy.white
+}
+
 [inline]
-fn draw_anchor(stroke Stroke, x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchorConfig) {
 	// Original author Chris H.F. Tsang / CPOL License
 	// https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
 	// http://artgrammer.blogspot.com/search/label/opengl
-
-	color := stroke.color
-	radius := stroke.width * 0.5
-	connect := stroke.connect
+	color := config.color
+	radius := config.width * 0.5
+	connect := config.connect
+	x1_ := x1
+	y1_ := y1
+	x2_ := x2
+	y2_ := y2
+	x3_ := x3
+	y3_ := y3
 
 	gl.c4b(color.r, color.g, color.b, color.a)
 
 	if radius == 1 {
 		gl.begin_line_strip()
-		gl.v2f(x1, y1)
-		gl.v2f(x2, y2)
+		gl.v2f(x1_, y1_)
+		gl.v2f(x2_, y2_)
 		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices', 2)
 		gl.end()
 		return
 	}
 
-	ar := anchor(x1, y1, x2, y2, x3, y3, radius)
+	ar := anchor(x1_, y1_, x2_, y2_, x3_, y3_, radius)
 
 	t0_x := ar.t0.x
 	t0_y := ar.t0.y
