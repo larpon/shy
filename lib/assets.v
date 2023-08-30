@@ -225,8 +225,23 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	assert a.data.len > 0, 'Asset.data appears empty'
 
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.source}" to image')
-	stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
-		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${a.lo.source}"')
+	mut stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
+		return error('${@STRUCT}.${@FN}' +
+			': stbi failed loading asset "${a.lo.source}". Error: ${err}')
+	}
+
+	if opt.rescale != 1.0 {
+		new_width := int(f32(stb_img.width) * opt.rescale)
+		new_height := int(f32(stb_img.height) * opt.rescale)
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'resizing image "${a.lo.source}" from ${stb_img.width}x${stb_img.height} to ${new_width}x${new_height}')
+		scaled_stb_img := stbi.resize_uint8(&stb_img, new_width, new_height) or {
+			return error('${@STRUCT}.${@FN}' +
+				': stbi failed to resize loaded asset "${a.lo.source}". Error: ${err}')
+		}
+		assert scaled_stb_img.width > 0, 'Asset.to_image resized image width <= 0'
+		assert scaled_stb_img.height > 0, 'Asset.to_image resized image height <= 0'
+		stb_img.free()
+		stb_img = scaled_stb_img
 	}
 
 	mut image := Image{
@@ -401,6 +416,7 @@ pub type ImageWrap = gfx.Wrap
 pub struct ImageOptions {
 	AssetLoadOptions
 mut:
+	rescale f32 = 1.0
 	width   int
 	height  int
 	mipmaps int
