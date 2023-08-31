@@ -44,7 +44,7 @@ mut:
 	mouse             &shy.Mouse    = shy.null
 	kbd               &shy.Keyboard = shy.null
 	window            &shy.Window   = shy.null
-	canvas            shy.Size
+	canvas            shy.Canvas
 }
 
 pub fn (mut a EasyApp) init() ! {
@@ -68,9 +68,7 @@ pub fn (mut a EasyApp) init() ! {
 	a.window = api.wm().active_window()
 	// TODO figure out if we want to let the Draw backend do the scaling or
 	// if we should report the actual size of the pixel buffer here (larger on Retina screens)
-	// a.canvas = a.window.drawable_size()
-	a.canvas = a.window.size()
-	a.draw.scale_factor(a.window.draw_factor())
+	a.set_canvas(a.window.canvas())
 
 	a.easy.init()!
 }
@@ -89,6 +87,11 @@ pub fn (mut a EasyApp) frame_end() {
 	a.draw.end_2d()
 	a.gfx.end_easy_frame()
 	a.App.frame_end()
+}
+
+pub fn (mut a EasyApp) set_canvas(canvas shy.Canvas) {
+	a.canvas = canvas
+	a.draw.set_canvas(a.canvas)
 }
 
 pub fn (mut a EasyApp) variable_update(dt f64) {
@@ -130,7 +133,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 			}
 		}
 		shy.WindowResizeEvent {
-			a.canvas = a.window.drawable_size()
+			a.canvas = a.window.canvas()
 		}
 		// MouseMotionEvent {
 		// 	a.shy.api.mouse.show()

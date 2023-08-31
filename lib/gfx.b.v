@@ -201,7 +201,7 @@ fn (mut c Context) sokol_gl_init() ! {
 	offscreen_sample_count := 1
 
 	win := c.shy.active_window()
-	w, h := win.drawable_wh()
+	w, h := win.canvas().wh()
 
 	gl_desc := &gl.Desc{
 		// max_vertices: 1_000_000
@@ -339,7 +339,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 	// Reinit offscreen pass if necessary
 	// TODO make nicer
 	win := g.shy.active_window()
-	w, h := win.drawable_wh()
+	w, h := win.canvas().wh()
 	if off.width != w || off.height != h {
 		mut mc := unsafe { g.get_active_context() }
 		mc.offscreen_reinit(w, h) or { panic(err) }
@@ -348,7 +348,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 
 pub fn (mut g GFX) end_easy_frame() {
 	win := g.shy.active_window()
-	dw, dh := win.drawable_wh()
+	dw, dh := win.canvas().wh()
 
 	c := g.get_active_context()
 	off := c.offscreen

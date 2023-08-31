@@ -346,7 +346,7 @@ pub fn (el &EasyLine) draw() {
 		}
 		// point a should always be the left-most point
 		nl.ensure_a_left_b_right()
-		w, h := el.shy.active_window().drawable_wh()
+		w, h := el.shy.active_window().canvas().wh()
 		// TODO do something less wasteful here?
 		grow := mth.max(w, h) * 2
 		nl.grow_a(-grow)

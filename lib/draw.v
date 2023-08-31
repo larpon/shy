@@ -60,7 +60,7 @@ pub fn (d &Draw) shape_2d() DrawShape2D {
 	s := d.shy
 	mut d2d := DrawShape2D{
 		shy: s
-		factor: d.factor
+		factor: d.canvas.factor
 	}
 	d2d.init() or {
 		msg := 'initializing DrawShape2D failed'
@@ -74,7 +74,7 @@ pub fn (d &Draw) text() DrawText {
 	s := d.shy
 	mut dt := DrawText{
 		shy: s
-		factor: d.factor
+		factor: d.canvas.factor
 	}
 	dt.init() or {
 		msg := 'initializing DrawText failed'
@@ -88,7 +88,7 @@ pub fn (d &Draw) image() DrawImage {
 	s := d.shy
 	mut di := DrawImage{
 		shy: s
-		factor: d.factor
+		factor: d.canvas.factor
 		draw: unsafe { d }
 	}
 	di.init() or {

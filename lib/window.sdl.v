@@ -962,39 +962,50 @@ pub fn (w &Window) width() int {
 	return width
 }
 
-pub fn (w &Window) drawable_wh() (int, int) {
+pub fn (w &Window) canvas() Canvas {
 	mut width := 0
 	mut height := 0
 	// TODO on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
 	// $if opengl ? {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
-	return width, height
-}
-
-pub fn (w &Window) drawable_size() Size {
-	mut width := 0
-	mut height := 0
-	// TODO on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
-	// $if opengl ? {
-	sdl.gl_get_drawable_size(w.handle, &width, &height)
-	// }
-	return Size{
+	ww, wh := w.wh()
+	dw, dh := width, height
+	mut factor_x := f32(1)
+	mut factor_y := f32(1)
+	if ww != dw || wh != dh {
+		factor_x = f32(dw) / ww
+		factor_y = f32(dh) / wh
+	}
+	return Canvas{
 		width: width
 		height: height
+		factor: mth.min(f32(dw) / ww, f32(dh) / wh)
+		factor_x: factor_x
+		factor_y: factor_y
 	}
 }
 
+[deprecated: 'use Window.canvas().wh() instead']
+[deprecated_after: '2024-08-30']
+pub fn (w &Window) drawable_wh() (int, int) {
+	return w.canvas().wh()
+}
+
+[deprecated: 'use Window.canvas().size() instead']
+[deprecated_after: '2024-08-30']
+pub fn (w &Window) drawable_size() Size {
+	return w.canvas().size()
+}
+
+[deprecated: 'use Window.canvas().factor_xy() instead']
+[deprecated_after: '2024-08-30']
 pub fn (w &Window) draw_factor_xy() (f32, f32) {
-	ww, wh := w.wh()
-	dw, dh := w.drawable_wh()
-	if ww != dw || wh != dh {
-		return f32(dw) / ww, f32(dh) / wh
-	}
-	return 1, 1
+	return w.canvas().factor_xy()
 }
 
+[deprecated: 'use Window.canvas().factor instead']
+[deprecated_after: '2024-08-30']
 pub fn (w &Window) draw_factor() f32 {
-	dw, dh := w.drawable_wh()
-	return mth.min(f32(dw) / w.width(), f32(dh) / w.height())
+	return w.canvas().factor
 }

@@ -91,7 +91,7 @@ pub fn (i Draw2DImage) draw() {
 			// default mode
 		}
 		.aspect_fit {
-			ratio := mth.min(f32(i.height) / (image.height), f32(i.width) / (image.width))
+			ratio := mth.min(f32(h) / (image.height), f32(w) / (image.width))
 			x1 = image.width * ratio
 			y1 = image.height * ratio
 			i_x, i_y := i.origin.pos_wh(w, h)
@@ -100,7 +100,7 @@ pub fn (i Draw2DImage) draw() {
 			o_off_y += i_y - y1y
 		}
 		.aspect_crop {
-			ratio := mth.max(f32(i.height) / (image.height), f32(i.width) / (image.width))
+			ratio := mth.max(f32(h) / (image.height), f32(w) / (image.width))
 			// u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)i
 			// v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
 			x1 = image.width * ratio
@@ -119,29 +119,29 @@ pub fn (i Draw2DImage) draw() {
 				height: h * i.scale
 			}
 			scissor = scissor.displaced_from(i.origin)
-			i.draw.scissor(scissor)
+			i.draw.set_scissor_rect(scissor)
 		}
 		.tile {
 			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
 			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .tile, must be loaded with wrap_u/wrap_v: .repeat'
-			u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)
-			v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
-			x1 = i.width
-			y1 = i.height
+			u1 = utils.remap[f32](w, 0, image.width, 0, 1)
+			v1 = utils.remap[f32](h, 0, image.height, 0, 1)
+			x1 = w
+			y1 = h
 		}
 		.tile_vertically {
 			assert image.opt.wrap_u == .clamp_to_edge, 'Images used for fill_mode: .tile_vertically, must be loaded with wrap_u: .clamp_to_edge'
 			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .tile_vertically, must be loaded with wrap_v: .repeat'
-			v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
-			x1 = i.width
-			y1 = i.height
+			v1 = utils.remap[f32](h, 0, image.height, 0, 1)
+			x1 = w
+			y1 = h
 		}
 		.tile_horizontally {
 			assert image.opt.wrap_u == .repeat, 'Images used for fill_mode: .tile_horizontally, must be loaded with wrap_u: .repeat'
 			assert image.opt.wrap_v == .clamp_to_edge, 'Images used for fill_mode: .tile_horizontally, must be loaded with wrap_v: .clamp_to_edge'
-			u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)
-			x1 = i.width
-			y1 = i.height
+			u1 = utils.remap[f32](w, 0, image.width, 0, 1)
+			x1 = w
+			y1 = h
 		}
 		.pad {
 			x1 = i.image.width
@@ -191,7 +191,7 @@ pub fn (i Draw2DImage) draw() {
 
 	gl.pop_matrix()
 	if scissor_rect.width >= 0 {
-		i.draw.scissor(scissor_rect)
+		i.draw.set_scissor_rect(scissor_rect)
 	}
 }
 

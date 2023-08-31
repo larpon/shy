@@ -6,17 +6,21 @@ module lib
 import shy.wraps.sokol.gl
 import shy.wraps.sokol.gfx
 
+[heap]
 pub struct Draw {
 	ShyStruct
 mut:
-	factor         f32 = 1.0
 	alpha_pipeline gl.Pipeline
 	viewport       Rect
 	scissor_rect   Rect
+	canvas         Canvas
 }
 
 pub fn (mut d Draw) init() ! {
 	d.ShyStruct.init()!
+
+	win := d.shy.active_window()
+	d.set_canvas(win.canvas()) // Set initial canvas
 
 	// Make a sokol-gl pipeline with alpha blending enabled (used by DrawImage for alpha blending textures)
 	mut alpha_pipdesc := gfx.PipelineDesc{}
@@ -46,18 +50,7 @@ pub fn (mut d Draw) shutdown() ! {
 	d.ShyStruct.shutdown()!
 }
 
-pub fn (mut d Draw) scale_factor(scale_factor f32) {
-	d.factor = scale_factor
-}
-
 pub fn (mut d Draw) begin_2d() {
-	win := d.shy.active_window()
-	w, h := win.drawable_wh()
-
-	// Don't "automagically" set any factor here.
-	// Let the callers decide when it is applied
-	// d.factor = win.draw_factor()
-
 	// Keep around for while:
 	// unsafe { di.shy.api.draw.layer++ }
 	// gl.set_context(gl.default_context)
@@ -67,26 +60,30 @@ pub fn (mut d Draw) begin_2d() {
 
 	// According to sokol_gfx.h documentation the viewport and scissor rects are reset
 	// to the size of the full framebuffer - so we can assume that here:
-	d.viewport = Rect{0, 0, w, h}
-	d.scissor_rect = d.viewport
+	d.set_viewport(d.canvas.rect())
+	d.set_scissor_rect(d.viewport)
 
 	// gl.set_context(s_gl_context)
 	gl.matrix_mode_projection()
-	gl.ortho(0.0, f32(w), f32(h), 0.0, -1.0, 1.0)
+	gl.ortho(0.0, d.canvas.width, d.canvas.height, 0.0, -1.0, 1.0)
 
 	gl.load_pipeline(d.alpha_pipeline)
 }
 
 pub fn (d &Draw) end_2d() {}
 
-pub fn (d &Draw) viewport(rect Rect) {
+pub fn (mut d Draw) set_canvas(canvas Canvas) {
+	d.canvas = canvas
+}
+
+pub fn (d &Draw) set_viewport(rect Rect) {
 	gl.viewportf(rect.x, rect.y, rect.width, rect.height, true)
 	unsafe {
 		d.viewport = rect
 	}
 }
 
-pub fn (d &Draw) scissor(rect Rect) {
+pub fn (d &Draw) set_scissor_rect(rect Rect) {
 	gl.scissor_rectf(rect.x, rect.y, rect.width, rect.height, true)
 	unsafe {
 		d.scissor_rect = rect
