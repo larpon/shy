@@ -44,7 +44,7 @@ mut:
 	mouse             &shy.Mouse    = shy.null
 	kbd               &shy.Keyboard = shy.null
 	window            &shy.Window   = shy.null
-	canvas            shy.Canvas
+	canvas_           ?shy.Canvas
 }
 
 pub fn (mut a EasyApp) init() ! {
@@ -89,9 +89,16 @@ pub fn (mut a EasyApp) frame_end() {
 	a.App.frame_end()
 }
 
+pub fn (a EasyApp) canvas() shy.Canvas {
+	if canvas := a.canvas_ {
+		return canvas
+	}
+	panic('${@STRUCT}.${@FN}: no canvas set')
+}
+
 pub fn (mut a EasyApp) set_canvas(canvas shy.Canvas) {
-	a.canvas = canvas
-	a.draw.set_canvas(a.canvas)
+	a.canvas_ = canvas
+	a.draw.set_canvas(canvas)
 }
 
 pub fn (mut a EasyApp) variable_update(dt f64) {

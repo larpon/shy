@@ -45,7 +45,7 @@ pub fn (mut a App) init() ! {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	center := shy.vec2((shy.half * a.canvas.width), (shy.half * a.canvas.height))
+	center := shy.vec2((shy.half * a.canvas().width), (shy.half * a.canvas().height))
 
 	origin := a.origin
 	rotation := f32(a.a_r.value()) * shy.deg2rad
@@ -69,8 +69,8 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.text(
-		x: a.canvas.width * 0.01
-		y: a.canvas.height * (1.0 - 0.01)
+		x: a.canvas().width * 0.01
+		y: a.canvas().height * (1.0 - 0.01)
 		origin: .bottom_left
 		text: 'Click mouse left/right to change transform origin
 Origin: ${a.origin}

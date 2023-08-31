@@ -722,3 +722,11 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 	}
 	return error('${@STRUCT}.${@FN}: TODO ${ao} type not implemented yet')
 }
+
+/*
+[inline]
+pub fn (q &Quick) concrete_asset[T](sas shy.AssetSource) !T {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	return q.easy.shy.assets().get[T](sas)!
+}
+*/

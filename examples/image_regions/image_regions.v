@@ -27,8 +27,8 @@ pub fn (mut a App) init() ! {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	cx := shy.half * a.canvas.width
-	cy := shy.half * a.canvas.height
+	cx := shy.half * a.canvas().width
+	cy := shy.half * a.canvas().height
 
 	margin := f32(10)
 

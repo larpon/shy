@@ -3,6 +3,15 @@
 // that can be found in the LICENSE file.
 module lib
 
+// Canvas represents properties of the actual backend pixel buffer.
+// On high DPI aware systems the pixel buffer returned by the hardware
+// abstraction layer (OpenGL, Metal, etc.) can be some factor larger
+// than the actual *window* size. Example:
+// You ask the system to open a window of size 600x480 pixels with an accelerated
+// context. The system opens a window in 600x480 pixels - but the accelerated
+// contexts's pixel buffer is *twice* as big: 1200x960 pixels. Then all the
+// stupid chaos begins and everything looks smaller etc.
+[noinit]
 pub struct Canvas {
 pub:
 	width    f32

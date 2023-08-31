@@ -18,7 +18,7 @@ struct App {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	center := shy.vec2((shy.half * a.canvas.width), (shy.half * a.canvas.height))
+	center := shy.vec2((shy.half * a.canvas().width), (shy.half * a.canvas().height))
 	half := shy.vec2(f32(50), 50)
 	// Draws a triangle "pointing" at the center of the window
 	a.quick.triangle(

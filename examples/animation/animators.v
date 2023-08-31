@@ -85,8 +85,8 @@ pub fn (mut a App) frame(dt f64) {
 	}
 
 	a.quick.rect(
-		x: shy.half * a.canvas.width
-		y: shy.half * a.canvas.height
+		x: shy.half * a.canvas().width
+		y: shy.half * a.canvas().height
 		rotation: a.a_r.value() * shy.deg2rad
 		scale: a.a_s.value()
 		origin: .center
@@ -95,8 +95,8 @@ pub fn (mut a App) frame(dt f64) {
 	win := a.window
 	es := a.timer.elapsed().seconds()
 	a.quick.text(
-		x: a.canvas.width * 0.01
-		y: a.canvas.height * (1.0 - 0.01)
+		x: a.canvas().width * 0.01
+		y: a.canvas().height * (1.0 - 0.01)
 		origin: .bottom_left
 		text: 'Animation running for ${es:.1f} seconds
 Frame: ${win.state.frame}
