@@ -29,7 +29,7 @@ fn test_stbi_read_write() {
 
 	assert d_s.width == d_d.width
 	assert d_s.height == d_d.height
-	assert d_s.nr_channels == d_d.nr_channels
+	assert d_s.channels == d_d.channels
 
 	mut v_s := &u32(d_s.data)
 	mut v_d := &u32(d_d.data)
@@ -66,6 +66,6 @@ fn test_stbi_resize() {
 
 	assert d_d.width == new_width
 	assert d_d.height == new_height
-	assert d_d.nr_channels == d_r.nr_channels
+	assert d_d.channels == d_r.channels
 	os.rm(out_path) or {}
 }

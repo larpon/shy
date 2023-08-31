@@ -230,9 +230,24 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 			': stbi failed loading asset "${a.lo.source}". Error: ${err}')
 	}
 
-	if opt.rescale != 1.0 {
-		new_width := int(f32(stb_img.width) * opt.rescale)
-		new_height := int(f32(stb_img.height) * opt.rescale)
+	mut new_width := int(stb_img.width)
+	mut new_height := int(stb_img.height)
+
+	match opt.resize {
+		f32 {
+			new_width = int(f32(stb_img.width) * opt.resize)
+			new_height = int(f32(stb_img.height) * opt.resize)
+		}
+		f64 {
+			new_width = int(f32(stb_img.width) * opt.resize)
+			new_height = int(f32(stb_img.height) * opt.resize)
+		}
+		Size {
+			new_width = int(opt.resize.width)
+			new_height = int(opt.resize.height)
+		}
+	}
+	if new_width != stb_img.width || new_height != stb_img.height {
 		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'resizing image "${a.lo.source}" from ${stb_img.width}x${stb_img.height} to ${new_width}x${new_height}')
 		scaled_stb_img := stbi.resize_uint8(&stb_img, new_width, new_height) or {
 			return error('${@STRUCT}.${@FN}' +
@@ -249,7 +264,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		opt: opt
 		width: stb_img.width
 		height: stb_img.height
-		channels: stb_img.nr_channels
+		channels: stb_img.use_channels
 		mipmaps: opt.mipmaps
 		ready: stb_img.ok
 		// data: stb_img.data
@@ -412,11 +427,13 @@ mut:
 
 pub type ImageWrap = gfx.Wrap
 
+pub type ResizeValue = Size | f32 | f64
+
 [params]
 pub struct ImageOptions {
 	AssetLoadOptions
 mut:
-	rescale f32 = 1.0
+	resize  ResizeValue = f32(1.0)
 	width   int
 	height  int
 	mipmaps int

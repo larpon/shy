@@ -38,12 +38,13 @@ fn cb_free(p voidptr) {
 
 pub struct Image {
 pub mut:
-	width       int
-	height      int
-	nr_channels int
-	ok          bool
-	data        voidptr
-	ext         string
+	width        int
+	height       int
+	channels     int
+	use_channels int
+	ok           bool
+	data         voidptr
+	ext          string
 }
 
 //-----------------------------------------------------------------------------
@@ -125,12 +126,12 @@ pub fn load(path string, params LoadParams) !Image {
 		ext: ext
 		data: 0
 	}
-	res.data = C.stbi_load(&char(path.str), &res.width, &res.height, &res.nr_channels,
-		params.desired_channels)
+	res.data = C.stbi_load(&char(path.str), &res.width, &res.height, &res.channels, params.desired_channels)
 
 	if isnil(res.data) {
 		return error('stbi_image failed to load from "${path}"')
 	}
+	res.use_channels = params.desired_channels
 	return res
 }
 
@@ -140,11 +141,12 @@ pub fn load_from_memory(buf &u8, bufsize int, params LoadParams) !Image {
 		ok: true
 		data: 0
 	}
-	res.data = C.stbi_load_from_memory(buf, bufsize, &res.width, &res.height, &res.nr_channels,
+	res.data = C.stbi_load_from_memory(buf, bufsize, &res.width, &res.height, &res.channels,
 		params.desired_channels)
 	if isnil(res.data) {
 		return error('stbi_image failed to load from memory')
 	}
+	res.use_channels = params.desired_channels
 	return res
 }
 
@@ -163,16 +165,17 @@ pub fn resize_uint8(img &Image, output_w int, output_h int) !Image {
 		data: 0
 		width: output_w
 		height: output_h
-		nr_channels: img.nr_channels
+		channels: img.channels
+		use_channels: img.use_channels
 	}
 
-	res.data = cb_malloc(usize(output_w * output_h * img.nr_channels))
+	res.data = cb_malloc(usize(output_w * output_h * img.use_channels))
 	if res.data == 0 {
 		return error('stbi_image failed to resize file')
 	}
 
 	if 0 == C.stbir_resize_uint8(img.data, img.width, img.height, 0, res.data, output_w,
-		output_h, 0, img.nr_channels) {
+		output_h, 0, img.use_channels) {
 		return error('stbi_image failed to resize file')
 	}
 	return res
