@@ -1,0 +1,10 @@
+cd shy
+mkdir /tmp/shyem/
+v -gc none -os wasm32_emscripten -o /tmp/shyem/vc_src.c examples/animation
+v -gc none -os wasm32_emscripten -o /tmp/shyem/vc_src.c examples/hello_world
+# etc.
+
+# -sFORCE_FILESYSTEM
+ shy_root="$(pwd)"; emcc --embed-file $shy_root/fonts@/fonts --embed-file $shy_root/examples/assets@/ -sASYNCIFY -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -sUSE_WEBGL2=1 -sUSE_SDL=2 -sNO_EXIT_RUNTIME=1 -sALLOW_MEMORY_GROWTH=1  -sTOTAL_MEMORY=100663296 -sINITIAL_MEMORY=33554432  -sERROR_ON_UNDEFINED_SYMBOLS=0 -O0 -g -D_DEBUG_ -D_DEBUG -flto -fPIC -fstrict-aliasing -Wall -Wextra -Wno-sign-compare -Wno-enum-conversion -Wno-unused-but-set-variable -Wno-incompatible-pointer-types  -Wno-incompatible-pointer-types-discards-qualifiers -Wno-literal-conversion -Wno-pointer-sign -Wno-deprecated-declarations -Wno-constant-conversion -Wno-unused-value -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-multichar -Wno-unknown-pragmas -Wno-ignored-qualifiers -Wno-long-long -Wno-overloaded-virtual -Wno-deprecated-writable-strings -Wno-unused-volatile-lvalue -Wno-warn-absolute-paths -Wno-expansion-to-defined -D SOKOL_GLES3 -D SOKOL_NO_ENTRY -D MINIAUDIO_IMPLEMENTATION -D _REENTRANT -I "$shy_root/thirdparty/stb" -I "$shy_root/thirdparty/fontstash" -I "$shy_root/thirdparty/sokol" -I "$shy_root/thirdparty/sokol/util" -I "$shy_root/wraps/miniaudio/c/miniaudio" -I "$shy_root/wraps/wren/c/wren/src/include" -I "$shy_root/wraps/wren/c/wren/src/vm" -I "$shy_root/wraps/wren/c/wren/src/optional" -I "$shy_root/thirdparty/sokol_gp/" -I "$shy_root/shy" $shy_root/thirdparty/stb/stbi.c /tmp/shyem/vc_src.c -lm -lpthread -ldl -o /tmp/shyem/vc_src.html && emrun /tmp/shyem/vc_src.html
+
+# && emrun --browser /snap/bin/chromium /tmp/shyem/vc_src.html

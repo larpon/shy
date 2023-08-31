@@ -1,0 +1,11 @@
+# Remove the `cmd.exe` window on launch
+
+With `mingw-w64` from winlibs.com:
+
+Linker flag
+
+```powershell
+v -prod -ldflags -mwindows .
+```
+
+MSVC?? `/SUBSYSTEM:WINDOWS`
