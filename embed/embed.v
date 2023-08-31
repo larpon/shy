@@ -133,7 +133,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 			}
 		}
 		shy.WindowResizeEvent {
-			a.canvas = a.window.canvas()
+			a.set_canvas(a.window.canvas())
 		}
 		// MouseMotionEvent {
 		// 	a.shy.api.mouse.show()

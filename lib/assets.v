@@ -5,7 +5,7 @@ module lib
 
 import os
 import shy.wraps.sokol.gfx
-import stbi
+import shy.wraps.stbi
 import v.embed_file
 import shy.analyse
 

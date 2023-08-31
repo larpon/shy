@@ -34,7 +34,6 @@ pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 		height: image.height
 		image: image
 		draw: di.draw
-		// alpha_pipeline: di.draw.alpha_pipeline
 	}
 	/*
 	// TODO return small default image?
@@ -45,8 +44,7 @@ pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 
 pub struct Draw2DImage {
 	Rect
-	image Image
-	// alpha_pipeline gl.Pipeline
+	image  Image
 	factor f32 = 1.0
 mut:
 	draw &Draw // For scissor state restoring

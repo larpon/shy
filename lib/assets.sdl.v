@@ -5,7 +5,7 @@ module lib
 
 // import os
 import sdl
-import stbi
+import shy.wraps.stbi
 import shy.analyse
 
 fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {

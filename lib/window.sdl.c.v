@@ -4,7 +4,7 @@
 module lib
 
 import os
-import stbi
+import shy.wraps.stbi
 
 #include "@VMODROOT/lib/shy_gl_read_pixels.h"
 
