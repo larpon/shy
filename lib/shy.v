@@ -4,6 +4,7 @@
 module lib
 
 import time
+import rand
 import shy.log { Log }
 import shy.analyse
 
@@ -92,6 +93,11 @@ pub fn (mut s Shy) init() ! {
 		s.log.set(.debug)
 	}
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
+	$if !shy_no_determinism ? {
+		s.log.gdebug('${@STRUCT}.${@FN}', 'enable determinism')
+		rand.seed([u32(0x4b1d), 0xbaadf00d])
+	}
+
 	s.alarms = &Alarms{
 		shy: s
 	}
