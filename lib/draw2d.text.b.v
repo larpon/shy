@@ -163,12 +163,16 @@ pub fn (t Draw2DText) draw() {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
 	}
+
 	// println('${@FN} ${t.color}')
 	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
 	font_context.set_color(color)
 	font_size := f32(int(text_size)) // TODO rendering errors/artefacts on (some) float values?
 	font_context.set_size(font_size)
 	// eprintln('${@STRUCT}.${@FN} ${font_size}')
+	unsafe {
+		debug_font_spam(0, 'Font: "${t.font}" size: ${font_size}')
+	}
 
 	if t.blur > 0 {
 		font_context.set_blur(t.blur)

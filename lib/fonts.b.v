@@ -11,6 +11,20 @@ import shy.wraps.fontstash
 import shy.wraps.sokol.sfons
 // import shy.wraps.sokol.gl
 
+[if shy_debug_fonts ?; unsafe]
+fn debug_font_spam(calls int, s string) {
+	mut static called := 0
+	if called <= calls {
+		println(s)
+		called++
+	}
+}
+
+[if shy_debug_fonts ?]
+fn debug_font(s string) {
+	println(s)
+}
+
 pub struct Fonts {
 	ShyStruct
 mut:
