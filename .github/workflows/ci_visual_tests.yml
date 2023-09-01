@@ -1,4 +1,4 @@
-name: Code CI
+name: Visual CI
 
 on:
   push:
