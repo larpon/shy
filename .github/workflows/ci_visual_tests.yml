@@ -50,7 +50,7 @@ jobs:
         cd build
         ../configure
         make
-        make install
+        sudo make install
 
     - name: Checkout V
       uses: actions/checkout@v2
