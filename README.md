@@ -23,6 +23,7 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 # Highlights
 
 * Get your creative ideas up and running relatively quick.
+* Deterministic by default.
 * Rich examples directory.
 * Live coding and runtime experimenting via V's `-live` flag.
 * Animation and timer system - built right in.
@@ -31,6 +32,7 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 * 2D shape collision detection.
 * 3D capable (via `sokol_gfx.h`)
 * Multiple, runtime switchable, render modes (immediate, UI, step).
+* [Visually tested](https://github.com/Larpon/shy/blob/master/.github/workflows/ci_visual_tests.yml) for graphic regressions.
 * Fairly sub-system agnostic. Bring your own ECS, physics engine etc.
 * [WIP] Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
 music, sounds etc.
