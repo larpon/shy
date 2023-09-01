@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
 
-  ubuntu-latest-bootstrap:
+  ubuntu-latest-visual-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -46,6 +46,9 @@ jobs:
     - name: Build SDL
       run: |
         cd SDL2-${SDL2_VERSION}
+        mkdir build
+        cd build
+        ../configure
         make
         make install
 
