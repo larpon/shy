@@ -319,7 +319,7 @@ fn (mut w Window) record_frame() {
 	if frame in rc.frames {
 		screenshot_file_path := '${rc.save_prefix}${frame}.png'
 		$if shy_record_trace ? {
-			eprintln('>>> ${@FN} screenshot ${screenshot_file_path}')
+			eprintln('>>> ${@FN} screenshot at frame ${frame} "${screenshot_file_path}"')
 		}
 		w.screenshot(screenshot_file_path) or { panic(err) }
 		w.step(1, f32(w.state.update_rate))
@@ -351,7 +351,7 @@ fn new_shy_frame_record_config() &FrameRecordConfig {
 		mut window_ids := os.getenv_opt('SHY_RECORD_WINDOW') or { '' }.split_any(',').filter(it != '').map(it.u64())
 		window_ids.sort()
 		exit_on_frame := os.getenv_opt('SHY_EXIT_ON_FRAME') or { '-1' }.i64()
-		mut frames := os.getenv('SHY_RECORD_FRAME').split_any(',').filter(it != '').map(it.u64())
+		mut frames := os.getenv('SHY_RECORD_FRAMES').split_any(',').filter(it != '').map(it.u64())
 		frames.sort()
 		dir := os.getenv_opt('SHY_RECORD_DIR') or { os.join_path(os.temp_dir(), 'shy') }
 		prefix := os.join_path_single(dir, os.file_name(os.executable()).all_before('.') + '_')
