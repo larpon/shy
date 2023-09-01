@@ -91,7 +91,7 @@ jobs:
       continue-on-error: true
       run: |
         Xvfb $DISPLAY -dpi 96 -screen 0 1280x1024x24 &
-        sleep 2 # give xvfb time to start
+        sleep 1 # give xvfb time to start
         v gret -r ~/.vmodules/shy -t ./shy-visual-tests/vgret.shy_examples.toml -v ./fresh-examples ./shy-visual-tests
         v gret -r ~/.vmodules/shy -t ./shy-visual-tests/vgret.shy_visual_tests.toml -v ./fresh-visual-tests ./shy-visual-tests
 
