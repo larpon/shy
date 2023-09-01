@@ -61,7 +61,7 @@ jobs:
       run: make && sudo ./v symlink
 
     - name: Install sdl module
-      run:
+      run: |
         git clone https://github.com/vlang/sdl.git ~/.vmodules/sdl
         v run ~/.vmodules/sdl/setup.vsh
 

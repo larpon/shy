@@ -194,7 +194,7 @@ jobs:
         v -d sdl_no_compile_flags ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-build:
-    runs-on: ubuntu-20.04 # use 20.04 for now (SDL2 compile issue)
+    runs-on: ubuntu-latest # use 20.04 for now (SDL2 compile issue)
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -260,7 +260,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04] # use 20.04 for now (SDL2 compile issue)
+        os: [ubuntu-latest]
         sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0]
     timeout-minutes: 20
     env:
@@ -268,8 +268,6 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install --quiet -y libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
         curl -L https://www.libsdl.org/release/SDL2-${{ matrix.sdl-version }}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
@@ -278,9 +276,9 @@ jobs:
         cd SDL2-${{ matrix.sdl-version }}
         mkdir build
         cd build
-        ../configure --prefix /tmp/sdl2-${{ matrix.sdl-version }}
+        ../configure
         make
-        make install
+        sudo make install
 
     - name: Checkout V
       uses: actions/checkout@v2
@@ -288,7 +286,7 @@ jobs:
         repository: vlang/v
 
     - name: Build local v
-      run: make -j4 && sudo ./v symlink
+      run: make && sudo ./v symlink
 
     - name: Checkout SDL ${{ matrix.sdl-version }}
       uses: actions/checkout@v2
@@ -324,9 +322,6 @@ jobs:
 
     - name: Build shy examples
       run: |
-        export CFLAGS="$(/tmp/sdl2-${{ matrix.sdl-version }}/bin/sdl2-config --cflags)"
-        export LDFLAGS="$(/tmp/sdl2-${{ matrix.sdl-version }}/bin/sdl2-config --libs)"
-
         v -d sdl_no_compile_flags -skip-unused should-compile-all ~/.vmodules/shy/examples
         v -d sdl_no_compile_flags -d shy_analyse should-compile-all ~/.vmodules/shy/examples
         v -d sdl_no_compile_flags -d shy_vet should-compile-all ~/.vmodules/shy/examples
