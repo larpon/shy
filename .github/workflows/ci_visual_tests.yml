@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
+      TMPDIR: /tmp
       DISPLAY: :99
       LIBGL_ALWAYS_SOFTWARE: true
       SDL2_VERSION: 2.28.2
