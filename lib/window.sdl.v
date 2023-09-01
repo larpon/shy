@@ -35,6 +35,7 @@ pub fn (mut wm WM) init() ! {
 		// sdl.set_hint(sdl.hint_render_vsync.str,'1'.str)
 		// sdl.set_hint(sdl.hint_video_x11_xrandr.str,'1'.str)
 		// sdl.set_hint(sdl.hint_render_scale_quality.str, '1'.str )
+		// sdl.set_hint(sdl.hint_video_highdpi_disabled.str, '0'.str)
 	}
 
 	$if windows {
@@ -207,7 +208,7 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	window_flags = window_flags | u32(sdl.WindowFlags.opengl) | u32(sdl.WindowFlags.allow_highdpi)
 	// }
 	// window_flags := u32(sdl.null)
-	// window_flags := u32(sdl.WindowFlags.fullscreen)
+	// window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
 
 	window := sdl.create_window(config.title.str, int(config.x), int(config.y), int(config.width),
 		int(config.height), window_flags)
@@ -818,30 +819,32 @@ pub fn (mut w Window) init() ! {
 
 	sdl.gl_make_current(w.handle, w.gl_context)
 	// $if opengl ? {
-	match w.config.render.vsync {
-		.off {
-			if sdl.gl_set_swap_interval(0) < 0 {
-				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-				return error('Could not set OpenGL swap interval:\n${sdl_error_msg}')
+	$if !shy_no_vsync ? {
+		s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=${w.config.render.vsync}')
+		match w.config.render.vsync {
+			.off {
+				if sdl.gl_set_swap_interval(0) < 0 {
+					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+					return error('Could not set OpenGL swap interval (vsync .off):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
+				}
 			}
-		}
-		.on {
-			if sdl.gl_set_swap_interval(1) < 0 {
-				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-				return error('Could not set OpenGL swap interval:\n${sdl_error_msg}')
+			.on {
+				if sdl.gl_set_swap_interval(0) < 0 {
+					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+					return error('Could not set OpenGL swap interval (vsync .on):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
+				}
 			}
-		}
-		.adaptive {
-			if sdl.gl_set_swap_interval(-1) < 0 {
-				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-				s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-				return error('Could not set OpenGL swap interval:\n${sdl_error_msg}')
+			.adaptive {
+				if sdl.gl_set_swap_interval(-1) < 0 {
+					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+					return error('Could not set OpenGL swap interval (vsync .adaptive):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
+				}
 			}
 		}
 	}
-	s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=${w.config.render.vsync}')
 	// }
 
 	// Initialize main graphics system if it's not already initialized
@@ -965,10 +968,17 @@ pub fn (w &Window) width() int {
 pub fn (w &Window) canvas() Canvas {
 	mut width := 0
 	mut height := 0
+
+	// mut linked_version := sdl.Version{}
+	// sdl.get_version(mut linked_version)
+	// if linked_version.minor_version >= 26 {
 	// TODO on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
+	//	sdl.get_window_size_in_pixels(w.handle, &width, &height);
+	//} else {
 	// $if opengl ? {
 	sdl.gl_get_drawable_size(w.handle, &width, &height)
 	// }
+	//}
 	ww, wh := w.wh()
 	dw, dh := width, height
 	mut factor_x := f32(1)
