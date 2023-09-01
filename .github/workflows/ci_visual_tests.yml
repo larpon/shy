@@ -1,0 +1,99 @@
+name: Code CI
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+concurrency:
+  group: general-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+
+  ubuntu-latest-bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VFLAGS: -cc tcc -no-retry-compilation
+      DISPLAY: :99
+      LIBGL_ALWAYS_SOFTWARE: true
+      SDL2_VERSION: 2.28.2
+    steps:
+    - name: Install dependencies
+      run: |
+        curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
+        tar -zxvf SDL2.tar.gz
+
+        # vgret dependencies
+        # imagemagick              : convert, mogrify, import
+        # xvfb                     : xvfb
+        # openimageio-tools        : idiff
+        # libgl1-mesa-dri          : For headless rendering / software DRI driver (LIBGL_ALWAYS_SOFTWARE=true)
+        # freeglut3-dev            : Fixes graphic apps compilation with tcc
+        sudo apt-get install imagemagick openimageio-tools freeglut3-dev libgl1-mesa-dri xvfb
+
+        # Get imgur upload script
+        wget https://raw.githubusercontent.com/tremby/imgur.sh/c98345d/imgur.sh
+        chmod +x ./imgur.sh
+
+        # Get reference images to test against
+        git clone https://github.com/Larpon/shy-visual-tests
+
+    - name: Build SDL
+      run: |
+        cd SDL2-${SDL2_VERSION}
+        make
+        make install
+
+    - name: Checkout V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make && sudo ./v symlink
+
+    - name: Install sdl module
+      run:
+        git clone https://github.com/vlang/sdl.git ~/.vmodules/sdl
+        v run ~/.vmodules/sdl/setup.vsh
+
+    - name: Checkout shy
+      uses: actions/checkout@v2
+      with:
+        path: shy
+
+    - name: Simulate "v install shy"
+      run: mv shy ~/.vmodules
+
+    - name: Build shy
+      run: v -g ~/.vmodules/shy
+
+    - name: Symlink shy
+      run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
+
+    - name: Run 'shy --help'
+      run: shy --help
+
+    - name: Run 'shy doctor'
+      run: shy doctor
+
+    - name: Sample and compare
+      id: compare
+      continue-on-error: true
+      run: |
+        Xvfb $DISPLAY -dpi 96 -screen 0 1280x1024x24 &
+        sleep 2 # give xvfb time to start
+        v gret -r ~/.vmodules/shy -t ./shy-visual-tests/vgret.shy_examples.toml -v ./fresh-examples ./shy-visual-tests
+        v gret -r ~/.vmodules/shy -t ./shy-visual-tests/vgret.shy_visual_tests.toml -v ./fresh-visual-tests ./shy-visual-tests
+
+    - name: Upload regression to imgur
+      if: steps.compare.outcome != 'success'
+      run: |
+        ./imgur.sh /tmp/fail.png
+        ./imgur.sh /tmp/diff.png
+        exit 1
