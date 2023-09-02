@@ -25,12 +25,10 @@ mut:
 	rendering   bool
 }
 
-/*
 fn (mut s State) reset() {
 	s.in_hot_code = false
 	s.rendering = false
 }
-*/
 
 // ShyStruct is meant to be used as an embed for all types that need to have access to
 // all sub-systems of the Shy struct.
@@ -114,6 +112,23 @@ pub fn (mut s Shy) init() ! {
 	s.health()!
 	s.ready = true
 	s.timer.start()
+}
+
+[inline]
+pub fn (mut s Shy) reset() ! {
+	s.running = false
+	s.shutdown = true
+	s.state.reset()
+	s.shutdown()!
+	time.sleep(2000)
+	s.shutdown = false
+
+	time.sleep(2000)
+	s.init()!
+	s.running = true
+	s.state.in_hot_code = true
+	eprintln('TODO except input, also reset ctx.??. `ps aux | rg record` then `kill -9 PID`')
+	//s.rendering = false
 }
 
 [inline]

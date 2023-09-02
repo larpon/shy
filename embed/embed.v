@@ -120,7 +120,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 			alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 			match key {
 				.escape {
-					a.shy.shutdown = true
+					a.shy.quit_request()
 				}
 				.printscreen, .f12 {
 					date := time.now()
