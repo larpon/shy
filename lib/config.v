@@ -42,7 +42,7 @@ pub:
 
 	input struct {
 	pub:
-		mice bool = false // Support multiple mouse input devices
+		mice bool // Support multiple mouse input devices
 	}
 
 	window struct {
