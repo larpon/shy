@@ -13,14 +13,27 @@ pub enum ButtonState {
 }
 
 const empty_event = Event(UnkownEvent{
+	timestamp: 0
+	frame: 0
 	window: null
 })
 
+pub enum EventsState {
+	normal
+	record
+	play
+}
+
 pub struct Events {
 	ShyStruct
+pub mut:
+	state EventsState
 mut:
-	queue     []Event
-	on_events []OnEventFn
+	queue      []Event
+	on_events  []OnEventFn
+	recorded   []Event
+	play_queue []Event
+	play_next  Event
 }
 
 pub fn (mut e Events) init() ! {
@@ -31,6 +44,10 @@ pub fn (mut e Events) init() ! {
 	e.queue = []Event{len: 0, cap: 10000, init: lib.empty_event}
 	unsafe { e.queue.flags.set(.noslices | .noshrink | .nogrow) }
 	analyse.max('${@MOD}.${@STRUCT}.queue.cap', e.queue.cap)
+}
+
+pub fn (mut e Events) reset() ! {
+	e.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 }
 
 pub fn (mut e Events) shutdown() ! {
@@ -46,7 +63,22 @@ pub fn (mut e Events) on_event(listener OnEventFn) {
 // poll polls the event queue for the next event.
 pub fn (mut e Events) poll() ?Event {
 	mut input := unsafe { e.shy.api().input() }
-	if event := input.poll_event() {
+
+	if e.state == .play {
+		if e.play_queue.len == 0 {
+			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, returning to normal')
+			e.state = .normal
+		} else {
+			if e.shy.wm().active_window().state.frame == e.play_next.frame {
+				if e.play_next is UnkownEvent {
+					e.play_next = e.play_queue.pop()
+					return none
+				}
+				e.send(e.play_next) or { panic(err) }
+				e.play_next = e.play_queue.pop()
+			}
+		}
+	} else if event := input.poll_event() {
 		e.send(event) or { panic(err) }
 	}
 
@@ -63,6 +95,24 @@ pub fn (mut e Events) poll() ?Event {
 		return event
 	}
 	return none
+}
+
+pub fn (mut e Events) record() {
+	e.shy.log.ginfo('${@STRUCT}.${@FN}', '')
+	e.send_reset_state_event()
+	e.play_queue.clear()
+	e.recorded.clear()
+	e.shy.wm().active_window().state.frame = 0 // TODO make a complete state reset possible to minimize any errors
+	e.state = .record
+}
+
+pub fn (mut e Events) play_back() {
+	e.send_reset_state_event()
+	e.play_queue = e.recorded.reverse()
+	e.shy.log.ginfo('${@STRUCT}.${@FN}', 'starting play back of ${e.play_queue.len} events')
+	e.shy.wm().active_window().state.frame = 0 // TODO make a complete state reset possible to minimize any errors
+	e.state = .play
+	e.play_next = e.play_queue.pop()
 }
 
 // pop pops the next event from the event queue.
@@ -93,12 +143,43 @@ pub fn (mut e Events) send(ev Event) ! {
 		return error('${@STRUCT}.${@FN}: sending unknown events is not allowed')
 	}
 	analyse.max('${@MOD}.${@STRUCT}.queue.len', e.queue.len + 1)
+	if e.state == .record {
+		e.recorded << ev
+		if ev is QuitEvent {
+			return
+		}
+	}
 	if e.queue.len < e.queue.cap {
 		analyse.count('${@MOD}.${@STRUCT}.queue <<', 1)
 		e.queue << ev
 		return
 	}
 	return error('${@STRUCT}.${@FN}: event queue is full')
+}
+
+pub fn (e Events) recorded() []Event {
+	return e.recorded.clone()
+}
+
+// Internal nice-to-have functions for easier sending
+
+// send_quit_event sends a QuitEvent
+fn (mut e Events) send_quit_event(force_quit bool) {
+	e.send(QuitEvent{
+		timestamp: e.shy.ticks()
+		frame: e.shy.wm().active_window().state.frame
+		window: e.shy.wm().active_window()
+		request: !force_quit
+	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
+}
+
+// send_reset_state_event sends a ResetStateEvent
+fn (mut e Events) send_reset_state_event() {
+	e.send(ResetStateEvent{
+		timestamp: e.shy.ticks()
+		frame: e.shy.wm().active_window().state.frame
+		window: e.shy.wm().active_window()
+	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
 
 // import sdl

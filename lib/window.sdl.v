@@ -24,6 +24,10 @@ pub fn (b Boot) init() !&WM {
 	return wm
 }
 
+pub fn (mut b Boot) reset() ! {
+	b.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+}
+
 pub fn (mut wm WM) init() ! {
 	wm.shy.assert_api_init()
 	mut s := wm.shy
@@ -69,6 +73,20 @@ pub fn (mut wm WM) init() ! {
 	}
 
 	wm.init_root_window()!
+}
+
+pub fn (mut wm WM) reset() ! {
+	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	// wm.root.close()!
+}
+
+pub fn (mut wm WM) shutdown() ! {
+	wm.shy.assert_api_shutdown()
+	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	wm.root.close()!
+	// TODO test unsafe { free(wm) }
+
+	sdl.quit()
 }
 
 pub fn (wm WM) display_count() u16 {
@@ -179,15 +197,6 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	win := wm.new_window(window_config)!
 	wm.root = win
 	return wm.root
-}
-
-pub fn (mut wm WM) shutdown() ! {
-	wm.shy.assert_api_shutdown()
-	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	wm.root.close()!
-	// TODO test unsafe { free(wm) }
-
-	sdl.quit()
 }
 
 fn (mut wm WM) new_window(config WindowConfig) !&Window {

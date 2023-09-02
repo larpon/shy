@@ -38,6 +38,10 @@ pub fn (mut a Audio) init() ! {
 	}
 }
 
+pub fn (mut a Audio) reset() ! {
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+}
+
 pub fn (mut a Audio) new_engine() !&AudioEngine {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data')
 	if a.engine_id >= lib.max_audio_engine_instances - 1 {

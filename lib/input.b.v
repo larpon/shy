@@ -62,6 +62,10 @@ pub fn (mut gp Gamepad) init() ! {
 	sdl.haptic_close(haptic)
 }
 
+pub fn (mut gp Gamepad) reset() ! {
+	gp.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+}
+
 // scan scans for new input devices.
 pub fn (mut ip Input) scan() ! {
 	// TODO
@@ -122,6 +126,22 @@ pub fn (mut ip Input) init() ! {
 	ip.init_input()!
 }
 
+pub fn (mut ip Input) reset() ! {
+	ip.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+
+	for _, mut mouse in ip.mice {
+		mouse.reset()!
+	}
+
+	for _, mut kb in ip.keyboards {
+		kb.reset()!
+	}
+
+	for _, mut pad in ip.pads {
+		pad.reset()!
+	}
+}
+
 pub fn (mut ip Input) shutdown() ! {
 	ip.shy.assert_api_shutdown()
 	ip.shy.log.gdebug('${@STRUCT}.${@FN}', '')
@@ -176,8 +196,10 @@ fn (mut ip Input) init_input() ! {
 fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 	s := ip.shy
 	win := s.active_window()
+	frame := win.state.frame
 	mut shy_event := Event(UnkownEvent{
 		timestamp: s.ticks()
+		frame: frame
 		window: win
 	})
 
@@ -190,6 +212,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			if wevid == .resized {
 				shy_event = WindowResizeEvent{
 					timestamp: s.ticks()
+					frame: frame
 					window: win // TODO multi-window support
 					width: win.width()
 					height: win.height()
@@ -199,6 +222,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		.quit {
 			shy_event = QuitEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 			}
 		}
@@ -207,6 +231,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = KeyEvent{
 				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 				state: .up
 				key_code: shy_key_code
@@ -217,6 +242,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = KeyEvent{
 				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 				state: .down
 				key_code: unsafe { KeyCode(int(shy_key_code)) }
@@ -233,6 +259,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 
 			shy_event = MouseMotionEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win // TODO multi-window support
 				// window_id: win.id // TODO multi-window support
 				which: which // sdl_event.motion.which // TODO use own ID system??
@@ -251,6 +278,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			button := map_sdl_button_to_shy_mouse_button(sdl_event.button.button)
 			shy_event = MouseButtonEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win // TODO multi-window support
 				which: default_mouse_id // sdl_event.button.which // TODO use own ID system??
 				button: button
@@ -272,6 +300,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			mouse := ip.mouse(default_mouse_id) or { panic(err) }
 			shy_event = MouseWheelEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win // TODO multi-window support
 				which: default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
 				x: mouse.x
@@ -285,12 +314,14 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		.dropbegin {
 			shy_event = DropBeginEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 			}
 		}
 		.dropcomplete {
 			shy_event = DropEndEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 			}
 		}
@@ -304,6 +335,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			}
 			shy_event = DropFileEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 				path: path
 			}
@@ -320,6 +352,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			}
 			shy_event = DropTextEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 				text: text
 			}
@@ -330,6 +363,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			}
 			shy_event = UnkownEvent{
 				timestamp: s.ticks()
+				frame: frame
 				window: win
 			}
 		}
@@ -345,6 +379,7 @@ fn (mut ip Input) poll_event() ?Event {
 	win := s.active_window()
 	mut shy_event := Event(UnkownEvent{
 		timestamp: s.ticks()
+		frame: win.state.frame
 		window: win
 	})
 
