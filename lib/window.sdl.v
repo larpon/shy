@@ -600,8 +600,14 @@ pub fn (mut w Window) render[T](mut ctx T) {
 	fixed_deltatime := w.state.fixed_deltatime
 
 	// TODO the rendering internals is messy, should be cleaned up
+	// It is also here the rendering is decoupled from the game ticks
+	// via the opportunity to call `fixed_update` and `variable_update`
+	// at what ever intervals one wishes. Manual control of this process
+	// is implemented in in the `.step` mode below.
+
+	// Mode implementations:
 	//
-	// non-immediate mode / GUI mode
+	// `.ui` non-immediate mode / GUI mode
 	// rendering is only done if w.refresh() is called.
 	// All this should probably also be in the stepper?
 	// Make Shy orchestrate the update of each window instead?
@@ -641,8 +647,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 
 			if w.refresh_config.sleep > 0 {
 				w.state.in_frame_call = true
-				// TODO remove me again
-				s.scripts().on_frame(1.0)
+				s.scripts().on_frame(1.0) // TODO remove me again
 				ctx.frame(1.0)
 				ctx.frame_end()
 				w.end_frame()
@@ -651,8 +656,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 
 		if w.refresh_config.sleep == 0 {
 			w.state.in_frame_call = true
-			// TODO remove me again
-			s.scripts().on_frame(1.0)
+			s.scripts().on_frame(1.0) // TODO remove me again
 			ctx.frame(1.0)
 			ctx.frame_end()
 			w.end_frame()
@@ -695,8 +699,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 				f_dt := f64(w.state.frame_accumulator) / desired_frametime
 				// eprintln('(unlocked) ctx.frame( $f_dt )')
 				w.state.in_frame_call = true
-				// TODO remove me again
-				s.scripts().on_frame(f_dt)
+				s.scripts().on_frame(f_dt) // TODO remove me again
 				ctx.frame(f_dt)
 			} else { // LOCKED FRAMERATE, NO INTERPOLATION
 				for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
@@ -714,8 +717,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 
 				// eprintln('(locked) ctx.frame( 1.0 )')
 				w.state.in_frame_call = true
-				// TODO remove me again
-				s.scripts().on_frame(1.0)
+				s.scripts().on_frame(1.0) // TODO remove me again
 				ctx.frame(1.0)
 			}
 		} else {
@@ -739,8 +741,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 					ctx.variable_update(fixed_dt)
 				}
 				w.state.in_frame_call = true
-				// TODO remove me again
-				s.scripts().on_frame(1.0)
+				s.scripts().on_frame(1.0) // TODO remove me again
 				ctx.frame(1.0)
 			}
 		}
