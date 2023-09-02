@@ -75,8 +75,9 @@ mut:
 	timer  time.StopWatch = time.new_stopwatch()
 	alarms &Alarms        = unsafe { nil }
 	//
-	app voidptr = unsafe { nil }
-	// user_data voidptr = unsafe { nil }
+	custom_data voidptr = unsafe { nil } // Expose a way for users to get and set custom data
+	app         voidptr = unsafe { nil } // This is reserved for `shy.run[X](...)` to put the user "App" struct
+	//
 	// The "blackbox" api implementation specific struct
 	// Can only be accessed via the unsafe api() function *outside* the module
 	api API
@@ -132,7 +133,6 @@ pub fn new(config Config) !&Shy {
 pub fn run[T](mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
 	shy_instance.app = voidptr(ctx)
-	// shy_instance.user_data = voidptr(ctx)
 	ctx.shy = shy_instance
 	ctx.init()!
 
@@ -145,6 +145,19 @@ pub fn run[T](mut ctx T, config Config) ! {
 
 fn (s Shy) health() ! {
 	s.api.health()!
+}
+
+[inline]
+pub fn (s Shy) user_data() ?voidptr {
+	if !isnil(s.custom_data) {
+		return s.custom_data
+	}
+	return none
+}
+
+[inline]
+pub fn (mut s Shy) set_user_data(ptr voidptr) {
+	s.custom_data = ptr
 }
 
 [if !prod]
