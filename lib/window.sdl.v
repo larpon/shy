@@ -831,7 +831,7 @@ pub fn (mut w Window) init() ! {
 				}
 			}
 			.on {
-				if sdl.gl_set_swap_interval(0) < 0 {
+				if sdl.gl_set_swap_interval(1) < 0 {
 					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
 					return error('Could not set OpenGL swap interval (vsync .on):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
