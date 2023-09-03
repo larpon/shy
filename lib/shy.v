@@ -152,11 +152,15 @@ fn (s Shy) health() ! {
 	s.api.health()!
 }
 
+// quit_request sends a request to quit and end execution.
+// quit requests can be cancelled in some cases.
 [inline]
 pub fn (mut s Shy) quit_request() {
 	s.api.events.send_quit_event(false)
 }
 
+// quit sends out a quit event, ensuring all of `Shy`
+// shutsdown cleanly
 [inline]
 pub fn (mut s Shy) quit() {
 	s.api.events.send_quit_event(true)

@@ -101,6 +101,7 @@ pub fn (mut e Events) poll() ?Event {
 	return none
 }
 
+// record starts recording events to a recording buffer.
 pub fn (mut e Events) record() {
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', '')
 	e.shy.timer.restart()
@@ -110,6 +111,7 @@ pub fn (mut e Events) record() {
 	e.state = .record
 }
 
+// play_back starts play back of the current recording queue.
 pub fn (mut e Events) play_back() {
 	// e.send_reset_state_event()
 	e.play_queue = e.recorded.reverse()
@@ -161,6 +163,7 @@ pub fn (mut e Events) send(ev Event) ! {
 	return error('${@STRUCT}.${@FN}: event queue is full')
 }
 
+// recorded returns a copy of the recording queue
 pub fn (e Events) recorded() []Event {
 	return e.recorded.clone()
 }

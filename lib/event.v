@@ -38,7 +38,7 @@ pub struct EventSerializeConfig {
 	format_version int
 }
 
-pub fn (ip Input) serialize_event[T](e Event, config EventSerializeConfig) !T {
+fn (ip Input) serialize_event[T](e Event, config EventSerializeConfig) !T {
 	mut t := T{}
 	$if T.typ is string {
 		mut s := ''
