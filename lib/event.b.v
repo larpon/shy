@@ -68,10 +68,10 @@ pub fn (mut e Events) poll() ?Event {
 			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, returning to normal')
 			e.state = .normal
 		} else {
-			e.shy.log.gwarn('${@STRUCT}.${@FN}', '[WIP] returning to normal')
-			e.state = .normal
-			/*
-			if e.shy.wm().active_window().state.frame == e.play_next.frame {
+			if e.shy.ticks() >= e.play_next.timestamp {
+				if e.shy.ticks() != e.play_next.timestamp {
+					e.shy.log.gwarn('${@STRUCT}.${@FN}', 'TODO replaying event at ${e.shy.ticks()} vs ${e.play_next.timestamp} was not precise')
+				}
 				if e.play_next is UnkownEvent {
 					e.play_next = e.play_queue.pop()
 					return none
@@ -81,7 +81,6 @@ pub fn (mut e Events) poll() ?Event {
 					e.play_next = e.play_queue.pop()
 				}
 			}
-			*/
 		}
 	} else if event := input.poll_event() {
 		e.send(event) or { panic(err) }
@@ -104,10 +103,10 @@ pub fn (mut e Events) poll() ?Event {
 
 pub fn (mut e Events) record() {
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', '')
+	e.shy.timer.restart()
 	// e.send_reset_state_event()
 	e.play_queue.clear()
 	e.recorded.clear()
-	e.shy.wm().active_window().state.frame = 0 // TODO make a complete state reset possible to minimize any errors
 	e.state = .record
 }
 
@@ -115,7 +114,7 @@ pub fn (mut e Events) play_back() {
 	// e.send_reset_state_event()
 	e.play_queue = e.recorded.reverse()
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', 'starting play back of ${e.play_queue.len} events')
-	e.shy.wm().active_window().state.frame = 0 // TODO make a complete state reset possible to minimize any errors
+	e.shy.timer.restart()
 	e.state = .play
 	e.play_next = e.play_queue.pop()
 }
