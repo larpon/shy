@@ -256,7 +256,7 @@ pub mut:
 	lock_framerate        bool
 	performance_frequency u64
 	snap_frequencies      [5]i64
-	fixed_deltatime       f64
+	fixed_delta_time      f64
 	desired_frametime     i64
 	vsync_maxerror        i64
 	time_averager         [4]i64 // NOTE should be same cap as time_history_count
@@ -498,7 +498,7 @@ pub fn (mut w Window) render_init() {
 
 	performance_frequency := s.performance_frequency()
 	w.state.performance_frequency = performance_frequency
-	w.state.fixed_deltatime = f64(1.0) / update_rate
+	w.state.fixed_delta_time = f64(1.0) / update_rate
 	w.state.desired_frametime = i64(performance_frequency / update_rate)
 
 	// These are to snap deltaTime to vsync values if it's close enough
@@ -535,7 +535,7 @@ pub fn (mut w Window) render_init() {
 }
 
 // render renders one frame
-pub fn (mut w Window) render[T](mut ctx T) {
+pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 	if !w.ready {
 		return
 	}
@@ -606,7 +606,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 		w.state.resync = false
 	}
 
-	fixed_deltatime := w.state.fixed_deltatime
+	fixed_delta_time := w.state.fixed_delta_time
 
 	// TODO the rendering internals is messy, should be cleaned up
 	// It is also here the rendering is decoupled from the game ticks
@@ -633,8 +633,6 @@ pub fn (mut w Window) render[T](mut ctx T) {
 
 		// do_sleep := !w.is_dirty
 		if w.is_dirty {
-			w.is_dirty = false
-
 			w.state.fps_frame++
 			w.state.frame++
 
@@ -661,6 +659,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 				ctx.frame_end()
 				w.end_frame()
 			}
+			w.is_dirty = false
 		}
 
 		if w.refresh_config.sleep == 0 {
@@ -683,17 +682,17 @@ pub fn (mut w Window) render[T](mut ctx T) {
 				mut consumed_delta_time := delta_time
 
 				for w.state.frame_accumulator >= desired_frametime {
-					// eprintln('(unlocked) s.fixed_update( $fixed_deltatime )')
-					w.fixed_update(fixed_deltatime)
-					ctx.fixed_update(fixed_deltatime)
+					// eprintln('(unlocked) s.fixed_update( $fixed_delta_time )')
+					w.fixed_update(fixed_delta_time)
+					ctx.fixed_update(fixed_delta_time)
 
 					if consumed_delta_time > desired_frametime {
 						// cap variable update's dt to not be larger than fixed update,
 						// and interleave it (so game state can always get the animation frames it needs)
 
-						// eprintln('(unlocked) 1 ctx.variable_update( $fixed_deltatime )')
-						w.variable_update(fixed_deltatime)
-						ctx.variable_update(fixed_deltatime)
+						// eprintln('(unlocked) 1 ctx.variable_update( $fixed_delta_time )')
+						w.variable_update(fixed_delta_time)
+						ctx.variable_update(fixed_delta_time)
 
 						consumed_delta_time -= desired_frametime
 					}
@@ -713,13 +712,13 @@ pub fn (mut w Window) render[T](mut ctx T) {
 			} else { // LOCKED FRAMERATE, NO INTERPOLATION
 				for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
 					for i := 0; i < w.state.update_multiplicity; i++ {
-						// eprintln('(locked) ctx.fixed_update( $fixed_deltatime )')
-						w.fixed_update(fixed_deltatime)
-						ctx.fixed_update(fixed_deltatime)
+						// eprintln('(locked) ctx.fixed_update( $fixed_delta_time )')
+						w.fixed_update(fixed_delta_time)
+						ctx.fixed_update(fixed_delta_time)
 
-						// eprintln('(locked) ctx.variable_update( $fixed_deltatime )')
-						w.variable_update(fixed_deltatime)
-						ctx.variable_update(fixed_deltatime)
+						// eprintln('(locked) ctx.variable_update( $fixed_delta_time )')
+						w.variable_update(fixed_delta_time)
+						ctx.variable_update(fixed_delta_time)
 						w.state.frame_accumulator -= desired_frametime
 					}
 				}
@@ -759,7 +758,7 @@ pub fn (mut w Window) render[T](mut ctx T) {
 	}
 
 	for mut cw in w.children {
-		cw.render[T](mut ctx)
+		cw.tick_and_render[T](mut ctx)
 	}
 }
 
