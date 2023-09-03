@@ -46,10 +46,6 @@ pub fn (mut d Draw) init() ! {
 	d.alpha_pipeline = gl.context_make_pipeline(off.gl_ctx, &alpha_pipdesc)
 }
 
-pub fn (mut d Draw) reset() ! {
-	d.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-}
-
 pub fn (mut d Draw) shutdown() ! {
 	d.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	gl.destroy_pipeline(d.alpha_pipeline)

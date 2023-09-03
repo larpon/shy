@@ -54,11 +54,6 @@ pub mut:
 	y int
 }
 
-pub fn (mut m Mouse) reset() ! {
-	m.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	m.bs.clear()
-}
-
 pub fn (mut m Mouse) on_motion(handler OnMouseMotionFn) {
 	m.on_motion << handler
 }

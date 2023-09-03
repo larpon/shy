@@ -38,7 +38,7 @@ pub struct EventSerializeConfig {
 	format_version int
 }
 
-pub fn (ip Input) serialize_event[T](e Event, config EventSerializeConfig) !T {
+fn (ip Input) serialize_event[T](e Event, config EventSerializeConfig) !T {
 	mut t := T{}
 	$if T.typ is string {
 		mut s := ''
@@ -69,8 +69,8 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 	if split.len < 4 {
 		return empty_event
 	}
-	event_type := split[3]
-	frame := split[2].u64()
+	offset := 3
+	event_type := split[2]
 	timestamp := split[1].u64()
 	window := ip.shy.wm().find_window(split[0].u32()) or {
 		ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'no window with id ${split[0]}. Error: ${err.msg()}')
@@ -81,80 +81,72 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 		'DropBeginEvent' {
 			DropBeginEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
 			}
 		}
 		'DropEndEvent' {
 			DropEndEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
 			}
 		}
 		'DropTextEvent' {
 			DropTextEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				text: split[3]
+				text: split[offset]
 			}
 		}
 		'DropFileEvent' {
 			DropFileEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				path: split[3]
+				path: split[offset]
 			}
 		}
 		'KeyEvent' {
 			KeyEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				which: split[3].u8()
-				state: ButtonState.from_string(split[4]) or { ButtonState.up }
-				key_code: keycode_from_string(split[5])
+				which: split[offset].u8()
+				state: ButtonState.from_string(split[offset + 1]) or { ButtonState.up }
+				key_code: keycode_from_string(split[offset + 2])
 			}
 		}
 		'MouseButtonEvent' {
 			MouseButtonEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				which: split[3].u8()
-				button: MouseButton.from_string(split[6]) or { MouseButton.unknown }
-				state: ButtonState.from_string(split[7]) or { ButtonState.up }
-				clicks: split[8].u8()
-				x: split[4].int()
-				y: split[5].int()
+				which: split[offset].u8()
+				button: MouseButton.from_string(split[offset + 3]) or { MouseButton.unknown }
+				state: ButtonState.from_string(split[offset + 4]) or { ButtonState.up }
+				clicks: split[offset + 5].u8()
+				x: split[offset + 1].int()
+				y: split[offset + 2].int()
 			}
 		}
 		'MouseMotionEvent' {
 			MouseMotionEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				which: split[3].u8()
-				// buttons: MouseButtons.from_string(split[6]) or { MouseButtons.unknown } // TODO
-				x: split[4].int()
-				y: split[5].int()
-				rel_x: split[6].int()
-				rel_y: split[7].int()
+				which: split[offset].u8()
+				// buttons: MouseButtons.from_string(split[offset+3]) or { MouseButtons.unknown } // TODO
+				x: split[offset + 1].int()
+				y: split[offset + 2].int()
+				rel_x: split[offset + 3].int()
+				rel_y: split[offset + 4].int()
 			}
 		}
 		'MouseWheelEvent' {
 			MouseWheelEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				which: split[3].u8()
-				x: split[4].int()
-				y: split[5].int()
-				scroll_x: split[6].int()
-				scroll_y: split[7].int()
-				direction: MouseWheelDirection.from_string(split[8]) or {
+				which: split[offset].u8()
+				x: split[offset + 1].int()
+				y: split[offset + 2].int()
+				scroll_x: split[offset + 3].int()
+				scroll_y: split[offset + 4].int()
+				direction: MouseWheelDirection.from_string(split[offset + 5]) or {
 					MouseWheelDirection.normal
 				}
 			}
@@ -162,15 +154,13 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 		'QuitEvent' {
 			QuitEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
-				request: split[3].bool()
+				request: split[offset].bool()
 			}
 		}
 		'ResetStateEvent' {
 			ResetStateEvent{
 				timestamp: timestamp
-				frame: frame
 				window: window
 			}
 		}
@@ -194,9 +184,8 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 
 pub struct ShyEvent {
 pub:
-	timestamp u64     [required] // Value of Shy.ticks()
-	frame     u64     [required] // Value of window.state.frame
-	window    &Window [required]
+	timestamp u64     [required]     // Value of Shy.ticks()
+	window    &Window [required] // TODO make this just an u32 or ?u32, no need to carry around the pointer
 }
 
 // str serialize `ShyEvent` into a string.

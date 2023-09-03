@@ -23,7 +23,6 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 # Highlights
 
 * Get your creative ideas up and running relatively quick.
-* Deterministic by default.
 * Rich examples directory.
 * Live coding and runtime experimenting via V's `-live` flag.
 * Animation and timer system - built right in.
@@ -41,11 +40,12 @@ music, sounds etc.
   supporting *custom* UI items (currently full of BUGS).
 * [WIP] ... much more :)
 
-# Known downsides
+# Currently known downsides
 
 The following points may turn you away from using `shy` at this point
 in time so use `shy` at your own risk and expense.
 
+* ~100% Deterministic behaviour is [WIP].
 * Multi-window rendering support has relatively low priority and may never be supported.
 * The `shy.ui` module's design goals can not currently be met 100% due to
   very-hard-to-reproduce bugs in the V compiler - mileage may vary until these bugs are squashed.
