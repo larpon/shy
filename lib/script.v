@@ -24,9 +24,9 @@ pub fn (sc Scripts) new_wren_vm() !&WrenVM {
 	return wvm
 }
 
-pub fn (mut sc Scripts) reset() ! {
-	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-}
+// pub fn (mut sc Scripts) reset() ! {
+//	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}
 
 pub fn (mut sc Scripts) init() ! {
 	sc.shy.assert_api_init()

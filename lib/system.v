@@ -7,6 +7,6 @@ pub struct System {
 	ShyStruct
 }
 
-pub fn (mut s System) reset() ! {
-	s.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-}
+// pub fn (mut s System) reset() ! {
+//	s.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}

@@ -14,7 +14,6 @@ pub enum ButtonState {
 
 const empty_event = Event(UnkownEvent{
 	timestamp: 0
-	frame: 0
 	window: null
 })
 
@@ -46,9 +45,9 @@ pub fn (mut e Events) init() ! {
 	analyse.max('${@MOD}.${@STRUCT}.queue.cap', e.queue.cap)
 }
 
-pub fn (mut e Events) reset() ! {
-	e.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-}
+// pub fn (mut e Events) reset() ! {
+//	e.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}
 
 pub fn (mut e Events) shutdown() ! {
 	e.queue.clear()
@@ -69,14 +68,20 @@ pub fn (mut e Events) poll() ?Event {
 			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, returning to normal')
 			e.state = .normal
 		} else {
+			e.shy.log.gwarn('${@STRUCT}.${@FN}', '[WIP] returning to normal')
+			e.state = .normal
+			/*
 			if e.shy.wm().active_window().state.frame == e.play_next.frame {
 				if e.play_next is UnkownEvent {
 					e.play_next = e.play_queue.pop()
 					return none
 				}
 				e.send(e.play_next) or { panic(err) }
-				e.play_next = e.play_queue.pop()
+				if e.play_queue.len > 0 {
+					e.play_next = e.play_queue.pop()
+				}
 			}
+			*/
 		}
 	} else if event := input.poll_event() {
 		e.send(event) or { panic(err) }
@@ -99,7 +104,7 @@ pub fn (mut e Events) poll() ?Event {
 
 pub fn (mut e Events) record() {
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', '')
-	e.send_reset_state_event()
+	// e.send_reset_state_event()
 	e.play_queue.clear()
 	e.recorded.clear()
 	e.shy.wm().active_window().state.frame = 0 // TODO make a complete state reset possible to minimize any errors
@@ -107,7 +112,7 @@ pub fn (mut e Events) record() {
 }
 
 pub fn (mut e Events) play_back() {
-	e.send_reset_state_event()
+	// e.send_reset_state_event()
 	e.play_queue = e.recorded.reverse()
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', 'starting play back of ${e.play_queue.len} events')
 	e.shy.wm().active_window().state.frame = 0 // TODO make a complete state reset possible to minimize any errors
@@ -145,9 +150,9 @@ pub fn (mut e Events) send(ev Event) ! {
 	analyse.max('${@MOD}.${@STRUCT}.queue.len', e.queue.len + 1)
 	if e.state == .record {
 		e.recorded << ev
-		if ev is QuitEvent {
-			return
-		}
+		// if ev is QuitEvent {
+		//	return
+		//}
 	}
 	if e.queue.len < e.queue.cap {
 		analyse.count('${@MOD}.${@STRUCT}.queue <<', 1)
@@ -167,7 +172,6 @@ pub fn (e Events) recorded() []Event {
 fn (mut e Events) send_quit_event(force_quit bool) {
 	e.send(QuitEvent{
 		timestamp: e.shy.ticks()
-		frame: e.shy.wm().active_window().state.frame
 		window: e.shy.wm().active_window()
 		request: !force_quit
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
@@ -177,7 +181,6 @@ fn (mut e Events) send_quit_event(force_quit bool) {
 fn (mut e Events) send_reset_state_event() {
 	e.send(ResetStateEvent{
 		timestamp: e.shy.ticks()
-		frame: e.shy.wm().active_window().state.frame
 		window: e.shy.wm().active_window()
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }

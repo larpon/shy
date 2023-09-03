@@ -24,9 +24,9 @@ pub fn (b Boot) init() !&WM {
 	return wm
 }
 
-pub fn (mut b Boot) reset() ! {
-	b.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-}
+// pub fn (mut b Boot) reset() ! {
+//	b.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}
 
 pub fn (mut wm WM) init() ! {
 	wm.shy.assert_api_init()
@@ -75,10 +75,10 @@ pub fn (mut wm WM) init() ! {
 	wm.init_root_window()!
 }
 
-pub fn (mut wm WM) reset() ! {
-	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	// wm.root.close()!
-}
+// pub fn (mut wm WM) reset() ! {
+//	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//	// wm.root.close()!
+//}
 
 pub fn (mut wm WM) shutdown() ! {
 	wm.shy.assert_api_shutdown()

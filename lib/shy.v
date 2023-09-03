@@ -115,23 +115,6 @@ pub fn (mut s Shy) init() ! {
 }
 
 [inline]
-pub fn (mut s Shy) reset() ! {
-	s.running = false
-	s.shutdown = true
-	s.state.reset()
-	s.shutdown()!
-	time.sleep(2000)
-	s.shutdown = false
-
-	time.sleep(2000)
-	s.init()!
-	s.running = true
-	s.state.in_hot_code = true
-	eprintln('TODO except input, also reset ctx.??. `ps aux | rg record` then `kill -9 PID`')
-	//s.rendering = false
-}
-
-[inline]
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.alarms.paused = true // Pause so no alarms will fire during shutdown

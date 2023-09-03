@@ -61,10 +61,10 @@ pub fn (mut k Keyboard) init() ! {
 	k.shy.api.events.on_event(k.on_event)
 }
 
-pub fn (mut k Keyboard) reset() ! {
-	k.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	k.keys.clear()
-}
+// pub fn (mut k Keyboard) reset() ! {
+//	k.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//	k.keys.clear()
+//}
 
 fn (mut k Keyboard) on_event(e Event) bool {
 	// Exit as early as possible
