@@ -75,7 +75,6 @@ pub fn (mut wm WM) shutdown() ! {
 	wm.shy.assert_api_shutdown()
 	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	wm.root.close()!
-	// TODO test unsafe { free(wm) }
 
 	sdl.quit()
 }
