@@ -100,6 +100,10 @@ pub fn (mut g GFX) init() ! {
 	g.ready = true
 }
 
+// pub fn (mut g GFX) reset() ! {
+//	g.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}
+
 pub fn (mut g GFX) shutdown() ! {
 	// g.shy.assert_api_shutdown() // TODO
 	g.ready = false

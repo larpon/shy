@@ -62,6 +62,10 @@ pub fn (mut gp Gamepad) init() ! {
 	sdl.haptic_close(haptic)
 }
 
+// pub fn (mut gp Gamepad) reset() ! {
+//	gp.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}
+
 // scan scans for new input devices.
 pub fn (mut ip Input) scan() ! {
 	// TODO
@@ -121,6 +125,22 @@ pub fn (mut ip Input) init() ! {
 
 	ip.init_input()!
 }
+
+// pub fn (mut ip Input) reset() ! {
+//	ip.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//
+//	for _, mut mouse in ip.mice {
+//		mouse.reset()!
+//	}
+//
+//	for _, mut kb in ip.keyboards {
+//		kb.reset()!
+//	}
+//
+//	for _, mut pad in ip.pads {
+//		pad.reset()!
+//	}
+//}
 
 pub fn (mut ip Input) shutdown() ! {
 	ip.shy.assert_api_shutdown()

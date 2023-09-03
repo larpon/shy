@@ -20,7 +20,13 @@ mut:
 	sound_cache map[string]Sound
 }
 
-pub fn (mut a Assets) init() ! {}
+pub fn (mut a Assets) init() ! {
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+}
+
+// pub fn (mut a Assets) reset() ! {
+//	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+//}
 
 pub fn (mut a Assets) shutdown() ! {
 	for _, mut image in a.image_cache {

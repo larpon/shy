@@ -25,6 +25,11 @@ mut:
 	rendering   bool
 }
 
+fn (mut s State) reset() {
+	s.in_hot_code = false
+	s.rendering = false
+}
+
 // ShyStruct is meant to be used as an embed for all types that need to have access to
 // all sub-systems of the Shy struct.
 struct ShyStruct {
@@ -145,6 +150,20 @@ pub fn run[T](mut ctx T, config Config) ! {
 
 fn (s Shy) health() ! {
 	s.api.health()!
+}
+
+// quit_request sends a request to quit and end execution.
+// quit requests can be cancelled in some cases.
+[inline]
+pub fn (mut s Shy) quit_request() {
+	s.api.events.send_quit_event(false)
+}
+
+// quit sends out a quit event, ensuring all of `Shy`
+// shutsdown cleanly
+[inline]
+pub fn (mut s Shy) quit() {
+	s.api.events.send_quit_event(true)
 }
 
 [inline]
