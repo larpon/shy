@@ -43,6 +43,13 @@ pub fn (mut t Timers) init() ! {
 	}
 }
 
+pub fn (mut t Timers) reset() ! {
+	for i := 0; i < t.active.len; i++ {
+		mut timer := t.active[i]
+		timer.restart()
+	}
+}
+
 pub fn (t &Timers) active() bool {
 	// t.running &&
 	return !t.paused && t.active.len > 0
@@ -204,9 +211,11 @@ fn (t &Timer) fire_event_fn(event TimerEvent) {
 	}
 }
 
-pub fn (mut t Timer) reset() {
-	t.running = false
-	t.elapsed = 0
+pub fn (t &Timer) reset() {
+	unsafe {
+		t.running = false
+		t.elapsed = 0
+	}
 }
 
 fn (mut t Timer) ended() {

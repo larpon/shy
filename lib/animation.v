@@ -53,6 +53,13 @@ pub fn (mut a Anims) init() ! {
 	}
 }
 
+pub fn (mut a Anims) reset() ! {
+	for i := 0; i < a.active.len; i++ {
+		animator := a.active[i]
+		animator.restart()
+	}
+}
+
 pub fn (a &Anims) active() bool {
 	// a.running &&
 	return !a.paused && a.active.len > 0
@@ -194,6 +201,8 @@ interface IAnimator {
 	recycle bool
 	step(f64)
 	touch()
+	restart()
+	reset()
 }
 
 [params]
@@ -281,7 +290,8 @@ pub fn (a &Animator[T]) t() f64 {
 	return a.t
 }
 
-pub fn (mut a Animator[T]) reset() {
+pub fn (ima Animator[T]) reset() {
+	mut a := unsafe { ima } // TODO BUG workaround mutable generic interfaces
 	a.running = false
 	a.elapsed = 0
 	a.value = a.from
@@ -385,6 +395,15 @@ fn (fa FollowAnimator[T]) touch() {
 			a.fire_event_fn(.begin)
 		}
 	}
+}
+
+fn (fa FollowAnimator[T]) restart() {
+	fa.reset()
+}
+
+fn (fa FollowAnimator[T]) reset() {
+	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
+	a.value = a.target
 }
 
 fn (mut a FollowAnimator[T]) config_update(config FollowAnimatorConfig) {

@@ -38,6 +38,26 @@ fn (mut a Alarms) init() ! {
 	analyse.max('${@MOD}.${@STRUCT}.pool.len', a.pool.len)
 }
 
+fn (mut a Alarms) reset() ! {
+	for mut alarm in a.active {
+		alarm.restart()
+	}
+}
+
+[manualfree]
+fn (mut a Alarms) shutdown() ! {
+	for alarm in a.active {
+		unsafe {
+			free(alarm)
+		}
+	}
+	for alarm in a.pool {
+		unsafe {
+			free(alarm)
+		}
+	}
+}
+
 pub fn (a &Alarms) is_active() bool {
 	// a.running &&
 	return !a.paused && a.active.len > 0
@@ -64,20 +84,6 @@ pub fn (a &Alarms) cancel(alarm_id AlarmID) {
 				a.active.delete(i)
 				analyse.max('${@MOD}.${@STRUCT}.pool.len', a.pool.len)
 			}
-		}
-	}
-}
-
-[manualfree]
-fn (mut a Alarms) shutdown() ! {
-	for alarm in a.active {
-		unsafe {
-			free(alarm)
-		}
-	}
-	for alarm in a.pool {
-		unsafe {
-			free(alarm)
 		}
 	}
 }

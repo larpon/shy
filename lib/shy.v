@@ -109,6 +109,12 @@ pub fn (mut s Shy) init() ! {
 	s.timer.start()
 }
 
+pub fn (mut s Shy) reset() ! {
+	s.alarms.reset()!
+	s.api.reset()!
+	s.timer.restart()
+}
+
 [inline]
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false

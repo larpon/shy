@@ -13,7 +13,7 @@ pub type Event = DropBeginEvent
 	| MouseMotionEvent
 	| MouseWheelEvent
 	| QuitEvent
-	| ResetStateEvent
+	| RecordEvent
 	| UnkownEvent
 	| WindowEvent
 	| WindowResizeEvent
@@ -21,7 +21,7 @@ pub type Event = DropBeginEvent
 fn (e Event) serialize_as_playback_string() string {
 	return match e {
 		DropBeginEvent, DropEndEvent, DropTextEvent, DropFileEvent, KeyEvent, MouseButtonEvent,
-		MouseMotionEvent, MouseWheelEvent, QuitEvent, ResetStateEvent, UnkownEvent, WindowEvent,
+		MouseMotionEvent, MouseWheelEvent, QuitEvent, RecordEvent, UnkownEvent, WindowEvent,
 		WindowResizeEvent {
 			e.serialize_as_playback_string()
 		}
@@ -158,8 +158,8 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 				request: split[offset].bool()
 			}
 		}
-		'ResetStateEvent' {
-			ResetStateEvent{
+		'RecordEvent' {
+			RecordEvent{
 				timestamp: timestamp
 				window: window
 			}
@@ -347,12 +347,12 @@ fn (e DropTextEvent) serialize_as_playback_string() string {
 	return '"${e.text}"'
 }
 
-// ResetStateEvent
-pub struct ResetStateEvent {
+// RecordEvent
+pub struct RecordEvent {
 	ShyEvent
 }
 
-fn (e ResetStateEvent) serialize_as_playback_string() string {
+fn (e RecordEvent) serialize_as_playback_string() string {
 	return ''
 }
 

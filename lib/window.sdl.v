@@ -71,6 +71,11 @@ pub fn (mut wm WM) init() ! {
 	wm.init_root_window()!
 }
 
+pub fn (mut wm WM) reset() ! {
+	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	wm.root.reset()!
+}
+
 pub fn (mut wm WM) shutdown() ! {
 	wm.shy.assert_api_shutdown()
 	wm.shy.log.gdebug('${@STRUCT}.${@FN}', '')
@@ -883,6 +888,16 @@ pub fn (mut w Window) close() ! {
 	w.ready = false
 	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	w.shutdown()!
+}
+
+pub fn (mut w Window) reset() ! {
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	for mut window in w.children {
+		window.reset()!
+	}
+	w.stepper.reset()
+	w.anims.reset()!
+	w.timers.reset()!
 }
 
 pub fn (mut w Window) shutdown() ! {

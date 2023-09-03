@@ -89,6 +89,12 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 	a.input.init()!
 }
 
+pub fn (mut a ShyAPI) reset() ! {
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	a.wm.reset()!
+	// TODO reset all otehr sub systems
+}
+
 pub fn (mut a ShyAPI) shutdown() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 
@@ -213,9 +219,6 @@ pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
 		for {
 			event := events.poll() or { break }
 			ctx.event(event)
-			// if event is ResetStateEvent {
-			//	a.shy.reset()!
-			//}
 		}
 
 		// Update alarms

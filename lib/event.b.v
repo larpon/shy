@@ -60,17 +60,33 @@ pub fn (mut e Events) poll() ?Event {
 	mut input := unsafe { e.shy.api().input() }
 
 	if e.state == .play {
+		mut win := e.shy.wm().active_window()
 		if e.play_queue.len == 0 {
-			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, returning to normal')
+			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, resetting and returning to normal')
+			// e.send_record_event() ???
+			// e.shy.reset() or { panic(err)}
 			e.state = .normal
+			win.unstep()
 		} else {
-			if e.shy.ticks() >= e.play_next.timestamp {
-				if e.shy.ticks() != e.play_next.timestamp {
-					e.shy.log.gwarn('${@STRUCT}.${@FN}', 'TODO replaying event at ${e.shy.ticks()} vs ${e.play_next.timestamp} was not precise')
+			ts := e.play_next.timestamp
+			now := e.shy.ticks()
+			if now < ts {
+				ur := win.state.update_rate
+				dt := ts - now
+				mut steps := u16(dt / ur)
+				// win.step(1, f32(dt))
+				// win.step(u16(dt/ur), f32(dt))
+				// win.step(1, f32(win.state.update_rate))
+				// println('now: ${now}, ts: ${ts}, steps: ${steps}')
+				if steps == 0 {
+					steps = 1
 				}
-				if e.play_next is UnkownEvent {
-					e.play_next = e.play_queue.pop()
-					return none
+				win.step(steps, f32(ur))
+				return none
+			}
+			if now >= ts {
+				if now != ts {
+					e.shy.log.gwarn('${@STRUCT}.${@FN}', 'play back of event at ${now} > ${ts} was not exact (~${now - ts}ms late)')
 				}
 				e.send(e.play_next) or { panic(err) }
 				if e.play_queue.len > 0 {
@@ -100,8 +116,8 @@ pub fn (mut e Events) poll() ?Event {
 // record starts recording events to a recording buffer.
 pub fn (mut e Events) record() {
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', '')
-	e.shy.timer.restart()
-	// e.send_reset_state_event()
+	e.send_record_event()
+	e.shy.reset() or { panic(err) }
 	e.play_queue.clear()
 	e.recorded.clear()
 	e.state = .record
@@ -109,10 +125,11 @@ pub fn (mut e Events) record() {
 
 // play_back starts play back of the current recording queue.
 pub fn (mut e Events) play_back() {
-	// e.send_reset_state_event()
+	e.shy.reset() or { panic(err) }
+	e.send_record_event() // TODO add record event type to event like: .record_begin, .record_end, .play_back_begin, .play_back_end
 	e.play_queue = e.recorded.reverse()
+	e.play_queue.drop(1) // delete the event that triggered this ??
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', 'starting play back of ${e.play_queue.len} events')
-	e.shy.timer.restart()
 	e.state = .play
 	e.play_next = e.play_queue.pop()
 }
@@ -172,9 +189,9 @@ fn (mut e Events) send_quit_event(force_quit bool) {
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
 
-// send_reset_state_event sends a ResetStateEvent
-fn (mut e Events) send_reset_state_event() {
-	e.send(ResetStateEvent{
+// send_reset_event sends a QuitEvent
+fn (mut e Events) send_record_event() {
+	e.send(RecordEvent{
 		timestamp: e.shy.ticks()
 		window: e.shy.wm().active_window()
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
