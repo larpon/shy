@@ -182,19 +182,6 @@ pub fn (a &ShyAPI) scripts() &Scripts {
 	return a.scripts
 }
 
-// pub fn (mut a ShyAPI) reset() ! {
-//	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-//	a.input.reset()!
-//	a.scripts.reset()!
-//	a.draw.reset()!
-//	a.assets.reset()!
-//	a.audio.reset()!
-//	a.system.reset()!
-//	a.wm.reset()!
-//	a.events.reset()!
-//	a.gfx.reset()!
-//}
-
 // V embeds with generics is not quite ready yet?!
 // TODO BUG MAY NEED WORKAROUND
 // pub fn api_main<T>(mut ctx T, mut s Shy) ! {
