@@ -15,7 +15,7 @@ fn test_pushing_max_number_of_events() {
 		eprintln('Pushing event number ${i + 1}')
 		e := shy.Event(shy.MouseMotionEvent{
 			timestamp: s.ticks()
-			window: shy.null
+			window_id: shy.no_window
 		})
 		events.send(e)!
 		assert true
@@ -24,9 +24,12 @@ fn test_pushing_max_number_of_events() {
 	eprintln('Pushing one too many events')
 	e := shy.Event(shy.MouseMotionEvent{
 		timestamp: s.ticks()
-		window: shy.null
+		window_id: shy.no_window
 	})
-	events.send(e) or { assert true }
+	events.send(e) or {
+		assert err.msg() == 'Events.send: event queue is full'
+		assert true
+	}
 
 	events.shutdown()!
 }
