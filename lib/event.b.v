@@ -14,7 +14,7 @@ pub enum ButtonState {
 
 const empty_event = Event(UnkownEvent{
 	timestamp: 0
-	window: null
+	window_id: no_window
 })
 
 pub enum EventsState {
@@ -65,7 +65,7 @@ pub fn (mut e Events) poll() ?Event {
 	mut input := unsafe { e.shy.api().input() }
 
 	if e.state == .play {
-		mut win := e.shy.wm().active_window()
+		mut win := e.shy.wm().active_window() // TODO multi-window support
 		if e.play_queue.len == 0 {
 			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, resetting and returning to normal')
 			// e.send_record_event() ???
@@ -150,6 +150,7 @@ pub fn (mut e Events) record() {
 pub fn (mut e Events) play_back() {
 	e.shy.reset() or { panic(err) }
 	e.send_record_event() // TODO add record event type to event like: .record_begin, .record_end, .play_back_begin, .play_back_end
+	// TODO make all this configurable, play back should support multi-window setup
 	mut win := e.shy.wm().active_window()
 	win.set_vsync(.off) or { panic(err) }
 	// win.state.update_rate = 10
@@ -191,7 +192,7 @@ pub fn (mut e Events) send(ev Event) ! {
 	if e.state == .record {
 		e.recorded << RecordedEvent{
 			event: ev
-			frame: ev.window.state.frame
+			frame: e.shy.window(ev.window_id) or { 0 }.state.frame
 		}
 	}
 	if e.queue.len < e.queue.cap {
@@ -213,7 +214,7 @@ pub fn (e Events) recorded() []RecordedEvent {
 fn (mut e Events) send_quit_event(force_quit bool) {
 	e.send(QuitEvent{
 		timestamp: e.shy.ticks()
-		window: e.shy.wm().active_window()
+		window_id: e.shy.wm().active_window_id()
 		request: !force_quit
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
@@ -222,7 +223,7 @@ fn (mut e Events) send_quit_event(force_quit bool) {
 fn (mut e Events) send_record_event() {
 	e.send(RecordEvent{
 		timestamp: e.shy.ticks()
-		window: e.shy.wm().active_window()
+		window_id: e.shy.wm().active_window_id()
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
 

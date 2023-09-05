@@ -175,22 +175,28 @@ fn (mut ip Input) init_input() ! {
 // be translated.
 fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 	s := ip.shy
-	win := s.active_window()
+
+	timestamp := s.ticks()
+	// Map sdl window id to shy window here, right now we use the same values as SDL
+	// if an SDL event does not have a window id associated we use the id of the root window
 	mut shy_event := Event(UnkownEvent{
-		timestamp: s.ticks()
-		window: win
+		timestamp: timestamp
+		window_id: no_window
 	})
 
 	match sdl_event.@type {
 		.windowevent {
-			// if sdl.WindowEventID(int(sdl_event.window.event)) == .focus_lost {
-			//	s.shutdown = true
-			//}
 			wevid := unsafe { sdl.WindowEventID(int(sdl_event.window.event)) }
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.window.windowID)
+			win := s.window(shy_window_id) or {
+				s.log.gerror('${@STRUCT}.${@FN}', 'unable to locate SDL/Shy window ${sdl_event.window.windowID}/${shy_window_id}: ${err}')
+				panic('${@STRUCT}.${@FN} unable locate SDL/Shy window ${sdl_event.window.windowID}/${shy_window_id}: ${err}')
+			}
+
 			if wevid == .resized {
 				shy_event = WindowResizeEvent{
-					timestamp: s.ticks()
-					window: win // TODO multi-window support
+					timestamp: timestamp
+					window_id: shy_window_id
 					width: win.width()
 					height: win.height()
 				}
@@ -198,26 +204,28 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		}
 		.quit {
 			shy_event = QuitEvent{
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: no_window
 			}
 		}
 		.keyup {
 			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.key.windowID)
 			shy_event = KeyEvent{
 				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: shy_window_id
 				state: .up
 				key_code: shy_key_code
 			}
 		}
 		.keydown {
 			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.key.windowID)
 			shy_event = KeyEvent{
 				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: shy_window_id
 				state: .down
 				key_code: unsafe { KeyCode(int(shy_key_code)) }
 			}
@@ -226,15 +234,15 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			// if !is_multi_mice {
 			buttons := map_sdl_button_mask_to_shy_mouse_buttons(sdl_event.motion.state)
 			which := default_mouse_id
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.motion.windowID)
 			// mut mouse := s.api.input.mouse(which) or { panic(err) }
 			// mouse.x = sdl_event.motion.x
 			// mouse.y = sdl_event.motion.y
 			// mouse.set_button_state(event.button, event.state)
 
 			shy_event = MouseMotionEvent{
-				timestamp: s.ticks()
-				window: win // TODO multi-window support
-				// window_id: win.id // TODO multi-window support
+				timestamp: timestamp
+				window_id: shy_window_id
 				which: which // sdl_event.motion.which // TODO use own ID system??
 				buttons: buttons
 				x: sdl_event.motion.x
@@ -249,9 +257,10 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			mut state := ButtonState.down
 			state = if sdl_event.button.state == u8(sdl.pressed) { .down } else { .up }
 			button := map_sdl_button_to_shy_mouse_button(sdl_event.button.button)
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.button.windowID)
 			shy_event = MouseButtonEvent{
-				timestamp: s.ticks()
-				window: win // TODO multi-window support
+				timestamp: timestamp
+				window_id: shy_window_id
 				which: default_mouse_id // sdl_event.button.which // TODO use own ID system??
 				button: button
 				state: state
@@ -270,9 +279,10 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				.flipped
 			}
 			mouse := ip.mouse(default_mouse_id) or { panic(err) }
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.wheel.windowID)
 			shy_event = MouseWheelEvent{
-				timestamp: s.ticks()
-				window: win // TODO multi-window support
+				timestamp: timestamp
+				window_id: shy_window_id
 				which: default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
 				x: mouse.x
 				y: mouse.y
@@ -283,18 +293,21 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			// }
 		}
 		.dropbegin {
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.drop.windowID)
 			shy_event = DropBeginEvent{
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: shy_window_id
 			}
 		}
 		.dropcomplete {
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.drop.windowID)
 			shy_event = DropEndEvent{
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: shy_window_id
 			}
 		}
 		.dropfile {
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.drop.windowID)
 			// See https://wiki.libsdl.org/SDL2/SDL_DropEvent
 			dropped_path := sdl_event.drop.file
 			path := unsafe { cstring_to_vstring(dropped_path) }
@@ -303,12 +316,13 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				unsafe { free(dropped_path) }
 			}
 			shy_event = DropFileEvent{
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: shy_window_id
 				path: path
 			}
 		}
 		.droptext {
+			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.drop.windowID)
 			// According to https://discourse.libsdl.org/t/what-is-sdl-droptext-and-what-does-it-require-to-work/25337
 			// This is an X11/Linux feature only
 			dropped_text := sdl_event.drop.file
@@ -319,8 +333,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				unsafe { free(dropped_text) }
 			}
 			shy_event = DropTextEvent{
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: shy_window_id
 				text: text
 			}
 		}
@@ -329,8 +343,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				eprintln('${@STRUCT}.${@FN} Unknown SDL event ${sdl_event.@type}.')
 			}
 			shy_event = UnkownEvent{
-				timestamp: s.ticks()
-				window: win
+				timestamp: timestamp
+				window_id: no_window
 			}
 		}
 	}
@@ -339,13 +353,11 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 
 // poll_event polls the next event from the OS event queue.
 fn (mut ip Input) poll_event() ?Event {
-	s := ip.shy
 	// TODO set mouse positions in each mouse in input.mice
 	// is_multi_mice := s.api.input.mice.len > 1
-	win := s.active_window()
 	mut shy_event := Event(UnkownEvent{
-		timestamp: s.ticks()
-		window: win
+		timestamp: ip.shy.ticks()
+		window_id: no_window
 	})
 
 	// Poll for SDL event here
@@ -381,7 +393,7 @@ fn (mut ip Input) poll_event() ?Event {
 					}
 					win := s.active_window()
 					return MouseMotionEvent{
-						timestamp: s.ticks()
+						timestamp: timestamp
 						window_id: win.id // TODO multi-window support
 						which: which
 						// buttons: buttons
@@ -409,7 +421,7 @@ fn (mut ip Input) poll_event() ?Event {
 						else{}
 					}
 					return MouseMotionEvent{
-						timestamp: s.ticks()
+						timestamp: timestamp
 						window_id: win.id // TODO multi-window support
 						which: which // sdl_event.motion.which // TODO use own ID system??
 						// buttons: buttons
@@ -428,7 +440,7 @@ fn (mut ip Input) poll_event() ?Event {
 					//button := map_sdl_button_to_shy_mouse_button(sdl_event.button.button)
 					win := s.active_window()
 					return MouseButtonEvent{
-						timestamp: s.ticks()
+						timestamp: timestamp
 						window_id: win.id // TODO
 						which: u16(event.device) // sdl_event.button.which // TODO use own ID system??
 						// button: button
@@ -445,20 +457,20 @@ fn (mut ip Input) poll_event() ?Event {
 						direction = if event.value < 0 { 'right' } else { 'left' }
 					}
 					return UnkownEvent{
-						timestamp: s.ticks()
+						timestamp: timestamp
 					}
 					// println('Mouse #$event.device wheel $wheel $direction')
 				}
 				.disconnect {
 					// println('Mouse #$event.device disconnected')
 					return UnkownEvent{
-						timestamp: s.ticks()
+						timestamp: timestamp
 					}
 				}
 				else {
 					// println('Mouse #$event.device unhandled event type $event.value')
 					return UnkownEvent{
-						timestamp: s.ticks()
+						timestamp: timestamp
 					}
 				}
 			}

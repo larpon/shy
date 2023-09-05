@@ -72,42 +72,42 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 	offset := 3
 	event_type := split[2]
 	timestamp := split[1].u64()
-	window := ip.shy.wm().find_window(split[0].u32()) or {
+	window_id := ip.shy.window(split[0].u32()) or {
 		ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'no window with id ${split[0]}. Error: ${err.msg()}')
 		return empty_event
-	}
+	}.id
 
 	return match event_type {
 		'DropBeginEvent' {
 			DropBeginEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 			}
 		}
 		'DropEndEvent' {
 			DropEndEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 			}
 		}
 		'DropTextEvent' {
 			DropTextEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				text: split[offset]
 			}
 		}
 		'DropFileEvent' {
 			DropFileEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				path: split[offset]
 			}
 		}
 		'KeyEvent' {
 			KeyEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				which: split[offset].u8()
 				state: ButtonState.from_string(split[offset + 1]) or { ButtonState.up }
 				key_code: keycode_from_string(split[offset + 2])
@@ -116,7 +116,7 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 		'MouseButtonEvent' {
 			MouseButtonEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				which: split[offset].u8()
 				button: MouseButton.from_string(split[offset + 3]) or { MouseButton.unknown }
 				state: ButtonState.from_string(split[offset + 4]) or { ButtonState.up }
@@ -128,7 +128,7 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 		'MouseMotionEvent' {
 			MouseMotionEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				which: split[offset].u8()
 				// buttons: MouseButtons.from_string(split[offset+3]) or { MouseButtons.unknown } // TODO
 				x: split[offset + 1].int()
@@ -140,7 +140,7 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 		'MouseWheelEvent' {
 			MouseWheelEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				which: split[offset].u8()
 				x: split[offset + 1].int()
 				y: split[offset + 2].int()
@@ -154,14 +154,14 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 		'QuitEvent' {
 			QuitEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 				request: split[offset].bool()
 			}
 		}
 		'RecordEvent' {
 			RecordEvent{
 				timestamp: timestamp
-				window: window
+				window_id: window_id
 			}
 		}
 		'UnkownEvent' {
@@ -184,23 +184,12 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 
 pub struct ShyEvent {
 pub:
-	timestamp u64     [required]     // Value of Shy.ticks()
-	window    &Window [required] // TODO make this just an u32 or ?u32, no need to carry around the pointer
-}
-
-// str serialize `ShyEvent` into a string.
-// NOTE This is also a workaround for a V cgen bug which
-// is caused by something in miniaudio
-// (window ref carries `shy` itself which carry all state, hence miniaudio is reached):
-// "cgen error: could not generate string method `ma_decoder_read_proc_str` for type `ma_decoder_read_proc`"
-pub fn (se ShyEvent) str() string {
-	window_id := if !isnil(se.window) { se.window.id } else { -1 }
-	return 'ShyEvent{\n\tWindow: ${window_id}\n\ttimestamp: ${se.timestamp}\n}\n'
+	timestamp u64 [required] // Value of Shy.ticks()
+	window_id u32 [required] // The id of the window, 0 = root window, -1 = no window
 }
 
 fn (se ShyEvent) serialize_as_playback_string() string {
-	window_id := if !isnil(se.window) { se.window.id } else { -1 }
-	return '${window_id},${se.timestamp}'
+	return '${se.window_id},${se.timestamp}'
 }
 
 pub struct UnkownEvent {
