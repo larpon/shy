@@ -23,6 +23,11 @@ pub enum EventsState {
 	play
 }
 
+pub struct RecordedEvent {
+	event Event
+	frame u64
+}
+
 pub struct Events {
 	ShyStruct
 pub mut:
@@ -30,9 +35,9 @@ pub mut:
 mut:
 	queue      []Event
 	on_events  []OnEventFn
-	recorded   []Event
-	play_queue []Event
-	play_next  Event
+	recorded   []RecordedEvent
+	play_queue []RecordedEvent
+	play_next  RecordedEvent
 }
 
 pub fn (mut e Events) init() ! {
@@ -66,9 +71,13 @@ pub fn (mut e Events) poll() ?Event {
 			// e.send_record_event() ???
 			// e.shy.reset() or { panic(err)}
 			e.state = .normal
+			// win.state.update_rate = 60
 			win.unstep()
+			win.set_vsync(.on) or { panic(err) }
 		} else {
-			ts := e.play_next.timestamp
+			/*
+			// Time-based play back of events, not accurate but maybe desired?
+			ts := e.play_next.event.timestamp
 			now := e.shy.ticks()
 			if now < ts {
 				ur := win.state.update_rate
@@ -76,22 +85,36 @@ pub fn (mut e Events) poll() ?Event {
 				mut steps := u16(dt / ur)
 				// win.step(1, f32(dt))
 				// win.step(u16(dt/ur), f32(dt))
-				// win.step(1, f32(win.state.update_rate))
+				// win.step(1, win.state.update_rate)
 				// println('now: ${now}, ts: ${ts}, steps: ${steps}')
 				if steps == 0 {
 					steps = 1
 				}
-				win.step(steps, f32(ur))
+				win.step(steps, ur)
 				return none
 			}
 			if now >= ts {
 				if now != ts {
 					e.shy.log.gwarn('${@STRUCT}.${@FN}', 'play back of event at ${now} > ${ts} was not exact (~${now - ts}ms late)')
 				}
-				e.send(e.play_next) or { panic(err) }
+				e.send(e.play_next.event) or { panic(err) }
 				if e.play_queue.len > 0 {
 					e.play_next = e.play_queue.pop()
 				}
+			}
+			*/
+			// Frame based play back
+			target_frame := e.play_next.frame
+			frame := win.state.frame
+			if frame < target_frame {
+				win.step(1, win.state.update_rate)
+				return none
+			} else {
+				e.send(e.play_next.event) or { panic(err) }
+				if e.play_queue.len > 0 {
+					e.play_next = e.play_queue.pop()
+				}
+				win.step(1, win.state.update_rate)
 			}
 		}
 	} else if event := input.poll_event() {
@@ -127,8 +150,11 @@ pub fn (mut e Events) record() {
 pub fn (mut e Events) play_back() {
 	e.shy.reset() or { panic(err) }
 	e.send_record_event() // TODO add record event type to event like: .record_begin, .record_end, .play_back_begin, .play_back_end
+	mut win := e.shy.wm().active_window()
+	win.set_vsync(.off) or { panic(err) }
+	// win.state.update_rate = 10
 	e.play_queue = e.recorded.reverse()
-	e.play_queue.drop(1) // delete the event that triggered this ??
+	e.play_queue.drop(1) // TODO delete the event that triggered this - problem is; this is currently not always triggered by an event
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', 'starting play back of ${e.play_queue.len} events')
 	e.state = .play
 	e.play_next = e.play_queue.pop()
@@ -163,7 +189,10 @@ pub fn (mut e Events) send(ev Event) ! {
 	}
 	analyse.max('${@MOD}.${@STRUCT}.queue.len', e.queue.len + 1)
 	if e.state == .record {
-		e.recorded << ev
+		e.recorded << RecordedEvent{
+			event: ev
+			frame: ev.window.state.frame
+		}
 	}
 	if e.queue.len < e.queue.cap {
 		analyse.count('${@MOD}.${@STRUCT}.queue <<', 1)
@@ -174,7 +203,7 @@ pub fn (mut e Events) send(ev Event) ! {
 }
 
 // recorded returns a copy of the recording queue
-pub fn (e Events) recorded() []Event {
+pub fn (e Events) recorded() []RecordedEvent {
 	return e.recorded.clone()
 }
 
