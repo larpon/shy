@@ -167,6 +167,13 @@ pub fn (mut s Shy) quit() {
 	s.api.events.send_quit_event(true)
 }
 
+// window returns the `Window` instance with `id == window_id`
+[inline]
+pub fn (s Shy) window(window_id u32) ?&Window {
+	assert !isnil(s.api.wm), '${@STRUCT}.${@FN}: ${@STRUCT}.api.wm is null'
+	return s.api.wm.find_window(window_id)
+}
+
 [inline]
 pub fn (s Shy) user_data() ?voidptr {
 	if !isnil(s.custom_data) {
@@ -185,9 +192,9 @@ pub fn (s Shy) assert_api_init() {
 	$if test {
 		return
 	}
-	assert !s.running, 'Shy.running is true'
-	assert !s.state.in_hot_code, 'Shy is in a hot code path'
-	assert !s.shutdown, 'Shy is shutting down'
+	assert !s.running, '${@STRUCT}.running is true'
+	assert !s.state.in_hot_code, '${@STRUCT} is in a hot code path'
+	assert !s.shutdown, '${@STRUCT} is shutting down'
 }
 
 [if !prod]
