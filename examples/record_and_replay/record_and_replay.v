@@ -59,7 +59,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.fa_x.target = mouse.x
 	a.fa_y.target = mouse.y
 
-	a.text = 'Press "R" key to start recording
+	a.text = 'Press "R" key to start recording events
 Press "P" to playback the recorded events
 rect.x ${a.fa_x.value}
 rect.y ${a.fa_y.value}'
