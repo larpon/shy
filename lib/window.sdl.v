@@ -260,10 +260,14 @@ pub mut:
 	frame_accumulator i64
 }
 
+pub fn (mut fs FrameState) reset() {
+	fs.frame = 0
+}
+
 struct Stepper {
 mut:
 	step u16
-	rate f32 = 60.0
+	rate f64 = 60.0
 }
 
 pub fn (mut s Stepper) reset() {
@@ -271,7 +275,7 @@ pub fn (mut s Stepper) reset() {
 	s.rate = 60.0
 }
 
-pub fn (mut w Window) step(frames u16, rate f32) {
+pub fn (mut w Window) step(frames u16, rate f64) {
 	w.mode = .step
 	w.stepper.step = frames
 	w.stepper.rate = rate
@@ -326,7 +330,7 @@ fn (mut w Window) record_frame() {
 			eprintln('>>> ${@FN} screenshot at frame ${frame} "${screenshot_file_path}"')
 		}
 		w.screenshot(screenshot_file_path) or { panic(err) }
-		w.step(1, f32(w.state.update_rate))
+		w.step(1, w.state.update_rate)
 	} else {
 		mut next_frame := frame
 		for f in rc.frames {
@@ -340,7 +344,7 @@ fn (mut w Window) record_frame() {
 		if step_frames <= 0 {
 			step_frames = 1
 		}
-		w.step(step_frames, f32(w.state.update_rate))
+		w.step(step_frames, w.state.update_rate)
 	}
 	if frame == rc.exit_on_frame {
 		$if shy_record_trace ? {
@@ -525,7 +529,7 @@ pub fn (mut w Window) render_init() {
 	w.state.frame_accumulator = 0
 
 	$if shy_record ? {
-		w.step(1, f32(w.state.update_rate))
+		w.step(1, w.state.update_rate)
 	}
 }
 
@@ -825,28 +829,8 @@ pub fn (mut w Window) init() ! {
 	// $if opengl ? {
 	$if !shy_no_vsync ? {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'vsync=${w.config.render.vsync}')
-		match w.config.render.vsync {
-			.off {
-				if sdl.gl_set_swap_interval(0) < 0 {
-					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-					return error('Could not set OpenGL swap interval (vsync .off):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
-				}
-			}
-			.on {
-				if sdl.gl_set_swap_interval(1) < 0 {
-					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-					return error('Could not set OpenGL swap interval (vsync .on):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
-				}
-			}
-			.adaptive {
-				if sdl.gl_set_swap_interval(-1) < 0 {
-					sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-					s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-					return error('Could not set OpenGL swap interval (vsync .adaptive):\n${sdl_error_msg}\nuse: -d shy_no_vsync to disable setting the swap interval')
-				}
-			}
+		w.set_vsync(w.config.render.vsync) or {
+			return error('${err}\nuse: -d shy_no_vsync to disable setting the swap interval on start up.')
 		}
 	}
 	// }
@@ -895,6 +879,7 @@ pub fn (mut w Window) reset() ! {
 	for mut window in w.children {
 		window.reset()!
 	}
+	w.state.reset()
 	w.stepper.reset()
 	w.anims.reset()!
 	w.timers.reset()!
@@ -923,6 +908,33 @@ pub fn (mut w Window) shutdown() ! {
 	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)
+}
+
+pub fn (mut w Window) set_vsync(vsync VSync) ! {
+	w.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	match vsync {
+		.off {
+			if sdl.gl_set_swap_interval(0) < 0 {
+				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+				w.shy.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+				return error('Could not set OpenGL swap interval (vsync .off). SDL error: ${sdl_error_msg}')
+			}
+		}
+		.on {
+			if sdl.gl_set_swap_interval(1) < 0 {
+				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+				w.shy.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+				return error('Could not set OpenGL swap interval (vsync .on). SDL error: ${sdl_error_msg}')
+			}
+		}
+		.adaptive {
+			if sdl.gl_set_swap_interval(-1) < 0 {
+				sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+				w.shy.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+				return error('Could not set OpenGL swap interval (vsync .adaptive). SDL error: ${sdl_error_msg}')
+			}
+		}
+	}
 }
 
 pub fn (mut w Window) toggle_fullscreen() {
