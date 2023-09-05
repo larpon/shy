@@ -3,8 +3,20 @@
 // that can be found in the LICENSE file.
 module lib
 
+const no_window = u32(0)
+
 pub struct Boot {
 	ShyStruct
+}
+
+pub fn (b Boot) init() !&WM {
+	b.shy.assert_api_init()
+	s := b.shy
+	s.log.gdebug('${@STRUCT}.${@FN}', '')
+	wm := &WM{
+		shy: s
+	}
+	return wm
 }
 
 pub struct WM {
@@ -16,5 +28,8 @@ mut:
 }
 
 fn (wm &WM) find_window(wid u32) ?&Window {
+	if !isnil(wm.root) && wm.root.id == wid {
+		return wm.root
+	}
 	return wm.root.find_window(wid)
 }
