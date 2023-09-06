@@ -41,7 +41,7 @@ pub fn (mut a Assets) shutdown() ! {
 pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	source := alo.source
-	if asset := a.ass[source.str()] {
+	if asset := a.ass[source.cache_key()] {
 		return asset
 	}
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
@@ -76,6 +76,15 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 			analyse.count('${@MOD}.${@STRUCT}.${@FN}(embedded)', 1)
 			bytes = source.to_bytes()
 		}
+		TaggedSource {
+			if !os.is_file(source.str()) {
+				return error('${@STRUCT}.${@FN}: "${source.str()}" does not exist on the file system')
+			}
+			analyse.count('${@MOD}.${@STRUCT}.${@FN}(filesystem)', 1)
+			bytes = os.read_bytes(source.str()) or {
+				return error('${@STRUCT}.${@FN}: "${source.str()}" could not be loaded')
+			}
+		}
 	}
 	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@bytes', u64(bytes.len))
 	// TODO preallocated asset pool??
@@ -97,12 +106,12 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 		ass := asset // as Image
 		assert !isnil(ass.asset)
 		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
-		a.image_cache[ass.asset.lo.source.str()] = asset
+		a.image_cache[ass.asset.lo.source.cache_key()] = asset
 	} $else $if T is Sound {
 		ass := asset //as Image
 		assert !isnil(ass.asset)
 		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
-		a.sound_cache[ass.asset.lo.source.str()] = asset
+		a.sound_cache[ass.asset.lo.source.cache_key()] = asset
 	} $else $if T is &Asset {
 		ass := asset //as &Asset
 		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
@@ -116,15 +125,15 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
 	$if T is Image {
-		if image := a.image_cache[source.str()] {
+		if image := a.image_cache[source.cache_key()] {
 			return image
 		}
 	} $else $if T is Sound {
-		if sound := a.sound_cache[source.str()] {
+		if sound := a.sound_cache[source.cache_key()] {
 			return sound
 		}
 	} $else $if T is &Asset {
-		return a.ass[source.str()]
+		return a.ass[source.cache_key()]
 	} $else {
 		// t := T{}
 		// tof := typeof(t).name
@@ -145,7 +154,40 @@ pub enum AssetStatus {
 	freed
 }
 
-pub type AssetSource = embed_file.EmbedFileData | string
+pub struct TaggedSource {
+	source AssetSource
+	tag    string
+}
+
+pub fn (ts TaggedSource) str() string {
+	return match ts.source {
+		string {
+			ts.source
+		}
+		embed_file.EmbedFileData {
+			ts.source.path
+		}
+		TaggedSource {
+			panic('${@STRUCT} does not support recursive tagged sources')
+		}
+	}
+}
+
+pub type AssetSource = TaggedSource | embed_file.EmbedFileData | string
+
+pub fn (a AssetSource) cache_key() string {
+	return match a {
+		string {
+			a
+		}
+		embed_file.EmbedFileData {
+			a.path
+		}
+		TaggedSource {
+			a.source.str() + '#' + a.tag
+		}
+	}
+}
 
 pub fn (a AssetSource) str() string {
 	return match a {
@@ -154,6 +196,9 @@ pub fn (a AssetSource) str() string {
 		}
 		embed_file.EmbedFileData {
 			a.path
+		}
+		TaggedSource {
+			a.source.str()
 		}
 	}
 }
@@ -215,9 +260,11 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 	return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.source}" to ${typeof(t).name}')
 }
 
+// to_image converts the asset data into an Image
 fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
+
 	if opt.cache {
 		if image := a.shy.assets().get[Image](a.lo.source) {
 			return image
@@ -300,7 +347,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		unsafe {
 			mut assets := a.shy.assets()
 			// assets.cache[Image](image)! // TODO
-			assets.image_cache[a.lo.source.str()] = image
+			assets.image_cache[a.lo.source.cache_key()] = image
 		}
 	}
 	return image
@@ -333,7 +380,7 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	if opt.cache {
 		unsafe {
 			mut assets := a.shy.assets()
-			assets.sound_cache[a.lo.source.str()] = sound
+			assets.sound_cache[a.lo.source.cache_key()] = sound
 			// assets.cache[Sound](sound)!
 		}
 	}

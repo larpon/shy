@@ -121,6 +121,9 @@ pub fn (mut ae AudioEngine) load(source AssetSource) !u16 {
 				return error('${@STRUCT}.${@FN}: failed loading "${source}": ${err}')
 			}
 		}
+		TaggedSource {
+			ae.load_file(source.source.str())!
+		}
 	}
 	ae.sound_id++
 	ae.sounds[ae.sound_id] = s
@@ -165,6 +168,9 @@ pub fn (mut ae AudioEngine) load_copies(source AssetSource, copies u8) !(u16, u1
 			ae.load_bytes(source.to_bytes()) or {
 				return error('${@STRUCT}.${@FN}: failed loading "${source}": ${err}')
 			}
+		}
+		TaggedSource {
+			ae.load_file(source.source.str())!
 		}
 	}
 	ae.sound_id++

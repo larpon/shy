@@ -79,7 +79,7 @@ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
 	// 		unsafe {
 	// 			mut assets := a.shy.assets()
 	// 			// assets.cache[Image](image)! // TODO
-	// 			assets.image_cache[a.lo.source.str()] = image
+	// 			assets.image_cache[a.lo.source.cache_key()] = image
 	// 		}
 	// 	}
 	return surf
