@@ -154,12 +154,12 @@ struct ExampleApp {
 	EasyApp
 }
 
-// asset unifies locating project assets
+// asset unifies locating example project assets
 pub fn (ea ExampleApp) asset(path string) string {
 	$if wasm32_emscripten {
 		return path
 	}
-	return os.resource_abs_path(os.join_path('..', '..', 'assets', path))
+	return os.join_path(@VMODROOT, 'assets', path)
 }
 
 /*
@@ -246,10 +246,21 @@ struct TestApp {
 	EasyApp
 }
 
-// asset unifies locating project assets
+// asset unifies locating project assets for visually tested apps
 pub fn (ta TestApp) asset(path string) string {
 	$if wasm32_emscripten {
 		return path
 	}
-	return os.resource_abs_path(os.join_path('..', '..', 'assets', path))
+
+	mut test_asset_path := os.join_path(@VMODROOT,'tests','visual','assets',path)
+	if !os.exists(test_asset_path) {
+		test_asset_path = os.join_path(@VMODROOT, 'assets', path)
+	}
+	if !os.exists(test_asset_path) {
+		test_asset_path = os.resource_abs_path(os.join_path('..', '..', 'tests','visual', 'assets', path))
+	}
+	if !os.exists(test_asset_path) {
+		test_asset_path = os.resource_abs_path(os.join_path('..', '..', 'assets', path))
+	}
+	return test_asset_path
 }
