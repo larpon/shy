@@ -291,11 +291,11 @@ pub fn (mut w Window) render_init() {
 	time_60hz := i64(performance_frequency / 60) // since this is about snapping to common vsync values
 	// time_60hz := i64(performance_frequency / update_rate)
 	w.state.snap_frequencies = [
-		time_60hz, /* 60fps */
-		time_60hz * 2, /* 30fps */
-		time_60hz * 3, /* 20fps */
-		time_60hz * 4, /* 15fps */
-		(time_60hz + 1) / 2, /* 120fps */
+		time_60hz, // 60fps
+		time_60hz * 2, // 30fps
+		time_60hz * 3, // 20fps
+		time_60hz * 4, // 15fps
+		(time_60hz + 1) / 2, // 120fps
 		/*
 		//120hz, 240hz, or higher need to round up, so that adding 120hz twice guaranteed is at least the same as adding time_60hz once
 		// (time_60hz+2)/3,  //180fps //that's where the +1 and +2 come from in those equations
