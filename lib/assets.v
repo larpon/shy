@@ -223,8 +223,8 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 			return image
 		}
 	}
-	assert a.status == .loaded, 'Asset is not loaded'
-	assert a.data.len > 0, 'Asset.data appears empty'
+	assert a.status == .loaded, '${@STRUCT}.${@FN} Asset is not loaded'
+	assert a.data.len > 0, '${@STRUCT}.${@FN} Asset.data appears empty'
 
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.source}" to image')
 	mut stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
