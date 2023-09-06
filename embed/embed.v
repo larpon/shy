@@ -149,17 +149,29 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 	}
 }
 
+[params]
+pub struct AssetLoadOption {
+	tag ?string
+}
+
 // Example app skeleton for all the examples
 struct ExampleApp {
 	EasyApp
 }
 
 // asset unifies locating example project assets
-pub fn (ea ExampleApp) asset(path string) string {
+pub fn (ea ExampleApp) asset(path string, option AssetLoadOption) shy.AssetSource {
 	$if wasm32_emscripten {
 		return path
 	}
-	return os.join_path(@VMODROOT, 'assets', path)
+	source := os.join_path(@VMODROOT, 'assets', path)
+	if tag := option.tag {
+		return shy.TaggedSource{
+			source: source
+			tag: tag
+		}
+	}
+	return source
 }
 
 /*
@@ -247,20 +259,24 @@ struct TestApp {
 }
 
 // asset unifies locating project assets for visually tested apps
-pub fn (ta TestApp) asset(path string) string {
+pub fn (ta TestApp) asset(path string, option AssetLoadOption) shy.AssetSource {
 	$if wasm32_emscripten {
 		return path
 	}
 
-	mut test_asset_path := os.join_path(@VMODROOT,'tests','visual','assets',path)
+	mut test_asset_path := os.join_path(@VMODROOT, 'tests', 'visual', 'assets', path)
 	if !os.exists(test_asset_path) {
 		test_asset_path = os.join_path(@VMODROOT, 'assets', path)
 	}
 	if !os.exists(test_asset_path) {
-		test_asset_path = os.resource_abs_path(os.join_path('..', '..', 'tests','visual', 'assets', path))
+		test_asset_path = os.resource_abs_path(os.join_path('..', '..', 'tests', 'visual',
+			'assets', path))
 	}
 	if !os.exists(test_asset_path) {
 		test_asset_path = os.resource_abs_path(os.join_path('..', '..', 'assets', path))
 	}
-	return test_asset_path
+	return shy.TaggedSource{
+		source: test_asset_path
+		tag: option.tag or { '' }
+	}
 }
