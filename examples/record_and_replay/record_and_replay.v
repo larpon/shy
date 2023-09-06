@@ -7,6 +7,8 @@ import shy.lib as shy
 import shy.embed
 import time
 
+const init_text_part = 'Recording events...\n'
+
 fn main() {
 	mut app := &App{}
 	shy.run[App](mut app)!
@@ -26,6 +28,11 @@ mut:
 [markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
+
+	mut events := a.shy.events()
+	events.record()
+
+	a.text = '${init_text_part}Press "P" to playback recorded events'
 
 	a.fa_x = a.shy.new_follow_animator[f32]()
 	a.fa_y = a.shy.new_follow_animator[f32]()
@@ -59,8 +66,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.fa_x.target = mouse.x
 	a.fa_y.target = mouse.y
 
-	a.text = 'Press "R" key to start recording events
-Press "P" to playback the recorded events
+	text := a.text + '
 rect.x ${a.fa_x.value}
 rect.y ${a.fa_y.value}'
 
@@ -75,7 +81,7 @@ rect.y ${a.fa_y.value}'
 		x: a.canvas().width * 0.01
 		y: a.canvas().height * 0.01
 		origin: .top_left
-		text: a.text
+		text: text
 	)
 }
 
@@ -89,9 +95,15 @@ pub fn (mut a App) event(e shy.Event) {
 				match e.key_code {
 					.r {
 						mut events := a.shy.events()
-						events.record()
+						if events.state == .normal {
+							events.record()
+						}
 					}
 					.p {
+						if !a.text.contains('"R"') {
+							a.text = 'Press "R" to record events\n' +
+								a.text.replace(init_text_part, '')
+						}
 						mut events := a.shy.events()
 						events.play_back()
 					}
