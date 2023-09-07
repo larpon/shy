@@ -17,6 +17,10 @@ const images = {
 	'256x512': 'shy_256x512.png'
 	'128x64':  'shy_128x64.png'
 	'64x128':  'shy_64x128.png'
+	'512x512': 'shy_512x512.png'
+	'256x256': 'shy_256x256.png'
+	'128x128': 'shy_128x128.png'
+	'64x64':   'shy_64x64.png'
 }
 
 fn main() {
