@@ -118,22 +118,22 @@ pub fn (i Draw2DImage) draw() {
 
 			i_x, i_y := i.origin.pos_wh(w, h)
 			x1x, y1y := i.origin.pos_wh(x1, y1)
+			// TODO(lmp) this offset circus should be able to use *less* branching
 			o_off_x += i_x - x1x
 			o_off_y += i_y - y1y
-			if i.origin in [.top_left, .top_center, .top_right] {
+			if i.origin in [.top_left, .top_center, .top_right, .bottom_left, .bottom_center,
+				.bottom_right] {
 				if image.width > image.height {
-					o_off_x -= (i_x - x1x)
-					o_off_x -= w * 0.5
-				} else {
-					o_off_y += h - y1 * 0.75
-				}
-			} else if i.origin in [.bottom_left, .bottom_center, .bottom_right] {
-				if image.width > image.height {
-					o_off_x -= (i_x - x1x)
+					o_off_x -= i_x - x1x
 					o_off_x -= w * 0.5
 				} else {
 					o_off_y -= i_y - y1y
 					o_off_y -= h * 0.5
+				}
+			} else if i.origin in [.center_left, .center_right] {
+				if image.width > image.height {
+					o_off_x -= i_x - x1x
+					o_off_x -= w * 0.5
 				}
 			}
 
