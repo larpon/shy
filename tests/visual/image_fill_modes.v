@@ -153,6 +153,16 @@ pub fn (mut a App) live_frame(dt f64) {
 		}
 	)
 
+	a.quick.rect(
+		x: cx
+		y: cy
+		width: 3
+		height: 3
+		origin: .center
+		fills: .body
+		color: shy.colors.blue
+	)
+
 	a.quick.text(
 		// x:
 		y: a.canvas().height
