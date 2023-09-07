@@ -113,8 +113,6 @@ pub fn (i Draw2DImage) draw() {
 		}
 		.aspect_crop {
 			ratio := mth.max(f32(h) / (image.height), f32(w) / (image.width))
-			// u1 = utils.remap[f32](i.width, 0, image.width, 0, 1)i
-			// v1 = utils.remap[f32](i.height, 0, image.height, 0, 1)
 			x1 = image.width * ratio
 			y1 = image.height * ratio
 
@@ -122,6 +120,22 @@ pub fn (i Draw2DImage) draw() {
 			x1x, y1y := i.origin.pos_wh(x1, y1)
 			o_off_x += i_x - x1x
 			o_off_y += i_y - y1y
+			if i.origin in [.top_left, .top_center, .top_right] {
+				if image.width > image.height {
+					o_off_x -= (i_x - x1x)
+					o_off_x -= w * 0.5
+				} else {
+					o_off_y += h - y1 * 0.75
+				}
+			} else if i.origin in [.bottom_left, .bottom_center, .bottom_right] {
+				if image.width > image.height {
+					o_off_x -= (i_x - x1x)
+					o_off_x -= w * 0.5
+				} else {
+					o_off_y -= i_y - y1y
+					o_off_y -= h * 0.5
+				}
+			}
 
 			scissor_rect = i.draw.scissor_rect
 			mut scissor := Rect{
