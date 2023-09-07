@@ -126,7 +126,7 @@ pub fn (i Draw2DImage) draw() {
 				if image.width > image.height {
 					o_off_x -= i_x - x1x
 					o_off_x -= w * 0.5
-				} else {
+				} else if image.width < image.height {
 					o_off_y -= i_y - y1y
 					o_off_y -= h * 0.5
 				}
