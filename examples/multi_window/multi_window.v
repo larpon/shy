@@ -28,7 +28,7 @@ pub fn (mut a App) frame(dt f64) {
 	mouse := a.mouse
 
 	mut color := shy.rgb(255, 0, 0)
-	if win.id == 0 {
+	if win.id == 1 {
 		color = shy.colors.shy.blue
 	}
 	a.quick.rect(
