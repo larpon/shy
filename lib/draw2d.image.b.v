@@ -263,15 +263,22 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	w := i.image.width
 	h := i.image.height
 
+	used_dst := Rect{
+		x: dst.x * i.factor
+		y: dst.y * i.factor
+		width: dst.width * i.factor
+		height: dst.height * i.factor
+	}
+
 	mut u0 := f32(0.0)
 	mut v0 := f32(0.0)
 	mut u1 := f32(1.0)
 	mut v1 := f32(1.0)
 
-	u0 = utils.remap(dst.x, 0, w, 0, 1)
-	v0 = utils.remap(dst.y, 0, h, 0, 1)
-	u1 = utils.remap(dst.x + dst.width, 0, w, 0, 1)
-	v1 = utils.remap(dst.y + dst.height, 0, h, 0, 1)
+	u0 = utils.remap(used_dst.x, 0, w, 0, 1)
+	v0 = utils.remap(used_dst.y, 0, h, 0, 1)
+	u1 = utils.remap(used_dst.x + used_dst.width, 0, w, 0, 1)
+	v1 = utils.remap(used_dst.y + used_dst.height, 0, h, 0, 1)
 	// eprintln('dst: ${dst.x},${dst.y},${dst.width},${dst.height} u0: $u0, v0: $v0, u1: $u1, v1: $v1')
 
 	mut x0 := f32(src.x) //- 0.5
@@ -304,8 +311,8 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 
 	// eprintln('image: ${w}x${h}\nsrc: ${src} dst: ${dst}')
 	// TODO division by zero can probably happen here...
-	dw := mth.min(dst.width, w) / mth.max(dst.width, w)
-	dh := mth.min(dst.height, h) / mth.max(dst.height, h)
+	dw := mth.min(used_dst.width, w) / mth.max(used_dst.width, w)
+	dh := mth.min(used_dst.height, h) / mth.max(used_dst.height, h)
 	if dw != 1 || dh != 1 {
 		gl.translate(-o_off_x, -o_off_y, 0)
 		gl.scale(dw, dh, 1)
