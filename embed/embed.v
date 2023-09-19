@@ -111,6 +111,9 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 		shy.QuitEvent {
 			a.shy.shutdown = true
 		}
+		shy.WindowCloseEvent {
+			a.shy.shutdown = true
+		}
 		shy.KeyEvent {
 			if e.state == .up {
 				return

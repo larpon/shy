@@ -221,6 +221,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
+						target: .keyboard
 						kind: .gained
 					}
 				}
@@ -228,7 +229,50 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
+						target: .keyboard
 						kind: .lost
+					}
+				}
+				.enter {
+					shy_event = WindowFocusEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						target: .mouse
+						kind: .gained
+					}
+				}
+				.leave {
+					shy_event = WindowFocusEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						target: .mouse
+						kind: .lost
+					}
+				}
+				.take_focus {
+					shy_event = WindowFocusEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						target: .keyboard
+						kind: .offered
+					}
+				}
+				.minimized {
+					shy_event = WindowMinimizedEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+					}
+				}
+				.maximized {
+					shy_event = WindowMaximizedEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+					}
+				}
+				.close {
+					shy_event = WindowCloseEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
 					}
 				}
 				else {
