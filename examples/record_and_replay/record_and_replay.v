@@ -78,8 +78,8 @@ rect.y ${a.fa_y.value}'
 	)
 
 	a.quick.text(
-		x: a.canvas().width * 0.01
-		y: a.canvas().height * 0.01
+		x: a.window.width * 0.01
+		y: a.window.height * 0.01
 		origin: .top_left
 		text: text
 	)

@@ -37,7 +37,7 @@ mut:
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
-	size := a.canvas().size()
+	size := a.window.size()
 
 	a.once_text = a.easy.new_text(
 		x: shy.half * size.width
@@ -68,7 +68,7 @@ pub fn (mut a App) init() ! {
 
 [markused]
 pub fn (mut a App) frame(dt f64) {
-	size := a.canvas().size()
+	size := a.window.size()
 	a.info_text.x = shy.half * size.width
 	a.once_text.x = shy.half * size.width
 	a.once_text.y = shy.half * size.height

@@ -20,8 +20,8 @@ struct App {
 pub fn (mut a App) frame(dt f64) {
 	// Draws a circle at the center of the window
 	a.quick.circle(
-		x: shy.half * a.canvas().width
-		y: shy.half * a.canvas().height
+		x: shy.half * a.window.width
+		y: shy.half * a.window.height
 		radius: 100
 		stroke: shy.Stroke{
 			width: 10

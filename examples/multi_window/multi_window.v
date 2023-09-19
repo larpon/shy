@@ -24,7 +24,7 @@ pub fn (mut a App) init() ! {
 [markused]
 pub fn (mut a App) frame(dt f64) {
 	mut win := a.shy.active_window()
-	win_size := win.canvas().size()
+	win_size := win.size()
 	mouse := a.mouse
 
 	mut color := shy.rgb(255, 0, 0)
