@@ -7,6 +7,6 @@ const vexe = os.real_path(os.getenv_opt('VEXE') or { @VEXE })
 
 const examples_dir = os.join_path(@VMODROOT, 'examples')
 
-fn test_all_examples_compiles() {
+fn test_all_examples_compile() {
 	os.execute_or_panic('${vexe} should-compile-all -c "${examples_dir}"')
 }
