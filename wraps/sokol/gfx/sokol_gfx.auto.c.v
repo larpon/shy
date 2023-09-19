@@ -114,83 +114,83 @@ pub type Color = C.sg_color
 
 // Backend is C.sg_backend
 pub enum Backend {
-	glcore33 = C.SG_BACKEND_GLCORE33
-	gles3 = C.SG_BACKEND_GLES3
-	d3d11 = C.SG_BACKEND_D3D11
-	metal_ios = C.SG_BACKEND_METAL_IOS
-	metal_macos = C.SG_BACKEND_METAL_MACOS
+	glcore33        = C.SG_BACKEND_GLCORE33
+	gles3           = C.SG_BACKEND_GLES3
+	d3d11           = C.SG_BACKEND_D3D11
+	metal_ios       = C.SG_BACKEND_METAL_IOS
+	metal_macos     = C.SG_BACKEND_METAL_MACOS
 	metal_simulator = C.SG_BACKEND_METAL_SIMULATOR
-	wgpu = C.SG_BACKEND_WGPU
-	dummy = C.SG_BACKEND_DUMMY
+	wgpu            = C.SG_BACKEND_WGPU
+	dummy           = C.SG_BACKEND_DUMMY
 }
 
 // PixelFormat is C.sg_pixel_format
 pub enum PixelFormat {
-	default = C._SG_PIXELFORMAT_DEFAULT // value 0 reserved for default-init
-	@none = C.SG_PIXELFORMAT_NONE
-	r8 = C.SG_PIXELFORMAT_R8
-	r8sn = C.SG_PIXELFORMAT_R8SN
-	r8ui = C.SG_PIXELFORMAT_R8UI
-	r8si = C.SG_PIXELFORMAT_R8SI
-	r16 = C.SG_PIXELFORMAT_R16
-	r16sn = C.SG_PIXELFORMAT_R16SN
-	r16ui = C.SG_PIXELFORMAT_R16UI
-	r16si = C.SG_PIXELFORMAT_R16SI
-	r16f = C.SG_PIXELFORMAT_R16F
-	rg8 = C.SG_PIXELFORMAT_RG8
-	rg8sn = C.SG_PIXELFORMAT_RG8SN
-	rg8ui = C.SG_PIXELFORMAT_RG8UI
-	rg8si = C.SG_PIXELFORMAT_RG8SI
-	r32ui = C.SG_PIXELFORMAT_R32UI
-	r32si = C.SG_PIXELFORMAT_R32SI
-	r32f = C.SG_PIXELFORMAT_R32F
-	rg16 = C.SG_PIXELFORMAT_RG16
-	rg16sn = C.SG_PIXELFORMAT_RG16SN
-	rg16ui = C.SG_PIXELFORMAT_RG16UI
-	rg16si = C.SG_PIXELFORMAT_RG16SI
-	rg16f = C.SG_PIXELFORMAT_RG16F
-	rgba8 = C.SG_PIXELFORMAT_RGBA8
-	srgb8a8 = C.SG_PIXELFORMAT_SRGB8A8
-	rgba8sn = C.SG_PIXELFORMAT_RGBA8SN
-	rgba8ui = C.SG_PIXELFORMAT_RGBA8UI
-	rgba8si = C.SG_PIXELFORMAT_RGBA8SI
-	bgra8 = C.SG_PIXELFORMAT_BGRA8
-	rgb10a2 = C.SG_PIXELFORMAT_RGB10A2
-	rg11b10f = C.SG_PIXELFORMAT_RG11B10F
-	rg32ui = C.SG_PIXELFORMAT_RG32UI
-	rg32si = C.SG_PIXELFORMAT_RG32SI
-	rg32f = C.SG_PIXELFORMAT_RG32F
-	rgba16 = C.SG_PIXELFORMAT_RGBA16
-	rgba16sn = C.SG_PIXELFORMAT_RGBA16SN
-	rgba16ui = C.SG_PIXELFORMAT_RGBA16UI
-	rgba16si = C.SG_PIXELFORMAT_RGBA16SI
-	rgba16f = C.SG_PIXELFORMAT_RGBA16F
-	rgba32ui = C.SG_PIXELFORMAT_RGBA32UI
-	rgba32si = C.SG_PIXELFORMAT_RGBA32SI
-	rgba32f = C.SG_PIXELFORMAT_RGBA32F
-	depth = C.SG_PIXELFORMAT_DEPTH
-	depth_stencil = C.SG_PIXELFORMAT_DEPTH_STENCIL
-	bc1_rgba = C.SG_PIXELFORMAT_BC1_RGBA
-	bc2_rgba = C.SG_PIXELFORMAT_BC2_RGBA
-	bc3_rgba = C.SG_PIXELFORMAT_BC3_RGBA
-	bc4_r = C.SG_PIXELFORMAT_BC4_R
-	bc4_rsn = C.SG_PIXELFORMAT_BC4_RSN
-	bc5_rg = C.SG_PIXELFORMAT_BC5_RG
-	bc5_rgsn = C.SG_PIXELFORMAT_BC5_RGSN
-	bc6h_rgbf = C.SG_PIXELFORMAT_BC6H_RGBF
-	bc6h_rgbuf = C.SG_PIXELFORMAT_BC6H_RGBUF
-	bc7_rgba = C.SG_PIXELFORMAT_BC7_RGBA
-	pvrtc_rgb_2bpp = C.SG_PIXELFORMAT_PVRTC_RGB_2BPP
-	pvrtc_rgb_4bpp = C.SG_PIXELFORMAT_PVRTC_RGB_4BPP
+	default         = C._SG_PIXELFORMAT_DEFAULT // value 0 reserved for default-init
+	@none           = C.SG_PIXELFORMAT_NONE
+	r8              = C.SG_PIXELFORMAT_R8
+	r8sn            = C.SG_PIXELFORMAT_R8SN
+	r8ui            = C.SG_PIXELFORMAT_R8UI
+	r8si            = C.SG_PIXELFORMAT_R8SI
+	r16             = C.SG_PIXELFORMAT_R16
+	r16sn           = C.SG_PIXELFORMAT_R16SN
+	r16ui           = C.SG_PIXELFORMAT_R16UI
+	r16si           = C.SG_PIXELFORMAT_R16SI
+	r16f            = C.SG_PIXELFORMAT_R16F
+	rg8             = C.SG_PIXELFORMAT_RG8
+	rg8sn           = C.SG_PIXELFORMAT_RG8SN
+	rg8ui           = C.SG_PIXELFORMAT_RG8UI
+	rg8si           = C.SG_PIXELFORMAT_RG8SI
+	r32ui           = C.SG_PIXELFORMAT_R32UI
+	r32si           = C.SG_PIXELFORMAT_R32SI
+	r32f            = C.SG_PIXELFORMAT_R32F
+	rg16            = C.SG_PIXELFORMAT_RG16
+	rg16sn          = C.SG_PIXELFORMAT_RG16SN
+	rg16ui          = C.SG_PIXELFORMAT_RG16UI
+	rg16si          = C.SG_PIXELFORMAT_RG16SI
+	rg16f           = C.SG_PIXELFORMAT_RG16F
+	rgba8           = C.SG_PIXELFORMAT_RGBA8
+	srgb8a8         = C.SG_PIXELFORMAT_SRGB8A8
+	rgba8sn         = C.SG_PIXELFORMAT_RGBA8SN
+	rgba8ui         = C.SG_PIXELFORMAT_RGBA8UI
+	rgba8si         = C.SG_PIXELFORMAT_RGBA8SI
+	bgra8           = C.SG_PIXELFORMAT_BGRA8
+	rgb10a2         = C.SG_PIXELFORMAT_RGB10A2
+	rg11b10f        = C.SG_PIXELFORMAT_RG11B10F
+	rg32ui          = C.SG_PIXELFORMAT_RG32UI
+	rg32si          = C.SG_PIXELFORMAT_RG32SI
+	rg32f           = C.SG_PIXELFORMAT_RG32F
+	rgba16          = C.SG_PIXELFORMAT_RGBA16
+	rgba16sn        = C.SG_PIXELFORMAT_RGBA16SN
+	rgba16ui        = C.SG_PIXELFORMAT_RGBA16UI
+	rgba16si        = C.SG_PIXELFORMAT_RGBA16SI
+	rgba16f         = C.SG_PIXELFORMAT_RGBA16F
+	rgba32ui        = C.SG_PIXELFORMAT_RGBA32UI
+	rgba32si        = C.SG_PIXELFORMAT_RGBA32SI
+	rgba32f         = C.SG_PIXELFORMAT_RGBA32F
+	depth           = C.SG_PIXELFORMAT_DEPTH
+	depth_stencil   = C.SG_PIXELFORMAT_DEPTH_STENCIL
+	bc1_rgba        = C.SG_PIXELFORMAT_BC1_RGBA
+	bc2_rgba        = C.SG_PIXELFORMAT_BC2_RGBA
+	bc3_rgba        = C.SG_PIXELFORMAT_BC3_RGBA
+	bc4_r           = C.SG_PIXELFORMAT_BC4_R
+	bc4_rsn         = C.SG_PIXELFORMAT_BC4_RSN
+	bc5_rg          = C.SG_PIXELFORMAT_BC5_RG
+	bc5_rgsn        = C.SG_PIXELFORMAT_BC5_RGSN
+	bc6h_rgbf       = C.SG_PIXELFORMAT_BC6H_RGBF
+	bc6h_rgbuf      = C.SG_PIXELFORMAT_BC6H_RGBUF
+	bc7_rgba        = C.SG_PIXELFORMAT_BC7_RGBA
+	pvrtc_rgb_2bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_2BPP
+	pvrtc_rgb_4bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_4BPP
 	pvrtc_rgba_2bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_2BPP
 	pvrtc_rgba_4bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_4BPP
-	etc2_rgb8 = C.SG_PIXELFORMAT_ETC2_RGB8
-	etc2_rgb8a1 = C.SG_PIXELFORMAT_ETC2_RGB8A1
-	etc2_rgba8 = C.SG_PIXELFORMAT_ETC2_RGBA8
-	etc2_rg11 = C.SG_PIXELFORMAT_ETC2_RG11
-	etc2_rg11sn = C.SG_PIXELFORMAT_ETC2_RG11SN
-	num = C._SG_PIXELFORMAT_NUM
-	force_u32 = C._SG_PIXELFORMAT_FORCE_U32 // 0x7FFFFFFF,
+	etc2_rgb8       = C.SG_PIXELFORMAT_ETC2_RGB8
+	etc2_rgb8a1     = C.SG_PIXELFORMAT_ETC2_RGB8A1
+	etc2_rgba8      = C.SG_PIXELFORMAT_ETC2_RGBA8
+	etc2_rg11       = C.SG_PIXELFORMAT_ETC2_RG11
+	etc2_rg11sn     = C.SG_PIXELFORMAT_ETC2_RG11SN
+	num             = C._SG_PIXELFORMAT_NUM
+	force_u32       = C._SG_PIXELFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
 
 [typedef]
@@ -222,300 +222,300 @@ pub type Limits = C.sg_limits
 
 // ResourceState is C.sg_resource_state
 pub enum ResourceState {
-	initial = C.SG_RESOURCESTATE_INITIAL
-	alloc = C.SG_RESOURCESTATE_ALLOC
-	valid = C.SG_RESOURCESTATE_VALID
-	failed = C.SG_RESOURCESTATE_FAILED
-	invalid = C.SG_RESOURCESTATE_INVALID
+	initial   = C.SG_RESOURCESTATE_INITIAL
+	alloc     = C.SG_RESOURCESTATE_ALLOC
+	valid     = C.SG_RESOURCESTATE_VALID
+	failed    = C.SG_RESOURCESTATE_FAILED
+	invalid   = C.SG_RESOURCESTATE_INVALID
 	force_u32 = C._SG_RESOURCESTATE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // Usage is C.sg_usage
 pub enum Usage {
-	default = C._SG_USAGE_DEFAULT // value 0 reserved for default-init
+	default   = C._SG_USAGE_DEFAULT // value 0 reserved for default-init
 	immutable = C.SG_USAGE_IMMUTABLE
-	dynamic = C.SG_USAGE_DYNAMIC
-	stream = C.SG_USAGE_STREAM
-	num = C._SG_USAGE_NUM
+	dynamic   = C.SG_USAGE_DYNAMIC
+	stream    = C.SG_USAGE_STREAM
+	num       = C._SG_USAGE_NUM
 	force_u32 = C._SG_USAGE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BufferType is C.sg_buffer_type
 pub enum BufferType {
-	default = C._SG_BUFFERTYPE_DEFAULT // value 0 reserved for default-init
+	default      = C._SG_BUFFERTYPE_DEFAULT // value 0 reserved for default-init
 	vertexbuffer = C.SG_BUFFERTYPE_VERTEXBUFFER
-	indexbuffer = C.SG_BUFFERTYPE_INDEXBUFFER
-	num = C._SG_BUFFERTYPE_NUM
-	force_u32 = C._SG_BUFFERTYPE_FORCE_U32 // 0x7FFFFFFF,
+	indexbuffer  = C.SG_BUFFERTYPE_INDEXBUFFER
+	num          = C._SG_BUFFERTYPE_NUM
+	force_u32    = C._SG_BUFFERTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // IndexType is C.sg_index_type
 pub enum IndexType {
-	default = C._SG_INDEXTYPE_DEFAULT // value 0 reserved for default-init
-	@none = C.SG_INDEXTYPE_NONE
-	uint16 = C.SG_INDEXTYPE_UINT16
-	uint32 = C.SG_INDEXTYPE_UINT32
-	num = C._SG_INDEXTYPE_NUM
+	default   = C._SG_INDEXTYPE_DEFAULT // value 0 reserved for default-init
+	@none     = C.SG_INDEXTYPE_NONE
+	uint16    = C.SG_INDEXTYPE_UINT16
+	uint32    = C.SG_INDEXTYPE_UINT32
+	num       = C._SG_INDEXTYPE_NUM
 	force_u32 = C._SG_INDEXTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // ImageType is C.sg_image_type
 pub enum ImageType {
-	default = C._SG_IMAGETYPE_DEFAULT // value 0 reserved for default-init
-	_2d = C.SG_IMAGETYPE_2D
-	cube = C.SG_IMAGETYPE_CUBE
-	_3d = C.SG_IMAGETYPE_3D
-	array = C.SG_IMAGETYPE_ARRAY
-	num = C._SG_IMAGETYPE_NUM
+	default   = C._SG_IMAGETYPE_DEFAULT // value 0 reserved for default-init
+	_2d       = C.SG_IMAGETYPE_2D
+	cube      = C.SG_IMAGETYPE_CUBE
+	_3d       = C.SG_IMAGETYPE_3D
+	array     = C.SG_IMAGETYPE_ARRAY
+	num       = C._SG_IMAGETYPE_NUM
 	force_u32 = C._SG_IMAGETYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // SamplerType is C.sg_sampler_type
 pub enum SamplerType {
 	default = C._SG_SAMPLERTYPE_DEFAULT // value 0 reserved for default-init
-	float = C.SG_SAMPLERTYPE_FLOAT
-	sint = C.SG_SAMPLERTYPE_SINT
-	uint = C.SG_SAMPLERTYPE_UINT
+	float   = C.SG_SAMPLERTYPE_FLOAT
+	sint    = C.SG_SAMPLERTYPE_SINT
+	uint    = C.SG_SAMPLERTYPE_UINT
 }
 
 // CubeFace is C.sg_cube_face
 pub enum CubeFace {
-	pos_x = C.SG_CUBEFACE_POS_X
-	neg_x = C.SG_CUBEFACE_NEG_X
-	pos_y = C.SG_CUBEFACE_POS_Y
-	neg_y = C.SG_CUBEFACE_NEG_Y
-	pos_z = C.SG_CUBEFACE_POS_Z
-	neg_z = C.SG_CUBEFACE_NEG_Z
-	num = C.SG_CUBEFACE_NUM
+	pos_x     = C.SG_CUBEFACE_POS_X
+	neg_x     = C.SG_CUBEFACE_NEG_X
+	pos_y     = C.SG_CUBEFACE_POS_Y
+	neg_y     = C.SG_CUBEFACE_NEG_Y
+	pos_z     = C.SG_CUBEFACE_POS_Z
+	neg_z     = C.SG_CUBEFACE_NEG_Z
+	num       = C.SG_CUBEFACE_NUM
 	force_u32 = C._SG_CUBEFACE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // ShaderStage is C.sg_shader_stage
 pub enum ShaderStage {
-	vs = C.SG_SHADERSTAGE_VS
-	fs = C.SG_SHADERSTAGE_FS
+	vs        = C.SG_SHADERSTAGE_VS
+	fs        = C.SG_SHADERSTAGE_FS
 	force_u32 = C._SG_SHADERSTAGE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // PrimitiveType is C.sg_primitive_type
 pub enum PrimitiveType {
-	default = C._SG_PRIMITIVETYPE_DEFAULT // value 0 reserved for default-init
-	points = C.SG_PRIMITIVETYPE_POINTS
-	lines = C.SG_PRIMITIVETYPE_LINES
-	line_strip = C.SG_PRIMITIVETYPE_LINE_STRIP
-	triangles = C.SG_PRIMITIVETYPE_TRIANGLES
+	default        = C._SG_PRIMITIVETYPE_DEFAULT // value 0 reserved for default-init
+	points         = C.SG_PRIMITIVETYPE_POINTS
+	lines          = C.SG_PRIMITIVETYPE_LINES
+	line_strip     = C.SG_PRIMITIVETYPE_LINE_STRIP
+	triangles      = C.SG_PRIMITIVETYPE_TRIANGLES
 	triangle_strip = C.SG_PRIMITIVETYPE_TRIANGLE_STRIP
-	num = C._SG_PRIMITIVETYPE_NUM
-	force_u32 = C._SG_PRIMITIVETYPE_FORCE_U32 // 0x7FFFFFFF,
+	num            = C._SG_PRIMITIVETYPE_NUM
+	force_u32      = C._SG_PRIMITIVETYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // Filter is C.sg_filter
 pub enum Filter {
-	default = C._SG_FILTER_DEFAULT // value 0 reserved for default-init
-	nearest = C.SG_FILTER_NEAREST
-	linear = C.SG_FILTER_LINEAR
+	default                = C._SG_FILTER_DEFAULT // value 0 reserved for default-init
+	nearest                = C.SG_FILTER_NEAREST
+	linear                 = C.SG_FILTER_LINEAR
 	nearest_mipmap_nearest = C.SG_FILTER_NEAREST_MIPMAP_NEAREST
-	nearest_mipmap_linear = C.SG_FILTER_NEAREST_MIPMAP_LINEAR
-	linear_mipmap_nearest = C.SG_FILTER_LINEAR_MIPMAP_NEAREST
-	linear_mipmap_linear = C.SG_FILTER_LINEAR_MIPMAP_LINEAR
-	num = C._SG_FILTER_NUM
-	force_u32 = C._SG_FILTER_FORCE_U32 // 0x7FFFFFFF,
+	nearest_mipmap_linear  = C.SG_FILTER_NEAREST_MIPMAP_LINEAR
+	linear_mipmap_nearest  = C.SG_FILTER_LINEAR_MIPMAP_NEAREST
+	linear_mipmap_linear   = C.SG_FILTER_LINEAR_MIPMAP_LINEAR
+	num                    = C._SG_FILTER_NUM
+	force_u32              = C._SG_FILTER_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // Wrap is C.sg_wrap
 pub enum Wrap {
-	default = C._SG_WRAP_DEFAULT // value 0 reserved for default-init
-	repeat = C.SG_WRAP_REPEAT
-	clamp_to_edge = C.SG_WRAP_CLAMP_TO_EDGE
+	default         = C._SG_WRAP_DEFAULT // value 0 reserved for default-init
+	repeat          = C.SG_WRAP_REPEAT
+	clamp_to_edge   = C.SG_WRAP_CLAMP_TO_EDGE
 	clamp_to_border = C.SG_WRAP_CLAMP_TO_BORDER
 	mirrored_repeat = C.SG_WRAP_MIRRORED_REPEAT
-	num = C._SG_WRAP_NUM
-	force_u32 = C._SG_WRAP_FORCE_U32 // 0x7FFFFFFF,
+	num             = C._SG_WRAP_NUM
+	force_u32       = C._SG_WRAP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BorderColor is C.sg_border_color
 pub enum BorderColor {
-	default = C._SG_BORDERCOLOR_DEFAULT // value 0 reserved for default-init
+	default           = C._SG_BORDERCOLOR_DEFAULT // value 0 reserved for default-init
 	transparent_black = C.SG_BORDERCOLOR_TRANSPARENT_BLACK
-	opaque_black = C.SG_BORDERCOLOR_OPAQUE_BLACK
-	opaque_white = C.SG_BORDERCOLOR_OPAQUE_WHITE
-	num = C._SG_BORDERCOLOR_NUM
-	force_u32 = C._SG_BORDERCOLOR_FORCE_U32 // 0x7FFFFFFF,
+	opaque_black      = C.SG_BORDERCOLOR_OPAQUE_BLACK
+	opaque_white      = C.SG_BORDERCOLOR_OPAQUE_WHITE
+	num               = C._SG_BORDERCOLOR_NUM
+	force_u32         = C._SG_BORDERCOLOR_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // VertexFormat is C.sg_vertex_format
 pub enum VertexFormat {
-	invalid = C.SG_VERTEXFORMAT_INVALID
-	float = C.SG_VERTEXFORMAT_FLOAT
-	float2 = C.SG_VERTEXFORMAT_FLOAT2
-	float3 = C.SG_VERTEXFORMAT_FLOAT3
-	float4 = C.SG_VERTEXFORMAT_FLOAT4
-	byte4 = C.SG_VERTEXFORMAT_BYTE4
-	byte4n = C.SG_VERTEXFORMAT_BYTE4N
-	ubyte4 = C.SG_VERTEXFORMAT_UBYTE4
-	ubyte4n = C.SG_VERTEXFORMAT_UBYTE4N
-	short2 = C.SG_VERTEXFORMAT_SHORT2
-	short2n = C.SG_VERTEXFORMAT_SHORT2N
-	ushort2n = C.SG_VERTEXFORMAT_USHORT2N
-	short4 = C.SG_VERTEXFORMAT_SHORT4
-	short4n = C.SG_VERTEXFORMAT_SHORT4N
-	ushort4n = C.SG_VERTEXFORMAT_USHORT4N
+	invalid   = C.SG_VERTEXFORMAT_INVALID
+	float     = C.SG_VERTEXFORMAT_FLOAT
+	float2    = C.SG_VERTEXFORMAT_FLOAT2
+	float3    = C.SG_VERTEXFORMAT_FLOAT3
+	float4    = C.SG_VERTEXFORMAT_FLOAT4
+	byte4     = C.SG_VERTEXFORMAT_BYTE4
+	byte4n    = C.SG_VERTEXFORMAT_BYTE4N
+	ubyte4    = C.SG_VERTEXFORMAT_UBYTE4
+	ubyte4n   = C.SG_VERTEXFORMAT_UBYTE4N
+	short2    = C.SG_VERTEXFORMAT_SHORT2
+	short2n   = C.SG_VERTEXFORMAT_SHORT2N
+	ushort2n  = C.SG_VERTEXFORMAT_USHORT2N
+	short4    = C.SG_VERTEXFORMAT_SHORT4
+	short4n   = C.SG_VERTEXFORMAT_SHORT4N
+	ushort4n  = C.SG_VERTEXFORMAT_USHORT4N
 	uint10_n2 = C.SG_VERTEXFORMAT_UINT10_N2
-	num = C._SG_VERTEXFORMAT_NUM
+	num       = C._SG_VERTEXFORMAT_NUM
 	force_u32 = C._SG_VERTEXFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // VertexStep is C.sg_vertex_step
 pub enum VertexStep {
-	default = C._SG_VERTEXSTEP_DEFAULT // value 0 reserved for default-init
-	per_vertex = C.SG_VERTEXSTEP_PER_VERTEX
+	default      = C._SG_VERTEXSTEP_DEFAULT // value 0 reserved for default-init
+	per_vertex   = C.SG_VERTEXSTEP_PER_VERTEX
 	per_instance = C.SG_VERTEXSTEP_PER_INSTANCE
-	num = C._SG_VERTEXSTEP_NUM
-	force_u32 = C._SG_VERTEXSTEP_FORCE_U32 // 0x7FFFFFFF,
+	num          = C._SG_VERTEXSTEP_NUM
+	force_u32    = C._SG_VERTEXSTEP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // UniformType is C.sg_uniform_type
 pub enum UniformType {
-	invalid = C.SG_UNIFORMTYPE_INVALID
-	float = C.SG_UNIFORMTYPE_FLOAT
-	float2 = C.SG_UNIFORMTYPE_FLOAT2
-	float3 = C.SG_UNIFORMTYPE_FLOAT3
-	float4 = C.SG_UNIFORMTYPE_FLOAT4
-	int = C.SG_UNIFORMTYPE_INT
-	int2 = C.SG_UNIFORMTYPE_INT2
-	int3 = C.SG_UNIFORMTYPE_INT3
-	int4 = C.SG_UNIFORMTYPE_INT4
-	mat4 = C.SG_UNIFORMTYPE_MAT4
-	num = C._SG_UNIFORMTYPE_NUM
+	invalid   = C.SG_UNIFORMTYPE_INVALID
+	float     = C.SG_UNIFORMTYPE_FLOAT
+	float2    = C.SG_UNIFORMTYPE_FLOAT2
+	float3    = C.SG_UNIFORMTYPE_FLOAT3
+	float4    = C.SG_UNIFORMTYPE_FLOAT4
+	int       = C.SG_UNIFORMTYPE_INT
+	int2      = C.SG_UNIFORMTYPE_INT2
+	int3      = C.SG_UNIFORMTYPE_INT3
+	int4      = C.SG_UNIFORMTYPE_INT4
+	mat4      = C.SG_UNIFORMTYPE_MAT4
+	num       = C._SG_UNIFORMTYPE_NUM
 	force_u32 = C._SG_UNIFORMTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // UniformLayout is C.sg_uniform_layout
 pub enum UniformLayout {
-	default = C._SG_UNIFORMLAYOUT_DEFAULT // value 0 reserved for default-init
-	native = C.SG_UNIFORMLAYOUT_NATIVE // default: layout depends on currently active backend
-	std140 = C.SG_UNIFORMLAYOUT_STD140 // std140: memory layout according to std140
-	num = C._SG_UNIFORMLAYOUT_NUM
+	default   = C._SG_UNIFORMLAYOUT_DEFAULT // value 0 reserved for default-init
+	native    = C.SG_UNIFORMLAYOUT_NATIVE // default: layout depends on currently active backend
+	std140    = C.SG_UNIFORMLAYOUT_STD140 // std140: memory layout according to std140
+	num       = C._SG_UNIFORMLAYOUT_NUM
 	force_u32 = C._SG_UNIFORMLAYOUT_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // CullMode is C.sg_cull_mode
 pub enum CullMode {
-	default = C._SG_CULLMODE_DEFAULT // value 0 reserved for default-init
-	@none = C.SG_CULLMODE_NONE
-	front = C.SG_CULLMODE_FRONT
-	back = C.SG_CULLMODE_BACK
-	num = C._SG_CULLMODE_NUM
+	default   = C._SG_CULLMODE_DEFAULT // value 0 reserved for default-init
+	@none     = C.SG_CULLMODE_NONE
+	front     = C.SG_CULLMODE_FRONT
+	back      = C.SG_CULLMODE_BACK
+	num       = C._SG_CULLMODE_NUM
 	force_u32 = C._SG_CULLMODE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // FaceWinding is C.sg_face_winding
 pub enum FaceWinding {
-	default = C._SG_FACEWINDING_DEFAULT // value 0 reserved for default-init
-	ccw = C.SG_FACEWINDING_CCW
-	cw = C.SG_FACEWINDING_CW
-	num = C._SG_FACEWINDING_NUM
+	default   = C._SG_FACEWINDING_DEFAULT // value 0 reserved for default-init
+	ccw       = C.SG_FACEWINDING_CCW
+	cw        = C.SG_FACEWINDING_CW
+	num       = C._SG_FACEWINDING_NUM
 	force_u32 = C._SG_FACEWINDING_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // CompareFunc is C.sg_compare_func
 pub enum CompareFunc {
-	default = C._SG_COMPAREFUNC_DEFAULT // value 0 reserved for default-init
-	never = C.SG_COMPAREFUNC_NEVER
-	less = C.SG_COMPAREFUNC_LESS
-	equal = C.SG_COMPAREFUNC_EQUAL
-	less_equal = C.SG_COMPAREFUNC_LESS_EQUAL
-	greater = C.SG_COMPAREFUNC_GREATER
-	not_equal = C.SG_COMPAREFUNC_NOT_EQUAL
+	default       = C._SG_COMPAREFUNC_DEFAULT // value 0 reserved for default-init
+	never         = C.SG_COMPAREFUNC_NEVER
+	less          = C.SG_COMPAREFUNC_LESS
+	equal         = C.SG_COMPAREFUNC_EQUAL
+	less_equal    = C.SG_COMPAREFUNC_LESS_EQUAL
+	greater       = C.SG_COMPAREFUNC_GREATER
+	not_equal     = C.SG_COMPAREFUNC_NOT_EQUAL
 	greater_equal = C.SG_COMPAREFUNC_GREATER_EQUAL
-	always = C.SG_COMPAREFUNC_ALWAYS
-	num = C._SG_COMPAREFUNC_NUM
-	force_u32 = C._SG_COMPAREFUNC_FORCE_U32 // 0x7FFFFFFF,
+	always        = C.SG_COMPAREFUNC_ALWAYS
+	num           = C._SG_COMPAREFUNC_NUM
+	force_u32     = C._SG_COMPAREFUNC_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // StencilOp is C.sg_stencil_op
 pub enum StencilOp {
-	default = C._SG_STENCILOP_DEFAULT // value 0 reserved for default-init
-	keep = C.SG_STENCILOP_KEEP
-	zero = C.SG_STENCILOP_ZERO
-	replace = C.SG_STENCILOP_REPLACE
+	default    = C._SG_STENCILOP_DEFAULT // value 0 reserved for default-init
+	keep       = C.SG_STENCILOP_KEEP
+	zero       = C.SG_STENCILOP_ZERO
+	replace    = C.SG_STENCILOP_REPLACE
 	incr_clamp = C.SG_STENCILOP_INCR_CLAMP
 	decr_clamp = C.SG_STENCILOP_DECR_CLAMP
-	invert = C.SG_STENCILOP_INVERT
-	incr_wrap = C.SG_STENCILOP_INCR_WRAP
-	decr_wrap = C.SG_STENCILOP_DECR_WRAP
-	num = C._SG_STENCILOP_NUM
-	force_u32 = C._SG_STENCILOP_FORCE_U32 // 0x7FFFFFFF,
+	invert     = C.SG_STENCILOP_INVERT
+	incr_wrap  = C.SG_STENCILOP_INCR_WRAP
+	decr_wrap  = C.SG_STENCILOP_DECR_WRAP
+	num        = C._SG_STENCILOP_NUM
+	force_u32  = C._SG_STENCILOP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BlendFactor is C.sg_blend_factor
 pub enum BlendFactor {
-	default = C._SG_BLENDFACTOR_DEFAULT // value 0 reserved for default-init
-	zero = C.SG_BLENDFACTOR_ZERO
-	one = C.SG_BLENDFACTOR_ONE
-	src_color = C.SG_BLENDFACTOR_SRC_COLOR
-	one_minus_src_color = C.SG_BLENDFACTOR_ONE_MINUS_SRC_COLOR
-	src_alpha = C.SG_BLENDFACTOR_SRC_ALPHA
-	one_minus_src_alpha = C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
-	dst_color = C.SG_BLENDFACTOR_DST_COLOR
-	one_minus_dst_color = C.SG_BLENDFACTOR_ONE_MINUS_DST_COLOR
-	dst_alpha = C.SG_BLENDFACTOR_DST_ALPHA
-	one_minus_dst_alpha = C.SG_BLENDFACTOR_ONE_MINUS_DST_ALPHA
-	src_alpha_saturated = C.SG_BLENDFACTOR_SRC_ALPHA_SATURATED
-	blend_color = C.SG_BLENDFACTOR_BLEND_COLOR
+	default               = C._SG_BLENDFACTOR_DEFAULT // value 0 reserved for default-init
+	zero                  = C.SG_BLENDFACTOR_ZERO
+	one                   = C.SG_BLENDFACTOR_ONE
+	src_color             = C.SG_BLENDFACTOR_SRC_COLOR
+	one_minus_src_color   = C.SG_BLENDFACTOR_ONE_MINUS_SRC_COLOR
+	src_alpha             = C.SG_BLENDFACTOR_SRC_ALPHA
+	one_minus_src_alpha   = C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
+	dst_color             = C.SG_BLENDFACTOR_DST_COLOR
+	one_minus_dst_color   = C.SG_BLENDFACTOR_ONE_MINUS_DST_COLOR
+	dst_alpha             = C.SG_BLENDFACTOR_DST_ALPHA
+	one_minus_dst_alpha   = C.SG_BLENDFACTOR_ONE_MINUS_DST_ALPHA
+	src_alpha_saturated   = C.SG_BLENDFACTOR_SRC_ALPHA_SATURATED
+	blend_color           = C.SG_BLENDFACTOR_BLEND_COLOR
 	one_minus_blend_color = C.SG_BLENDFACTOR_ONE_MINUS_BLEND_COLOR
-	blend_alpha = C.SG_BLENDFACTOR_BLEND_ALPHA
+	blend_alpha           = C.SG_BLENDFACTOR_BLEND_ALPHA
 	one_minus_blend_alpha = C.SG_BLENDFACTOR_ONE_MINUS_BLEND_ALPHA
-	num = C._SG_BLENDFACTOR_NUM
-	force_u32 = C._SG_BLENDFACTOR_FORCE_U32 // 0x7FFFFFFF,
+	num                   = C._SG_BLENDFACTOR_NUM
+	force_u32             = C._SG_BLENDFACTOR_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BlendOp is C.sg_blend_op
 pub enum BlendOp {
-	default = C._SG_BLENDOP_DEFAULT // value 0 reserved for default-init
-	add = C.SG_BLENDOP_ADD
-	subtract = C.SG_BLENDOP_SUBTRACT
+	default          = C._SG_BLENDOP_DEFAULT // value 0 reserved for default-init
+	add              = C.SG_BLENDOP_ADD
+	subtract         = C.SG_BLENDOP_SUBTRACT
 	reverse_subtract = C.SG_BLENDOP_REVERSE_SUBTRACT
-	num = C._SG_BLENDOP_NUM
-	force_u32 = C._SG_BLENDOP_FORCE_U32 // 0x7FFFFFFF,
+	num              = C._SG_BLENDOP_NUM
+	force_u32        = C._SG_BLENDOP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // ColorMask is C.sg_color_mask
 pub enum ColorMask {
-	default = C._SG_COLORMASK_DEFAULT // 0, value 0 reserved for default-init
-	@none = C.SG_COLORMASK_NONE // 0x10, special value for 'all channels disabled
-	r = C.SG_COLORMASK_R // 0x1,
-	g = C.SG_COLORMASK_G // 0x2,
-	rg = C.SG_COLORMASK_RG // 0x3,
-	b = C.SG_COLORMASK_B // 0x4,
-	rb = C.SG_COLORMASK_RB // 0x5,
-	gb = C.SG_COLORMASK_GB // 0x6,
-	rgb = C.SG_COLORMASK_RGB // 0x7,
-	a = C.SG_COLORMASK_A // 0x8,
-	ra = C.SG_COLORMASK_RA // 0x9,
-	ga = C.SG_COLORMASK_GA // 0xA,
-	rga = C.SG_COLORMASK_RGA // 0xB,
-	ba = C.SG_COLORMASK_BA // 0xC,
-	rba = C.SG_COLORMASK_RBA // 0xD,
-	gba = C.SG_COLORMASK_GBA // 0xE,
-	rgba = C.SG_COLORMASK_RGBA // 0xF,
+	default   = C._SG_COLORMASK_DEFAULT // 0, value 0 reserved for default-init
+	@none     = C.SG_COLORMASK_NONE // 0x10, special value for 'all channels disabled
+	r         = C.SG_COLORMASK_R // 0x1,
+	g         = C.SG_COLORMASK_G // 0x2,
+	rg        = C.SG_COLORMASK_RG // 0x3,
+	b         = C.SG_COLORMASK_B // 0x4,
+	rb        = C.SG_COLORMASK_RB // 0x5,
+	gb        = C.SG_COLORMASK_GB // 0x6,
+	rgb       = C.SG_COLORMASK_RGB // 0x7,
+	a         = C.SG_COLORMASK_A // 0x8,
+	ra        = C.SG_COLORMASK_RA // 0x9,
+	ga        = C.SG_COLORMASK_GA // 0xA,
+	rga       = C.SG_COLORMASK_RGA // 0xB,
+	ba        = C.SG_COLORMASK_BA // 0xC,
+	rba       = C.SG_COLORMASK_RBA // 0xD,
+	gba       = C.SG_COLORMASK_GBA // 0xE,
+	rgba      = C.SG_COLORMASK_RGBA // 0xF,
 	force_u32 = C._SG_COLORMASK_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // LoadAction is C.sg_load_action
 pub enum LoadAction {
-	default = C._SG_LOADACTION_DEFAULT
-	clear = C.SG_LOADACTION_CLEAR
-	load = C.SG_LOADACTION_LOAD
-	dontcare = C.SG_LOADACTION_DONTCARE
+	default   = C._SG_LOADACTION_DEFAULT
+	clear     = C.SG_LOADACTION_CLEAR
+	load      = C.SG_LOADACTION_LOAD
+	dontcare  = C.SG_LOADACTION_DONTCARE
 	force_u32 = C._SG_LOADACTION_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // StoreAction is C.sg_store_action
 pub enum StoreAction {
-	default = C._SG_STOREACTION_DEFAULT
-	store = C.SG_STOREACTION_STORE
-	dontcare = C.SG_STOREACTION_DONTCARE
+	default   = C._SG_STOREACTION_DEFAULT
+	store     = C.SG_STOREACTION_STORE
+	dontcare  = C.SG_STOREACTION_DONTCARE
 	force_u32 = C._SG_STOREACTION_FORCE_U32 // 0x7FFFFFFF,
 }
 

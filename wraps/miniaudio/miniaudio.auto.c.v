@@ -95,145 +95,145 @@ pub const simd_alignment = 32
 
 // LogLevel is C.ma_log_level
 pub enum LogLevel {
-	debug = C.MA_LOG_LEVEL_DEBUG // 4,
-	info = C.MA_LOG_LEVEL_INFO // 3,
+	debug   = C.MA_LOG_LEVEL_DEBUG // 4,
+	info    = C.MA_LOG_LEVEL_INFO // 3,
 	warning = C.MA_LOG_LEVEL_WARNING // 2,
-	error = C.MA_LOG_LEVEL_ERROR // 1,
+	error   = C.MA_LOG_LEVEL_ERROR // 1,
 }
 
 // ChannelPosition is C._ma_channel_position
 pub enum ChannelPosition {
-	@none = C.MA_CHANNEL_NONE // 0,
-	mono = C.MA_CHANNEL_MONO // 1,
-	front_left = C.MA_CHANNEL_FRONT_LEFT // 2,
-	front_right = C.MA_CHANNEL_FRONT_RIGHT // 3,
-	front_center = C.MA_CHANNEL_FRONT_CENTER // 4,
-	lfe = C.MA_CHANNEL_LFE // 5,
-	back_left = C.MA_CHANNEL_BACK_LEFT // 6,
-	back_right = C.MA_CHANNEL_BACK_RIGHT // 7,
-	front_left_center = C.MA_CHANNEL_FRONT_LEFT_CENTER // 8,
+	@none              = C.MA_CHANNEL_NONE // 0,
+	mono               = C.MA_CHANNEL_MONO // 1,
+	front_left         = C.MA_CHANNEL_FRONT_LEFT // 2,
+	front_right        = C.MA_CHANNEL_FRONT_RIGHT // 3,
+	front_center       = C.MA_CHANNEL_FRONT_CENTER // 4,
+	lfe                = C.MA_CHANNEL_LFE // 5,
+	back_left          = C.MA_CHANNEL_BACK_LEFT // 6,
+	back_right         = C.MA_CHANNEL_BACK_RIGHT // 7,
+	front_left_center  = C.MA_CHANNEL_FRONT_LEFT_CENTER // 8,
 	front_right_center = C.MA_CHANNEL_FRONT_RIGHT_CENTER // 9,
-	back_center = C.MA_CHANNEL_BACK_CENTER // 10,
-	side_left = C.MA_CHANNEL_SIDE_LEFT // 11,
-	side_right = C.MA_CHANNEL_SIDE_RIGHT // 12,
-	top_center = C.MA_CHANNEL_TOP_CENTER // 13,
-	top_front_left = C.MA_CHANNEL_TOP_FRONT_LEFT // 14,
-	top_front_center = C.MA_CHANNEL_TOP_FRONT_CENTER // 15,
-	top_front_right = C.MA_CHANNEL_TOP_FRONT_RIGHT // 16,
-	top_back_left = C.MA_CHANNEL_TOP_BACK_LEFT // 17,
-	top_back_center = C.MA_CHANNEL_TOP_BACK_CENTER // 18,
-	top_back_right = C.MA_CHANNEL_TOP_BACK_RIGHT // 19,
-	aux_0 = C.MA_CHANNEL_AUX_0 // 20,
-	aux_1 = C.MA_CHANNEL_AUX_1 // 21,
-	aux_2 = C.MA_CHANNEL_AUX_2 // 22,
-	aux_3 = C.MA_CHANNEL_AUX_3 // 23,
-	aux_4 = C.MA_CHANNEL_AUX_4 // 24,
-	aux_5 = C.MA_CHANNEL_AUX_5 // 25,
-	aux_6 = C.MA_CHANNEL_AUX_6 // 26,
-	aux_7 = C.MA_CHANNEL_AUX_7 // 27,
-	aux_8 = C.MA_CHANNEL_AUX_8 // 28,
-	aux_9 = C.MA_CHANNEL_AUX_9 // 29,
-	aux_10 = C.MA_CHANNEL_AUX_10 // 30,
-	aux_11 = C.MA_CHANNEL_AUX_11 // 31,
-	aux_12 = C.MA_CHANNEL_AUX_12 // 32,
-	aux_13 = C.MA_CHANNEL_AUX_13 // 33,
-	aux_14 = C.MA_CHANNEL_AUX_14 // 34,
-	aux_15 = C.MA_CHANNEL_AUX_15 // 35,
-	aux_16 = C.MA_CHANNEL_AUX_16 // 36,
-	aux_17 = C.MA_CHANNEL_AUX_17 // 37,
-	aux_18 = C.MA_CHANNEL_AUX_18 // 38,
-	aux_19 = C.MA_CHANNEL_AUX_19 // 39,
-	aux_20 = C.MA_CHANNEL_AUX_20 // 40,
-	aux_21 = C.MA_CHANNEL_AUX_21 // 41,
-	aux_22 = C.MA_CHANNEL_AUX_22 // 42,
-	aux_23 = C.MA_CHANNEL_AUX_23 // 43,
-	aux_24 = C.MA_CHANNEL_AUX_24 // 44,
-	aux_25 = C.MA_CHANNEL_AUX_25 // 45,
-	aux_26 = C.MA_CHANNEL_AUX_26 // 46,
-	aux_27 = C.MA_CHANNEL_AUX_27 // 47,
-	aux_28 = C.MA_CHANNEL_AUX_28 // 48,
-	aux_29 = C.MA_CHANNEL_AUX_29 // 49,
-	aux_30 = C.MA_CHANNEL_AUX_30 // 50,
-	aux_31 = C.MA_CHANNEL_AUX_31 // 51,
-	left = C.MA_CHANNEL_LEFT // MA_CHANNEL_FRONT_LEFT,
-	right = C.MA_CHANNEL_RIGHT // MA_CHANNEL_FRONT_RIGHT,
-	position_count = C.MA_CHANNEL_POSITION_COUNT // (MA_CHANNEL_AUX_31 + 1),
+	back_center        = C.MA_CHANNEL_BACK_CENTER // 10,
+	side_left          = C.MA_CHANNEL_SIDE_LEFT // 11,
+	side_right         = C.MA_CHANNEL_SIDE_RIGHT // 12,
+	top_center         = C.MA_CHANNEL_TOP_CENTER // 13,
+	top_front_left     = C.MA_CHANNEL_TOP_FRONT_LEFT // 14,
+	top_front_center   = C.MA_CHANNEL_TOP_FRONT_CENTER // 15,
+	top_front_right    = C.MA_CHANNEL_TOP_FRONT_RIGHT // 16,
+	top_back_left      = C.MA_CHANNEL_TOP_BACK_LEFT // 17,
+	top_back_center    = C.MA_CHANNEL_TOP_BACK_CENTER // 18,
+	top_back_right     = C.MA_CHANNEL_TOP_BACK_RIGHT // 19,
+	aux_0              = C.MA_CHANNEL_AUX_0 // 20,
+	aux_1              = C.MA_CHANNEL_AUX_1 // 21,
+	aux_2              = C.MA_CHANNEL_AUX_2 // 22,
+	aux_3              = C.MA_CHANNEL_AUX_3 // 23,
+	aux_4              = C.MA_CHANNEL_AUX_4 // 24,
+	aux_5              = C.MA_CHANNEL_AUX_5 // 25,
+	aux_6              = C.MA_CHANNEL_AUX_6 // 26,
+	aux_7              = C.MA_CHANNEL_AUX_7 // 27,
+	aux_8              = C.MA_CHANNEL_AUX_8 // 28,
+	aux_9              = C.MA_CHANNEL_AUX_9 // 29,
+	aux_10             = C.MA_CHANNEL_AUX_10 // 30,
+	aux_11             = C.MA_CHANNEL_AUX_11 // 31,
+	aux_12             = C.MA_CHANNEL_AUX_12 // 32,
+	aux_13             = C.MA_CHANNEL_AUX_13 // 33,
+	aux_14             = C.MA_CHANNEL_AUX_14 // 34,
+	aux_15             = C.MA_CHANNEL_AUX_15 // 35,
+	aux_16             = C.MA_CHANNEL_AUX_16 // 36,
+	aux_17             = C.MA_CHANNEL_AUX_17 // 37,
+	aux_18             = C.MA_CHANNEL_AUX_18 // 38,
+	aux_19             = C.MA_CHANNEL_AUX_19 // 39,
+	aux_20             = C.MA_CHANNEL_AUX_20 // 40,
+	aux_21             = C.MA_CHANNEL_AUX_21 // 41,
+	aux_22             = C.MA_CHANNEL_AUX_22 // 42,
+	aux_23             = C.MA_CHANNEL_AUX_23 // 43,
+	aux_24             = C.MA_CHANNEL_AUX_24 // 44,
+	aux_25             = C.MA_CHANNEL_AUX_25 // 45,
+	aux_26             = C.MA_CHANNEL_AUX_26 // 46,
+	aux_27             = C.MA_CHANNEL_AUX_27 // 47,
+	aux_28             = C.MA_CHANNEL_AUX_28 // 48,
+	aux_29             = C.MA_CHANNEL_AUX_29 // 49,
+	aux_30             = C.MA_CHANNEL_AUX_30 // 50,
+	aux_31             = C.MA_CHANNEL_AUX_31 // 51,
+	left               = C.MA_CHANNEL_LEFT // MA_CHANNEL_FRONT_LEFT,
+	right              = C.MA_CHANNEL_RIGHT // MA_CHANNEL_FRONT_RIGHT,
+	position_count     = C.MA_CHANNEL_POSITION_COUNT // (MA_CHANNEL_AUX_31 + 1),
 }
 
 // Result is C.ma_result
 pub enum Result {
-	success = C.MA_SUCCESS // 0,
-	error = C.MA_ERROR // -1, A generic error.
-	invalid_args = C.MA_INVALID_ARGS // -2,
-	invalid_operation = C.MA_INVALID_OPERATION // -3,
-	out_of_memory = C.MA_OUT_OF_MEMORY // -4,
-	out_of_range = C.MA_OUT_OF_RANGE // -5,
-	access_denied = C.MA_ACCESS_DENIED // -6,
-	does_not_exist = C.MA_DOES_NOT_EXIST // -7,
-	already_exists = C.MA_ALREADY_EXISTS // -8,
-	too_many_open_files = C.MA_TOO_MANY_OPEN_FILES // -9,
-	invalid_file = C.MA_INVALID_FILE // -10,
-	too_big = C.MA_TOO_BIG // -11,
-	path_too_long = C.MA_PATH_TOO_LONG // -12,
-	name_too_long = C.MA_NAME_TOO_LONG // -13,
-	not_directory = C.MA_NOT_DIRECTORY // -14,
-	is_directory = C.MA_IS_DIRECTORY // -15,
-	directory_not_empty = C.MA_DIRECTORY_NOT_EMPTY // -16,
-	at_end = C.MA_AT_END // -17,
-	no_space = C.MA_NO_SPACE // -18,
-	busy = C.MA_BUSY // -19,
-	io_error = C.MA_IO_ERROR // -20,
-	interrupt = C.MA_INTERRUPT // -21,
-	unavailable = C.MA_UNAVAILABLE // -22,
-	already_in_use = C.MA_ALREADY_IN_USE // -23,
-	bad_address = C.MA_BAD_ADDRESS // -24,
-	bad_seek = C.MA_BAD_SEEK // -25,
-	bad_pipe = C.MA_BAD_PIPE // -26,
-	deadlock = C.MA_DEADLOCK // -27,
-	too_many_links = C.MA_TOO_MANY_LINKS // -28,
-	not_implemented = C.MA_NOT_IMPLEMENTED // -29,
-	no_message = C.MA_NO_MESSAGE // -30,
-	bad_message = C.MA_BAD_MESSAGE // -31,
-	no_data_available = C.MA_NO_DATA_AVAILABLE // -32,
-	invalid_data = C.MA_INVALID_DATA // -33,
-	timeout = C.MA_TIMEOUT // -34,
-	no_network = C.MA_NO_NETWORK // -35,
-	not_unique = C.MA_NOT_UNIQUE // -36,
-	not_socket = C.MA_NOT_SOCKET // -37,
-	no_address = C.MA_NO_ADDRESS // -38,
-	bad_protocol = C.MA_BAD_PROTOCOL // -39,
-	protocol_unavailable = C.MA_PROTOCOL_UNAVAILABLE // -40,
-	protocol_not_supported = C.MA_PROTOCOL_NOT_SUPPORTED // -41,
-	protocol_family_not_supported = C.MA_PROTOCOL_FAMILY_NOT_SUPPORTED // -42,
-	address_family_not_supported = C.MA_ADDRESS_FAMILY_NOT_SUPPORTED // -43,
-	socket_not_supported = C.MA_SOCKET_NOT_SUPPORTED // -44,
-	connection_reset = C.MA_CONNECTION_RESET // -45,
-	already_connected = C.MA_ALREADY_CONNECTED // -46,
-	not_connected = C.MA_NOT_CONNECTED // -47,
-	connection_refused = C.MA_CONNECTION_REFUSED // -48,
-	no_host = C.MA_NO_HOST // -49,
-	in_progress = C.MA_IN_PROGRESS // -50,
-	cancelled = C.MA_CANCELLED // -51,
-	memory_already_mapped = C.MA_MEMORY_ALREADY_MAPPED // -52,
+	success                        = C.MA_SUCCESS // 0,
+	error                          = C.MA_ERROR // -1, A generic error.
+	invalid_args                   = C.MA_INVALID_ARGS // -2,
+	invalid_operation              = C.MA_INVALID_OPERATION // -3,
+	out_of_memory                  = C.MA_OUT_OF_MEMORY // -4,
+	out_of_range                   = C.MA_OUT_OF_RANGE // -5,
+	access_denied                  = C.MA_ACCESS_DENIED // -6,
+	does_not_exist                 = C.MA_DOES_NOT_EXIST // -7,
+	already_exists                 = C.MA_ALREADY_EXISTS // -8,
+	too_many_open_files            = C.MA_TOO_MANY_OPEN_FILES // -9,
+	invalid_file                   = C.MA_INVALID_FILE // -10,
+	too_big                        = C.MA_TOO_BIG // -11,
+	path_too_long                  = C.MA_PATH_TOO_LONG // -12,
+	name_too_long                  = C.MA_NAME_TOO_LONG // -13,
+	not_directory                  = C.MA_NOT_DIRECTORY // -14,
+	is_directory                   = C.MA_IS_DIRECTORY // -15,
+	directory_not_empty            = C.MA_DIRECTORY_NOT_EMPTY // -16,
+	at_end                         = C.MA_AT_END // -17,
+	no_space                       = C.MA_NO_SPACE // -18,
+	busy                           = C.MA_BUSY // -19,
+	io_error                       = C.MA_IO_ERROR // -20,
+	interrupt                      = C.MA_INTERRUPT // -21,
+	unavailable                    = C.MA_UNAVAILABLE // -22,
+	already_in_use                 = C.MA_ALREADY_IN_USE // -23,
+	bad_address                    = C.MA_BAD_ADDRESS // -24,
+	bad_seek                       = C.MA_BAD_SEEK // -25,
+	bad_pipe                       = C.MA_BAD_PIPE // -26,
+	deadlock                       = C.MA_DEADLOCK // -27,
+	too_many_links                 = C.MA_TOO_MANY_LINKS // -28,
+	not_implemented                = C.MA_NOT_IMPLEMENTED // -29,
+	no_message                     = C.MA_NO_MESSAGE // -30,
+	bad_message                    = C.MA_BAD_MESSAGE // -31,
+	no_data_available              = C.MA_NO_DATA_AVAILABLE // -32,
+	invalid_data                   = C.MA_INVALID_DATA // -33,
+	timeout                        = C.MA_TIMEOUT // -34,
+	no_network                     = C.MA_NO_NETWORK // -35,
+	not_unique                     = C.MA_NOT_UNIQUE // -36,
+	not_socket                     = C.MA_NOT_SOCKET // -37,
+	no_address                     = C.MA_NO_ADDRESS // -38,
+	bad_protocol                   = C.MA_BAD_PROTOCOL // -39,
+	protocol_unavailable           = C.MA_PROTOCOL_UNAVAILABLE // -40,
+	protocol_not_supported         = C.MA_PROTOCOL_NOT_SUPPORTED // -41,
+	protocol_family_not_supported  = C.MA_PROTOCOL_FAMILY_NOT_SUPPORTED // -42,
+	address_family_not_supported   = C.MA_ADDRESS_FAMILY_NOT_SUPPORTED // -43,
+	socket_not_supported           = C.MA_SOCKET_NOT_SUPPORTED // -44,
+	connection_reset               = C.MA_CONNECTION_RESET // -45,
+	already_connected              = C.MA_ALREADY_CONNECTED // -46,
+	not_connected                  = C.MA_NOT_CONNECTED // -47,
+	connection_refused             = C.MA_CONNECTION_REFUSED // -48,
+	no_host                        = C.MA_NO_HOST // -49,
+	in_progress                    = C.MA_IN_PROGRESS // -50,
+	cancelled                      = C.MA_CANCELLED // -51,
+	memory_already_mapped          = C.MA_MEMORY_ALREADY_MAPPED // -52,
 	// -100, General miniaudio-specific errors.
-	format_not_supported = C.MA_FORMAT_NOT_SUPPORTED
-	device_type_not_supported = C.MA_DEVICE_TYPE_NOT_SUPPORTED // -101,
-	share_mode_not_supported = C.MA_SHARE_MODE_NOT_SUPPORTED // -102,
-	no_backend = C.MA_NO_BACKEND // -103,
-	no_device = C.MA_NO_DEVICE // -104,
-	api_not_found = C.MA_API_NOT_FOUND // -105,
-	invalid_device_config = C.MA_INVALID_DEVICE_CONFIG // -106,
-	loop = C.MA_LOOP // -107,
+	format_not_supported           = C.MA_FORMAT_NOT_SUPPORTED
+	device_type_not_supported      = C.MA_DEVICE_TYPE_NOT_SUPPORTED // -101,
+	share_mode_not_supported       = C.MA_SHARE_MODE_NOT_SUPPORTED // -102,
+	no_backend                     = C.MA_NO_BACKEND // -103,
+	no_device                      = C.MA_NO_DEVICE // -104,
+	api_not_found                  = C.MA_API_NOT_FOUND // -105,
+	invalid_device_config          = C.MA_INVALID_DEVICE_CONFIG // -106,
+	loop                           = C.MA_LOOP // -107,
 	// -200, State errors.
-	device_not_initialized = C.MA_DEVICE_NOT_INITIALIZED
-	device_already_initialized = C.MA_DEVICE_ALREADY_INITIALIZED // -201,
-	device_not_started = C.MA_DEVICE_NOT_STARTED // -202,
-	device_not_stopped = C.MA_DEVICE_NOT_STOPPED // -203,
+	device_not_initialized         = C.MA_DEVICE_NOT_INITIALIZED
+	device_already_initialized     = C.MA_DEVICE_ALREADY_INITIALIZED // -201,
+	device_not_started             = C.MA_DEVICE_NOT_STARTED // -202,
+	device_not_stopped             = C.MA_DEVICE_NOT_STOPPED // -203,
 	// -300, Operation errors.
-	failed_to_init_backend = C.MA_FAILED_TO_INIT_BACKEND
-	failed_to_open_backend_device = C.MA_FAILED_TO_OPEN_BACKEND_DEVICE // -301,
+	failed_to_init_backend         = C.MA_FAILED_TO_INIT_BACKEND
+	failed_to_open_backend_device  = C.MA_FAILED_TO_OPEN_BACKEND_DEVICE // -301,
 	failed_to_start_backend_device = C.MA_FAILED_TO_START_BACKEND_DEVICE // -302,
-	failed_to_stop_backend_device = C.MA_FAILED_TO_STOP_BACKEND_DEVICE // -303,
+	failed_to_stop_backend_device  = C.MA_FAILED_TO_STOP_BACKEND_DEVICE // -303,
 }
 
 pub const min_channels = 1
@@ -249,73 +249,73 @@ pub enum StreamFormat {
 
 // StreamLayout is C.ma_stream_layout
 pub enum StreamLayout {
-	interleaved = C.ma_stream_layout_interleaved // 0,
+	interleaved   = C.ma_stream_layout_interleaved // 0,
 	deinterleaved = C.ma_stream_layout_deinterleaved
 }
 
 // DitherMode is C.ma_dither_mode
 pub enum DitherMode {
-	@none = C.ma_dither_mode_none // 0,
+	@none     = C.ma_dither_mode_none // 0,
 	rectangle = C.ma_dither_mode_rectangle
-	triangle = C.ma_dither_mode_triangle
+	triangle  = C.ma_dither_mode_triangle
 }
 
 // Format is C.ma_format
 pub enum Format {
 	unknown = C.ma_format_unknown // 0, Mainly used for indicating an error, but also used as the default for the output format for decoders.
-	u8 = C.ma_format_u8 // 1,
-	s16 = C.ma_format_s16 // 2, Seems to be the most widely supported format.
-	s24 = C.ma_format_s24 // 3, Tightly packed. 3 bytes per sample.
-	s32 = C.ma_format_s32 // 4,
-	f32 = C.ma_format_f32 // 5,
-	count = C.ma_format_count
+	u8      = C.ma_format_u8 // 1,
+	s16     = C.ma_format_s16 // 2, Seems to be the most widely supported format.
+	s24     = C.ma_format_s24 // 3, Tightly packed. 3 bytes per sample.
+	s32     = C.ma_format_s32 // 4,
+	f32     = C.ma_format_f32 // 5,
+	count   = C.ma_format_count
 }
 
 // StandardSampleRate is C.ma_standard_sample_rate
 pub enum StandardSampleRate {
-	_48000 = C.ma_standard_sample_rate_48000 // 48000, Most common
-	_44100 = C.ma_standard_sample_rate_44100 // 44100,
-	_32000 = C.ma_standard_sample_rate_32000 // 32000, Lows
-	_24000 = C.ma_standard_sample_rate_24000 // 24000,
-	_22050 = C.ma_standard_sample_rate_22050 // 22050,
-	_88200 = C.ma_standard_sample_rate_88200 // 88200, Highs
-	_96000 = C.ma_standard_sample_rate_96000 // 96000,
+	_48000  = C.ma_standard_sample_rate_48000 // 48000, Most common
+	_44100  = C.ma_standard_sample_rate_44100 // 44100,
+	_32000  = C.ma_standard_sample_rate_32000 // 32000, Lows
+	_24000  = C.ma_standard_sample_rate_24000 // 24000,
+	_22050  = C.ma_standard_sample_rate_22050 // 22050,
+	_88200  = C.ma_standard_sample_rate_88200 // 88200, Highs
+	_96000  = C.ma_standard_sample_rate_96000 // 96000,
 	_176400 = C.ma_standard_sample_rate_176400 // 176400,
 	_192000 = C.ma_standard_sample_rate_192000 // 192000,
-	_16000 = C.ma_standard_sample_rate_16000 // 16000, Extreme lows
-	_11025 = C.ma_standard_sample_rate_11025 // 11250,
-	_8000 = C.ma_standard_sample_rate_8000 // 8000,
+	_16000  = C.ma_standard_sample_rate_16000 // 16000, Extreme lows
+	_11025  = C.ma_standard_sample_rate_11025 // 11250,
+	_8000   = C.ma_standard_sample_rate_8000 // 8000,
 	_352800 = C.ma_standard_sample_rate_352800 // 352800, Extreme highs
 	_384000 = C.ma_standard_sample_rate_384000 // 384000,
-	min = C.ma_standard_sample_rate_min // ma_standard_sample_rate_8000,
-	max = C.ma_standard_sample_rate_max // ma_standard_sample_rate_384000,
-	count = C.ma_standard_sample_rate_count // 14, Need to maintain the count manually. Make sure this is updated if items are added to enum.
+	min     = C.ma_standard_sample_rate_min // ma_standard_sample_rate_8000,
+	max     = C.ma_standard_sample_rate_max // ma_standard_sample_rate_384000,
+	count   = C.ma_standard_sample_rate_count // 14, Need to maintain the count manually. Make sure this is updated if items are added to enum.
 }
 
 // ChannelMixMode is C.ma_channel_mix_mode
 pub enum ChannelMixMode {
-	rectangular = C.ma_channel_mix_mode_rectangular // 0, Simple averaging based on the plane(s) the channel is sitting on.
-	simple = C.ma_channel_mix_mode_simple // Drop excess channels; zeroed out extra channels.
+	rectangular    = C.ma_channel_mix_mode_rectangular // 0, Simple averaging based on the plane(s) the channel is sitting on.
+	simple         = C.ma_channel_mix_mode_simple // Drop excess channels; zeroed out extra channels.
 	custom_weights = C.ma_channel_mix_mode_custom_weights // Use custom weights specified in ma_channel_router_config.
-	default = C.ma_channel_mix_mode_default // ma_channel_mix_mode_rectangular,
+	default        = C.ma_channel_mix_mode_default // ma_channel_mix_mode_rectangular,
 }
 
 // StandardChannelMap is C.ma_standard_channel_map
 pub enum StandardChannelMap {
 	microsoft = C.ma_standard_channel_map_microsoft
-	alsa = C.ma_standard_channel_map_alsa
-	rfc3551 = C.ma_standard_channel_map_rfc3551 // Based off AIFF.
-	flac = C.ma_standard_channel_map_flac
-	vorbis = C.ma_standard_channel_map_vorbis
-	sound4 = C.ma_standard_channel_map_sound4 // FreeBSD's sound(4).
-	sndio = C.ma_standard_channel_map_sndio // www.sndio.org/tips.html
-	webaudio = C.ma_standard_channel_map_webaudio // ma_standard_channel_map_flac, https://webaudio.github.io/web-audio-api/#ChannelOrdering. Only 1, 2, 4 and 6 channels are defined, but can fill in the gaps with logical assumptions.
-	default = C.ma_standard_channel_map_default // ma_standard_channel_map_microsoft,
+	alsa      = C.ma_standard_channel_map_alsa
+	rfc3551   = C.ma_standard_channel_map_rfc3551 // Based off AIFF.
+	flac      = C.ma_standard_channel_map_flac
+	vorbis    = C.ma_standard_channel_map_vorbis
+	sound4    = C.ma_standard_channel_map_sound4 // FreeBSD's sound(4).
+	sndio     = C.ma_standard_channel_map_sndio // www.sndio.org/tips.html
+	webaudio  = C.ma_standard_channel_map_webaudio // ma_standard_channel_map_flac, https://webaudio.github.io/web-audio-api/#ChannelOrdering. Only 1, 2, 4 and 6 channels are defined, but can fill in the gaps with logical assumptions.
+	default   = C.ma_standard_channel_map_default // ma_standard_channel_map_microsoft,
 }
 
 // PerformanceProfile is C.ma_performance_profile
 pub enum PerformanceProfile {
-	low_latency = C.ma_performance_profile_low_latency // 0,
+	low_latency  = C.ma_performance_profile_low_latency // 0,
 	conservative = C.ma_performance_profile_conservative
 }
 
@@ -340,14 +340,14 @@ pub type Lcg = C.ma_lcg
 
 // ThreadPriority is C.ma_thread_priority
 pub enum ThreadPriority {
-	idle = C.ma_thread_priority_idle // -5,
-	lowest = C.ma_thread_priority_lowest // -4,
-	low = C.ma_thread_priority_low // -3,
-	normal = C.ma_thread_priority_normal // -2,
-	high = C.ma_thread_priority_high // -1,
-	highest = C.ma_thread_priority_highest // 0,
+	idle     = C.ma_thread_priority_idle // -5,
+	lowest   = C.ma_thread_priority_lowest // -4,
+	low      = C.ma_thread_priority_low // -3,
+	normal   = C.ma_thread_priority_normal // -2,
+	high     = C.ma_thread_priority_high // -1,
+	highest  = C.ma_thread_priority_highest // 0,
 	realtime = C.ma_thread_priority_realtime // 1,
-	default = C.ma_thread_priority_default // 0,
+	default  = C.ma_thread_priority_default // 0,
 }
 
 [typedef]
@@ -1933,7 +1933,7 @@ pub fn gainer_set_gains(p_gainer &Gainer, p_new_gains &f32) Result {
 // PanMode is C.ma_pan_mode
 pub enum PanMode {
 	balance = C.ma_pan_mode_balance // 0, Does not blend one side with the other. Technically just a balance. Compatible with other popular audio engines and therefore the default.
-	pan = C.ma_pan_mode_pan // A true pan. The sound from one side will "move" to the other side and blend with it.
+	pan     = C.ma_pan_mode_pan // A true pan. The sound from one side will "move" to the other side and blend with it.
 }
 
 [typedef]
@@ -2096,9 +2096,9 @@ pub type Vec3f = C.ma_vec3f
 
 // AttenuationModel is C.ma_attenuation_model
 pub enum AttenuationModel {
-	@none = C.ma_attenuation_model_none // No distance attenuation and no spatialization.
-	inverse = C.ma_attenuation_model_inverse // Equivalent to OpenAL's AL_INVERSE_DISTANCE_CLAMPED.
-	linear = C.ma_attenuation_model_linear // Linear attenuation. Equivalent to OpenAL's AL_LINEAR_DISTANCE_CLAMPED.
+	@none       = C.ma_attenuation_model_none // No distance attenuation and no spatialization.
+	inverse     = C.ma_attenuation_model_inverse // Equivalent to OpenAL's AL_INVERSE_DISTANCE_CLAMPED.
+	linear      = C.ma_attenuation_model_linear // Linear attenuation. Equivalent to OpenAL's AL_LINEAR_DISTANCE_CLAMPED.
 	exponential = C.ma_attenuation_model_exponential // Exponential attenuation. Equivalent to OpenAL's AL_EXPONENT_DISTANCE_CLAMPED.
 }
 
@@ -2111,7 +2111,7 @@ pub enum Positioning {
 // Handedness is C.ma_handedness
 pub enum Handedness {
 	right = C.ma_handedness_right
-	left = C.ma_handedness_left
+	left  = C.ma_handedness_left
 }
 
 [typedef]
@@ -2978,20 +2978,20 @@ pub fn resampler_reset(p_resampler &Resampler) Result {
 
 // ChannelConversionPath is C.ma_channel_conversion_path
 pub enum ChannelConversionPath {
-	unknown = C.ma_channel_conversion_path_unknown
+	unknown     = C.ma_channel_conversion_path_unknown
 	passthrough = C.ma_channel_conversion_path_passthrough
-	mono_out = C.ma_channel_conversion_path_mono_out // Converting to mono.
-	mono_in = C.ma_channel_conversion_path_mono_in // Converting from mono.
-	shuffle = C.ma_channel_conversion_path_shuffle // Simple shuffle. Will use this when all channels are present in both input and output channel maps, but just in a different order.
-	weights = C.ma_channel_conversion_path_weights // Blended based on weights.
+	mono_out    = C.ma_channel_conversion_path_mono_out // Converting to mono.
+	mono_in     = C.ma_channel_conversion_path_mono_in // Converting from mono.
+	shuffle     = C.ma_channel_conversion_path_shuffle // Simple shuffle. Will use this when all channels are present in both input and output channel maps, but just in a different order.
+	weights     = C.ma_channel_conversion_path_weights // Blended based on weights.
 }
 
 // MonoExpansionMode is C.ma_mono_expansion_mode
 pub enum MonoExpansionMode {
-	duplicate = C.ma_mono_expansion_mode_duplicate // 0, The default.
-	average = C.ma_mono_expansion_mode_average // Average the mono channel across all channels.
+	duplicate   = C.ma_mono_expansion_mode_duplicate // 0, The default.
+	average     = C.ma_mono_expansion_mode_average // Average the mono channel across all channels.
 	stereo_only = C.ma_mono_expansion_mode_stereo_only // Duplicate to the left and right channels only and ignore the others.
-	default = C.ma_mono_expansion_mode_default // ma_mono_expansion_mode_duplicate,
+	default     = C.ma_mono_expansion_mode_default // ma_mono_expansion_mode_duplicate,
 }
 
 [typedef]
@@ -3133,10 +3133,10 @@ pub fn data_converter_config_init(format_in Format, format_out Format, channels_
 
 // DataConverterExecutionPath is C.ma_data_converter_execution_path
 pub enum DataConverterExecutionPath {
-	passthrough = C.ma_data_converter_execution_path_passthrough // No conversion.
-	format_only = C.ma_data_converter_execution_path_format_only // Only format conversion.
-	channels_only = C.ma_data_converter_execution_path_channels_only // Only channel conversion.
-	resample_only = C.ma_data_converter_execution_path_resample_only // Only resampling.
+	passthrough    = C.ma_data_converter_execution_path_passthrough // No conversion.
+	format_only    = C.ma_data_converter_execution_path_format_only // Only format conversion.
+	channels_only  = C.ma_data_converter_execution_path_channels_only // Only channel conversion.
+	resample_only  = C.ma_data_converter_execution_path_resample_only // Only resampling.
 	resample_first = C.ma_data_converter_execution_path_resample_first // All conversions, but resample as the first step.
 	channels_first = C.ma_data_converter_execution_path_channels_first // All conversions, but channels as the first step.
 }
@@ -4338,22 +4338,22 @@ pub type JobProc = fn (p_job &Job) Result
 // JobType is C.ma_job_type
 pub enum JobType {
 	// 0, Miscellaneous.
-	quit = C.MA_JOB_TYPE_QUIT
-	custom = C.MA_JOB_TYPE_CUSTOM
+	quit                                   = C.MA_JOB_TYPE_QUIT
+	custom                                 = C.MA_JOB_TYPE_CUSTOM
 	// Resource Manager.
 	resource_manager_load_data_buffer_node = C.MA_JOB_TYPE_RESOURCE_MANAGER_LOAD_DATA_BUFFER_NODE
 	resource_manager_free_data_buffer_node = C.MA_JOB_TYPE_RESOURCE_MANAGER_FREE_DATA_BUFFER_NODE
 	resource_manager_page_data_buffer_node = C.MA_JOB_TYPE_RESOURCE_MANAGER_PAGE_DATA_BUFFER_NODE
-	resource_manager_load_data_buffer = C.MA_JOB_TYPE_RESOURCE_MANAGER_LOAD_DATA_BUFFER
-	resource_manager_free_data_buffer = C.MA_JOB_TYPE_RESOURCE_MANAGER_FREE_DATA_BUFFER
-	resource_manager_load_data_stream = C.MA_JOB_TYPE_RESOURCE_MANAGER_LOAD_DATA_STREAM
-	resource_manager_free_data_stream = C.MA_JOB_TYPE_RESOURCE_MANAGER_FREE_DATA_STREAM
-	resource_manager_page_data_stream = C.MA_JOB_TYPE_RESOURCE_MANAGER_PAGE_DATA_STREAM
-	resource_manager_seek_data_stream = C.MA_JOB_TYPE_RESOURCE_MANAGER_SEEK_DATA_STREAM
+	resource_manager_load_data_buffer      = C.MA_JOB_TYPE_RESOURCE_MANAGER_LOAD_DATA_BUFFER
+	resource_manager_free_data_buffer      = C.MA_JOB_TYPE_RESOURCE_MANAGER_FREE_DATA_BUFFER
+	resource_manager_load_data_stream      = C.MA_JOB_TYPE_RESOURCE_MANAGER_LOAD_DATA_STREAM
+	resource_manager_free_data_stream      = C.MA_JOB_TYPE_RESOURCE_MANAGER_FREE_DATA_STREAM
+	resource_manager_page_data_stream      = C.MA_JOB_TYPE_RESOURCE_MANAGER_PAGE_DATA_STREAM
+	resource_manager_seek_data_stream      = C.MA_JOB_TYPE_RESOURCE_MANAGER_SEEK_DATA_STREAM
 	// Device.
-	device_aaudio_reroute = C.MA_JOB_TYPE_DEVICE_AAUDIO_REROUTE
+	device_aaudio_reroute                  = C.MA_JOB_TYPE_DEVICE_AAUDIO_REROUTE
 	// Count. Must always be last.
-	count = C.MA_JOB_TYPE_COUNT
+	count                                  = C.MA_JOB_TYPE_COUNT
 }
 
 [typedef]
@@ -4509,10 +4509,10 @@ TODO Non-numerical: #define MA_SUPPORT_NULL
 // DeviceState is C.ma_device_state
 pub enum DeviceState {
 	uninitialized = C.ma_device_state_uninitialized // 0,
-	stopped = C.ma_device_state_stopped // 1, The device's default state after initialization.
-	started = C.ma_device_state_started // 2, The device is started and is requesting and/or delivering audio data.
-	starting = C.ma_device_state_starting // 3, Transitioning from a stopped state to started.
-	stopping = C.ma_device_state_stopping // 4, Transitioning from a started state to stopped.
+	stopped       = C.ma_device_state_stopped // 1, The device's default state after initialization.
+	started       = C.ma_device_state_started // 2, The device is started and is requesting and/or delivering audio data.
+	starting      = C.ma_device_state_starting // 3, Transitioning from a stopped state to started.
+	stopping      = C.ma_device_state_stopping // 4, Transitioning from a started state to stopped.
 }
 
 /*
@@ -4529,21 +4529,21 @@ pub type IMMNotificationClient = C.ma_IMMNotificationClient
 
 // Backend is C.ma_backend
 pub enum Backend {
-	wasapi = C.ma_backend_wasapi
-	dsound = C.ma_backend_dsound
-	winmm = C.ma_backend_winmm
-	coreaudio = C.ma_backend_coreaudio
-	sndio = C.ma_backend_sndio
-	audio4 = C.ma_backend_audio4
-	oss = C.ma_backend_oss
+	wasapi     = C.ma_backend_wasapi
+	dsound     = C.ma_backend_dsound
+	winmm      = C.ma_backend_winmm
+	coreaudio  = C.ma_backend_coreaudio
+	sndio      = C.ma_backend_sndio
+	audio4     = C.ma_backend_audio4
+	oss        = C.ma_backend_oss
 	pulseaudio = C.ma_backend_pulseaudio
-	alsa = C.ma_backend_alsa
-	jack = C.ma_backend_jack
-	aaudio = C.ma_backend_aaudio
-	opensl = C.ma_backend_opensl
-	webaudio = C.ma_backend_webaudio
-	custom = C.ma_backend_custom // <-- Custom backend, with callbacks defined by the context config.
-	null = C.ma_backend_null // <-- Must always be the last item. Lowest priority, and used as the terminator for backend enumeration.
+	alsa       = C.ma_backend_alsa
+	jack       = C.ma_backend_jack
+	aaudio     = C.ma_backend_aaudio
+	opensl     = C.ma_backend_opensl
+	webaudio   = C.ma_backend_webaudio
+	custom     = C.ma_backend_custom // <-- Custom backend, with callbacks defined by the context config.
+	null       = C.ma_backend_null // <-- Must always be the last item. Lowest priority, and used as the terminator for backend enumeration.
 }
 
 /*
@@ -4612,9 +4612,9 @@ pub fn device_job_thread_next(p_job_thread &DeviceJobThread, p_job &Job) Result 
 
 // DeviceNotificationType is C.ma_device_notification_type
 pub enum DeviceNotificationType {
-	started = C.ma_device_notification_type_started
-	stopped = C.ma_device_notification_type_stopped
-	rerouted = C.ma_device_notification_type_rerouted
+	started            = C.ma_device_notification_type_started
+	stopped            = C.ma_device_notification_type_stopped
+	rerouted           = C.ma_device_notification_type_rerouted
 	interruption_began = C.ma_device_notification_type_interruption_began
 	interruption_ended = C.ma_device_notification_type_interruption_ended
 }
@@ -4744,100 +4744,100 @@ pub type StopProc = fn (p_device &Device)
 // DeviceType is C.ma_device_type
 pub enum DeviceType {
 	playback = C.ma_device_type_playback // 1,
-	capture = C.ma_device_type_capture // 2,
-	duplex = C.ma_device_type_duplex // ma_device_type_playback | ma_device_type_capture, 3
+	capture  = C.ma_device_type_capture // 2,
+	duplex   = C.ma_device_type_duplex // ma_device_type_playback | ma_device_type_capture, 3
 	loopback = C.ma_device_type_loopback // 4,
 }
 
 // ShareMode is C.ma_share_mode
 pub enum ShareMode {
-	@shared = C.ma_share_mode_shared // 0,
+	@shared   = C.ma_share_mode_shared // 0,
 	exclusive = C.ma_share_mode_exclusive
 }
 
 // IosSessionCategory is C.ma_ios_session_category
 pub enum IosSessionCategory {
-	default = C.ma_ios_session_category_default // 0, AVAudioSessionCategoryPlayAndRecord with AVAudioSessionCategoryOptionDefaultToSpeaker.
-	@none = C.ma_ios_session_category_none // Leave the session category unchanged.
-	ambient = C.ma_ios_session_category_ambient // AVAudioSessionCategoryAmbient
-	solo_ambient = C.ma_ios_session_category_solo_ambient // AVAudioSessionCategorySoloAmbient
-	playback = C.ma_ios_session_category_playback // AVAudioSessionCategoryPlayback
-	record = C.ma_ios_session_category_record // AVAudioSessionCategoryRecord
+	default         = C.ma_ios_session_category_default // 0, AVAudioSessionCategoryPlayAndRecord with AVAudioSessionCategoryOptionDefaultToSpeaker.
+	@none           = C.ma_ios_session_category_none // Leave the session category unchanged.
+	ambient         = C.ma_ios_session_category_ambient // AVAudioSessionCategoryAmbient
+	solo_ambient    = C.ma_ios_session_category_solo_ambient // AVAudioSessionCategorySoloAmbient
+	playback        = C.ma_ios_session_category_playback // AVAudioSessionCategoryPlayback
+	record          = C.ma_ios_session_category_record // AVAudioSessionCategoryRecord
 	play_and_record = C.ma_ios_session_category_play_and_record // AVAudioSessionCategoryPlayAndRecord
-	multi_route = C.ma_ios_session_category_multi_route // AVAudioSessionCategoryMultiRoute
+	multi_route     = C.ma_ios_session_category_multi_route // AVAudioSessionCategoryMultiRoute
 }
 
 // IosSessionCategoryOption is C.ma_ios_session_category_option
 pub enum IosSessionCategoryOption {
-	mix_with_others = C.ma_ios_session_category_option_mix_with_others // 0x01, AVAudioSessionCategoryOptionMixWithOthers
-	duck_others = C.ma_ios_session_category_option_duck_others // 0x02, AVAudioSessionCategoryOptionDuckOthers
-	allow_bluetooth = C.ma_ios_session_category_option_allow_bluetooth // 0x04, AVAudioSessionCategoryOptionAllowBluetooth
-	default_to_speaker = C.ma_ios_session_category_option_default_to_speaker // 0x08, AVAudioSessionCategoryOptionDefaultToSpeaker
+	mix_with_others                            = C.ma_ios_session_category_option_mix_with_others // 0x01, AVAudioSessionCategoryOptionMixWithOthers
+	duck_others                                = C.ma_ios_session_category_option_duck_others // 0x02, AVAudioSessionCategoryOptionDuckOthers
+	allow_bluetooth                            = C.ma_ios_session_category_option_allow_bluetooth // 0x04, AVAudioSessionCategoryOptionAllowBluetooth
+	default_to_speaker                         = C.ma_ios_session_category_option_default_to_speaker // 0x08, AVAudioSessionCategoryOptionDefaultToSpeaker
 	interrupt_spoken_audio_and_mix_with_others = C.ma_ios_session_category_option_interrupt_spoken_audio_and_mix_with_others // 0x11, AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers
-	allow_bluetooth_a2dp = C.ma_ios_session_category_option_allow_bluetooth_a2dp // 0x20, AVAudioSessionCategoryOptionAllowBluetoothA2DP
-	allow_air_play = C.ma_ios_session_category_option_allow_air_play // 0x40, AVAudioSessionCategoryOptionAllowAirPlay
+	allow_bluetooth_a2dp                       = C.ma_ios_session_category_option_allow_bluetooth_a2dp // 0x20, AVAudioSessionCategoryOptionAllowBluetoothA2DP
+	allow_air_play                             = C.ma_ios_session_category_option_allow_air_play // 0x40, AVAudioSessionCategoryOptionAllowAirPlay
 }
 
 // OpenslStreamType is C.ma_opensl_stream_type
 pub enum OpenslStreamType {
-	default = C.ma_opensl_stream_type_default // 0, Leaves the stream type unset.
-	voice = C.ma_opensl_stream_type_voice // SL_ANDROID_STREAM_VOICE
-	system = C.ma_opensl_stream_type_system // SL_ANDROID_STREAM_SYSTEM
-	ring = C.ma_opensl_stream_type_ring // SL_ANDROID_STREAM_RING
-	media = C.ma_opensl_stream_type_media // SL_ANDROID_STREAM_MEDIA
-	alarm = C.ma_opensl_stream_type_alarm // SL_ANDROID_STREAM_ALARM
+	default      = C.ma_opensl_stream_type_default // 0, Leaves the stream type unset.
+	voice        = C.ma_opensl_stream_type_voice // SL_ANDROID_STREAM_VOICE
+	system       = C.ma_opensl_stream_type_system // SL_ANDROID_STREAM_SYSTEM
+	ring         = C.ma_opensl_stream_type_ring // SL_ANDROID_STREAM_RING
+	media        = C.ma_opensl_stream_type_media // SL_ANDROID_STREAM_MEDIA
+	alarm        = C.ma_opensl_stream_type_alarm // SL_ANDROID_STREAM_ALARM
 	notification = C.ma_opensl_stream_type_notification // SL_ANDROID_STREAM_NOTIFICATION
 }
 
 // OpenslRecordingPreset is C.ma_opensl_recording_preset
 pub enum OpenslRecordingPreset {
-	default = C.ma_opensl_recording_preset_default // 0, Leaves the input preset unset.
-	generic = C.ma_opensl_recording_preset_generic // SL_ANDROID_RECORDING_PRESET_GENERIC
-	camcorder = C.ma_opensl_recording_preset_camcorder // SL_ANDROID_RECORDING_PRESET_CAMCORDER
-	voice_recognition = C.ma_opensl_recording_preset_voice_recognition // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION
+	default             = C.ma_opensl_recording_preset_default // 0, Leaves the input preset unset.
+	generic             = C.ma_opensl_recording_preset_generic // SL_ANDROID_RECORDING_PRESET_GENERIC
+	camcorder           = C.ma_opensl_recording_preset_camcorder // SL_ANDROID_RECORDING_PRESET_CAMCORDER
+	voice_recognition   = C.ma_opensl_recording_preset_voice_recognition // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION
 	voice_communication = C.ma_opensl_recording_preset_voice_communication // SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION
-	voice_unprocessed = C.ma_opensl_recording_preset_voice_unprocessed // SL_ANDROID_RECORDING_PRESET_UNPROCESSED
+	voice_unprocessed   = C.ma_opensl_recording_preset_voice_unprocessed // SL_ANDROID_RECORDING_PRESET_UNPROCESSED
 }
 
 // AaudioUsage is C.ma_aaudio_usage
 pub enum AaudioUsage {
-	default = C.ma_aaudio_usage_default // 0, Leaves the usage type unset.
-	announcement = C.ma_aaudio_usage_announcement // AAUDIO_SYSTEM_USAGE_ANNOUNCEMENT
-	emergency = C.ma_aaudio_usage_emergency // AAUDIO_SYSTEM_USAGE_EMERGENCY
-	safety = C.ma_aaudio_usage_safety // AAUDIO_SYSTEM_USAGE_SAFETY
-	vehicle_status = C.ma_aaudio_usage_vehicle_status // AAUDIO_SYSTEM_USAGE_VEHICLE_STATUS
-	alarm = C.ma_aaudio_usage_alarm // AAUDIO_USAGE_ALARM
-	assistance_accessibility = C.ma_aaudio_usage_assistance_accessibility // AAUDIO_USAGE_ASSISTANCE_ACCESSIBILITY
+	default                        = C.ma_aaudio_usage_default // 0, Leaves the usage type unset.
+	announcement                   = C.ma_aaudio_usage_announcement // AAUDIO_SYSTEM_USAGE_ANNOUNCEMENT
+	emergency                      = C.ma_aaudio_usage_emergency // AAUDIO_SYSTEM_USAGE_EMERGENCY
+	safety                         = C.ma_aaudio_usage_safety // AAUDIO_SYSTEM_USAGE_SAFETY
+	vehicle_status                 = C.ma_aaudio_usage_vehicle_status // AAUDIO_SYSTEM_USAGE_VEHICLE_STATUS
+	alarm                          = C.ma_aaudio_usage_alarm // AAUDIO_USAGE_ALARM
+	assistance_accessibility       = C.ma_aaudio_usage_assistance_accessibility // AAUDIO_USAGE_ASSISTANCE_ACCESSIBILITY
 	assistance_navigation_guidance = C.ma_aaudio_usage_assistance_navigation_guidance // AAUDIO_USAGE_ASSISTANCE_NAVIGATION_GUIDANCE
-	assistance_sonification = C.ma_aaudio_usage_assistance_sonification // AAUDIO_USAGE_ASSISTANCE_SONIFICATION
-	assitant = C.ma_aaudio_usage_assitant // AAUDIO_USAGE_ASSISTANT
-	game = C.ma_aaudio_usage_game // AAUDIO_USAGE_GAME
-	media = C.ma_aaudio_usage_media // AAUDIO_USAGE_MEDIA
-	notification = C.ma_aaudio_usage_notification // AAUDIO_USAGE_NOTIFICATION
-	notification_event = C.ma_aaudio_usage_notification_event // AAUDIO_USAGE_NOTIFICATION_EVENT
-	notification_ringtone = C.ma_aaudio_usage_notification_ringtone // AAUDIO_USAGE_NOTIFICATION_RINGTONE
-	voice_communication = C.ma_aaudio_usage_voice_communication // AAUDIO_USAGE_VOICE_COMMUNICATION
+	assistance_sonification        = C.ma_aaudio_usage_assistance_sonification // AAUDIO_USAGE_ASSISTANCE_SONIFICATION
+	assitant                       = C.ma_aaudio_usage_assitant // AAUDIO_USAGE_ASSISTANT
+	game                           = C.ma_aaudio_usage_game // AAUDIO_USAGE_GAME
+	media                          = C.ma_aaudio_usage_media // AAUDIO_USAGE_MEDIA
+	notification                   = C.ma_aaudio_usage_notification // AAUDIO_USAGE_NOTIFICATION
+	notification_event             = C.ma_aaudio_usage_notification_event // AAUDIO_USAGE_NOTIFICATION_EVENT
+	notification_ringtone          = C.ma_aaudio_usage_notification_ringtone // AAUDIO_USAGE_NOTIFICATION_RINGTONE
+	voice_communication            = C.ma_aaudio_usage_voice_communication // AAUDIO_USAGE_VOICE_COMMUNICATION
 	voice_communication_signalling = C.ma_aaudio_usage_voice_communication_signalling // AAUDIO_USAGE_VOICE_COMMUNICATION_SIGNALLING
 }
 
 // AaudioContentType is C.ma_aaudio_content_type
 pub enum AaudioContentType {
-	default = C.ma_aaudio_content_type_default // 0, Leaves the content type unset.
-	movie = C.ma_aaudio_content_type_movie // AAUDIO_CONTENT_TYPE_MOVIE
-	music = C.ma_aaudio_content_type_music // AAUDIO_CONTENT_TYPE_MUSIC
+	default      = C.ma_aaudio_content_type_default // 0, Leaves the content type unset.
+	movie        = C.ma_aaudio_content_type_movie // AAUDIO_CONTENT_TYPE_MOVIE
+	music        = C.ma_aaudio_content_type_music // AAUDIO_CONTENT_TYPE_MUSIC
 	sonification = C.ma_aaudio_content_type_sonification // AAUDIO_CONTENT_TYPE_SONIFICATION
-	speech = C.ma_aaudio_content_type_speech // AAUDIO_CONTENT_TYPE_SPEECH
+	speech       = C.ma_aaudio_content_type_speech // AAUDIO_CONTENT_TYPE_SPEECH
 }
 
 // AaudioInputPreset is C.ma_aaudio_input_preset
 pub enum AaudioInputPreset {
-	default = C.ma_aaudio_input_preset_default // 0, Leaves the input preset unset.
-	generic = C.ma_aaudio_input_preset_generic // AAUDIO_INPUT_PRESET_GENERIC
-	camcorder = C.ma_aaudio_input_preset_camcorder // AAUDIO_INPUT_PRESET_CAMCORDER
-	unprocessed = C.ma_aaudio_input_preset_unprocessed // AAUDIO_INPUT_PRESET_UNPROCESSED
-	voice_recognition = C.ma_aaudio_input_preset_voice_recognition // AAUDIO_INPUT_PRESET_VOICE_RECOGNITION
+	default             = C.ma_aaudio_input_preset_default // 0, Leaves the input preset unset.
+	generic             = C.ma_aaudio_input_preset_generic // AAUDIO_INPUT_PRESET_GENERIC
+	camcorder           = C.ma_aaudio_input_preset_camcorder // AAUDIO_INPUT_PRESET_CAMCORDER
+	unprocessed         = C.ma_aaudio_input_preset_unprocessed // AAUDIO_INPUT_PRESET_UNPROCESSED
+	voice_recognition   = C.ma_aaudio_input_preset_voice_recognition // AAUDIO_INPUT_PRESET_VOICE_RECOGNITION
 	voice_communication = C.ma_aaudio_input_preset_voice_communication // AAUDIO_INPUT_PRESET_VOICE_COMMUNICATION
-	voice_performance = C.ma_aaudio_input_preset_voice_performance // AAUDIO_INPUT_PRESET_VOICE_PERFORMANCE
+	voice_performance   = C.ma_aaudio_input_preset_voice_performance // AAUDIO_INPUT_PRESET_VOICE_PERFORMANCE
 }
 
 [typedef]
@@ -7842,15 +7842,15 @@ pub fn paged_audio_buffer_get_length_in_pcm_frames(p_paged_audio_buffer &PagedAu
 
 // OpenModeFlags is C.ma_open_mode_flags
 pub enum OpenModeFlags {
-	read = C.MA_OPEN_MODE_READ // 0x00000001,
+	read  = C.MA_OPEN_MODE_READ // 0x00000001,
 	write = C.MA_OPEN_MODE_WRITE // 0x00000002,
 }
 
 // SeekOrigin is C.ma_seek_origin
 pub enum SeekOrigin {
-	start = C.ma_seek_origin_start
+	start   = C.ma_seek_origin_start
 	current = C.ma_seek_origin_current
-	end = C.ma_seek_origin_end // Not used by decoders.
+	end     = C.ma_seek_origin_end // Not used by decoders.
 }
 
 [typedef]
@@ -7980,10 +7980,10 @@ pub type TellProc = fn (p_user_data voidptr, p_cursor &i64) Result
 // EncodingFormat is C.ma_encoding_format
 pub enum EncodingFormat {
 	unknown = C.ma_encoding_format_unknown // 0,
-	wav = C.ma_encoding_format_wav
-	flac = C.ma_encoding_format_flac
-	mp3 = C.ma_encoding_format_mp3
-	vorbis = C.ma_encoding_format_vorbis
+	wav     = C.ma_encoding_format_wav
+	flac    = C.ma_encoding_format_flac
+	mp3     = C.ma_encoding_format_mp3
+	vorbis  = C.ma_encoding_format_vorbis
 }
 
 [typedef]
@@ -8361,8 +8361,8 @@ pub fn encoder_write_pcm_frames(p_encoder &Encoder, const_p_frames_in voidptr, f
 
 // WaveformType is C.ma_waveform_type
 pub enum WaveformType {
-	sine = C.ma_waveform_type_sine
-	square = C.ma_waveform_type_square
+	sine     = C.ma_waveform_type_sine
+	square   = C.ma_waveform_type_square
 	triangle = C.ma_waveform_type_triangle
 	sawtooth = C.ma_waveform_type_sawtooth
 }
@@ -8466,8 +8466,8 @@ pub fn waveform_set_sample_rate(p_waveform &Waveform, sample_rate u32) Result {
 
 // NoiseType is C.ma_noise_type
 pub enum NoiseType {
-	white = C.ma_noise_type_white
-	pink = C.ma_noise_type_pink
+	white    = C.ma_noise_type_white
+	pink     = C.ma_noise_type_pink
 	brownian = C.ma_noise_type_brownian
 }
 
@@ -8579,10 +8579,10 @@ TODO Non-numerical: #define MA_NO_RESOURCE_MANAGER
 
 // ResourceManagerDataSourceFlags is C.ma_resource_manager_data_source_flags
 pub enum ResourceManagerDataSourceFlags {
-	stream = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_STREAM // 0x00000001, When set, does not load the entire data source in memory. Disk I/O will happen on job threads.
-	decode = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_DECODE // 0x00000002, Decode data before storing in memory. When set, decoding is done at the resource manager level rather than the mixing thread. Results in faster mixing, but higher memory usage.
-	async = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_ASYNC // 0x00000004, When set, the resource manager will load the data source asynchronously.
-	wait_init = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT // 0x00000008, When set, waits for initialization of the underlying data source before returning from ma_resource_manager_data_source_init().
+	stream         = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_STREAM // 0x00000001, When set, does not load the entire data source in memory. Disk I/O will happen on job threads.
+	decode         = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_DECODE // 0x00000002, Decode data before storing in memory. When set, decoding is done at the resource manager level rather than the mixing thread. Results in faster mixing, but higher memory usage.
+	async          = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_ASYNC // 0x00000004, When set, the resource manager will load the data source asynchronously.
+	wait_init      = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT // 0x00000008, When set, waits for initialization of the underlying data source before returning from ma_resource_manager_data_source_init().
 	unknown_length = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_UNKNOWN_LENGTH // 0x00000010, Gives the resource manager a hint that the length of the data source is unknown and calling `ma_data_source_get_length_in_pcm_frames()` should be avoided.
 }
 
@@ -8698,9 +8698,9 @@ pub fn resource_manager_data_source_config_init() ResourceManagerDataSourceConfi
 
 // ResourceManagerDataSupplyType is C.ma_resource_manager_data_supply_type
 pub enum ResourceManagerDataSupplyType {
-	unknown = C.ma_resource_manager_data_supply_type_unknown // 0, Used for determining whether or the data supply has been initialized.
-	encoded = C.ma_resource_manager_data_supply_type_encoded // Data supply is an encoded buffer. Connector is ma_decoder.
-	decoded = C.ma_resource_manager_data_supply_type_decoded // Data supply is a decoded buffer. Connector is ma_audio_buffer.
+	unknown       = C.ma_resource_manager_data_supply_type_unknown // 0, Used for determining whether or the data supply has been initialized.
+	encoded       = C.ma_resource_manager_data_supply_type_encoded // Data supply is an encoded buffer. Connector is ma_decoder.
+	decoded       = C.ma_resource_manager_data_supply_type_decoded // Data supply is a decoded buffer. Connector is ma_audio_buffer.
 	decoded_paged = C.ma_resource_manager_data_supply_type_decoded_paged // Data supply is a linked list of decoded buffers. Connector is ma_paged_audio_buffer.
 }
 
@@ -9341,11 +9341,11 @@ pub const node_bus_count_unknown = 255
 
 // NodeFlags is C.ma_node_flags
 pub enum NodeFlags {
-	passthrough = C.MA_NODE_FLAG_PASSTHROUGH // 0x00000001,
-	continuous_processing = C.MA_NODE_FLAG_CONTINUOUS_PROCESSING // 0x00000002,
-	allow_null_input = C.MA_NODE_FLAG_ALLOW_NULL_INPUT // 0x00000004,
+	passthrough                = C.MA_NODE_FLAG_PASSTHROUGH // 0x00000001,
+	continuous_processing      = C.MA_NODE_FLAG_CONTINUOUS_PROCESSING // 0x00000002,
+	allow_null_input           = C.MA_NODE_FLAG_ALLOW_NULL_INPUT // 0x00000004,
 	different_processing_rates = C.MA_NODE_FLAG_DIFFERENT_PROCESSING_RATES // 0x00000008,
-	silent_output = C.MA_NODE_FLAG_SILENT_OUTPUT // 0x00000010,
+	silent_output              = C.MA_NODE_FLAG_SILENT_OUTPUT // 0x00000010,
 }
 
 // NodeState is C.ma_node_state
@@ -10304,13 +10304,13 @@ pub fn delay_node_get_decay(const_p_delay_node &DelayNode) f32 {
 
 // SoundFlags is C.ma_sound_flags
 pub enum SoundFlags {
-	stream = C.MA_SOUND_FLAG_STREAM // 0x00000001, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_STREAM
-	decode = C.MA_SOUND_FLAG_DECODE // 0x00000002, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_DECODE
-	async = C.MA_SOUND_FLAG_ASYNC // 0x00000004, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_ASYNC
-	wait_init = C.MA_SOUND_FLAG_WAIT_INIT // 0x00000008, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT
+	stream                = C.MA_SOUND_FLAG_STREAM // 0x00000001, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_STREAM
+	decode                = C.MA_SOUND_FLAG_DECODE // 0x00000002, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_DECODE
+	async                 = C.MA_SOUND_FLAG_ASYNC // 0x00000004, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_ASYNC
+	wait_init             = C.MA_SOUND_FLAG_WAIT_INIT // 0x00000008, MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT
 	no_default_attachment = C.MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT // 0x00000010, Do not attach to the endpoint by default. Useful for when setting up nodes in a complex graph system.
-	no_pitch = C.MA_SOUND_FLAG_NO_PITCH // 0x00000020, Disable pitch shifting with ma_sound_set_pitch() and ma_sound_group_set_pitch(). This is an optimization.
-	no_spatialization = C.MA_SOUND_FLAG_NO_SPATIALIZATION // 0x00000040, Disable spatialization.
+	no_pitch              = C.MA_SOUND_FLAG_NO_PITCH // 0x00000020, Disable pitch shifting with ma_sound_set_pitch() and ma_sound_group_set_pitch(). This is an optimization.
+	no_spatialization     = C.MA_SOUND_FLAG_NO_SPATIALIZATION // 0x00000040, Disable spatialization.
 }
 
 pub const engine_max_listeners = 4

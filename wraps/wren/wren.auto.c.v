@@ -111,9 +111,9 @@ pub type WriteFn = fn (vm &VM, const_text &char)
 // WrenErrorType is C.WrenErrorType
 pub enum ErrorType {
 	// A syntax or resolution error detected at compile time.
-	compile = C.WREN_ERROR_COMPILE
+	compile     = C.WREN_ERROR_COMPILE
 	// The error message for a runtime error.
-	runtime = C.WREN_ERROR_RUNTIME
+	runtime     = C.WREN_ERROR_RUNTIME
 	// One entry of a runtime error's stack trace.
 	stack_trace = C.WREN_ERROR_STACK_TRACE
 }
@@ -294,20 +294,20 @@ pub type Configuration = C.WrenConfiguration
 
 // WrenInterpretResult is C.WrenInterpretResult
 pub enum WrenInterpretResult {
-	success = C.WREN_RESULT_SUCCESS
+	success       = C.WREN_RESULT_SUCCESS
 	compile_error = C.WREN_RESULT_COMPILE_ERROR
 	runtime_error = C.WREN_RESULT_RUNTIME_ERROR
 }
 
 // WrenType is C.WrenType
 pub enum WrenType {
-	bool = C.WREN_TYPE_BOOL
-	num = C.WREN_TYPE_NUM
+	bool    = C.WREN_TYPE_BOOL
+	num     = C.WREN_TYPE_NUM
 	foreign = C.WREN_TYPE_FOREIGN
-	list = C.WREN_TYPE_LIST
-	map = C.WREN_TYPE_MAP
-	null = C.WREN_TYPE_NULL
-	string = C.WREN_TYPE_STRING
+	list    = C.WREN_TYPE_LIST
+	map     = C.WREN_TYPE_MAP
+	null    = C.WREN_TYPE_NULL
+	string  = C.WREN_TYPE_STRING
 	// The object is of a type that isn't accessible by the C API.
 	unknown = C.WREN_TYPE_UNKNOWN
 }
