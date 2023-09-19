@@ -16,13 +16,17 @@ pub type Event = DropBeginEvent
 	| RecordEvent
 	| UnkownEvent
 	| WindowEvent
+	| WindowFocusEvent
+	| WindowHiddenEvent
+	| WindowMoveEvent
 	| WindowResizeEvent
+	| WindowShownEvent
 
 fn (e Event) serialize_as_playback_string() string {
 	return match e {
 		DropBeginEvent, DropEndEvent, DropTextEvent, DropFileEvent, KeyEvent, MouseButtonEvent,
 		MouseMotionEvent, MouseWheelEvent, QuitEvent, RecordEvent, UnkownEvent, WindowEvent,
-		WindowResizeEvent {
+		WindowFocusEvent, WindowMoveEvent, WindowResizeEvent, WindowShownEvent, WindowHiddenEvent {
 			e.serialize_as_playback_string()
 		}
 	}
@@ -30,6 +34,11 @@ fn (e Event) serialize_as_playback_string() string {
 
 pub enum EventStringSerializeFormat {
 	playback
+}
+
+pub enum WindowFocusEventKind {
+	gained
+	lost
 }
 
 [params]
@@ -171,7 +180,23 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 			ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'event ${event_type} not implemented')
 			empty_event
 		}
+		'WindowMoveEvent' {
+			ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'event ${event_type} not implemented')
+			empty_event
+		}
 		'WindowResizeEvent' {
+			ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'event ${event_type} not implemented')
+			empty_event
+		}
+		'WindowShownEvent' {
+			ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'event ${event_type} not implemented')
+			empty_event
+		}
+		'WindowHiddenEvent' {
+			ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'event ${event_type} not implemented')
+			empty_event
+		}
+		'WindowFocusEvent' {
 			ip.shy.log.gcritical('${@STRUCT}.${@FN}', 'event ${event_type} not implemented')
 			empty_event
 		}
@@ -225,10 +250,10 @@ fn (e WindowEvent) serialize_as_playback_string() string {
 
 pub enum WindowEventKind {
 	@none // Never used
-	shown // Window has been shown
-	hidden // Window has been hidden
+	// shown // Window has been shown
+	// hidden // Window has been hidden
 	exposed // Window has been exposed and should be redrawn
-	moved // Window has been moved to data1, data2
+	// moved // Window has been moved to data1, data2
 	// resized // Window has been resized
 	// size_changed // The window size has changed, either as a result of an API call or through the system or user changing the window size.
 	minimized // Window has been minimized
@@ -236,8 +261,8 @@ pub enum WindowEventKind {
 	restored // Window has been restored to normal size and position
 	enter // Window has gained mouse focus
 	leave // Window has lost mouse focus
-	focus_gained // Window has gained keyboard focus
-	focus_lost // Window has lost keyboard focus
+	// focus_gained // Window has gained keyboard focus
+	// focus_lost // Window has lost keyboard focus
 	close // The window manager requests that the window be closed
 	take_focus // Window is being offered a focus
 	hit_test // Window had a hit test.
@@ -252,6 +277,43 @@ pub:
 
 fn (e WindowResizeEvent) serialize_as_playback_string() string {
 	return '${e.Size.width},${e.Size.height},${e.previous.width},${e.previous.height}'
+}
+
+pub struct WindowMoveEvent {
+	ShyEvent
+pub:
+	x int
+	y int
+}
+
+fn (e WindowMoveEvent) serialize_as_playback_string() string {
+	return '${e.x},${e.y}'
+}
+
+pub struct WindowShownEvent {
+	ShyEvent
+}
+
+fn (e WindowShownEvent) serialize_as_playback_string() string {
+	return ''
+}
+
+pub struct WindowHiddenEvent {
+	ShyEvent
+}
+
+fn (e WindowHiddenEvent) serialize_as_playback_string() string {
+	return ''
+}
+
+pub struct WindowFocusEvent {
+	ShyEvent
+pub:
+	kind WindowFocusEventKind
+}
+
+fn (e WindowFocusEvent) serialize_as_playback_string() string {
+	return '${e.kind}'
 }
 
 //

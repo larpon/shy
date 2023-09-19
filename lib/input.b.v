@@ -193,12 +193,46 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				panic('${@STRUCT}.${@FN} unable locate SDL/Shy window ${sdl_event.window.windowID}/${shy_window_id}: ${err}')
 			}
 
-			if wevid == .resized {
-				shy_event = WindowResizeEvent{
-					timestamp: timestamp
-					window_id: shy_window_id
-					width: win.width()
-					height: win.height()
+			match wevid {
+				.resized {
+					shy_event = WindowResizeEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						width: win.width()
+						height: win.height()
+					}
+				}
+				.moved {
+					x, y := win.position()
+					shy_event = WindowMoveEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						x: x
+						y: y
+					}
+				}
+				.shown {
+					shy_event = WindowShownEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+					}
+				}
+				.focus_gained {
+					shy_event = WindowFocusEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						kind: .gained
+					}
+				}
+				.focus_lost {
+					shy_event = WindowFocusEvent{
+						timestamp: timestamp
+						window_id: shy_window_id
+						kind: .lost
+					}
+				}
+				else {
+					// TODO(lmp) panic('${@STRUCT}.${@FN} TODO implement ${wevid}')
 				}
 			}
 		}
