@@ -681,8 +681,10 @@ pub fn (mut w Window) init() ! {
 
 	w.render_init()
 
-	w.x, w.y = w.position()
-	w.width, w.height = w.wh()
+	w.Rect.x, w.Rect.y = w.position()
+	w.Rect.width, w.Rect.height = w.wh()
+
+	w.shy.api.events.on_event(w.on_event)
 
 	w.ready = true
 }
@@ -727,6 +729,32 @@ pub fn (mut w Window) shutdown() ! {
 	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)
+}
+
+fn (mut w Window) on_event(e Event) bool {
+	if e !is WindowResizeEvent && e !is WindowMoveEvent {
+		return false
+	}
+	match e {
+		WindowResizeEvent {
+			if e.window_id == w.id {
+				w.Rect.width = e.width
+				w.Rect.height = e.height
+			}
+			return false
+		}
+		WindowMoveEvent {
+			if e.window_id == w.id {
+				w.Rect.x = e.x
+				w.Rect.y = e.y
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
 }
 
 pub fn (mut w Window) set_vsync(vsync VSync) ! {
@@ -775,6 +803,18 @@ pub fn (w &Window) is_fullscreen() bool {
 	cur_flags := sdl.get_window_flags(w.handle)
 	return cur_flags & u32(sdl.WindowFlags.fullscreen) > 0
 		|| cur_flags & u32(sdl.WindowFlags.fullscreen_desktop) > 0
+}
+
+pub fn (w &Window) x() int {
+	mut x := 0
+	sdl.get_window_position(w.handle, &x, sdl.null)
+	return x
+}
+
+pub fn (w &Window) y() int {
+	mut y := 0
+	sdl.get_window_position(w.handle, sdl.null, &y)
+	return y
 }
 
 pub fn (w &Window) position() (int, int) {
