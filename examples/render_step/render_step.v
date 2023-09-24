@@ -85,7 +85,7 @@ pub fn (mut a App) event(e shy.Event) {
 				return
 			}
 			key := e.key_code
-			shift_held := a.kbd.is_key_down(.lshift) || a.kbd.is_key_down(.rshift)
+			shift_held := a.keyboard.is_key_down(.lshift) || a.keyboard.is_key_down(.rshift)
 			match key {
 				.s {
 					if !shift_held {

@@ -42,7 +42,7 @@ mut:
 	assets            &shy.Assets   = shy.null
 	draw              &shy.Draw     = shy.null
 	mouse             &shy.Mouse    = shy.null
-	kbd               &shy.Keyboard = shy.null
+	keyboard          &shy.Keyboard = shy.null
 	window            &shy.Window   = shy.null
 	canvas_           ?shy.Canvas
 }
@@ -61,7 +61,7 @@ pub fn (mut a EasyApp) init() ! {
 	}
 	a.assets = a.shy.assets()
 	a.mouse = api.input().mouse(0) or { return error('${@STRUCT}.${@FN}: no default mouse found') }
-	a.kbd = api.input().keyboard(0) or {
+	a.keyboard = api.input().keyboard(0) or {
 		return error('${@STRUCT}.${@FN}: no default keyboard found')
 	}
 	a.draw = a.shy.draw()
@@ -119,7 +119,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 				return
 			}
 			key := e.key_code
-			kb := a.kbd
+			kb := a.keyboard
 			alt_is_held := (kb.is_key_down(.lalt) || kb.is_key_down(.ralt))
 			match key {
 				.escape {
@@ -205,7 +205,7 @@ pub fn (mut a DevApp) event(e shy.Event) {
 	if e is shy.KeyEvent {
 		key_code := e.key_code
 		if e.state == .down {
-			kb := a.kbd
+			kb := a.keyboard
 			if kb.is_key_down(.comma) {
 				if key_code == .s {
 					s.log.print_status('STATUS')
