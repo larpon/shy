@@ -27,7 +27,7 @@ pub fn (mut di DrawImage) end() {
 	// gl.draw()
 }
 
-pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
+pub fn (di DrawImage) image_2d(image &Image) Draw2DImage {
 	return Draw2DImage{
 		factor: di.factor
 		width: image.width
@@ -44,7 +44,7 @@ pub fn (di DrawImage) image_2d(image Image) Draw2DImage {
 
 pub struct Draw2DImage {
 	Rect
-	image  Image
+	image  &Image
 	factor f32 = 1.0
 mut:
 	draw &Draw // For scissor state restoring
