@@ -4,6 +4,7 @@
 module lib
 
 import os
+import strings
 import shy.wraps.sokol.gfx
 import shy.wraps.stbi
 import v.embed_file
@@ -18,10 +19,12 @@ mut:
 
 	image_cache map[string]Image
 	sound_cache map[string]Sound
+	sb          strings.Builder
 }
 
 pub fn (mut a Assets) init() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	a.sb.ensure_cap(1024) // NOTE TODO(lmp) this needs attention if no GC is used
 }
 
 pub fn (mut a Assets) shutdown() ! {
@@ -34,6 +37,8 @@ pub fn (mut a Assets) shutdown() ! {
 	}
 	// Sounds are handled by the AudioEngine
 	a.sound_cache.clear()
+
+	unsafe { a.sb.free() }
 }
 
 // load loads a binary blob from a variety of sources and return
@@ -41,7 +46,7 @@ pub fn (mut a Assets) shutdown() ! {
 pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	source := alo.source
-	if asset := a.ass[source.cache_key()] {
+	if asset := a.ass[source.cache_key(mut a.sb)] {
 		return asset
 	}
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
@@ -106,12 +111,12 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 		ass := asset // as Image
 		assert !isnil(ass.asset)
 		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
-		a.image_cache[ass.asset.lo.source.cache_key()] = asset
+		a.image_cache[ass.asset.lo.source.cache_key(a.sb)] = asset
 	} $else $if T is Sound {
 		ass := asset //as Image
 		assert !isnil(ass.asset)
 		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
-		a.sound_cache[ass.asset.lo.source.cache_key()] = asset
+		a.sound_cache[ass.asset.lo.source.cache_key(mut a.sb)] = asset
 	} $else $if T is &Asset {
 		ass := asset //as &Asset
 		analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}(${typeof(ass).name})', 1)
@@ -124,16 +129,17 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 */
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
+	mut sb := a.sb // TODO(lmp) workaround V compile error
 	$if T is Image {
-		if image := a.image_cache[source.cache_key()] {
+		if image := a.image_cache[source.cache_key(mut sb)] {
 			return image
 		}
 	} $else $if T is Sound {
-		if sound := a.sound_cache[source.cache_key()] {
+		if sound := a.sound_cache[source.cache_key(mut sb)] {
 			return sound
 		}
 	} $else $if T is &Asset {
-		return a.ass[source.cache_key()]
+		return a.ass[source.cache_key(mut sb)]
 	} $else {
 		// t := T{}
 		// tof := typeof(t).name
@@ -175,7 +181,7 @@ pub fn (ts TaggedSource) str() string {
 
 pub type AssetSource = TaggedSource | embed_file.EmbedFileData | string
 
-pub fn (a AssetSource) cache_key() string {
+fn (a AssetSource) cache_key(mut sb strings.Builder) string {
 	return match a {
 		string {
 			a
@@ -184,7 +190,11 @@ pub fn (a AssetSource) cache_key() string {
 			a.path
 		}
 		TaggedSource {
-			a.source.str() + '#' + a.tag
+			//'${a.source.str()}#${a.tag}'
+			sb.write_string(a.source.str())
+			sb.write_string('#')
+			sb.write_string(a.tag)
+			sb.str()
 		}
 	}
 }
@@ -347,7 +357,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		unsafe {
 			mut assets := a.shy.assets()
 			// assets.cache[Image](image)! // TODO
-			assets.image_cache[a.lo.source.cache_key()] = image
+			assets.image_cache[a.lo.source.cache_key(mut assets.sb)] = image
 		}
 	}
 	return image
@@ -380,7 +390,7 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	if opt.cache {
 		unsafe {
 			mut assets := a.shy.assets()
-			assets.sound_cache[a.lo.source.cache_key()] = sound
+			assets.sound_cache[a.lo.source.cache_key(mut assets.sb)] = sound
 			// assets.cache[Sound](sound)!
 		}
 	}
