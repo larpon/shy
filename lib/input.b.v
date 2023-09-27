@@ -433,6 +433,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 fn (mut ip Input) poll_event() ?Event {
 	// TODO set mouse positions in each mouse in input.mice
 	// is_multi_mice := s.api.input.mice.len > 1
+
+	// TODO(lmp) memory leak around here with Option / Result type :(. See https://github.com/vlang/v/issues/19454
 	mut shy_event := Event(UnkownEvent{
 		timestamp: ip.shy.ticks()
 		window_id: no_window
