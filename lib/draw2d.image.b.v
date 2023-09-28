@@ -27,7 +27,10 @@ pub fn (mut di DrawImage) end() {
 	// gl.draw()
 }
 
+// image_2d returns an initialized Draw2DImage struct.
+// NOTE `image` is passed by reference because building with `-gc none` otherwise leaks.
 pub fn (di DrawImage) image_2d(image &Image) Draw2DImage {
+
 	return Draw2DImage{
 		factor: di.factor
 		width: image.width
