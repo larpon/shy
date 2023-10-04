@@ -229,8 +229,8 @@ fn (mut c Context) sokol_gl_init() ! {
 	// create a sokol-gl context compatible with the offscreen render pass
 	// (specific color pixel format, no depth-stencil-surface, no MSAA)
 	gl_ctx_desc := gl.ContextDesc{
-		// max_vertices: 8
-		// max_commands: 4
+		max_vertices: 1_000_000 // TODO(lmp) make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
+		max_commands: 100_000 // TODO(lmp) make configurable default 16k
 		color_format: .rgba8
 		depth_format: .@none
 		sample_count: offscreen_sample_count
