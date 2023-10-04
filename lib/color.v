@@ -95,33 +95,32 @@ pub fn (c &Color) is_opaque() bool {
 	return c.a == 255
 }
 
-/*
-pub fn (c &Color) r(value u8) Color {
+pub fn (c &Color) copy_set_r(value u8) Color {
 	return Color{
 		...c
 		r: value
 	}
 }
-pub fn (c &Color) g(value u8) Color {
+pub fn (c &Color) copy_set_g(value u8) Color {
 	return Color{
 		...c
 		g: value
 	}
 }
-pub fn (c &Color) b(value u8) Color {
+pub fn (c &Color) copy_set_b(value u8) Color {
 	return Color{
 		...c
 		b: value
 	}
 }
 
-pub fn (c &Color) a(value u8) Color {
+pub fn (c &Color) copy_set_a(value u8) Color {
 	return Color{
 		...c
 		a: value
 	}
 }
-*/
+
 pub fn (c &Color) darker() Color {
 	return c.blend_with(Color{0, 0, 0, 255}, 0.1)
 }
@@ -199,6 +198,26 @@ pub fn (mut c Color) variate(cv ColorVariation) {
 	}
 	if cv.a > 0 {
 		c.a = u8(c.a * (1 - cv.a) + rand.f32_in_range(0, 255) or { 255 } * cv.a)
+	}
+}
+
+[inline]
+pub fn rgb_hex(hex u32) Color {
+	return Color{
+		u8(((hex >> 16) & 0xff)),
+		u8(((hex >> 8) & 0xff)),
+		u8(((hex) & 0xff)),
+		u8(255)
+	}
+}
+
+[inline]
+pub fn rgba_hex(hex u32) Color {
+	return Color{
+		u8(((hex >> 24) & 0xff)),
+		u8(((hex >> 16) & 0xff)),
+		u8(((hex >> 8) & 0xff)),
+		u8(((hex) & 0xff))
 	}
 }
 
