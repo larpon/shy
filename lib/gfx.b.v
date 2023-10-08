@@ -38,11 +38,13 @@ mut:
 	pass_desc   gfx.PassDesc
 	pass_action gfx.PassAction
 	img         gfx.Image
+	sampler     gfx.Sampler
 	gl_ctx      gl.Context
 }
 
 fn (o Offscreen) destroy() {
 	gfx.destroy_image(o.img)
+	gfx.destroy_sampler(o.sampler)
 	gfx.destroy_pass(o.pass)
 	gl.destroy_context(o.gl_ctx)
 }
@@ -67,7 +69,7 @@ pub fn (mut g GFX) init() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
-	// TODO(lmp) do a better logger
+	// TODO(lmp) do a better / non-inline logger fn
 	mut logger := gfx.Logger{
 		func: fn (const_tag &char, log_level u32, log_item_id u32, message_or_null &char, line_nr u32, filename_or_null &char, user_data voidptr) {
 			mut output := ''
@@ -87,6 +89,8 @@ pub fn (mut g GFX) init() ! {
 	}
 
 	mut gfx_desc := gfx.Desc{
+		// image_pool_size
+		// sampler_pool_size
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		context_pool_size: 4 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 4 * 1024 // default 64, NOTE this number affects the prealloc_contexts in fonts.b.v...
@@ -243,12 +247,16 @@ fn (mut c Context) sokol_gl_init() ! {
 		height: h
 		pixel_format: .rgba8
 		sample_count: offscreen_sample_count
+	}
+	off_img := gfx.make_image(&img_desc)
+
+	mut smp_desc := gfx.SamplerDesc{
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		min_filter: .nearest
 		mag_filter: .nearest
 	}
-	off_img := gfx.make_image(&img_desc)
+	mut off_sampler := gfx.make_sampler(&smp_desc)
 
 	mut off_pass_desc := gfx.PassDesc{}
 	off_pass_desc.color_attachments[0].image = off_img
@@ -261,6 +269,7 @@ fn (mut c Context) sokol_gl_init() ! {
 		pass_desc: off_pass_desc
 		gl_ctx: gl.make_context(gl_ctx_desc)
 		img: off_img
+		sampler: off_sampler
 	}
 
 	c.display = display
@@ -272,6 +281,7 @@ fn (mut c Context) offscreen_reinit(width int, height int) ! {
 
 	gfx.destroy_pass(c.offscreen.pass)
 	gfx.destroy_image(c.offscreen.pass_desc.color_attachments[0].image)
+	gfx.destroy_sampler(c.offscreen.sampler)
 	// recreate an offscreen render target texture, pass, and pass_action
 	mut img_desc := gfx.ImageDesc{
 		render_target: true
@@ -279,12 +289,16 @@ fn (mut c Context) offscreen_reinit(width int, height int) ! {
 		height: height
 		pixel_format: .rgba8
 		sample_count: offscreen_sample_count
+	}
+	off_img := gfx.make_image(&img_desc)
+
+	mut smp_desc := gfx.SamplerDesc{
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		min_filter: .nearest
 		mag_filter: .nearest
 	}
-	off_img := gfx.make_image(&img_desc)
+	mut off_sampler := gfx.make_sampler(&smp_desc)
 
 	mut off_pass_desc := gfx.PassDesc{}
 	off_pass_desc.color_attachments[0].image = off_img
@@ -294,6 +308,7 @@ fn (mut c Context) offscreen_reinit(width int, height int) ! {
 	c.offscreen.pass = gfx.make_pass(&off_pass_desc)
 	c.offscreen.pass_desc = off_pass_desc
 	c.offscreen.img = off_img
+	c.offscreen.sampler = off_sampler
 }
 
 [manualfree]
@@ -358,7 +373,7 @@ pub fn (mut g GFX) end_easy_frame() {
 	gl.set_context(gl.default_context)
 	gl.defaults()
 	gl.enable_texture()
-	gl.texture(off.img)
+	gl.texture(off.img, off.sampler)
 	gl.load_pipeline(dis.gl_pip)
 
 	/*

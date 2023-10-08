@@ -6,8 +6,8 @@ import shy.wraps.sokol.memory
 
 [markused]
 const default_allocator = Allocator{
-	alloc: memory.salloc
-	free: memory.sfree
+	alloc_fn: memory.salloc
+	free_fn: memory.sfree
 	user_data: voidptr(0x100005f0)
 }
 
@@ -25,10 +25,10 @@ sfonst_allocator_t
 [typedef]
 struct C.sfons_allocator_t {
 	// void* (*alloc)(size_t size, void* user_data);
-	alloc memory.FnAllocatorAlloc
+	alloc_fn memory.FnAllocatorAlloc
 	// alloc fn (size usize, user_data voidptr) voidptr
 	// void (*free)(void* ptr, void* user_data);
-	free memory.FnAllocatorFree
+	free_fn memory.FnAllocatorFree
 	// free      fn (ptr voidptr, user_data voidptr)
 	user_data voidptr
 }

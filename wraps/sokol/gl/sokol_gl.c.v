@@ -117,8 +117,8 @@ pub fn disable_texture() {
 }
 
 [inline]
-pub fn texture(img gfx.Image) {
-	C.sgl_texture(img)
+pub fn texture(img gfx.Image, smp gfx.Sampler) {
+	C.sgl_texture(img, smp)
 }
 
 // pipeline stack functions

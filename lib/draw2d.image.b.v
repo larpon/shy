@@ -30,7 +30,6 @@ pub fn (mut di DrawImage) end() {
 // image_2d returns an initialized Draw2DImage struct.
 // NOTE `image` is passed by reference because building with `-gc none` otherwise leaks.
 pub fn (di DrawImage) image_2d(image &Image) Draw2DImage {
-
 	return Draw2DImage{
 		factor: di.factor
 		width: image.width
@@ -213,7 +212,7 @@ pub fn (i Draw2DImage) draw() {
 
 	gl.push_matrix()
 	gl.enable_texture()
-	gl.texture(i.image.gfx_image)
+	gl.texture(i.image.gfx_image, i.image.gfx_sampler)
 
 	// o_off_x = int(o_off_x)
 	// o_off_y = int(o_off_y)
@@ -292,7 +291,7 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	gl.push_matrix()
 
 	gl.enable_texture()
-	gl.texture(i.image.gfx_image)
+	gl.texture(i.image.gfx_image, i.image.gfx_sampler)
 
 	mut o_off_x, mut o_off_y := i.origin_offset()
 	// o_off_x = int(o_off_x)

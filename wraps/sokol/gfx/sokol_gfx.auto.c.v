@@ -50,6 +50,13 @@ struct C.sg_image {
 pub type Image = C.sg_image
 
 [typedef]
+struct C.sg_sampler {
+	id u32 // NOTE Added from chew config
+}
+
+pub type Sampler = C.sg_sampler
+
+[typedef]
 struct C.sg_shader {
 	id u32 // NOTE Added from chew config
 }
@@ -221,206 +228,217 @@ pub mut:
 pub type Limits = C.sg_limits
 
 // ResourceState is C.sg_resource_state
-pub enum ResourceState {
-	initial   = C.SG_RESOURCESTATE_INITIAL
-	alloc     = C.SG_RESOURCESTATE_ALLOC
-	valid     = C.SG_RESOURCESTATE_VALID
-	failed    = C.SG_RESOURCESTATE_FAILED
-	invalid   = C.SG_RESOURCESTATE_INVALID
-	force_u32 = C._SG_RESOURCESTATE_FORCE_U32 // 0x7FFFFFFF,
+pub enum ResourceState as u32 {
+	initial    = C.SG_RESOURCESTATE_INITIAL
+	alloc      = C.SG_RESOURCESTATE_ALLOC
+	valid      = C.SG_RESOURCESTATE_VALID
+	failed     = C.SG_RESOURCESTATE_FAILED
+	invalid    = C.SG_RESOURCESTATE_INVALID
+	_force_u32 = C._SG_RESOURCESTATE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // Usage is C.sg_usage
-pub enum Usage {
-	default   = C._SG_USAGE_DEFAULT // value 0 reserved for default-init
-	immutable = C.SG_USAGE_IMMUTABLE
-	dynamic   = C.SG_USAGE_DYNAMIC
-	stream    = C.SG_USAGE_STREAM
-	num       = C._SG_USAGE_NUM
-	force_u32 = C._SG_USAGE_FORCE_U32 // 0x7FFFFFFF,
+pub enum Usage as u32 {
+	_default   = C._SG_USAGE_DEFAULT // value 0 reserved for default-init
+	immutable  = C.SG_USAGE_IMMUTABLE
+	dynamic    = C.SG_USAGE_DYNAMIC
+	stream     = C.SG_USAGE_STREAM
+	_num       = C._SG_USAGE_NUM
+	_force_u32 = C._SG_USAGE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BufferType is C.sg_buffer_type
-pub enum BufferType {
-	default      = C._SG_BUFFERTYPE_DEFAULT // value 0 reserved for default-init
+pub enum BufferType as u32 {
+	_default     = C._SG_BUFFERTYPE_DEFAULT // value 0 reserved for default-init
 	vertexbuffer = C.SG_BUFFERTYPE_VERTEXBUFFER
 	indexbuffer  = C.SG_BUFFERTYPE_INDEXBUFFER
-	num          = C._SG_BUFFERTYPE_NUM
-	force_u32    = C._SG_BUFFERTYPE_FORCE_U32 // 0x7FFFFFFF,
+	_num         = C._SG_BUFFERTYPE_NUM
+	_force_u32   = C._SG_BUFFERTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // IndexType is C.sg_index_type
-pub enum IndexType {
-	default   = C._SG_INDEXTYPE_DEFAULT // value 0 reserved for default-init
-	@none     = C.SG_INDEXTYPE_NONE
-	uint16    = C.SG_INDEXTYPE_UINT16
-	uint32    = C.SG_INDEXTYPE_UINT32
-	num       = C._SG_INDEXTYPE_NUM
-	force_u32 = C._SG_INDEXTYPE_FORCE_U32 // 0x7FFFFFFF,
+pub enum IndexType as u32 {
+	_default   = C._SG_INDEXTYPE_DEFAULT // value 0 reserved for default-init
+	@none      = C.SG_INDEXTYPE_NONE
+	uint16     = C.SG_INDEXTYPE_UINT16
+	uint32     = C.SG_INDEXTYPE_UINT32
+	_num       = C._SG_INDEXTYPE_NUM
+	_force_u32 = C._SG_INDEXTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // ImageType is C.sg_image_type
-pub enum ImageType {
-	default   = C._SG_IMAGETYPE_DEFAULT // value 0 reserved for default-init
-	_2d       = C.SG_IMAGETYPE_2D
-	cube      = C.SG_IMAGETYPE_CUBE
-	_3d       = C.SG_IMAGETYPE_3D
-	array     = C.SG_IMAGETYPE_ARRAY
-	num       = C._SG_IMAGETYPE_NUM
-	force_u32 = C._SG_IMAGETYPE_FORCE_U32 // 0x7FFFFFFF,
+pub enum ImageType as u32 {
+	_default   = C._SG_IMAGETYPE_DEFAULT // value 0 reserved for default-init
+	_2d        = C.SG_IMAGETYPE_2D
+	cube       = C.SG_IMAGETYPE_CUBE
+	_3d        = C.SG_IMAGETYPE_3D
+	array      = C.SG_IMAGETYPE_ARRAY
+	_num       = C._SG_IMAGETYPE_NUM
+	_force_u32 = C._SG_IMAGETYPE_FORCE_U32 // 0x7FFFFFFF,
+}
+
+pub enum ImageSampleType as u32 {
+	_default   = C._SG_IMAGESAMPLETYPE_DEFAULT // value 0 reserved for default-init
+	float      = C.SG_IMAGESAMPLETYPE_FLOAT
+	depth      = C.SG_IMAGESAMPLETYPE_DEPTH
+	sint       = C.SG_IMAGESAMPLETYPE_SINT
+	uint       = C.SG_IMAGESAMPLETYPE_UINT
+	_num       = C._SG_IMAGESAMPLETYPE_NUM
+	_force_u32 = C._SG_IMAGESAMPLETYPE_FORCE_U32 // 0x7FFFFFFF
 }
 
 // SamplerType is C.sg_sampler_type
-pub enum SamplerType {
-	default = C._SG_SAMPLERTYPE_DEFAULT // value 0 reserved for default-init
-	float   = C.SG_SAMPLERTYPE_FLOAT
-	sint    = C.SG_SAMPLERTYPE_SINT
-	uint    = C.SG_SAMPLERTYPE_UINT
+pub enum SamplerType as u32 {
+	_default   = C._SG_SAMPLERTYPE_DEFAULT // value 0 reserved for default-init
+	sample     = C.SG_SAMPLERTYPE_SAMPLE
+	compare    = C.SG_SAMPLERTYPE_COMPARE
+	_num       = C._SG_SAMPLERTYPE_NUM
+	_force_u32 = C._SG_SAMPLERTYPE_FORCE_U32 // 0x7FFFFFFF
 }
 
 // CubeFace is C.sg_cube_face
-pub enum CubeFace {
-	pos_x     = C.SG_CUBEFACE_POS_X
-	neg_x     = C.SG_CUBEFACE_NEG_X
-	pos_y     = C.SG_CUBEFACE_POS_Y
-	neg_y     = C.SG_CUBEFACE_NEG_Y
-	pos_z     = C.SG_CUBEFACE_POS_Z
-	neg_z     = C.SG_CUBEFACE_NEG_Z
-	num       = C.SG_CUBEFACE_NUM
-	force_u32 = C._SG_CUBEFACE_FORCE_U32 // 0x7FFFFFFF,
+pub enum CubeFace as u32 {
+	pos_x      = C.SG_CUBEFACE_POS_X
+	neg_x      = C.SG_CUBEFACE_NEG_X
+	pos_y      = C.SG_CUBEFACE_POS_Y
+	neg_y      = C.SG_CUBEFACE_NEG_Y
+	pos_z      = C.SG_CUBEFACE_POS_Z
+	neg_z      = C.SG_CUBEFACE_NEG_Z
+	_num       = C.SG_CUBEFACE_NUM
+	_force_u32 = C._SG_CUBEFACE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // ShaderStage is C.sg_shader_stage
-pub enum ShaderStage {
-	vs        = C.SG_SHADERSTAGE_VS
-	fs        = C.SG_SHADERSTAGE_FS
-	force_u32 = C._SG_SHADERSTAGE_FORCE_U32 // 0x7FFFFFFF,
+pub enum ShaderStage as u32 {
+	vs         = C.SG_SHADERSTAGE_VS
+	fs         = C.SG_SHADERSTAGE_FS
+	_force_u32 = C._SG_SHADERSTAGE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // PrimitiveType is C.sg_primitive_type
-pub enum PrimitiveType {
-	default        = C._SG_PRIMITIVETYPE_DEFAULT // value 0 reserved for default-init
+pub enum PrimitiveType as u32 {
+	_default       = C._SG_PRIMITIVETYPE_DEFAULT // value 0 reserved for default-init
 	points         = C.SG_PRIMITIVETYPE_POINTS
 	lines          = C.SG_PRIMITIVETYPE_LINES
 	line_strip     = C.SG_PRIMITIVETYPE_LINE_STRIP
 	triangles      = C.SG_PRIMITIVETYPE_TRIANGLES
 	triangle_strip = C.SG_PRIMITIVETYPE_TRIANGLE_STRIP
-	num            = C._SG_PRIMITIVETYPE_NUM
-	force_u32      = C._SG_PRIMITIVETYPE_FORCE_U32 // 0x7FFFFFFF,
+	_num           = C._SG_PRIMITIVETYPE_NUM
+	_force_u32     = C._SG_PRIMITIVETYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // Filter is C.sg_filter
-pub enum Filter {
-	default                = C._SG_FILTER_DEFAULT // value 0 reserved for default-init
-	nearest                = C.SG_FILTER_NEAREST
-	linear                 = C.SG_FILTER_LINEAR
-	nearest_mipmap_nearest = C.SG_FILTER_NEAREST_MIPMAP_NEAREST
-	nearest_mipmap_linear  = C.SG_FILTER_NEAREST_MIPMAP_LINEAR
-	linear_mipmap_nearest  = C.SG_FILTER_LINEAR_MIPMAP_NEAREST
-	linear_mipmap_linear   = C.SG_FILTER_LINEAR_MIPMAP_LINEAR
-	num                    = C._SG_FILTER_NUM
-	force_u32              = C._SG_FILTER_FORCE_U32 // 0x7FFFFFFF,
+pub enum Filter as u32 {
+	_default   = C._SG_FILTER_DEFAULT // value 0 reserved for default-init
+	nearest    = C.SG_FILTER_NEAREST
+	linear     = C.SG_FILTER_LINEAR
+	// nearest_mipmap_nearest = C.SG_FILTER_NEAREST_MIPMAP_NEAREST
+	// nearest_mipmap_linear  = C.SG_FILTER_NEAREST_MIPMAP_LINEAR
+	// linear_mipmap_nearest  = C.SG_FILTER_LINEAR_MIPMAP_NEAREST
+	// linear_mipmap_linear   = C.SG_FILTER_LINEAR_MIPMAP_LINEAR
+	_num       = C._SG_FILTER_NUM
+	_force_u32 = C._SG_FILTER_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // Wrap is C.sg_wrap
-pub enum Wrap {
-	default         = C._SG_WRAP_DEFAULT // value 0 reserved for default-init
+pub enum Wrap as u32 {
+	_default        = C._SG_WRAP_DEFAULT // value 0 reserved for default-init
 	repeat          = C.SG_WRAP_REPEAT
 	clamp_to_edge   = C.SG_WRAP_CLAMP_TO_EDGE
 	clamp_to_border = C.SG_WRAP_CLAMP_TO_BORDER
 	mirrored_repeat = C.SG_WRAP_MIRRORED_REPEAT
-	num             = C._SG_WRAP_NUM
-	force_u32       = C._SG_WRAP_FORCE_U32 // 0x7FFFFFFF,
+	_num            = C._SG_WRAP_NUM
+	_force_u32      = C._SG_WRAP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BorderColor is C.sg_border_color
-pub enum BorderColor {
-	default           = C._SG_BORDERCOLOR_DEFAULT // value 0 reserved for default-init
+pub enum BorderColor as u32 {
+	_default          = C._SG_BORDERCOLOR_DEFAULT // value 0 reserved for default-init
 	transparent_black = C.SG_BORDERCOLOR_TRANSPARENT_BLACK
 	opaque_black      = C.SG_BORDERCOLOR_OPAQUE_BLACK
 	opaque_white      = C.SG_BORDERCOLOR_OPAQUE_WHITE
-	num               = C._SG_BORDERCOLOR_NUM
-	force_u32         = C._SG_BORDERCOLOR_FORCE_U32 // 0x7FFFFFFF,
+	_num              = C._SG_BORDERCOLOR_NUM
+	_force_u32        = C._SG_BORDERCOLOR_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // VertexFormat is C.sg_vertex_format
-pub enum VertexFormat {
-	invalid   = C.SG_VERTEXFORMAT_INVALID
-	float     = C.SG_VERTEXFORMAT_FLOAT
-	float2    = C.SG_VERTEXFORMAT_FLOAT2
-	float3    = C.SG_VERTEXFORMAT_FLOAT3
-	float4    = C.SG_VERTEXFORMAT_FLOAT4
-	byte4     = C.SG_VERTEXFORMAT_BYTE4
-	byte4n    = C.SG_VERTEXFORMAT_BYTE4N
-	ubyte4    = C.SG_VERTEXFORMAT_UBYTE4
-	ubyte4n   = C.SG_VERTEXFORMAT_UBYTE4N
-	short2    = C.SG_VERTEXFORMAT_SHORT2
-	short2n   = C.SG_VERTEXFORMAT_SHORT2N
-	ushort2n  = C.SG_VERTEXFORMAT_USHORT2N
-	short4    = C.SG_VERTEXFORMAT_SHORT4
-	short4n   = C.SG_VERTEXFORMAT_SHORT4N
-	ushort4n  = C.SG_VERTEXFORMAT_USHORT4N
-	uint10_n2 = C.SG_VERTEXFORMAT_UINT10_N2
-	num       = C._SG_VERTEXFORMAT_NUM
-	force_u32 = C._SG_VERTEXFORMAT_FORCE_U32 // 0x7FFFFFFF,
+pub enum VertexFormat as u32 {
+	invalid    = C.SG_VERTEXFORMAT_INVALID
+	float      = C.SG_VERTEXFORMAT_FLOAT
+	float2     = C.SG_VERTEXFORMAT_FLOAT2
+	float3     = C.SG_VERTEXFORMAT_FLOAT3
+	float4     = C.SG_VERTEXFORMAT_FLOAT4
+	byte4      = C.SG_VERTEXFORMAT_BYTE4
+	byte4n     = C.SG_VERTEXFORMAT_BYTE4N
+	ubyte4     = C.SG_VERTEXFORMAT_UBYTE4
+	ubyte4n    = C.SG_VERTEXFORMAT_UBYTE4N
+	short2     = C.SG_VERTEXFORMAT_SHORT2
+	short2n    = C.SG_VERTEXFORMAT_SHORT2N
+	ushort2n   = C.SG_VERTEXFORMAT_USHORT2N
+	short4     = C.SG_VERTEXFORMAT_SHORT4
+	short4n    = C.SG_VERTEXFORMAT_SHORT4N
+	ushort4n   = C.SG_VERTEXFORMAT_USHORT4N
+	uint10_n2  = C.SG_VERTEXFORMAT_UINT10_N2
+	_num       = C._SG_VERTEXFORMAT_NUM
+	_force_u32 = C._SG_VERTEXFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // VertexStep is C.sg_vertex_step
-pub enum VertexStep {
-	default      = C._SG_VERTEXSTEP_DEFAULT // value 0 reserved for default-init
+pub enum VertexStep as u32 {
+	_default     = C._SG_VERTEXSTEP_DEFAULT // value 0 reserved for default-init
 	per_vertex   = C.SG_VERTEXSTEP_PER_VERTEX
 	per_instance = C.SG_VERTEXSTEP_PER_INSTANCE
-	num          = C._SG_VERTEXSTEP_NUM
-	force_u32    = C._SG_VERTEXSTEP_FORCE_U32 // 0x7FFFFFFF,
+	_num         = C._SG_VERTEXSTEP_NUM
+	_force_u32   = C._SG_VERTEXSTEP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // UniformType is C.sg_uniform_type
-pub enum UniformType {
-	invalid   = C.SG_UNIFORMTYPE_INVALID
-	float     = C.SG_UNIFORMTYPE_FLOAT
-	float2    = C.SG_UNIFORMTYPE_FLOAT2
-	float3    = C.SG_UNIFORMTYPE_FLOAT3
-	float4    = C.SG_UNIFORMTYPE_FLOAT4
-	int       = C.SG_UNIFORMTYPE_INT
-	int2      = C.SG_UNIFORMTYPE_INT2
-	int3      = C.SG_UNIFORMTYPE_INT3
-	int4      = C.SG_UNIFORMTYPE_INT4
-	mat4      = C.SG_UNIFORMTYPE_MAT4
-	num       = C._SG_UNIFORMTYPE_NUM
-	force_u32 = C._SG_UNIFORMTYPE_FORCE_U32 // 0x7FFFFFFF,
+pub enum UniformType as u32 {
+	invalid    = C.SG_UNIFORMTYPE_INVALID
+	float      = C.SG_UNIFORMTYPE_FLOAT
+	float2     = C.SG_UNIFORMTYPE_FLOAT2
+	float3     = C.SG_UNIFORMTYPE_FLOAT3
+	float4     = C.SG_UNIFORMTYPE_FLOAT4
+	int        = C.SG_UNIFORMTYPE_INT
+	int2       = C.SG_UNIFORMTYPE_INT2
+	int3       = C.SG_UNIFORMTYPE_INT3
+	int4       = C.SG_UNIFORMTYPE_INT4
+	mat4       = C.SG_UNIFORMTYPE_MAT4
+	_num       = C._SG_UNIFORMTYPE_NUM
+	_force_u32 = C._SG_UNIFORMTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // UniformLayout is C.sg_uniform_layout
-pub enum UniformLayout {
-	default   = C._SG_UNIFORMLAYOUT_DEFAULT // value 0 reserved for default-init
-	native    = C.SG_UNIFORMLAYOUT_NATIVE // default: layout depends on currently active backend
-	std140    = C.SG_UNIFORMLAYOUT_STD140 // std140: memory layout according to std140
-	num       = C._SG_UNIFORMLAYOUT_NUM
-	force_u32 = C._SG_UNIFORMLAYOUT_FORCE_U32 // 0x7FFFFFFF,
+pub enum UniformLayout as u32 {
+	_default   = C._SG_UNIFORMLAYOUT_DEFAULT // value 0 reserved for default-init
+	native     = C.SG_UNIFORMLAYOUT_NATIVE // default: layout depends on currently active backend
+	std140     = C.SG_UNIFORMLAYOUT_STD140 // std140: memory layout according to std140
+	_num       = C._SG_UNIFORMLAYOUT_NUM
+	_force_u32 = C._SG_UNIFORMLAYOUT_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // CullMode is C.sg_cull_mode
-pub enum CullMode {
-	default   = C._SG_CULLMODE_DEFAULT // value 0 reserved for default-init
-	@none     = C.SG_CULLMODE_NONE
-	front     = C.SG_CULLMODE_FRONT
-	back      = C.SG_CULLMODE_BACK
-	num       = C._SG_CULLMODE_NUM
-	force_u32 = C._SG_CULLMODE_FORCE_U32 // 0x7FFFFFFF,
+pub enum CullMode as u32 {
+	_default   = C._SG_CULLMODE_DEFAULT // value 0 reserved for default-init
+	@none      = C.SG_CULLMODE_NONE
+	front      = C.SG_CULLMODE_FRONT
+	back       = C.SG_CULLMODE_BACK
+	_num       = C._SG_CULLMODE_NUM
+	_force_u32 = C._SG_CULLMODE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // FaceWinding is C.sg_face_winding
-pub enum FaceWinding {
-	default   = C._SG_FACEWINDING_DEFAULT // value 0 reserved for default-init
-	ccw       = C.SG_FACEWINDING_CCW
-	cw        = C.SG_FACEWINDING_CW
-	num       = C._SG_FACEWINDING_NUM
-	force_u32 = C._SG_FACEWINDING_FORCE_U32 // 0x7FFFFFFF,
+pub enum FaceWinding as u32 {
+	_default   = C._SG_FACEWINDING_DEFAULT // value 0 reserved for default-init
+	ccw        = C.SG_FACEWINDING_CCW
+	cw         = C.SG_FACEWINDING_CW
+	_num       = C._SG_FACEWINDING_NUM
+	_force_u32 = C._SG_FACEWINDING_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // CompareFunc is C.sg_compare_func
-pub enum CompareFunc {
-	default       = C._SG_COMPAREFUNC_DEFAULT // value 0 reserved for default-init
+pub enum CompareFunc as u32 {
+	_default      = C._SG_COMPAREFUNC_DEFAULT // value 0 reserved for default-init
 	never         = C.SG_COMPAREFUNC_NEVER
 	less          = C.SG_COMPAREFUNC_LESS
 	equal         = C.SG_COMPAREFUNC_EQUAL
@@ -429,13 +447,13 @@ pub enum CompareFunc {
 	not_equal     = C.SG_COMPAREFUNC_NOT_EQUAL
 	greater_equal = C.SG_COMPAREFUNC_GREATER_EQUAL
 	always        = C.SG_COMPAREFUNC_ALWAYS
-	num           = C._SG_COMPAREFUNC_NUM
-	force_u32     = C._SG_COMPAREFUNC_FORCE_U32 // 0x7FFFFFFF,
+	_num          = C._SG_COMPAREFUNC_NUM
+	_force_u32    = C._SG_COMPAREFUNC_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // StencilOp is C.sg_stencil_op
 pub enum StencilOp {
-	default    = C._SG_STENCILOP_DEFAULT // value 0 reserved for default-init
+	_default   = C._SG_STENCILOP_DEFAULT // value 0 reserved for default-init
 	keep       = C.SG_STENCILOP_KEEP
 	zero       = C.SG_STENCILOP_ZERO
 	replace    = C.SG_STENCILOP_REPLACE
@@ -444,13 +462,13 @@ pub enum StencilOp {
 	invert     = C.SG_STENCILOP_INVERT
 	incr_wrap  = C.SG_STENCILOP_INCR_WRAP
 	decr_wrap  = C.SG_STENCILOP_DECR_WRAP
-	num        = C._SG_STENCILOP_NUM
-	force_u32  = C._SG_STENCILOP_FORCE_U32 // 0x7FFFFFFF,
+	_num       = C._SG_STENCILOP_NUM
+	_force_u32 = C._SG_STENCILOP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BlendFactor is C.sg_blend_factor
-pub enum BlendFactor {
-	default               = C._SG_BLENDFACTOR_DEFAULT // value 0 reserved for default-init
+pub enum BlendFactor as u32 {
+	_default              = C._SG_BLENDFACTOR_DEFAULT // value 0 reserved for default-init
 	zero                  = C.SG_BLENDFACTOR_ZERO
 	one                   = C.SG_BLENDFACTOR_ONE
 	src_color             = C.SG_BLENDFACTOR_SRC_COLOR
@@ -466,57 +484,57 @@ pub enum BlendFactor {
 	one_minus_blend_color = C.SG_BLENDFACTOR_ONE_MINUS_BLEND_COLOR
 	blend_alpha           = C.SG_BLENDFACTOR_BLEND_ALPHA
 	one_minus_blend_alpha = C.SG_BLENDFACTOR_ONE_MINUS_BLEND_ALPHA
-	num                   = C._SG_BLENDFACTOR_NUM
-	force_u32             = C._SG_BLENDFACTOR_FORCE_U32 // 0x7FFFFFFF,
+	_num                  = C._SG_BLENDFACTOR_NUM
+	_force_u32            = C._SG_BLENDFACTOR_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // BlendOp is C.sg_blend_op
-pub enum BlendOp {
-	default          = C._SG_BLENDOP_DEFAULT // value 0 reserved for default-init
+pub enum BlendOp as u32 {
+	_default         = C._SG_BLENDOP_DEFAULT // value 0 reserved for default-init
 	add              = C.SG_BLENDOP_ADD
 	subtract         = C.SG_BLENDOP_SUBTRACT
 	reverse_subtract = C.SG_BLENDOP_REVERSE_SUBTRACT
-	num              = C._SG_BLENDOP_NUM
-	force_u32        = C._SG_BLENDOP_FORCE_U32 // 0x7FFFFFFF,
+	_num             = C._SG_BLENDOP_NUM
+	_force_u32       = C._SG_BLENDOP_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // ColorMask is C.sg_color_mask
-pub enum ColorMask {
-	default   = C._SG_COLORMASK_DEFAULT // 0, value 0 reserved for default-init
-	@none     = C.SG_COLORMASK_NONE // 0x10, special value for 'all channels disabled
-	r         = C.SG_COLORMASK_R // 0x1,
-	g         = C.SG_COLORMASK_G // 0x2,
-	rg        = C.SG_COLORMASK_RG // 0x3,
-	b         = C.SG_COLORMASK_B // 0x4,
-	rb        = C.SG_COLORMASK_RB // 0x5,
-	gb        = C.SG_COLORMASK_GB // 0x6,
-	rgb       = C.SG_COLORMASK_RGB // 0x7,
-	a         = C.SG_COLORMASK_A // 0x8,
-	ra        = C.SG_COLORMASK_RA // 0x9,
-	ga        = C.SG_COLORMASK_GA // 0xA,
-	rga       = C.SG_COLORMASK_RGA // 0xB,
-	ba        = C.SG_COLORMASK_BA // 0xC,
-	rba       = C.SG_COLORMASK_RBA // 0xD,
-	gba       = C.SG_COLORMASK_GBA // 0xE,
-	rgba      = C.SG_COLORMASK_RGBA // 0xF,
-	force_u32 = C._SG_COLORMASK_FORCE_U32 // 0x7FFFFFFF,
+pub enum ColorMask as u32 {
+	_default   = C._SG_COLORMASK_DEFAULT // 0, value 0 reserved for default-init
+	@none      = C.SG_COLORMASK_NONE // 0x10, special value for 'all channels disabled
+	r          = C.SG_COLORMASK_R // 0x1,
+	g          = C.SG_COLORMASK_G // 0x2,
+	rg         = C.SG_COLORMASK_RG // 0x3,
+	b          = C.SG_COLORMASK_B // 0x4,
+	rb         = C.SG_COLORMASK_RB // 0x5,
+	gb         = C.SG_COLORMASK_GB // 0x6,
+	rgb        = C.SG_COLORMASK_RGB // 0x7,
+	a          = C.SG_COLORMASK_A // 0x8,
+	ra         = C.SG_COLORMASK_RA // 0x9,
+	ga         = C.SG_COLORMASK_GA // 0xA,
+	rga        = C.SG_COLORMASK_RGA // 0xB,
+	ba         = C.SG_COLORMASK_BA // 0xC,
+	rba        = C.SG_COLORMASK_RBA // 0xD,
+	gba        = C.SG_COLORMASK_GBA // 0xE,
+	rgba       = C.SG_COLORMASK_RGBA // 0xF,
+	_force_u32 = C._SG_COLORMASK_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // LoadAction is C.sg_load_action
-pub enum LoadAction {
-	default   = C._SG_LOADACTION_DEFAULT
-	clear     = C.SG_LOADACTION_CLEAR
-	load      = C.SG_LOADACTION_LOAD
-	dontcare  = C.SG_LOADACTION_DONTCARE
-	force_u32 = C._SG_LOADACTION_FORCE_U32 // 0x7FFFFFFF,
+pub enum LoadAction as u32 {
+	_default   = C._SG_LOADACTION_DEFAULT
+	clear      = C.SG_LOADACTION_CLEAR
+	load       = C.SG_LOADACTION_LOAD
+	dontcare   = C.SG_LOADACTION_DONTCARE
+	_force_u32 = C._SG_LOADACTION_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // StoreAction is C.sg_store_action
-pub enum StoreAction {
-	default   = C._SG_STOREACTION_DEFAULT
-	store     = C.SG_STOREACTION_STORE
-	dontcare  = C.SG_STOREACTION_DONTCARE
-	force_u32 = C._SG_STOREACTION_FORCE_U32 // 0x7FFFFFFF,
+pub enum StoreAction as u32 {
+	_default   = C._SG_STOREACTION_DEFAULT
+	store      = C.SG_STOREACTION_STORE
+	dontcare   = C.SG_STOREACTION_DONTCARE
+	_force_u32 = C._SG_STOREACTION_FORCE_U32 // 0x7FFFFFFF,
 }
 
 [typedef]
@@ -560,6 +578,14 @@ pub mut:
 pub type PassAction = C.sg_pass_action
 
 [typedef]
+struct C.sg_stage_bindings {
+	images   [12]Image  // 12 TODO C.SG_MAX_SHADERSTAGE_IMAGES
+	samplers [8]Sampler // 8 TODO C.SG_MAX_SHADERSTAGE_SAMPLERS
+}
+
+pub type StageBindings = C.sg_stage_bindings
+
+[typedef]
 struct C.sg_bindings {
 pub mut:
 	_start_canary         u32
@@ -567,9 +593,9 @@ pub mut:
 	vertex_buffer_offsets [8]int
 	index_buffer          Buffer
 	index_buffer_offset   int
-	// TODO 	vs_images [SG_MAX_SHADERSTAGE_IMAGES]Image
-	// TODO 	fs_images [SG_MAX_SHADERSTAGE_IMAGES]Image
-	_end_canary u32
+	vs                    StageBindings
+	fs                    StageBindings
+	_end_canary           u32
 }
 
 pub type Bindings = C.sg_bindings
@@ -608,29 +634,21 @@ pub type ImageData = C.sg_image_data
 [typedef]
 struct C.sg_image_desc {
 pub mut:
-	_start_canary  u32
-	@type          ImageType
-	render_target  bool
-	width          int
-	height         int
-	num_slices     int
-	num_mipmaps    int
-	usage          Usage
-	pixel_format   PixelFormat
-	sample_count   int
-	min_filter     Filter
-	mag_filter     Filter
-	wrap_u         Wrap
-	wrap_v         Wrap
-	wrap_w         Wrap
-	border_color   BorderColor
-	max_anisotropy u32
-	min_lod        f32
-	max_lod        f32
-	data           ImageData
-	label          &char = unsafe { nil } // GL specific
+	_start_canary u32
+	@type         ImageType
+	render_target bool
+	width         int
+	height        int
+	num_slices    int
+	num_mipmaps   int
+	usage         Usage
+	pixel_format  PixelFormat
+	sample_count  int
+	data          ImageData
+	label         &char = unsafe { nil } // GL specific
+	// optionally inject backend-specific resources
 	// TODO 	gl_textures [SG_NUM_INFLIGHT_FRAMES]u32
-	gl_texture_target u32 // Metal specific
+	gl_texture_target u32 // GL specific
 	// TODO 	mtl_textures [SG_NUM_INFLIGHT_FRAMES]voidptr // D3D11 specific
 	d3d11_texture              voidptr
 	d3d11_shader_resource_view voidptr // WebGPU specific
@@ -639,6 +657,32 @@ pub mut:
 }
 
 pub type ImageDesc = C.sg_image_desc
+
+[typedef]
+struct C.sg_sampler_desc {
+pub mut:
+	_start_canary  u32
+	min_filter     Filter
+	mag_filter     Filter
+	mipmap_filter  Filter
+	wrap_u         Wrap
+	wrap_v         Wrap
+	wrap_w         Wrap
+	min_lod        f32
+	max_lod        f32
+	border_color   BorderColor
+	compare        CompareFunc
+	max_anisotropy u32
+	label          &char = unsafe { nil }
+	// optionally inject backend-specific resources
+	gl_sampler    u32
+	mtl_sampler   voidptr
+	d3d11_sampler voidptr
+	wgpu_sampler  voidptr
+	_end_canary   u32
+}
+
+pub type SamplerDesc = C.sg_sampler_desc
 
 [typedef]
 struct C.sg_shader_attr_desc {
@@ -671,12 +715,31 @@ pub type ShaderUniformBlockDesc = C.sg_shader_uniform_block_desc
 [typedef]
 struct C.sg_shader_image_desc {
 pub mut:
-	name         &char = unsafe { nil }
+	used         bool
+	multisampled bool
 	image_type   ImageType
-	sampler_type SamplerType
+	sample_type  ImageSampleType
 }
 
 pub type ShaderImageDesc = C.sg_shader_image_desc
+
+[typedef]
+struct C.sg_shader_sampler_desc {
+	used         bool
+	sampler_type SamplerType
+}
+
+pub type ShaderSamplerDesc = C.sg_shader_sampler_desc
+
+[typedef]
+struct C.sg_shader_image_sampler_pair_desc {
+	used         bool
+	image_slot   int
+	sampler_slot int
+	glsl_name    &char
+}
+
+pub type ShaderImageSamplerPairDesc = C.sg_shader_image_sampler_pair_desc
 
 [typedef]
 struct C.sg_shader_stage_desc {
@@ -685,8 +748,10 @@ pub mut:
 	bytecode     Range
 	entry        &char = unsafe { nil }
 	d3d11_target &char = unsafe { nil }
-	// TODO 	uniform_blocks [SG_MAX_SHADERSTAGE_UBS]ShaderUniformBlockDesc
-	// TODO 	images [SG_MAX_SHADERSTAGE_IMAGES]ShaderImageDesc
+	// TODO     uniform_blocks [SG_MAX_SHADERSTAGE_UBS]ShaderUniformBlockDesc
+	// TODO     images [SG_MAX_SHADERSTAGE_IMAGES]ShaderImageDesc
+	// TODO     samplers[SG_MAX_SHADERSTAGE_SAMPLERS]ShaderSamplerDesc
+	// TODO     image_sampler_pairs[SG_MAX_SHADERSTAGE_IMAGESAMPLERPAIRS]ShaderImageSamplerPairDesc
 }
 
 pub type ShaderStageDesc = C.sg_shader_stage_desc
@@ -695,7 +760,7 @@ pub type ShaderStageDesc = C.sg_shader_stage_desc
 struct C.sg_shader_desc {
 pub mut:
 	_start_canary u32
-	// TODO 	attrs [16]ShaderAttrDesc
+	// TODO 	attrs [C.SG_MAX_VERTEX_ATTRIBUTES]ShaderAttrDesc // 16
 	vs          ShaderStageDesc
 	fs          ShaderStageDesc
 	label       &char = unsafe { nil }
@@ -705,35 +770,32 @@ pub mut:
 pub type ShaderDesc = C.sg_shader_desc
 
 [typedef]
-struct C.sg_buffer_layout_desc {
+struct C.sg_vertex_buffer_layout_state {
 pub mut:
 	stride    int
 	step_func VertexStep
 	step_rate int
-	// TODO #if defined(SOKOL_ZIG_BINDINGS) uint32_t __pad[2]
 }
 
-pub type BufferLayoutDesc = C.sg_buffer_layout_desc
+pub type VertexBufferLayoutState = C.sg_vertex_buffer_layout_state
 
 [typedef]
-struct C.sg_vertex_attr_desc {
+struct C.sg_vertex_attr_state {
 pub mut:
 	buffer_index int
 	offset       int
 	format       VertexFormat
-	// TODO #if defined(SOKOL_ZIG_BINDINGS) uint32_t __pad[2]
 }
 
-pub type VertexAttrDesc = C.sg_vertex_attr_desc
+pub type VertexAttrState = C.sg_vertex_attr_state
 
 [typedef]
-struct C.sg_layout_desc {
-pub mut:
-	buffers [8]BufferLayoutDesc
-	attrs   [16]VertexAttrDesc
+struct C.sg_vertex_layout_state {
+	buffers [8]VertexBufferLayoutState
+	attrs   [16]VertexAttrState
 }
 
-pub type LayoutDesc = C.sg_layout_desc
+pub type VertexLayoutState = C.sg_vertex_layout_state
 
 [typedef]
 struct C.sg_stencil_face_state {
@@ -787,26 +849,25 @@ pub mut:
 pub type BlendState = C.sg_blend_state
 
 [typedef]
-struct C.sg_color_state {
+struct C.sg_color_target_state {
 pub mut:
 	pixel_format PixelFormat
 	write_mask   ColorMask
 	blend        BlendState
 }
 
-pub type ColorState = C.sg_color_state
+pub type ColorTargetState = C.sg_color_target_state
 
 [typedef]
 struct C.sg_pipeline_desc {
 pub mut:
-	_start_canary u32
-	shader        Shader
-	layout        LayoutDesc
-	depth         DepthState
-	stencil       StencilState
-	color_count   int
-	// TODO 	colors [SG_MAX_COLOR_ATTACHMENTS]ColorState
-	colors                    [4]ColorState
+	_start_canary             u32
+	shader                    Shader
+	layout                    VertexLayoutState
+	depth                     DepthState
+	stencil                   StencilState
+	color_count               int
+	colors                    [4]ColorTargetState // TODO C.SG_MAX_COLOR_ATTACHMENTS enum *sigh*
 	primitive_type            PrimitiveType
 	index_type                IndexType
 	cull_mode                 CullMode
@@ -950,6 +1011,13 @@ pub mut:
 pub type ImageInfo = C.sg_image_info
 
 [typedef]
+struct C.sg_sampler_info {
+	slot SlotInfo // resource pool slot info
+}
+
+pub type SamplerInfo = C.sg_sampler_info
+
+[typedef]
 struct C.sg_shader_info {
 pub mut:
 	slot SlotInfo // resoure pool slot info
@@ -1070,20 +1138,23 @@ pub type Logger = C.sg_logger
 [typedef]
 struct C.sg_desc {
 pub mut:
-	_start_canary       u32
-	buffer_pool_size    int
-	image_pool_size     int
-	shader_pool_size    int
-	pipeline_pool_size  int
-	pass_pool_size      int
-	context_pool_size   int
-	uniform_buffer_size int
-	staging_buffer_size int
-	sampler_cache_size  int
-	allocator           Allocator
-	logger              Logger // optional log function override
-	context             ContextDesc
-	_end_canary         u32
+	_start_canary                  u32
+	buffer_pool_size               int
+	image_pool_size                int
+	sampler_pool_size              int
+	shader_pool_size               int
+	pipeline_pool_size             int
+	pass_pool_size                 int
+	context_pool_size              int
+	uniform_buffer_size            int
+	staging_buffer_size            int
+	max_commit_listeners           int
+	disable_validation             bool
+	mtl_force_managed_storage_mode bool // for debugging: use Metal managed storage mode for resources even with UMA
+	allocator                      Allocator
+	logger                         Logger // optional log function override
+	context                        ContextDesc
+	_end_canary                    u32
 }
 
 pub type Desc = C.sg_desc
@@ -1176,6 +1247,14 @@ pub fn make_image(const_desc &ImageDesc) Image {
 	return C.sg_make_image(const_desc)
 }
 
+// C: `SOKOL_GFX_API_DECL sg_sampler sg_make_sampler(const sg_sampler_desc* desc)`
+fn C.sg_make_sampler(const_desc &SamplerDesc) Sampler
+
+// make_sampler is currently undocumented
+pub fn make_sampler(const_desc &SamplerDesc) Sampler {
+	return C.sg_make_sampler(const_desc)
+}
+
 // C: `SOKOL_GFX_API_DECL sg_shader sg_make_shader(const sg_shader_desc* desc)`
 fn C.sg_make_shader(const_desc &ShaderDesc) Shader
 
@@ -1214,6 +1293,14 @@ fn C.sg_destroy_image(img Image)
 // destroy_image is currently undocumented
 pub fn destroy_image(img Image) {
 	C.sg_destroy_image(img)
+}
+
+// C: `SOKOL_GFX_API_DECL void sg_destroy_sampler(sg_sampler smp)`
+fn C.sg_destroy_sampler(smp Sampler)
+
+// destroy_sampler is currently undocumented
+pub fn destroy_sampler(smp Sampler) {
+	C.sg_destroy_sampler(smp)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_destroy_shader(sg_shader shd)`
@@ -1440,6 +1527,14 @@ pub fn query_image_state(img Image) ResourceState {
 	return C.sg_query_image_state(img)
 }
 
+// C: `SOKOL_GFX_API_DECL sg_resource_state sg_query_sampler_state(sg_sampler smp)`
+fn C.sg_query_sampler_state(smp Sampler) ResourceState
+
+// query_sampler is currently undocumented
+pub fn query_sampler(smp Sampler) ResourceState {
+	return C.sg_query_sampler_state(smp)
+}
+
 // C: `SOKOL_GFX_API_DECL sg_resource_state sg_query_shader_state(sg_shader shd)`
 fn C.sg_query_shader_state(shd Shader) ResourceState
 
@@ -1478,6 +1573,14 @@ fn C.sg_query_image_info(img Image) ImageInfo
 // query_image_info is currently undocumented
 pub fn query_image_info(img Image) ImageInfo {
 	return C.sg_query_image_info(img)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_sampler_info sg_query_sampler_info(sg_sampler smp)`
+fn C.sg_query_sampler_info(smp Sampler) SamplerInfo
+
+// query_sampler_info is currently undocumented
+pub fn query_sampler_info(smp Sampler) SamplerInfo {
+	return C.sg_query_sampler_info(smp)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_shader_info sg_query_shader_info(sg_shader shd)`
@@ -1520,6 +1623,13 @@ pub fn query_image_desc(img Image) ImageDesc {
 	return C.sg_query_image_desc(img)
 }
 
+// C: `SOKOL_GFX_API_DECL sg_sampler_desc sg_query_sampler_desc(sg_sampler smp)`
+fn C.sg_query_sampler_desc(smp Sampler) SamplerDesc
+
+pub fn query_sampler_desc(smp Sampler) SamplerDesc {
+	return C.sg_query_sampler_desc(smp)
+}
+
 // C: `SOKOL_GFX_API_DECL sg_shader_desc sg_query_shader_desc(sg_shader shd)`
 fn C.sg_query_shader_desc(shd Shader) ShaderDesc
 
@@ -1558,6 +1668,14 @@ fn C.sg_query_image_defaults(const_desc &ImageDesc) ImageDesc
 // query_image_defaults is currently undocumented
 pub fn query_image_defaults(const_desc &ImageDesc) ImageDesc {
 	return C.sg_query_image_defaults(const_desc)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_sampler_desc sg_query_sampler_defaults(const sg_sampler_desc* desc)`
+fn C.sg_query_sampler_defaults(const_desc &SamplerDesc) SamplerDesc
+
+// query_sampler_defaults is currently undocumented
+pub fn query_sampler_defaults(const_desc &SamplerDesc) SamplerDesc {
+	return C.sg_query_sampler_defaults(const_desc)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_shader_desc sg_query_shader_defaults(const sg_shader_desc* desc)`
@@ -1600,6 +1718,14 @@ pub fn alloc_image() Image {
 	return C.sg_alloc_image()
 }
 
+// C: `SOKOL_GFX_API_DECL sg_sampler sg_alloc_sampler(void)`
+fn C.sg_alloc_sampler() Sampler
+
+// alloc_sampler is currently undocumented
+pub fn alloc_sampler() Sampler {
+	return C.sg_alloc_sampler()
+}
+
 // C: `SOKOL_GFX_API_DECL sg_shader sg_alloc_shader(void)`
 fn C.sg_alloc_shader() Shader
 
@@ -1638,6 +1764,14 @@ fn C.sg_dealloc_image(img_id Image)
 // dealloc_image is currently undocumented
 pub fn dealloc_image(img_id Image) {
 	C.sg_dealloc_image(img_id)
+}
+
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_sampler(sg_sampler smp)`
+fn C.sg_dealloc_sampler(smp Sampler)
+
+// dealloc_sampler is currently undocumented
+pub fn dealloc_sampler(smp Sampler) {
+	C.sg_dealloc_sampler(smp)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_dealloc_shader(sg_shader shd_id)`
@@ -1680,6 +1814,14 @@ pub fn init_image(img_id Image, const_desc &ImageDesc) {
 	C.sg_init_image(img_id, const_desc)
 }
 
+// C: `SOKOL_GFX_API_DECL void sg_init_sampler(sg_sampler smg, const sg_sampler_desc* desc)`
+fn C.sg_init_sampler(smg Sampler, const_desc &SamplerDesc)
+
+// init_sampler is currently undocumented
+pub fn init_sampler(smg Sampler, const_desc &SamplerDesc) {
+	C.sg_init_sampler(smg, const_desc)
+}
+
 // C: `SOKOL_GFX_API_DECL void sg_init_shader(sg_shader shd_id, const sg_shader_desc* desc)`
 fn C.sg_init_shader(shd_id Shader, const_desc &ShaderDesc)
 
@@ -1720,6 +1862,14 @@ pub fn uninit_image(img_id Image) {
 	C.sg_uninit_image(img_id)
 }
 
+// C: `SOKOL_GFX_API_DECL void sg_uninit_sampler(sg_sampler smp)`
+fn C.sg_uninit_sampler(smp Sampler)
+
+// uninit_sampler is currently undocumented
+pub fn uninit_sampler(smp Sampler) {
+	C.sg_uninit_sampler(smp)
+}
+
 // C: `SOKOL_GFX_API_DECL sg_uninit_shader(sg_shader shd_id)`
 fn C.sg_uninit_shader(shd_id Shader)
 
@@ -1758,6 +1908,14 @@ fn C.sg_fail_image(img_id Image)
 // fail_image is currently undocumented
 pub fn fail_image(img_id Image) {
 	C.sg_fail_image(img_id)
+}
+
+// C: `SOKOL_GFX_API_DECL void sg_fail_sampler(sg_sampler smp)`
+fn C.sg_fail_sampler(smp Sampler)
+
+// fail_sampler is currently undocumented
+pub fn fail_sampler(smp Sampler) {
+	C.sg_fail_sampler(smp)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_fail_shader(sg_shader shd_id)`

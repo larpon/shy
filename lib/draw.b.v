@@ -33,7 +33,8 @@ pub fn (mut d Draw) init() ! {
 		write_enabled: true
 		// compare: .less_equal
 	}
-	alpha_pipdesc.colors[0] = gfx.ColorState{
+
+	alpha_pipdesc.colors[0] = gfx.ColorTargetState{
 		blend: gfx.BlendState{
 			enabled: true
 			src_factor_rgb: .src_alpha
