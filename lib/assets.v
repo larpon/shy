@@ -336,10 +336,13 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		width: image.width
 		height: image.height
 		num_mipmaps: 0 // TODO image.mipmaps
-		wrap_u: opt.wrap_u // .clamp_to_edge
-		wrap_v: opt.wrap_v // .clamp_to_edge
 		// label: &u8(0)
 		pixel_format: .rgba8
+	}
+
+	mut smp_desc := gfx.SamplerDesc{
+		wrap_u: opt.wrap_u // .clamp_to_edge
+		wrap_v: opt.wrap_v // .clamp_to_edge
 	}
 
 	// println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
@@ -350,6 +353,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	}
 
 	image.gfx_image = gfx.make_image(&img_desc)
+	image.gfx_sampler = gfx.make_sampler(&smp_desc)
 
 	stb_img.free()
 
@@ -495,7 +499,8 @@ mut:
 	mipmaps  int
 	kind     ImageKind
 	// Implementation specific
-	gfx_image gfx.Image
+	gfx_image   gfx.Image
+	gfx_sampler gfx.Sampler
 }
 
 pub type ImageWrap = gfx.Wrap
@@ -517,6 +522,7 @@ mut:
 pub fn (mut i Image) free() {
 	unsafe {
 		gfx.destroy_image(i.gfx_image)
+		gfx.destroy_sampler(i.gfx_sampler)
 	}
 }
 
