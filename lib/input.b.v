@@ -391,7 +391,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			path := unsafe { cstring_to_vstring(dropped_path) }
 			defer {
 				// 	sdl.free(dropped_path) // TODO Crashes?!
-				unsafe { free(dropped_path) }
+				unsafe { shy_free(dropped_path) }
 			}
 			shy_event = DropFileEvent{
 				timestamp: timestamp
@@ -408,7 +408,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			text := unsafe { cstring_to_vstring(dropped_text) }
 			defer {
 				// sdl.free(dropped_text) // TODO Crashes?!
-				unsafe { free(dropped_text) }
+				unsafe { shy_free(dropped_text) }
 			}
 			shy_event = DropTextEvent{
 				timestamp: timestamp

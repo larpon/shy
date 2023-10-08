@@ -51,10 +51,10 @@ pub fn (k &Keyboard) is_key_down(keycode KeyCode) bool {
 pub fn (mut k Keyboard) set_key_state(key_code KeyCode, button_state ButtonState) {
 	match button_state {
 		.up {
-			k.keys[i32(key_code)] = false
+			k.keys[int(key_code)] = false
 		}
 		.down {
-			k.keys[i32(key_code)] = true
+			k.keys[int(key_code)] = true
 		}
 	}
 }

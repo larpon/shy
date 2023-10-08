@@ -121,7 +121,7 @@ fn (w Window) dump_pixels(rect Rect) &Screenshot {
 [unsafe]
 pub fn (mut ss Screenshot) free() {
 	unsafe {
-		free(ss.pixels)
+		shy_free(ss.pixels)
 		ss.pixels = &u8(0)
 	}
 }
@@ -131,5 +131,5 @@ pub fn (mut ss Screenshot) free() {
 [unsafe]
 pub fn (mut ss Screenshot) destroy() {
 	unsafe { ss.free() }
-	unsafe { free(ss) }
+	unsafe { shy_free(ss) }
 }

@@ -146,7 +146,7 @@ pub fn run[T](mut ctx T, config Config) ! {
 
 	ctx.shutdown()!
 	shy_instance.shutdown()!
-	unsafe { free(shy_instance) }
+	unsafe { shy_free(shy_instance) }
 }
 
 fn (s Shy) health() ! {

@@ -70,12 +70,20 @@ pub fn (mut a Anims) shutdown() ! {
 	a.shy.assert_api_shutdown()
 	for anim in a.active {
 		unsafe {
-			free(anim)
+			if isnil(anim) {
+				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.active.len}')
+				return
+			}
+			shy_free(anim)
 		}
 	}
 	for anim in a.f32pool {
 		unsafe {
-			free(anim)
+			if isnil(anim) {
+				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.f32pool.len}')
+				return
+			}
+			shy_free(anim)
 		}
 	}
 }
@@ -89,8 +97,8 @@ pub fn (mut a Anims) update(dt f64) {
 		animator := a.active[i]
 		// TODO(lmp) workaround weird crash/behavior with `-d shy_analyse` here?!?
 		if isnil(animator) {
-			a.shy.log.gerror('${@MOD}.${@STRUCT}','TODO :( ${a.active.len}')
-			return //continue
+			a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.active.len}')
+			return
 		}
 
 		if animator.kind == .follow {

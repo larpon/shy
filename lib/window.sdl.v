@@ -255,7 +255,7 @@ pub fn (mut w Window) set_icon(source AssetSource) ! {
 	})!
 
 	sdl.set_window_icon(w.handle, surf)
-	unsafe { free(surf) }
+	unsafe { shy_free(surf) }
 }
 
 [inline]
@@ -712,10 +712,10 @@ pub fn (mut w Window) shutdown() ! {
 		window.close()!
 	}
 	w.anims.shutdown()!
-	unsafe { free(w.anims) }
+	unsafe { shy_free(w.anims) }
 
 	w.timers.shutdown()!
-	unsafe { free(w.timers) }
+	unsafe { shy_free(w.timers) }
 
 	w.set_current()
 

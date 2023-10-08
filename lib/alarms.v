@@ -48,12 +48,12 @@ fn (mut a Alarms) reset() ! {
 fn (mut a Alarms) shutdown() ! {
 	for alarm in a.active {
 		unsafe {
-			free(alarm)
+			shy_free(alarm)
 		}
 	}
 	for alarm in a.pool {
 		unsafe {
-			free(alarm)
+			shy_free(alarm)
 		}
 	}
 }

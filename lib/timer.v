@@ -60,12 +60,12 @@ pub fn (mut t Timers) shutdown() ! {
 	t.shy.assert_api_shutdown()
 	for timer in t.active {
 		unsafe {
-			free(timer)
+			shy_free(timer)
 		}
 	}
 	for timer in t.pool {
 		unsafe {
-			free(timer)
+			shy_free(timer)
 		}
 	}
 }

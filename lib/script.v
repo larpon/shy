@@ -43,6 +43,6 @@ pub fn (mut sc Scripts) shutdown() ! {
 
 	for mut wvm in sc.wren_vms {
 		wvm.shutdown()!
-		unsafe { free(wvm) }
+		unsafe { shy_free(wvm) }
 	}
 }

@@ -114,15 +114,15 @@ pub fn (mut a ShyAPI) shutdown() ! {
 fn (mut a ShyAPI) free() {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	unsafe {
-		free(a.input)
-		free(a.scripts)
-		free(a.assets)
-		free(a.draw)
-		free(a.gfx)
-		free(a.audio)
-		free(a.system)
-		free(a.wm)
-		free(a.events)
+		shy_free(a.input)
+		shy_free(a.scripts)
+		shy_free(a.assets)
+		shy_free(a.draw)
+		shy_free(a.gfx)
+		shy_free(a.audio)
+		shy_free(a.system)
+		shy_free(a.wm)
+		shy_free(a.events)
 	}
 }
 

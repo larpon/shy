@@ -148,3 +148,12 @@ pub fn size(w f32, h f32) Size {
 		height: h
 	}
 }
+
+[inline; markused; unsafe]
+pub fn shy_free(ptr voidptr) {
+	assert !isnil(ptr), 'shy_free tries to free null pointer'
+	unsafe { free(ptr) }
+	unsafe {
+		ptr = nil
+	}
+}
