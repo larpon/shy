@@ -101,12 +101,14 @@ pub fn (c &Color) copy_set_r(value u8) Color {
 		r: value
 	}
 }
+
 pub fn (c &Color) copy_set_g(value u8) Color {
 	return Color{
 		...c
 		g: value
 	}
 }
+
 pub fn (c &Color) copy_set_b(value u8) Color {
 	return Color{
 		...c
@@ -203,22 +205,12 @@ pub fn (mut c Color) variate(cv ColorVariation) {
 
 [inline]
 pub fn rgb_hex(hex u32) Color {
-	return Color{
-		u8(((hex >> 16) & 0xff)),
-		u8(((hex >> 8) & 0xff)),
-		u8(((hex) & 0xff)),
-		u8(255)
-	}
+	return Color{u8(((hex >> 16) & 0xff)), u8(((hex >> 8) & 0xff)), u8((hex & 0xff)), u8(255)}
 }
 
 [inline]
 pub fn rgba_hex(hex u32) Color {
-	return Color{
-		u8(((hex >> 24) & 0xff)),
-		u8(((hex >> 16) & 0xff)),
-		u8(((hex >> 8) & 0xff)),
-		u8(((hex) & 0xff))
-	}
+	return Color{u8(((hex >> 24) & 0xff)), u8(((hex >> 16) & 0xff)), u8(((hex >> 8) & 0xff)), u8((hex & 0xff))}
 }
 
 [inline]
