@@ -15,6 +15,14 @@ pub fn (mut wm WM) init() ! {
 	wm.shy.assert_api_init()
 	mut s := wm.shy
 
+	// SDL debug info, must be called before sdl.init
+	$if debug ? {
+		if s.config.debug {
+			s.log.gdebug('${@STRUCT}.${@FN}', 'debug on')
+			sdl.log_set_all_priority(sdl.LogPriority.debug)
+		}
+	}
+
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
 	$if linux {
@@ -23,6 +31,13 @@ pub fn (mut wm WM) init() ! {
 		// sdl.set_hint(sdl.hint_video_x11_xrandr.str,'1'.str)
 		// sdl.set_hint(sdl.hint_render_scale_quality.str, '1'.str )
 		// sdl.set_hint(sdl.hint_video_highdpi_disabled.str, '0'.str)
+		//
+		// Stop the big "blackout/flash" on Linux desktops
+		if !sdl.set_hint(sdl.hint_video_x11_net_wm_bypass_compositor.str, '0'.str) {
+			sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+			s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
+			return error('SDL could not bypass compositor, SDL says:\n${sdl_error_msg}')
+		}
 	}
 
 	$if windows {
@@ -31,14 +46,6 @@ pub fn (mut wm WM) init() ! {
 		// Also note that it can be switched with the ENV var:
 		// SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING=0
 		sdl.set_hint(sdl.hint_windows_disable_thread_naming.str, '1'.str)
-	}
-
-	// SDL debug info, must be called before sdl.init
-	$if debug ? {
-		if s.config.debug {
-			s.log.gdebug('${@STRUCT}.${@FN}', 'debug on')
-			sdl.log_set_all_priority(sdl.LogPriority.debug)
-		}
 	}
 
 	mut init_flags := u32(sdl.init_video)
