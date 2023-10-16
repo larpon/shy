@@ -11,14 +11,35 @@ pub const used_import = c.used_import
 
 // C typedef aliases used
 // ma_bool8 -> ma_uint8 -> u8
+type C.ma_bool8 = u8 // C.ma_uint8
+
 // ma_bool32 -> ma_uint32 -> u32
+type C.ma_bool32 = u32 // C.ma_uint32
+
 // ma_handle -> void* -> voidptr
+type C.ma_handle = voidptr
+
 // ma_ptr -> void* -> voidptr
 // wchar_t -> ma_uint16 -> u16
 // ma_channel -> ma_uint8 -> u8
+type C.ma_channel = u8
+pub type Channel = u8
+
 // ma_spinlock -> ma_uint32 -> u32
 // ma_thread -> ma_pthread_t -> C.ma_pthread_t
+type C.ma_thread = voidptr // C.ma_pthread_t -> C.ma_handle
+
 // ma_mutex -> ma_pthread_mutex_t -> C.ma_pthread_mutex_t
+type C.ma_mutex = C.pthread_mutex_t
+
+struct C.pthread_mutex_t {}
+
+type C.ma_pthread_mutex_t = C.pthread_mutex_t
+
+struct C.pthread_cond_t {}
+
+type C.ma_pthread_cond_t = C.pthread_cond_t
+
 // ma_event -> ma_handle -> C.ma_handle
 // ma_semaphore -> ma_handle -> C.ma_handle
 // ma_resampling_backend -> void ->
@@ -26,9 +47,18 @@ pub const used_import = c.used_import
 // ma_data_source -> void ->
 // ma_vfs -> void ->
 // ma_vfs_file -> ma_handle -> C.ma_handle
+type C.ma_vfs_file = voidptr // C.ma_handle
+
 // ma_node -> void ->
 // ma_sound_group_config -> ma_sound_config -> SoundConfig
+type C.ma_sound_group_config = C.ma_sound_config
+
 // ma_sound_group -> ma_sound -> Sound
+type C.ma_sound_group = C.ma_sound
+
+// va_list
+[typedef]
+pub struct C.va_list {}
 
 [typedef]
 struct C.ma_data_source {}
@@ -40,9 +70,9 @@ pub mut:
 	pDeviceID      &DeviceId
 	format         Format
 	channels       u32
-	pChannelMap    &C.ma_channel
-	channelMixMode C.ma_channel_mix_mode
-	shareMode      C.ma_share_mode
+	pChannelMap    &Channel
+	channelMixMode ChannelMixMode
+	shareMode      ShareMode
 }
 
 pub type Playback = C.playback
@@ -52,9 +82,9 @@ pub mut:
 	pDeviceID      &DeviceId
 	format         Format
 	channels       u32
-	pChannelMap    &C.ma_channel
-	channelMixMode C.ma_channel_mix_mode
-	shareMode      C.ma_share_mode
+	pChannelMap    &Channel
+	channelMixMode ChannelMixMode
+	shareMode      ShareMode
 }
 
 pub type Capture = C.capture
@@ -425,17 +455,17 @@ pub type LogCallbackProc = fn (p_user_data voidptr, level u32, const_p_message &
 [typedef]
 struct C.ma_log_callback {
 pub mut:
-	onLog     C.ma_log_callback_proc
+	onLog     LogCallbackProc
 	pUserData voidptr
 }
 
 pub type LogCallback = C.ma_log_callback
 
 // C: `MA_API ma_log_callback ma_log_callback_init(ma_log_callback_proc onLog, void* pUserData)`
-fn C.ma_log_callback_init(on_log C.ma_log_callback_proc, p_user_data voidptr) LogCallback
+fn C.ma_log_callback_init(on_log LogCallbackProc, p_user_data voidptr) LogCallback
 
 // log_callback_init is currently undocumented
-pub fn log_callback_init(on_log C.ma_log_callback_proc, p_user_data voidptr) LogCallback {
+pub fn log_callback_init(on_log LogCallbackProc, p_user_data voidptr) LogCallback {
 	return C.ma_log_callback_init(on_log, p_user_data)
 }
 
@@ -4904,9 +4934,9 @@ pub mut:
 	noClip                    u8 // When set to true, the contents of the output buffer passed into the data callback will be clipped after returning. Only applies when the playback sample format is f32.
 	noDisableDenormals        u8 // Do not disable denormals when firing the data callback.
 	noFixedSizedCallback      u8 // Disables strict fixed-sized data callbacks. Setting this to true will result in the period size being treated only as a hint to the backend. This is an optimization for those who don't need fixed sized callbacks.
-	dataCallback              C.ma_device_data_proc
-	notificationCallback      C.ma_device_notification_proc
-	stopCallback              C.ma_stop_proc
+	dataCallback              DeviceDataProc
+	notificationCallback      DeviceNotificationProc
+	stopCallback              StopProc
 	pUserData                 voidptr
 	resampling                ResamplerConfig
 	// TODO// struct {
@@ -4973,7 +5003,7 @@ struct C.ma_backend_callbacks {
 pub mut:
 	onContextInit             fn (p_context &Context, const_p_config &ContextConfig, p_callbacks &BackendCallbacks) Result // onContextInit)(ma_context*
 	onContextUninit           fn (p_context &Context) Result // onContextUninit)(ma_context*
-	onContextEnumerateDevices fn (p_context &Context, callback C.ma_enum_devices_callback_proc, p_user_data voidptr) Result // onContextEnumerateDevices)(ma_context*
+	onContextEnumerateDevices fn (p_context &Context, callback EnumDevicesCallbackProc, p_user_data voidptr) Result // onContextEnumerateDevices)(ma_context*
 	onContextGetDeviceInfo    fn (p_context &Context, device_type DeviceType, const_p_device_id &DeviceId, p_device_info &DeviceInfo) Result // onContextGetDeviceInfo)(ma_context*
 	onDeviceInit              fn (p_device &Device, const_p_config &DeviceConfig, p_descriptor_playback &DeviceDescriptor, p_descriptor_capture &DeviceDescriptor) Result // onDeviceInit)(ma_device*
 	onDeviceUninit            fn (p_device &Device) Result // onDeviceUninit)(ma_device*
@@ -5057,10 +5087,10 @@ pub mut:
 	@type      DeviceType
 	sampleRate u32
 	// TODO MA_ATOMIC(4, ma_device_state) state
-	onData                    C.ma_device_data_proc // Set once at initialization time and should not be changed after.
-	onNotification            C.ma_device_notification_proc // Set once at initialization time and should not be changed after.
-	onStop                    C.ma_stop_proc // DEPRECATED. Use the notification callback instead. Set once at initialization time and should not be changed after.
-	pUserData                 voidptr        // Application defined data.
+	onData                    DeviceDataProc // Set once at initialization time and should not be changed after.
+	onNotification            DeviceNotificationProc // Set once at initialization time and should not be changed after.
+	onStop                    StopProc // DEPRECATED. Use the notification callback instead. Set once at initialization time and should not be changed after.
+	pUserData                 voidptr  // Application defined data.
 	startStopLock             C.ma_mutex
 	wakeupEvent               Event
 	startEvent                Event
@@ -5389,7 +5419,7 @@ pub fn context_get_log(p_context &Context) &Log {
 }
 
 // C: `MA_API ma_result ma_context_enumerate_devices(ma_context* pContext, ma_enum_devices_callback_proc callback, void* pUserData)`
-fn C.ma_context_enumerate_devices(p_context &Context, callback C.ma_enum_devices_callback_proc, p_user_data voidptr) Result
+fn C.ma_context_enumerate_devices(p_context &Context, callback EnumDevicesCallbackProc, p_user_data voidptr) Result
 
 // context_enumerate_devices enumerates over every device (both playback and capture).
 //
@@ -5454,7 +5484,7 @@ fn C.ma_context_enumerate_devices(p_context &Context, callback C.ma_enum_devices
 // See Also
 //--------
 // ma_context_get_devices()
-pub fn context_enumerate_devices(p_context &Context, callback C.ma_enum_devices_callback_proc, p_user_data voidptr) Result {
+pub fn context_enumerate_devices(p_context &Context, callback EnumDevicesCallbackProc, p_user_data voidptr) Result {
 	return C.ma_context_enumerate_devices(p_context, callback, p_user_data)
 }
 
@@ -7238,7 +7268,7 @@ pub mut:
 	loopEndInFrames  u64     // Relative to rangeBegInFrames. Set to -1 for the end of the range.
 	pCurrent         voidptr // When non-NULL, the data source being initialized will act as a proxy and will route all operations to pCurrent. Used in conjunction with pNext/onGetNext for seamless chaining.
 	pNext            voidptr // When set to NULL, onGetNext will be used.
-	onGetNext        C.ma_data_source_get_next_proc // Will be used when pNext is NULL. If both are NULL, no next will be used.
+	onGetNext        DataSourceGetNextProc // Will be used when pNext is NULL. If both are NULL, no next will be used.
 	// TODO MA_ATOMIC(4, ma_bool32) isLooping
 }
 
@@ -7411,18 +7441,18 @@ pub fn data_source_get_next(const_p_data_source voidptr) voidptr {
 }
 
 // C: `MA_API ma_result ma_data_source_set_next_callback(ma_data_source* pDataSource, ma_data_source_get_next_proc onGetNext)`
-fn C.ma_data_source_set_next_callback(p_data_source voidptr, on_get_next C.ma_data_source_get_next_proc) Result
+fn C.ma_data_source_set_next_callback(p_data_source voidptr, on_get_next DataSourceGetNextProc) Result
 
 // data_source_set_next_callback is currently undocumented
-pub fn data_source_set_next_callback(p_data_source voidptr, on_get_next C.ma_data_source_get_next_proc) Result {
+pub fn data_source_set_next_callback(p_data_source voidptr, on_get_next DataSourceGetNextProc) Result {
 	return C.ma_data_source_set_next_callback(p_data_source, on_get_next)
 }
 
 // C: `MA_API ma_data_source_get_next_proc ma_data_source_get_next_callback(const ma_data_source* pDataSource)`
-fn C.ma_data_source_get_next_callback(const_p_data_source voidptr) C.ma_data_source_get_next_proc
+fn C.ma_data_source_get_next_callback(const_p_data_source voidptr) DataSourceGetNextProc
 
 // data_source_get_next_callback is currently undocumented
-pub fn data_source_get_next_callback(const_p_data_source voidptr) C.ma_data_source_get_next_proc {
+pub fn data_source_get_next_callback(const_p_data_source voidptr) DataSourceGetNextProc {
 	return C.ma_data_source_get_next_callback(const_p_data_source)
 }
 
@@ -8006,7 +8036,7 @@ pub fn decoding_backend_config_init(preferred_format Format, seek_point_count u3
 [typedef]
 struct C.ma_decoding_backend_vtable {
 pub mut:
-	onInit       fn (p_user_data voidptr, on_read C.ma_read_proc, on_seek C.ma_seek_proc, on_tell C.ma_tell_proc, p_read_seek_tell_user_data voidptr, const_p_config &DecodingBackendConfig, const_p_allocation_callbacks &AllocationCallbacks, pp_backend voidptr) Result // onInit
+	onInit       fn (p_user_data voidptr, on_read ReadProc, on_seek SeekProc, on_tell TellProc, p_read_seek_tell_user_data voidptr, const_p_config &DecodingBackendConfig, const_p_allocation_callbacks &AllocationCallbacks, pp_backend voidptr) Result // onInit
 	onInitFile   fn (p_user_data voidptr, const_p_file_path &char, const_p_config &DecodingBackendConfig, const_p_allocation_callbacks &AllocationCallbacks, pp_backend voidptr) Result // onInitFile Optional.
 	onInitFileW  fn (p_user_data voidptr, const_p_file_path &u16, const_p_config &DecodingBackendConfig, const_p_allocation_callbacks &AllocationCallbacks, pp_backend voidptr) Result  // onInitFileW Optional.
 	onInitMemory fn (p_user_data voidptr, const_p_data voidptr, data_size usize, const_p_config &DecodingBackendConfig, const_p_allocation_callbacks &AllocationCallbacks, pp_backend voidptr) Result // onInitMemory)(void* Optional.
@@ -8054,9 +8084,9 @@ pub mut:
 	pBackend voidptr // The decoding backend we'll be pulling data from.
 	// TODO 	ma_decoding_backend_vtable* C.  // pBackendVTable The vtable for the decoding backend. This needs to be stored so we can access the onUninit() callback.
 	pBackendUserData       voidptr
-	onRead                 C.ma_decoder_read_proc
-	onSeek                 C.ma_decoder_seek_proc
-	onTell                 C.ma_decoder_tell_proc
+	onRead                 DecoderReadProc
+	onSeek                 DecoderSeekProc
+	onTell                 DecoderTellProc
 	pUserData              voidptr
 	readPointerInPCMFrames u64 // In output sample rate. Used for keeping track of how many frames are available for decoding.
 	outputFormat           Format
@@ -8094,10 +8124,10 @@ pub fn decoder_config_init_default() DecoderConfig {
 }
 
 // C: `MA_API ma_result ma_decoder_init(ma_decoder_read_proc onRead, ma_decoder_seek_proc onSeek, void* pUserData, const ma_decoder_config* pConfig, ma_decoder* pDecoder)`
-fn C.ma_decoder_init(on_read C.ma_decoder_read_proc, on_seek C.ma_decoder_seek_proc, p_user_data voidptr, const_p_config &DecoderConfig, p_decoder &Decoder) Result
+fn C.ma_decoder_init(on_read DecoderReadProc, on_seek DecoderSeekProc, p_user_data voidptr, const_p_config &DecoderConfig, p_decoder &Decoder) Result
 
 // decoder_init is currently undocumented
-pub fn decoder_init(on_read C.ma_decoder_read_proc, on_seek C.ma_decoder_seek_proc, p_user_data voidptr, const_p_config &DecoderConfig, p_decoder &Decoder) Result {
+pub fn decoder_init(on_read DecoderReadProc, on_seek DecoderSeekProc, p_user_data voidptr, const_p_config &DecoderConfig, p_decoder &Decoder) Result {
 	return C.ma_decoder_init(on_read, on_seek, p_user_data, const_p_config, p_decoder)
 }
 
@@ -8289,11 +8319,11 @@ pub fn encoder_config_init(encoding_format EncodingFormat, format Format, channe
 struct C.ma_encoder {
 pub mut:
 	config           EncoderConfig
-	onWrite          C.ma_encoder_write_proc
-	onSeek           C.ma_encoder_seek_proc
-	onInit           C.ma_encoder_init_proc
-	onUninit         C.ma_encoder_uninit_proc
-	onWritePCMFrames C.ma_encoder_write_pcm_frames_proc
+	onWrite          EncoderWriteProc
+	onSeek           EncoderSeekProc
+	onInit           EncoderInitProc
+	onUninit         EncoderUninitProc
+	onWritePCMFrames EncoderWritePcmFramesProc
 	pUserData        voidptr
 	pInternalEncoder voidptr // <-- The drwav/drflac/stb_vorbis/etc. objects.
 	// TODO// union {
@@ -8304,10 +8334,10 @@ pub mut:
 pub type Encoder = C.ma_encoder
 
 // C: `MA_API ma_result ma_encoder_init(ma_encoder_write_proc onWrite, ma_encoder_seek_proc onSeek, void* pUserData, const ma_encoder_config* pConfig, ma_encoder* pEncoder)`
-fn C.ma_encoder_init(on_write C.ma_encoder_write_proc, on_seek C.ma_encoder_seek_proc, p_user_data voidptr, const_p_config &EncoderConfig, p_encoder &Encoder) Result
+fn C.ma_encoder_init(on_write EncoderWriteProc, on_seek EncoderSeekProc, p_user_data voidptr, const_p_config &EncoderConfig, p_encoder &Encoder) Result
 
 // encoder_init is currently undocumented
-pub fn encoder_init(on_write C.ma_encoder_write_proc, on_seek C.ma_encoder_seek_proc, p_user_data voidptr, const_p_config &EncoderConfig, p_encoder &Encoder) Result {
+pub fn encoder_init(on_write EncoderWriteProc, on_seek EncoderSeekProc, p_user_data voidptr, const_p_config &EncoderConfig, p_encoder &Encoder) Result {
 	return C.ma_encoder_init(on_write, on_seek, p_user_data, const_p_config, p_encoder)
 }
 
