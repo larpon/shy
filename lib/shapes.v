@@ -260,6 +260,13 @@ pub fn (r &Rect) contains(x f32, y f32) bool {
 	return x > r.x && y > r.y && x < r.x + r.width && y < r.y + r.height
 }
 
+// hit_rect returns `true` if `Rect` collides with the rectangle `rect`.
+[inline]
+pub fn (r &Rect) hit_rect(rect Rect) bool {
+	return r.x <= rect.x + rect.width && r.x + r.width >= rect.x && r.y <= rect.y + rect.height
+		&& r.y + r.height >= rect.y
+}
+
 [inline]
 pub fn (mut r Rect) displace_from(origin Anchor) {
 	r.x, r.y = origin.displace_rect(r)
@@ -288,6 +295,17 @@ pub fn (r &Rect) mul_scalar(scalar f32) Rect {
 		y: r.y * scalar
 		width: r.width * scalar
 		height: r.height * scalar
+	}
+}
+
+// scale_at returns a rectangle scaled by `factor_x`,`factor_y` at `origin_x`,`origin_y`
+[inline]
+pub fn (r &Rect) scale_at(origin_x f32, origin_y f32, factor_x f32, factor_y f32) Rect {
+	return Rect{
+		x: origin_x + (r.x - origin_x) * factor_x
+		y: origin_y + (r.y - origin_y) * factor_y
+		width: r.width * factor_x
+		height: r.height * factor_y
 	}
 }
 
