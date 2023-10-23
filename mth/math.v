@@ -41,3 +41,27 @@ pub fn reduce_fraction[T](numerator T, denominator T) (T, T) {
 	g_c_d := gcd(numerator, denominator)
 	return numerator / g_c_d, denominator / g_c_d
 }
+
+// eq_approx_f32 returns whether `x` and `y` are approximately equal within `tolerance`.
+pub fn eq_approx_f32(x f32, y f32, tolerance f32) bool {
+	diff := abs(x - y)
+	if diff <= tolerance {
+		return true
+	}
+	if diff < max(abs(x), abs(y)) * tolerance {
+		return true
+	}
+	return false
+}
+
+// eq_approx_f64 returns whether `x` and `y` are approximately equal within `tolerance`.
+pub fn eq_approx_f64(x f64, y f64, tolerance f64) bool {
+	diff := abs(x - y)
+	if diff <= tolerance {
+		return true
+	}
+	if diff < max(abs(x), abs(y)) * tolerance {
+		return true
+	}
+	return false
+}
