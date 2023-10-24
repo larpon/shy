@@ -840,7 +840,7 @@ fn map_sdl_button_mask_to_shy_mouse_buttons(mask u32) MouseButtons {
 	return buttons
 }
 
-fn map_sdl_button_to_shy_mouse_button(sdl_button byte) MouseButton {
+fn map_sdl_button_to_shy_mouse_button(sdl_button u8) MouseButton {
 	mut button := MouseButton.unknown
 	if sdl_button == sdl.button_left {
 		button = .left
