@@ -88,7 +88,7 @@ pub mut:
 }
 
 pub fn (c &Color) is_transparent() bool {
-	return c.a == 0
+	return c.a < 255
 }
 
 pub fn (c &Color) is_opaque() bool {
