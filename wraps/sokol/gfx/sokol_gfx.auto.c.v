@@ -196,6 +196,7 @@ pub enum PixelFormat {
 	etc2_rgba8      = C.SG_PIXELFORMAT_ETC2_RGBA8
 	etc2_rg11       = C.SG_PIXELFORMAT_ETC2_RG11
 	etc2_rg11sn     = C.SG_PIXELFORMAT_ETC2_RG11SN
+	rgb9e5          = C.SG_PIXELFORMAT_RGB9E5
 	num             = C._SG_PIXELFORMAT_NUM
 	force_u32       = C._SG_PIXELFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
@@ -289,11 +290,12 @@ pub enum ImageSampleType as u32 {
 
 // SamplerType is C.sg_sampler_type
 pub enum SamplerType as u32 {
-	_default   = C._SG_SAMPLERTYPE_DEFAULT // value 0 reserved for default-init
-	sample     = C.SG_SAMPLERTYPE_SAMPLE
-	compare    = C.SG_SAMPLERTYPE_COMPARE
-	_num       = C._SG_SAMPLERTYPE_NUM
-	_force_u32 = C._SG_SAMPLERTYPE_FORCE_U32 // 0x7FFFFFFF
+	_default     = C._SG_SAMPLERTYPE_DEFAULT // value 0 reserved for default-init
+	filtering    = C.SG_SAMPLERTYPE_FILTERING
+	nonfiltering = C.SG_SAMPLERTYPE_NONFILTERING
+	comparison   = C.SG_SAMPLERTYPE_COMPARISON
+	_num         = C._SG_SAMPLERTYPE_NUM
+	_force_u32   = C._SG_SAMPLERTYPE_FORCE_U32 // 0x7FFFFFFF
 }
 
 // CubeFace is C.sg_cube_face
@@ -379,6 +381,8 @@ pub enum VertexFormat as u32 {
 	short4n    = C.SG_VERTEXFORMAT_SHORT4N
 	ushort4n   = C.SG_VERTEXFORMAT_USHORT4N
 	uint10_n2  = C.SG_VERTEXFORMAT_UINT10_N2
+	half2      = C.SG_VERTEXFORMAT_HALF2
+	half4      = C.SG_VERTEXFORMAT_HALF4
 	_num       = C._SG_VERTEXFORMAT_NUM
 	_force_u32 = C._SG_VERTEXFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
@@ -675,6 +679,8 @@ pub mut:
 	max_anisotropy u32
 	label          &char = unsafe { nil }
 	// optionally inject backend-specific resources
+	//
+
 	gl_sampler    u32
 	mtl_sampler   voidptr
 	d3d11_sampler voidptr
@@ -725,6 +731,7 @@ pub type ShaderImageDesc = C.sg_shader_image_desc
 
 [typedef]
 struct C.sg_shader_sampler_desc {
+pub mut:
 	used         bool
 	sampler_type SamplerType
 }
@@ -733,10 +740,11 @@ pub type ShaderSamplerDesc = C.sg_shader_sampler_desc
 
 [typedef]
 struct C.sg_shader_image_sampler_pair_desc {
+pub mut:
 	used         bool
 	image_slot   int
 	sampler_slot int
-	glsl_name    &char
+	glsl_name    &char = unsafe { nil }
 }
 
 pub type ShaderImageSamplerPairDesc = C.sg_shader_image_sampler_pair_desc
@@ -748,10 +756,10 @@ pub mut:
 	bytecode     Range
 	entry        &char = unsafe { nil }
 	d3d11_target &char = unsafe { nil }
-	// TODO     uniform_blocks [SG_MAX_SHADERSTAGE_UBS]ShaderUniformBlockDesc
-	// TODO     images [SG_MAX_SHADERSTAGE_IMAGES]ShaderImageDesc
-	// TODO     samplers[SG_MAX_SHADERSTAGE_SAMPLERS]ShaderSamplerDesc
-	// TODO     image_sampler_pairs[SG_MAX_SHADERSTAGE_IMAGESAMPLERPAIRS]ShaderImageSamplerPairDesc
+	// TODO 	uniform_blocks [SG_MAX_SHADERSTAGE_UBS]ShaderUniformBlockDesc
+	// TODO 	images [SG_MAX_SHADERSTAGE_IMAGES]ShaderImageDesc
+	// TODO 	samplers [SG_MAX_SHADERSTAGE_SAMPLERS]ShaderSamplerDesc
+	// TODO 	image_sampler_pairs [SG_MAX_SHADERSTAGE_IMAGESAMPLERPAIRS]ShaderImageSamplerPairDesc
 }
 
 pub type ShaderStageDesc = C.sg_shader_stage_desc
@@ -775,6 +783,7 @@ pub mut:
 	stride    int
 	step_func VertexStep
 	step_rate int
+	// TODO #if defined(SOKOL_ZIG_BINDINGS) uint32_t __pad[2]
 }
 
 pub type VertexBufferLayoutState = C.sg_vertex_buffer_layout_state
@@ -785,6 +794,7 @@ pub mut:
 	buffer_index int
 	offset       int
 	format       VertexFormat
+	// TODO #if defined(SOKOL_ZIG_BINDINGS) uint32_t __pad[2]
 }
 
 pub type VertexAttrState = C.sg_vertex_attr_state
@@ -908,67 +918,65 @@ pub type PassDesc = C.sg_pass_desc
 [typedef]
 struct C.sg_trace_hooks {
 pub mut:
-	user_data                   voidptr
-	reset_state_cache           fn (user_data voidptr) // user_data)
-	make_buffer                 fn (const_desc &BufferDesc, result Buffer, user_data voidptr)     // sg_buffer_desc*
-	make_image                  fn (const_desc &ImageDesc, result Image, user_data voidptr)       // sg_image_desc*
-	make_shader                 fn (const_desc &ShaderDesc, result Shader, user_data voidptr)     // sg_shader_desc*
-	make_pipeline               fn (const_desc &PipelineDesc, result Pipeline, user_data voidptr) // sg_pipeline_desc*
-	make_pass                   fn (const_desc &PassDesc, result Pass, user_data voidptr) // sg_pass_desc*
-	destroy_buffer              fn (buf Buffer, user_data voidptr)   // buf,
-	destroy_image               fn (img Image, user_data voidptr)    // img,
-	destroy_shader              fn (shd Shader, user_data voidptr)   // shd,
-	destroy_pipeline            fn (pip Pipeline, user_data voidptr) // pip,
-	destroy_pass                fn (pass Pass, user_data voidptr)    // pass,
-	update_buffer               fn (buf Buffer, const_data &Range, user_data voidptr)    // buf,
-	update_image                fn (img Image, const_data &ImageData, user_data voidptr) // img,
-	append_buffer               fn (buf Buffer, const_data &Range, result int, user_data voidptr) // buf,
-	begin_default_pass          fn (const_pass_action &PassAction, width int, height int, user_data voidptr) // sg_pass_action*
-	begin_pass                  fn (pass Pass, const_pass_action &PassAction, user_data voidptr) // pass,
-	apply_viewport              fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
-	apply_scissor_rect          fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
-	apply_pipeline              fn (pip Pipeline, user_data voidptr) // pip,
-	apply_bindings              fn (const_bindings &Bindings, user_data voidptr) // sg_bindings*
-	apply_uniforms              fn (stage ShaderStage, ub_index int, const_data &Range, user_data voidptr)    // stage,
-	draw                        fn (base_element int, num_elements int, num_instances int, user_data voidptr) // base_element,
-	end_pass                    fn (user_data voidptr) // user_data)
-	commit                      fn (user_data voidptr) // user_data)
-	alloc_buffer                fn (result Buffer, user_data voidptr)   // result,
-	alloc_image                 fn (result Image, user_data voidptr)    // result,
-	alloc_shader                fn (result Shader, user_data voidptr)   // result,
-	alloc_pipeline              fn (result Pipeline, user_data voidptr) // result,
-	alloc_pass                  fn (result Pass, user_data voidptr)     // result,
-	dealloc_buffer              fn (buf_id Buffer, user_data voidptr)   // buf_id,
-	dealloc_image               fn (img_id Image, user_data voidptr)    // img_id,
-	dealloc_shader              fn (shd_id Shader, user_data voidptr)   // shd_id,
-	dealloc_pipeline            fn (pip_id Pipeline, user_data voidptr) // pip_id,
-	dealloc_pass                fn (pass_id Pass, user_data voidptr)    // pass_id,
-	init_buffer                 fn (buf_id Buffer, const_desc &BufferDesc, user_data voidptr)     // buf_id,
-	init_image                  fn (img_id Image, const_desc &ImageDesc, user_data voidptr)       // img_id,
-	init_shader                 fn (shd_id Shader, const_desc &ShaderDesc, user_data voidptr)     // shd_id,
-	init_pipeline               fn (pip_id Pipeline, const_desc &PipelineDesc, user_data voidptr) // pip_id,
-	init_pass                   fn (pass_id Pass, const_desc &PassDesc, user_data voidptr)        // pass_id,
-	uninit_buffer               fn (buf_id Buffer, user_data voidptr)    // buf_id,
-	uninit_image                fn (img_id Image, user_data voidptr)     // img_id,
-	uninit_shader               fn (shd_id Shader, user_data voidptr)    // shd_id,
-	uninit_pipeline             fn (pip_id Pipeline, user_data voidptr)  // pip_id,
-	uninit_pass                 fn (pass_id Pass, user_data voidptr)     // pass_id,
-	fail_buffer                 fn (buf_id Buffer, user_data voidptr)    // buf_id,
-	fail_image                  fn (img_id Image, user_data voidptr)     // img_id,
-	fail_shader                 fn (shd_id Shader, user_data voidptr)    // shd_id,
-	fail_pipeline               fn (pip_id Pipeline, user_data voidptr)  // pip_id,
-	fail_pass                   fn (pass_id Pass, user_data voidptr)     // pass_id,
-	push_debug_group            fn (const_name &char, user_data voidptr) // char*
-	pop_debug_group             fn (user_data voidptr) // user_data)
-	err_buffer_pool_exhausted   fn (user_data voidptr) // user_data)
-	err_image_pool_exhausted    fn (user_data voidptr) // user_data)
-	err_shader_pool_exhausted   fn (user_data voidptr) // user_data)
-	err_pipeline_pool_exhausted fn (user_data voidptr) // user_data)
-	err_pass_pool_exhausted     fn (user_data voidptr) // user_data)
-	err_context_mismatch        fn (user_data voidptr) // user_data)
-	err_pass_invalid            fn (user_data voidptr) // user_data)
-	err_draw_invalid            fn (user_data voidptr) // user_data)
-	err_bindings_invalid        fn (user_data voidptr) // user_data)
+	user_data          voidptr
+	reset_state_cache  fn (user_data voidptr) // user_data)
+	make_buffer        fn (const_desc &BufferDesc, result Buffer, user_data voidptr)     // sg_buffer_desc*
+	make_image         fn (const_desc &ImageDesc, result Image, user_data voidptr)       // sg_image_desc*
+	make_sampler       fn (const_desc &SamplerDesc, result Sampler, user_data voidptr)   // sg_sampler_desc*
+	make_shader        fn (const_desc &ShaderDesc, result Shader, user_data voidptr)     // sg_shader_desc*
+	make_pipeline      fn (const_desc &PipelineDesc, result Pipeline, user_data voidptr) // sg_pipeline_desc*
+	make_pass          fn (const_desc &PassDesc, result Pass, user_data voidptr) // sg_pass_desc*
+	destroy_buffer     fn (buf Buffer, user_data voidptr)   // buf,
+	destroy_image      fn (img Image, user_data voidptr)    // img,
+	destroy_sampler    fn (smp Sampler, user_data voidptr)  // smp,
+	destroy_shader     fn (shd Shader, user_data voidptr)   // shd,
+	destroy_pipeline   fn (pip Pipeline, user_data voidptr) // pip,
+	destroy_pass       fn (pass Pass, user_data voidptr)    // pass,
+	update_buffer      fn (buf Buffer, const_data &Range, user_data voidptr)    // buf,
+	update_image       fn (img Image, const_data &ImageData, user_data voidptr) // img,
+	append_buffer      fn (buf Buffer, const_data &Range, result int, user_data voidptr) // buf,
+	begin_default_pass fn (const_pass_action &PassAction, width int, height int, user_data voidptr) // sg_pass_action*
+	begin_pass         fn (pass Pass, const_pass_action &PassAction, user_data voidptr) // pass,
+	apply_viewport     fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
+	apply_scissor_rect fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
+	apply_pipeline     fn (pip Pipeline, user_data voidptr) // pip,
+	apply_bindings     fn (const_bindings &Bindings, user_data voidptr) // sg_bindings*
+	apply_uniforms     fn (stage ShaderStage, ub_index int, const_data &Range, user_data voidptr)    // stage,
+	draw               fn (base_element int, num_elements int, num_instances int, user_data voidptr) // base_element,
+	end_pass           fn (user_data voidptr) // user_data)
+	commit             fn (user_data voidptr) // user_data)
+	alloc_buffer       fn (result Buffer, user_data voidptr)   // result,
+	alloc_image        fn (result Image, user_data voidptr)    // result,
+	alloc_sampler      fn (result Sampler, user_data voidptr)  // result,
+	alloc_shader       fn (result Shader, user_data voidptr)   // result,
+	alloc_pipeline     fn (result Pipeline, user_data voidptr) // result,
+	alloc_pass         fn (result Pass, user_data voidptr)     // result,
+	dealloc_buffer     fn (buf_id Buffer, user_data voidptr)   // buf_id,
+	dealloc_image      fn (img_id Image, user_data voidptr)    // img_id,
+	dealloc_sampler    fn (smp_id Sampler, user_data voidptr)  // smp_id,
+	dealloc_shader     fn (shd_id Shader, user_data voidptr)   // shd_id,
+	dealloc_pipeline   fn (pip_id Pipeline, user_data voidptr) // pip_id,
+	dealloc_pass       fn (pass_id Pass, user_data voidptr)    // pass_id,
+	init_buffer        fn (buf_id Buffer, const_desc &BufferDesc, user_data voidptr)     // buf_id,
+	init_image         fn (img_id Image, const_desc &ImageDesc, user_data voidptr)       // img_id,
+	init_sampler       fn (smp_id Sampler, const_desc &SamplerDesc, user_data voidptr)   // smp_id,
+	init_shader        fn (shd_id Shader, const_desc &ShaderDesc, user_data voidptr)     // shd_id,
+	init_pipeline      fn (pip_id Pipeline, const_desc &PipelineDesc, user_data voidptr) // pip_id,
+	init_pass          fn (pass_id Pass, const_desc &PassDesc, user_data voidptr)        // pass_id,
+	uninit_buffer      fn (buf_id Buffer, user_data voidptr)    // buf_id,
+	uninit_image       fn (img_id Image, user_data voidptr)     // img_id,
+	uninit_sampler     fn (smp_id Sampler, user_data voidptr)   // smp_id,
+	uninit_shader      fn (shd_id Shader, user_data voidptr)    // shd_id,
+	uninit_pipeline    fn (pip_id Pipeline, user_data voidptr)  // pip_id,
+	uninit_pass        fn (pass_id Pass, user_data voidptr)     // pass_id,
+	fail_buffer        fn (buf_id Buffer, user_data voidptr)    // buf_id,
+	fail_image         fn (img_id Image, user_data voidptr)     // img_id,
+	fail_sampler       fn (smp_id Sampler, user_data voidptr)   // smp_id,
+	fail_shader        fn (shd_id Shader, user_data voidptr)    // shd_id,
+	fail_pipeline      fn (pip_id Pipeline, user_data voidptr)  // pip_id,
+	fail_pass          fn (pass_id Pass, user_data voidptr)     // pass_id,
+	push_debug_group   fn (const_name &char, user_data voidptr) // char*
+	pop_debug_group    fn (user_data voidptr) // user_data)
 }
 
 pub type TraceHooks = C.sg_trace_hooks
@@ -1012,6 +1020,7 @@ pub type ImageInfo = C.sg_image_info
 
 [typedef]
 struct C.sg_sampler_info {
+pub mut:
 	slot SlotInfo // resource pool slot info
 }
 
@@ -1040,6 +1049,231 @@ pub mut:
 }
 
 pub type PassInfo = C.sg_pass_info
+
+[typedef]
+struct C.sg_frame_stats_gl {
+pub mut:
+	num_bind_buffer                 u32
+	num_active_texture              u32
+	num_bind_texture                u32
+	num_bind_sampler                u32
+	num_use_program                 u32
+	num_render_state                u32
+	num_vertex_attrib_pointer       u32
+	num_vertex_attrib_divisor       u32
+	num_enable_vertex_attrib_array  u32
+	num_disable_vertex_attrib_array u32
+	num_uniform                     u32
+}
+
+pub type FrameStatsGl = C.sg_frame_stats_gl
+
+[typedef]
+struct C.sg_frame_stats_d3d11_pass {
+pub mut:
+	num_om_set_render_targets    u32
+	num_clear_render_target_view u32
+	num_clear_depth_stencil_view u32
+	num_resolve_subresource      u32
+}
+
+pub type FrameStatsD3d11Pass = C.sg_frame_stats_d3d11_pass
+
+[typedef]
+struct C.sg_frame_stats_d3d11_pipeline {
+pub mut:
+	num_rs_set_state               u32
+	num_om_set_depth_stencil_state u32
+	num_om_set_blend_state         u32
+	num_ia_set_primitive_topology  u32
+	num_ia_set_input_layout        u32
+	num_vs_set_shader              u32
+	num_vs_set_constant_buffers    u32
+	num_ps_set_shader              u32
+	num_ps_set_constant_buffers    u32
+}
+
+pub type FrameStatsD3d11Pipeline = C.sg_frame_stats_d3d11_pipeline
+
+[typedef]
+struct C.sg_frame_stats_d3d11_bindings {
+pub mut:
+	num_ia_set_vertex_buffers   u32
+	num_ia_set_index_buffer     u32
+	num_vs_set_shader_resources u32
+	num_ps_set_shader_resources u32
+	num_vs_set_samplers         u32
+	num_ps_set_samplers         u32
+}
+
+pub type FrameStatsD3d11Bindings = C.sg_frame_stats_d3d11_bindings
+
+[typedef]
+struct C.sg_frame_stats_d3d11_uniforms {
+pub mut:
+	num_update_subresource u32
+}
+
+pub type FrameStatsD3d11Uniforms = C.sg_frame_stats_d3d11_uniforms
+
+[typedef]
+struct C.sg_frame_stats_d3d11_draw {
+pub mut:
+	num_draw_indexed_instanced u32
+	num_draw_indexed           u32
+	num_draw_instanced         u32
+	num_draw                   u32
+}
+
+pub type FrameStatsD3d11Draw = C.sg_frame_stats_d3d11_draw
+
+[typedef]
+struct C.sg_frame_stats_d3d11 {
+pub mut:
+	pass      FrameStatsD3d11Pass
+	pipeline  FrameStatsD3d11Pipeline
+	bindings  FrameStatsD3d11Bindings
+	uniforms  FrameStatsD3d11Uniforms
+	draw      FrameStatsD3d11Draw
+	num_map   u32
+	num_unmap u32
+}
+
+pub type FrameStatsD3d11 = C.sg_frame_stats_d3d11
+
+[typedef]
+struct C.sg_frame_stats_metal_idpool {
+pub mut:
+	num_added             u32
+	num_released          u32
+	num_garbage_collected u32
+}
+
+pub type FrameStatsMetalIdpool = C.sg_frame_stats_metal_idpool
+
+[typedef]
+struct C.sg_frame_stats_metal_pipeline {
+pub mut:
+	num_set_blend_color             u32
+	num_set_cull_mode               u32
+	num_set_front_facing_winding    u32
+	num_set_stencil_reference_value u32
+	num_set_depth_bias              u32
+	num_set_render_pipeline_state   u32
+	num_set_depth_stencil_state     u32
+}
+
+pub type FrameStatsMetalPipeline = C.sg_frame_stats_metal_pipeline
+
+[typedef]
+struct C.sg_frame_stats_metal_bindings {
+pub mut:
+	num_set_vertex_buffer          u32
+	num_set_vertex_texture         u32
+	num_set_vertex_sampler_state   u32
+	num_set_fragment_texture       u32
+	num_set_fragment_sampler_state u32
+}
+
+pub type FrameStatsMetalBindings = C.sg_frame_stats_metal_bindings
+
+[typedef]
+struct C.sg_frame_stats_metal_uniforms {
+pub mut:
+	num_set_vertex_buffer_offset   u32
+	num_set_fragment_buffer_offset u32
+}
+
+pub type FrameStatsMetalUniforms = C.sg_frame_stats_metal_uniforms
+
+[typedef]
+struct C.sg_frame_stats_metal {
+pub mut:
+	idpool   FrameStatsMetalIdpool
+	pipeline FrameStatsMetalPipeline
+	bindings FrameStatsMetalBindings
+	uniforms FrameStatsMetalUniforms
+}
+
+pub type FrameStatsMetal = C.sg_frame_stats_metal
+
+[typedef]
+struct C.sg_frame_stats_wgpu_uniforms {
+pub mut:
+	num_set_bindgroup u32
+	size_write_buffer u32
+}
+
+pub type FrameStatsWgpuUniforms = C.sg_frame_stats_wgpu_uniforms
+
+[typedef]
+struct C.sg_frame_stats_wgpu_bindings {
+pub mut:
+	num_set_vertex_buffer                    u32
+	num_skip_redundant_vertex_buffer         u32
+	num_set_index_buffer                     u32
+	num_skip_redundant_index_buffer          u32
+	num_create_bindgroup                     u32
+	num_discard_bindgroup                    u32
+	num_set_bindgroup                        u32
+	num_skip_redundant_bindgroup             u32
+	num_bindgroup_cache_hits                 u32
+	num_bindgroup_cache_misses               u32
+	num_bindgroup_cache_collisions           u32
+	num_bindgroup_cache_hash_vs_key_mismatch u32
+}
+
+pub type FrameStatsWgpuBindings = C.sg_frame_stats_wgpu_bindings
+
+[typedef]
+struct C.sg_frame_stats_wgpu {
+pub mut:
+	uniforms FrameStatsWgpuUniforms
+	bindings FrameStatsWgpuBindings
+}
+
+pub type FrameStatsWgpu = C.sg_frame_stats_wgpu
+
+[typedef]
+struct C.sg_frame_stats {
+pub mut:
+	frame_index u32
+	// current frame counter, starts at 0 uint32_t num_passes
+	//
+
+	num_apply_viewport     u32
+	num_apply_scissor_rect u32
+	num_apply_pipeline     u32
+	num_apply_bindings     u32
+	num_apply_uniforms     u32
+	num_draw               u32
+	num_update_buffer      u32
+	num_append_buffer      u32
+	num_update_image       u32
+	size_apply_uniforms    u32
+	size_update_buffer     u32
+	size_append_buffer     u32
+	size_update_image      u32
+	gl                     FrameStatsGl
+	d3d11                  FrameStatsD3d11
+	metal                  FrameStatsMetal
+	wgpu                   FrameStatsWgpu
+}
+
+pub type FrameStats = C.sg_frame_stats
+
+/*
+TODO Non-numerical: #define _SG_LOG_ITEMS \
+*/
+
+/*
+TODO Non-numerical: #define _SG_LOGITEM_XMACRO(item,msg) SG_LOGITEM_##item,
+*/
+
+// LogItem is C.sg_log_item
+// pub enum LogItem {
+//	s = C._SG_LOG_ITEMS
+//}
 
 [typedef]
 struct C.sg_metal_context_desc {
@@ -1084,6 +1318,16 @@ pub mut:
 pub type WgpuContextDesc = C.sg_wgpu_context_desc
 
 [typedef]
+struct C.sg_gl_context_desc {
+pub mut:
+	default_framebuffer_cb          fn () u32
+	default_framebuffer_userdata_cb fn () u32
+	user_data                       voidptr
+}
+
+pub type GlContextDesc = C.sg_gl_context_desc
+
+[typedef]
 struct C.sg_context_desc {
 pub mut:
 	color_format PixelFormat
@@ -1092,13 +1336,15 @@ pub mut:
 	metal        MetalContextDesc
 	d3d11        D3d11ContextDesc
 	wgpu         WgpuContextDesc
+	gl           GlContextDesc
 }
 
 pub type ContextDesc = C.sg_context_desc
 
 [typedef]
 struct C.sg_commit_listener {
-	func      fn (user_data voidptr)
+pub mut:
+	func      fn (user_data voidptr) // user_data)
 	user_data voidptr
 }
 
@@ -1107,8 +1353,8 @@ pub type CommitListener = C.sg_commit_listener
 [typedef]
 struct C.sg_allocator {
 pub mut:
-	alloc     fn (size usize, user_data voidptr) voidptr // size,
-	free      fn (ptr voidptr, user_data voidptr)        // ptr,
+	alloc_fn  fn (size usize, user_data voidptr) voidptr // size,
+	free_fn   fn (ptr voidptr, user_data voidptr)        // ptr,
 	user_data voidptr
 }
 
@@ -1147,7 +1393,6 @@ pub mut:
 	pass_pool_size                 int
 	context_pool_size              int
 	uniform_buffer_size            int
-	staging_buffer_size            int
 	max_commit_listeners           int
 	disable_validation             bool
 	mtl_force_managed_storage_mode bool // for debugging: use Metal managed storage mode for resources even with UMA
@@ -1530,8 +1775,8 @@ pub fn query_image_state(img Image) ResourceState {
 // C: `SOKOL_GFX_API_DECL sg_resource_state sg_query_sampler_state(sg_sampler smp)`
 fn C.sg_query_sampler_state(smp Sampler) ResourceState
 
-// query_sampler is currently undocumented
-pub fn query_sampler(smp Sampler) ResourceState {
+// query_sampler_state is currently undocumented
+pub fn query_sampler_state(smp Sampler) ResourceState {
 	return C.sg_query_sampler_state(smp)
 }
 
@@ -1626,6 +1871,7 @@ pub fn query_image_desc(img Image) ImageDesc {
 // C: `SOKOL_GFX_API_DECL sg_sampler_desc sg_query_sampler_desc(sg_sampler smp)`
 fn C.sg_query_sampler_desc(smp Sampler) SamplerDesc
 
+// query_sampler_desc is currently undocumented
 pub fn query_sampler_desc(smp Sampler) SamplerDesc {
 	return C.sg_query_sampler_desc(smp)
 }
@@ -1750,20 +1996,20 @@ pub fn alloc_pass() Pass {
 	return C.sg_alloc_pass()
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_dealloc_buffer(sg_buffer buf_id)`
-fn C.sg_dealloc_buffer(buf_id Buffer)
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_buffer(sg_buffer buf)`
+fn C.sg_dealloc_buffer(buf Buffer)
 
 // dealloc_buffer is currently undocumented
-pub fn dealloc_buffer(buf_id Buffer) {
-	C.sg_dealloc_buffer(buf_id)
+pub fn dealloc_buffer(buf Buffer) {
+	C.sg_dealloc_buffer(buf)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_dealloc_image(sg_image img_id)`
-fn C.sg_dealloc_image(img_id Image)
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_image(sg_image img)`
+fn C.sg_dealloc_image(img Image)
 
 // dealloc_image is currently undocumented
-pub fn dealloc_image(img_id Image) {
-	C.sg_dealloc_image(img_id)
+pub fn dealloc_image(img Image) {
+	C.sg_dealloc_image(img)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_dealloc_sampler(sg_sampler smp)`
@@ -1774,44 +2020,44 @@ pub fn dealloc_sampler(smp Sampler) {
 	C.sg_dealloc_sampler(smp)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_dealloc_shader(sg_shader shd_id)`
-fn C.sg_dealloc_shader(shd_id Shader)
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_shader(sg_shader shd)`
+fn C.sg_dealloc_shader(shd Shader)
 
 // dealloc_shader is currently undocumented
-pub fn dealloc_shader(shd_id Shader) {
-	C.sg_dealloc_shader(shd_id)
+pub fn dealloc_shader(shd Shader) {
+	C.sg_dealloc_shader(shd)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_dealloc_pipeline(sg_pipeline pip_id)`
-fn C.sg_dealloc_pipeline(pip_id Pipeline)
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_pipeline(sg_pipeline pip)`
+fn C.sg_dealloc_pipeline(pip Pipeline)
 
 // dealloc_pipeline is currently undocumented
-pub fn dealloc_pipeline(pip_id Pipeline) {
-	C.sg_dealloc_pipeline(pip_id)
+pub fn dealloc_pipeline(pip Pipeline) {
+	C.sg_dealloc_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_dealloc_pass(sg_pass pass_id)`
-fn C.sg_dealloc_pass(pass_id Pass)
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_pass(sg_pass pass)`
+fn C.sg_dealloc_pass(pass Pass)
 
 // dealloc_pass is currently undocumented
-pub fn dealloc_pass(pass_id Pass) {
-	C.sg_dealloc_pass(pass_id)
+pub fn dealloc_pass(pass Pass) {
+	C.sg_dealloc_pass(pass)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_init_buffer(sg_buffer buf_id, const sg_buffer_desc* desc)`
-fn C.sg_init_buffer(buf_id Buffer, const_desc &BufferDesc)
+// C: `SOKOL_GFX_API_DECL void sg_init_buffer(sg_buffer buf, const sg_buffer_desc* desc)`
+fn C.sg_init_buffer(buf Buffer, const_desc &BufferDesc)
 
 // init_buffer is currently undocumented
-pub fn init_buffer(buf_id Buffer, const_desc &BufferDesc) {
-	C.sg_init_buffer(buf_id, const_desc)
+pub fn init_buffer(buf Buffer, const_desc &BufferDesc) {
+	C.sg_init_buffer(buf, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_init_image(sg_image img_id, const sg_image_desc* desc)`
-fn C.sg_init_image(img_id Image, const_desc &ImageDesc)
+// C: `SOKOL_GFX_API_DECL void sg_init_image(sg_image img, const sg_image_desc* desc)`
+fn C.sg_init_image(img Image, const_desc &ImageDesc)
 
 // init_image is currently undocumented
-pub fn init_image(img_id Image, const_desc &ImageDesc) {
-	C.sg_init_image(img_id, const_desc)
+pub fn init_image(img Image, const_desc &ImageDesc) {
+	C.sg_init_image(img, const_desc)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_init_sampler(sg_sampler smg, const sg_sampler_desc* desc)`
@@ -1822,44 +2068,44 @@ pub fn init_sampler(smg Sampler, const_desc &SamplerDesc) {
 	C.sg_init_sampler(smg, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_init_shader(sg_shader shd_id, const sg_shader_desc* desc)`
-fn C.sg_init_shader(shd_id Shader, const_desc &ShaderDesc)
+// C: `SOKOL_GFX_API_DECL void sg_init_shader(sg_shader shd, const sg_shader_desc* desc)`
+fn C.sg_init_shader(shd Shader, const_desc &ShaderDesc)
 
 // init_shader is currently undocumented
-pub fn init_shader(shd_id Shader, const_desc &ShaderDesc) {
-	C.sg_init_shader(shd_id, const_desc)
+pub fn init_shader(shd Shader, const_desc &ShaderDesc) {
+	C.sg_init_shader(shd, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_init_pipeline(sg_pipeline pip_id, const sg_pipeline_desc* desc)`
-fn C.sg_init_pipeline(pip_id Pipeline, const_desc &PipelineDesc)
+// C: `SOKOL_GFX_API_DECL void sg_init_pipeline(sg_pipeline pip, const sg_pipeline_desc* desc)`
+fn C.sg_init_pipeline(pip Pipeline, const_desc &PipelineDesc)
 
 // init_pipeline is currently undocumented
-pub fn init_pipeline(pip_id Pipeline, const_desc &PipelineDesc) {
-	C.sg_init_pipeline(pip_id, const_desc)
+pub fn init_pipeline(pip Pipeline, const_desc &PipelineDesc) {
+	C.sg_init_pipeline(pip, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_init_pass(sg_pass pass_id, const sg_pass_desc* desc)`
-fn C.sg_init_pass(pass_id Pass, const_desc &PassDesc)
+// C: `SOKOL_GFX_API_DECL void sg_init_pass(sg_pass pass, const sg_pass_desc* desc)`
+fn C.sg_init_pass(pass Pass, const_desc &PassDesc)
 
 // init_pass is currently undocumented
-pub fn init_pass(pass_id Pass, const_desc &PassDesc) {
-	C.sg_init_pass(pass_id, const_desc)
+pub fn init_pass(pass Pass, const_desc &PassDesc) {
+	C.sg_init_pass(pass, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_uninit_buffer(sg_buffer buf_id)`
-fn C.sg_uninit_buffer(buf_id Buffer)
+// C: `SOKOL_GFX_API_DECL void sg_uninit_buffer(sg_buffer buf)`
+fn C.sg_uninit_buffer(buf Buffer)
 
 // uninit_buffer is currently undocumented
-pub fn uninit_buffer(buf_id Buffer) {
-	C.sg_uninit_buffer(buf_id)
+pub fn uninit_buffer(buf Buffer) {
+	C.sg_uninit_buffer(buf)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_uninit_image(sg_image img_id)`
-fn C.sg_uninit_image(img_id Image)
+// C: `SOKOL_GFX_API_DECL void sg_uninit_image(sg_image img)`
+fn C.sg_uninit_image(img Image)
 
 // uninit_image is currently undocumented
-pub fn uninit_image(img_id Image) {
-	C.sg_uninit_image(img_id)
+pub fn uninit_image(img Image) {
+	C.sg_uninit_image(img)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_uninit_sampler(sg_sampler smp)`
@@ -1870,44 +2116,44 @@ pub fn uninit_sampler(smp Sampler) {
 	C.sg_uninit_sampler(smp)
 }
 
-// C: `SOKOL_GFX_API_DECL sg_uninit_shader(sg_shader shd_id)`
-fn C.sg_uninit_shader(shd_id Shader)
+// C: `SOKOL_GFX_API_DECL void sg_uninit_shader(sg_shader shd)`
+fn C.sg_uninit_shader(shd Shader)
 
 // uninit_shader is currently undocumented
-pub fn uninit_shader(shd_id Shader) {
-	C.sg_uninit_shader(shd_id)
+pub fn uninit_shader(shd Shader) {
+	C.sg_uninit_shader(shd)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_uninit_pipeline(sg_pipeline pip_id)`
-fn C.sg_uninit_pipeline(pip_id Pipeline)
+// C: `SOKOL_GFX_API_DECL void sg_uninit_pipeline(sg_pipeline pip)`
+fn C.sg_uninit_pipeline(pip Pipeline)
 
 // uninit_pipeline is currently undocumented
-pub fn uninit_pipeline(pip_id Pipeline) {
-	C.sg_uninit_pipeline(pip_id)
+pub fn uninit_pipeline(pip Pipeline) {
+	C.sg_uninit_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_uninit_pass(sg_pass pass_id)`
-fn C.sg_uninit_pass(pass_id Pass)
+// C: `SOKOL_GFX_API_DECL void sg_uninit_pass(sg_pass pass)`
+fn C.sg_uninit_pass(pass Pass)
 
 // uninit_pass is currently undocumented
-pub fn uninit_pass(pass_id Pass) {
-	C.sg_uninit_pass(pass_id)
+pub fn uninit_pass(pass Pass) {
+	C.sg_uninit_pass(pass)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_fail_buffer(sg_buffer buf_id)`
-fn C.sg_fail_buffer(buf_id Buffer)
+// C: `SOKOL_GFX_API_DECL void sg_fail_buffer(sg_buffer buf)`
+fn C.sg_fail_buffer(buf Buffer)
 
 // fail_buffer is currently undocumented
-pub fn fail_buffer(buf_id Buffer) {
-	C.sg_fail_buffer(buf_id)
+pub fn fail_buffer(buf Buffer) {
+	C.sg_fail_buffer(buf)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_fail_image(sg_image img_id)`
-fn C.sg_fail_image(img_id Image)
+// C: `SOKOL_GFX_API_DECL void sg_fail_image(sg_image img)`
+fn C.sg_fail_image(img Image)
 
 // fail_image is currently undocumented
-pub fn fail_image(img_id Image) {
-	C.sg_fail_image(img_id)
+pub fn fail_image(img Image) {
+	C.sg_fail_image(img)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_fail_sampler(sg_sampler smp)`
@@ -1918,28 +2164,60 @@ pub fn fail_sampler(smp Sampler) {
 	C.sg_fail_sampler(smp)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_fail_shader(sg_shader shd_id)`
-fn C.sg_fail_shader(shd_id Shader)
+// C: `SOKOL_GFX_API_DECL void sg_fail_shader(sg_shader shd)`
+fn C.sg_fail_shader(shd Shader)
 
 // fail_shader is currently undocumented
-pub fn fail_shader(shd_id Shader) {
-	C.sg_fail_shader(shd_id)
+pub fn fail_shader(shd Shader) {
+	C.sg_fail_shader(shd)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_fail_pipeline(sg_pipeline pip_id)`
-fn C.sg_fail_pipeline(pip_id Pipeline)
+// C: `SOKOL_GFX_API_DECL void sg_fail_pipeline(sg_pipeline pip)`
+fn C.sg_fail_pipeline(pip Pipeline)
 
 // fail_pipeline is currently undocumented
-pub fn fail_pipeline(pip_id Pipeline) {
-	C.sg_fail_pipeline(pip_id)
+pub fn fail_pipeline(pip Pipeline) {
+	C.sg_fail_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_fail_pass(sg_pass pass_id)`
-fn C.sg_fail_pass(pass_id Pass)
+// C: `SOKOL_GFX_API_DECL void sg_fail_pass(sg_pass pass)`
+fn C.sg_fail_pass(pass Pass)
 
 // fail_pass is currently undocumented
-pub fn fail_pass(pass_id Pass) {
-	C.sg_fail_pass(pass_id)
+pub fn fail_pass(pass Pass) {
+	C.sg_fail_pass(pass)
+}
+
+// C: `SOKOL_GFX_API_DECL void sg_enable_frame_stats(void)`
+fn C.sg_enable_frame_stats()
+
+// enable_frame_stats //s frame stats
+pub fn enable_frame_stats() {
+	C.sg_enable_frame_stats()
+}
+
+// C: `SOKOL_GFX_API_DECL void sg_disable_frame_stats(void)`
+fn C.sg_disable_frame_stats()
+
+// disable_frame_stats is currently undocumented
+pub fn disable_frame_stats() {
+	C.sg_disable_frame_stats()
+}
+
+// C: `SOKOL_GFX_API_DECL bool sg_frame_stats_enabled(void)`
+fn C.sg_frame_stats_enabled() bool
+
+// frame_stats_enabled is currently undocumented
+pub fn frame_stats_enabled() bool {
+	return C.sg_frame_stats_enabled()
+}
+
+// C: `SOKOL_GFX_API_DECL sg_frame_stats sg_query_frame_stats(void)`
+fn C.sg_query_frame_stats() FrameStats
+
+// query_frame_stats is currently undocumented
+pub fn query_frame_stats() FrameStats {
+	return C.sg_query_frame_stats()
 }
 
 // C: `SOKOL_GFX_API_DECL sg_context sg_setup_context(void)`
@@ -1988,4 +2266,36 @@ fn C.sg_mtl_render_command_encoder() voidptr
 // mtl_render_command_encoder metal:s return __bridge-casted MTLRenderCommandEncoder in current pass (or zero if outside pass)
 pub fn mtl_render_command_encoder() voidptr {
 	return C.sg_mtl_render_command_encoder()
+}
+
+// C: `SOKOL_GFX_API_DECL const void* sg_wgpu_device(void)`
+fn C.sg_wgpu_device() voidptr
+
+// wgpu_device //s WebGPU: return WGPUDevice object
+pub fn wgpu_device() voidptr {
+	return C.sg_wgpu_device()
+}
+
+// C: `SOKOL_GFX_API_DECL const void* sg_wgpu_queue(void)`
+fn C.sg_wgpu_queue() voidptr
+
+// wgpu_queue //s WebGPU: return WGPUQueue object
+pub fn wgpu_queue() voidptr {
+	return C.sg_wgpu_queue()
+}
+
+// C: `SOKOL_GFX_API_DECL const void* sg_wgpu_command_encoder(void)`
+fn C.sg_wgpu_command_encoder() voidptr
+
+// wgpu_command_encoder //s WebGPU: return this frame's WGPUCommandEncoder
+pub fn wgpu_command_encoder() voidptr {
+	return C.sg_wgpu_command_encoder()
+}
+
+// C: `SOKOL_GFX_API_DECL const void* sg_wgpu_render_pass_encoder(void)`
+fn C.sg_wgpu_render_pass_encoder() voidptr
+
+// wgpu_render_pass_encoder //s WebGPU: return WGPURenderPassEncoder of currrent pass
+pub fn wgpu_render_pass_encoder() voidptr {
+	return C.sg_wgpu_render_pass_encoder()
 }
