@@ -27,6 +27,13 @@ pub fn abs[T](a T) T {
 	return if a < 0 { -a } else { a }
 }
 
+// modf32
+[inline]
+pub fn modf32(x f32) (f32,f32) {
+  x_integer_f64, x_fraction_f64 := modf(x)
+  return f32(x_integer_f64), f32(x_fraction_f64)
+}
+
 // gcd finds the Greatest Common Divisor between two numbers.
 pub fn gcd[T](a T, b T) T {
 	return T(if b == 0 {
