@@ -555,6 +555,18 @@ pub mut:
 	height f32 = 100
 }
 
+// + returns the resulting size of the addition of `s1` and `s2`.
+[inline]
+pub fn (s1 Size) + (s2 Size) Size {
+	return Size{s1.width + s2.height, s1.width + s2.height}
+}
+
+// - returns the resulting size of the subtraction of `s1` and `s2`.
+[inline]
+pub fn (s1 Size) - (s2 Size) Size {
+	return Size{s1.width - s2.height, s1.width - s2.height}
+}
+
 // to_rect converts `Size` to `Rect` with `x` and `y` fields sat to 0.
 pub fn (s &Size) to_rect() Rect {
 	return Rect{
@@ -562,6 +574,14 @@ pub fn (s &Size) to_rect() Rect {
 		y: 0
 		width: s.width
 		height: s.height
+	}
+}
+
+// to_vec2 converts `Size` to `Vec2[f32]` with `x` and `y` fields equal to `width` and `height`.
+pub fn (s &Size) to_vec2() vec.Vec2[f32] {
+	return vec.Vec2{
+		x: s.width
+		y: s.height
 	}
 }
 
