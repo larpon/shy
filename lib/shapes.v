@@ -578,8 +578,8 @@ pub fn (s &Size) to_rect() Rect {
 }
 
 // to_vec2 converts `Size` to `Vec2[f32]` with `x` and `y` fields equal to `width` and `height`.
-pub fn (s &Size) to_vec2() vec.Vec2[f32] {
-	return vec.Vec2{
+pub fn (s &Size) to_vec2() Vec2[f32] {
+	return Vec2{
 		x: s.width
 		y: s.height
 	}
