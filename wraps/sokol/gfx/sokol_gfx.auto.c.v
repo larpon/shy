@@ -801,6 +801,7 @@ pub type VertexAttrState = C.sg_vertex_attr_state
 
 [typedef]
 struct C.sg_vertex_layout_state {
+pub mut:
 	buffers [8]VertexBufferLayoutState
 	attrs   [16]VertexAttrState
 }
