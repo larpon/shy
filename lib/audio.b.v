@@ -80,7 +80,7 @@ pub fn (a &Audio) engine(id u8) !&AudioEngine {
 
 // AudioEngine implementation
 
-[heap]
+@[heap]
 pub struct AudioEngine {
 	ShyStruct
 	e &ma.Engine = null

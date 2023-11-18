@@ -66,7 +66,7 @@ pub fn (mut dt DrawText) text_2d() Draw2DText {
 
 // pub type TextAlign = fontstash.Align
 
-[flag]
+@[flag]
 pub enum TextAlign {
 	// Horizontal align
 	left // Default
@@ -140,7 +140,7 @@ pub mut:
 	blur     f32
 }
 
-[inline]
+@[inline]
 pub fn (t Draw2DText) draw() {
 	// http://www.freetype.org/freetype2/docs/tutorial/metrics.png
 
@@ -310,7 +310,7 @@ pub fn (t Draw2DText) draw() {
 	}
 }
 
-[inline; if shy_debug_draw ?]
+@[inline; if shy_debug_draw ?]
 fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
 	gl.begin_line_strip()
 	gl.v2f(x1, y1)
@@ -318,7 +318,7 @@ fn (t Draw2DText) dbg_draw_line(x1 f32, y1 f32, x2 f32, y2 f32) {
 	gl.end()
 }
 
-[inline; if shy_debug_draw ?]
+@[inline; if shy_debug_draw ?]
 fn (t Draw2DText) dbg_draw_rect(r Rect) {
 	gl.begin_line_strip()
 	gl.v2f(r.x, r.y)
@@ -331,7 +331,7 @@ fn (t Draw2DText) dbg_draw_rect(r Rect) {
 	gl.end()
 }
 
-[inline]
+@[inline]
 pub fn (t Draw2DText) set_font_render_alignment(align TextAlign) {
 	unsafe {
 		t.cur_align = align
@@ -339,7 +339,7 @@ pub fn (t Draw2DText) set_font_render_alignment(align TextAlign) {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (t Draw2DText) baseline_height(s string) f32 {
 	prev_align := t.cur_align
 	t.set_font_render_alignment(.left | .top)
@@ -351,7 +351,7 @@ pub fn (t Draw2DText) baseline_height(s string) f32 {
 	return bounds_tl.y - bounds_de.y
 }
 
-[inline]
+@[inline]
 pub fn (t Draw2DText) bounds(s string) Rect {
 	fc := t.fc
 	font_context := fc.fsc
@@ -384,7 +384,7 @@ pub fn (t Draw2DText) bounds(s string) Rect {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (t Draw2DText) line_bounds(y f32) (f32, f32) {
 	mut min_y, mut max_y := f32(0), f32(0)
 	t.fc.fsc.line_bounds(y, &min_y, &max_y)
@@ -398,7 +398,7 @@ pub:
 	line_height f32
 }
 
-[inline]
+@[inline]
 pub fn (t Draw2DText) metrics() FontMetrics {
 	mut asc, mut desc, line_h := f32(0), f32(0), f32(0)
 	t.fc.fsc.vert_metrics(&asc, &desc, &line_h)
@@ -409,7 +409,7 @@ pub fn (t Draw2DText) metrics() FontMetrics {
 	}
 }
 
-[inline]
+@[inline]
 fn (t Draw2DText) anchor_to_alignment(a Anchor) TextAlign {
 	return match a {
 		.top_left {

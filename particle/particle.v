@@ -81,7 +81,7 @@ fn (p ParticleState) eq(pa ParticleState) bool {
 }
 
 // Particle is the data structure representing one particle in a `System`.
-[heap]
+@[heap]
 pub struct Particle {
 mut:
 	system &System

@@ -12,14 +12,14 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
 	a_r &shy.Animator[f32] = shy.null
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 	a.a_r = a.shy.new_animator[f32](
@@ -36,7 +36,7 @@ pub fn (mut a App) init() ! {
 	}
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.circle(
 		x: (shy.half * a.window.width())

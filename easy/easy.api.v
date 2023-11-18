@@ -20,7 +20,7 @@ pub mut: // TODO error: field ... is not public - make this just "pub" to caller
 	easy &Easy = shy.null
 }
 
-[heap]
+@[heap]
 pub struct Easy {
 	shy.ShyStruct
 mut:
@@ -49,7 +49,7 @@ pub fn (mut e Easy) variable_update(dt f64) {
 	}
 }
 
-[params]
+@[params]
 pub struct EasyTextConfig {
 pub mut:
 	x        f32
@@ -65,7 +65,7 @@ pub mut:
 	blur     f32
 }
 
-[noinit]
+@[noinit]
 pub struct EasyText {
 	shy.ShyStruct
 pub mut:
@@ -82,7 +82,7 @@ pub mut:
 	blur     f32
 }
 
-[inline]
+@[inline]
 pub fn (et &EasyText) draw() {
 	draw := et.shy.draw()
 	mut dt := draw.text()
@@ -103,7 +103,7 @@ pub fn (et &EasyText) draw() {
 	dt.end()
 }
 
-[inline]
+@[inline]
 pub fn (et &EasyText) bounds() shy.Rect {
 	draw := et.shy.draw()
 	mut dt := draw.text()
@@ -126,7 +126,7 @@ pub fn (et &EasyText) bounds() shy.Rect {
 	return t.bounds(t.text)
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) new_text(etc EasyTextConfig) &EasyText {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return &EasyText{
@@ -135,7 +135,7 @@ pub fn (e &Easy) new_text(etc EasyTextConfig) &EasyText {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyText{
@@ -144,7 +144,7 @@ pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) text(etc EasyTextConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.text(etc).draw()
@@ -154,7 +154,7 @@ pub fn (q &Quick) text(etc EasyTextConfig) {
 
 // Rect
 
-[params]
+@[params]
 pub struct EasyRectConfig {
 	shy.Rect
 pub mut:
@@ -167,7 +167,7 @@ pub mut:
 	origin   shy.Anchor
 }
 
-[noinit]
+@[noinit]
 pub struct EasyRect {
 	shy.ShyStruct
 	shy.Rect
@@ -181,7 +181,7 @@ pub mut:
 	origin   shy.Anchor
 }
 
-[inline]
+@[inline]
 pub fn (er &EasyRect) draw() {
 	draw := er.shy.draw()
 	mut d := draw.shape_2d()
@@ -202,7 +202,7 @@ pub fn (er &EasyRect) draw() {
 	d.end()
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyRect{
@@ -211,7 +211,7 @@ pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) rect(erc EasyRectConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.rect(erc).draw()
@@ -219,7 +219,7 @@ pub fn (q &Quick) rect(erc EasyRectConfig) {
 
 // Triangle
 
-[params]
+@[params]
 pub struct EasyTriangleConfig {
 pub mut:
 	a        vec.Vec2[f32]
@@ -234,7 +234,7 @@ pub mut:
 	origin   shy.Anchor
 }
 
-[noinit]
+@[noinit]
 pub struct EasyTriangle {
 	shy.ShyStruct
 pub mut:
@@ -250,7 +250,7 @@ pub mut:
 	origin   shy.Anchor
 }
 
-[inline]
+@[inline]
 pub fn (et &EasyTriangle) bbox() shy.Rect {
 	t := shy.Triangle{
 		a: et.a
@@ -267,7 +267,7 @@ pub fn (et &EasyTriangle) bbox() shy.Rect {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (et &EasyTriangle) draw() {
 	draw := et.shy.draw()
 	mut d := draw.shape_2d()
@@ -287,7 +287,7 @@ pub fn (et &EasyTriangle) draw() {
 	d.end()
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) triangle(etc EasyTriangleConfig) EasyTriangle {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyTriangle{
@@ -296,7 +296,7 @@ pub fn (e &Easy) triangle(etc EasyTriangleConfig) EasyTriangle {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) triangle(etc EasyTriangleConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.triangle(etc).draw()
@@ -304,7 +304,7 @@ pub fn (q &Quick) triangle(etc EasyTriangleConfig) {
 
 // Line
 
-[params]
+@[params]
 pub struct EasyLineConfig {
 	shy.Line
 	shy.Stroke
@@ -316,7 +316,7 @@ pub mut:
 	origin   shy.Anchor = .center_left
 }
 
-[noinit]
+@[noinit]
 pub struct EasyLine {
 	shy.ShyStruct
 	shy.Line
@@ -329,7 +329,7 @@ pub mut:
 	origin   shy.Anchor = .center_left
 }
 
-[inline]
+@[inline]
 pub fn (el &EasyLine) draw() {
 	draw := el.shy.draw()
 	mut d := draw.shape_2d()
@@ -363,7 +363,7 @@ pub fn (el &EasyLine) draw() {
 	d.end()
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) line_segment(elc EasyLineConfig) EasyLine {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyLine{
@@ -372,7 +372,7 @@ pub fn (e &Easy) line_segment(elc EasyLineConfig) EasyLine {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) line_segment(elc EasyLineConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.line_segment(elc).draw()
@@ -380,7 +380,7 @@ pub fn (q &Quick) line_segment(elc EasyLineConfig) {
 
 // Circle
 
-[params]
+@[params]
 pub struct EasyCircleConfig {
 	shy.Circle
 pub mut:
@@ -393,7 +393,7 @@ pub mut:
 	origin   shy.Anchor = .center
 }
 
-[noinit]
+@[noinit]
 pub struct EasyCircle {
 	shy.ShyStruct
 	shy.Circle
@@ -407,7 +407,7 @@ pub mut:
 	origin   shy.Anchor = .center
 }
 
-[inline]
+@[inline]
 pub fn (ec &EasyCircle) draw() {
 	draw := ec.shy.draw()
 	mut d := draw.shape_2d()
@@ -427,7 +427,7 @@ pub fn (ec &EasyCircle) draw() {
 	d.end()
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) circle(ecc EasyCircleConfig) EasyCircle {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyCircle{
@@ -436,7 +436,7 @@ pub fn (e &Easy) circle(ecc EasyCircleConfig) EasyCircle {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) circle(ecc EasyCircleConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.circle(ecc).draw()
@@ -444,7 +444,7 @@ pub fn (q &Quick) circle(ecc EasyCircleConfig) {
 
 // Uniform Polygon
 
-[params]
+@[params]
 pub struct EasyUniformPolyConfig {
 	shy.Circle
 pub mut:
@@ -458,7 +458,7 @@ pub mut:
 	origin   shy.Anchor = .center
 }
 
-[noinit]
+@[noinit]
 pub struct EasyUniformPoly {
 	shy.ShyStruct
 	shy.Circle
@@ -473,7 +473,7 @@ pub mut:
 	origin   shy.Anchor = .center
 }
 
-[inline]
+@[inline]
 pub fn (eup &EasyUniformPoly) draw() {
 	draw := eup.shy.draw()
 	mut d := draw.shape_2d()
@@ -493,7 +493,7 @@ pub fn (eup &EasyUniformPoly) draw() {
 	d.end()
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) uniform_poly(eupc EasyUniformPolyConfig) EasyUniformPoly {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return EasyUniformPoly{
@@ -502,7 +502,7 @@ pub fn (e &Easy) uniform_poly(eupc EasyUniformPolyConfig) EasyUniformPoly {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.uniform_poly(eupc).draw()
@@ -527,15 +527,15 @@ pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
 //  	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
 // }
 
-[params]
+@[params]
 pub struct EasySoundPlayOptions {
-	source shy.AssetSource [required]
+	source shy.AssetSource @[required]
 	loops  u16
 	pitch  f32
 	volume f32 = 1.0
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) play(opt EasySoundPlayOptions) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 
@@ -582,7 +582,7 @@ pub struct EasyImageConfigRect {
 }
 
 // Image drawing sub-system
-[params]
+@[params]
 pub struct EasyImageConfig {
 	// shy.Rect: shy.Rect{0,0,-1,-1}
 	EasyImageConfigRect
@@ -597,7 +597,7 @@ pub:
 	fill_mode shy.ImageFillMode
 }
 
-[noinit]
+@[noinit]
 pub struct EasyImage {
 	shy.ShyStruct
 	shy.Rect
@@ -648,7 +648,7 @@ pub fn (ei &EasyImage) draw() {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 
@@ -684,7 +684,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 	panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) image(eic EasyImageConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.image(eic).draw()
@@ -698,7 +698,7 @@ pub fn (e &Easy) load(alo shy.AssetLoadOptions) !&shy.Asset {
 	return assets.load(alo)!
 }
 
-[inline]
+@[inline]
 pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	assets := q.easy.shy.assets()

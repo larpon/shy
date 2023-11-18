@@ -152,7 +152,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 	}
 }
 
-[params]
+@[params]
 pub struct AssetLoadOption {
 	tag ?string
 }

@@ -11,12 +11,12 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -26,7 +26,7 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.image(
 		x: shy.half * a.window.width

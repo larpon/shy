@@ -35,56 +35,56 @@ TODO Function: #define SOKOL_GFX_API_DECL __declspec(dllimport)
 TODO Non-numerical: #define SOKOL_GFX_API_DECL extern
 */
 
-[typedef]
+@[typedef]
 struct C.sg_buffer {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Buffer = C.sg_buffer
 
-[typedef]
+@[typedef]
 struct C.sg_image {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Image = C.sg_image
 
-[typedef]
+@[typedef]
 struct C.sg_sampler {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Sampler = C.sg_sampler
 
-[typedef]
+@[typedef]
 struct C.sg_shader {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Shader = C.sg_shader
 
-[typedef]
+@[typedef]
 struct C.sg_pipeline {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Pipeline = C.sg_pipeline
 
-[typedef]
+@[typedef]
 struct C.sg_pass {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Pass = C.sg_pass
 
-[typedef]
+@[typedef]
 struct C.sg_context {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Context = C.sg_context
 
-[typedef]
+@[typedef]
 struct C.sg_range {
 pub mut:
 	ptr  voidptr
@@ -109,7 +109,7 @@ TODO Function: #define SG_RANGE(x) (sg_range){ &x, sizeof(x) }
 TODO Function: #define SG_RANGE_REF(x) &(sg_range){ &x, sizeof(x) }
 */
 
-[typedef]
+@[typedef]
 struct C.sg_color {
 	r f32 // NOTE Added from chew config
 	g f32 // NOTE Added from chew config
@@ -201,7 +201,7 @@ pub enum PixelFormat {
 	force_u32       = C._SG_PIXELFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
 
-[typedef]
+@[typedef]
 struct C.sg_pixelformat_info {
 pub mut:
 	sample bool
@@ -209,7 +209,7 @@ pub mut:
 
 pub type PixelformatInfo = C.sg_pixelformat_info
 
-[typedef]
+@[typedef]
 struct C.sg_features {
 pub mut:
 	origin_top_left             bool // framebuffer and texture origin is in top left corner
@@ -220,7 +220,7 @@ pub mut:
 
 pub type Features = C.sg_features
 
-[typedef]
+@[typedef]
 struct C.sg_limits {
 pub mut:
 	max_image_size_2d int
@@ -541,7 +541,7 @@ pub enum StoreAction as u32 {
 	_force_u32 = C._SG_STOREACTION_FORCE_U32 // 0x7FFFFFFF,
 }
 
-[typedef]
+@[typedef]
 struct C.sg_color_attachment_action {
 pub mut:
 	load_action LoadAction
@@ -550,7 +550,7 @@ pub mut:
 
 pub type ColorAttachmentAction = C.sg_color_attachment_action
 
-[typedef]
+@[typedef]
 struct C.sg_depth_attachment_action {
 pub mut:
 	load_action LoadAction
@@ -559,7 +559,7 @@ pub mut:
 
 pub type DepthAttachmentAction = C.sg_depth_attachment_action
 
-[typedef]
+@[typedef]
 struct C.sg_stencil_attachment_action {
 pub mut:
 	load_action LoadAction
@@ -568,7 +568,7 @@ pub mut:
 
 pub type StencilAttachmentAction = C.sg_stencil_attachment_action
 
-[typedef]
+@[typedef]
 struct C.sg_pass_action {
 pub mut:
 	_start_canary u32
@@ -581,7 +581,7 @@ pub mut:
 
 pub type PassAction = C.sg_pass_action
 
-[typedef]
+@[typedef]
 struct C.sg_stage_bindings {
 	images   [12]Image  // 12 TODO C.SG_MAX_SHADERSTAGE_IMAGES
 	samplers [8]Sampler // 8 TODO C.SG_MAX_SHADERSTAGE_SAMPLERS
@@ -589,7 +589,7 @@ struct C.sg_stage_bindings {
 
 pub type StageBindings = C.sg_stage_bindings
 
-[typedef]
+@[typedef]
 struct C.sg_bindings {
 pub mut:
 	_start_canary         u32
@@ -604,7 +604,7 @@ pub mut:
 
 pub type Bindings = C.sg_bindings
 
-[typedef]
+@[typedef]
 struct C.sg_buffer_desc {
 pub mut:
 	_start_canary u32
@@ -626,7 +626,7 @@ pub const sg_cubeface_num = 6
 
 pub const sg_max_mipmaps = 16
 
-[typedef]
+@[typedef]
 struct C.sg_image_data {
 pub mut:
 	// TODO 	subimage [SG_CUBEFACE_NUM][SG_MAX_MIPMAPS]Range
@@ -635,7 +635,7 @@ pub mut:
 
 pub type ImageData = C.sg_image_data
 
-[typedef]
+@[typedef]
 struct C.sg_image_desc {
 pub mut:
 	_start_canary u32
@@ -662,7 +662,7 @@ pub mut:
 
 pub type ImageDesc = C.sg_image_desc
 
-[typedef]
+@[typedef]
 struct C.sg_sampler_desc {
 pub mut:
 	_start_canary  u32
@@ -690,7 +690,7 @@ pub mut:
 
 pub type SamplerDesc = C.sg_sampler_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_attr_desc {
 pub mut:
 	name &char = unsafe { nil }
@@ -698,7 +698,7 @@ pub mut:
 
 pub type ShaderAttrDesc = C.sg_shader_attr_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_uniform_desc {
 pub mut:
 	name        &char = unsafe { nil }
@@ -708,7 +708,7 @@ pub mut:
 
 pub type ShaderUniformDesc = C.sg_shader_uniform_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_uniform_block_desc {
 pub mut:
 	size   usize
@@ -718,7 +718,7 @@ pub mut:
 
 pub type ShaderUniformBlockDesc = C.sg_shader_uniform_block_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_image_desc {
 pub mut:
 	used         bool
@@ -729,7 +729,7 @@ pub mut:
 
 pub type ShaderImageDesc = C.sg_shader_image_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_sampler_desc {
 pub mut:
 	used         bool
@@ -738,7 +738,7 @@ pub mut:
 
 pub type ShaderSamplerDesc = C.sg_shader_sampler_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_image_sampler_pair_desc {
 pub mut:
 	used         bool
@@ -749,7 +749,7 @@ pub mut:
 
 pub type ShaderImageSamplerPairDesc = C.sg_shader_image_sampler_pair_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_stage_desc {
 pub mut:
 	source       &char = unsafe { nil }
@@ -764,7 +764,7 @@ pub mut:
 
 pub type ShaderStageDesc = C.sg_shader_stage_desc
 
-[typedef]
+@[typedef]
 struct C.sg_shader_desc {
 pub mut:
 	_start_canary u32
@@ -777,7 +777,7 @@ pub mut:
 
 pub type ShaderDesc = C.sg_shader_desc
 
-[typedef]
+@[typedef]
 struct C.sg_vertex_buffer_layout_state {
 pub mut:
 	stride    int
@@ -788,7 +788,7 @@ pub mut:
 
 pub type VertexBufferLayoutState = C.sg_vertex_buffer_layout_state
 
-[typedef]
+@[typedef]
 struct C.sg_vertex_attr_state {
 pub mut:
 	buffer_index int
@@ -799,7 +799,7 @@ pub mut:
 
 pub type VertexAttrState = C.sg_vertex_attr_state
 
-[typedef]
+@[typedef]
 struct C.sg_vertex_layout_state {
 pub mut:
 	buffers [8]VertexBufferLayoutState
@@ -808,7 +808,7 @@ pub mut:
 
 pub type VertexLayoutState = C.sg_vertex_layout_state
 
-[typedef]
+@[typedef]
 struct C.sg_stencil_face_state {
 pub mut:
 	compare       CompareFunc
@@ -819,7 +819,7 @@ pub mut:
 
 pub type StencilFaceState = C.sg_stencil_face_state
 
-[typedef]
+@[typedef]
 struct C.sg_stencil_state {
 pub mut:
 	enabled    bool
@@ -832,7 +832,7 @@ pub mut:
 
 pub type StencilState = C.sg_stencil_state
 
-[typedef]
+@[typedef]
 struct C.sg_depth_state {
 pub mut:
 	pixel_format     PixelFormat
@@ -845,7 +845,7 @@ pub mut:
 
 pub type DepthState = C.sg_depth_state
 
-[typedef]
+@[typedef]
 struct C.sg_blend_state {
 pub mut:
 	enabled          bool
@@ -859,7 +859,7 @@ pub mut:
 
 pub type BlendState = C.sg_blend_state
 
-[typedef]
+@[typedef]
 struct C.sg_color_target_state {
 pub mut:
 	pixel_format PixelFormat
@@ -869,7 +869,7 @@ pub mut:
 
 pub type ColorTargetState = C.sg_color_target_state
 
-[typedef]
+@[typedef]
 struct C.sg_pipeline_desc {
 pub mut:
 	_start_canary             u32
@@ -892,7 +892,7 @@ pub mut:
 
 pub type PipelineDesc = C.sg_pipeline_desc
 
-[typedef]
+@[typedef]
 struct C.sg_pass_attachment_desc {
 pub mut:
 	image     Image
@@ -903,7 +903,7 @@ pub mut:
 
 pub type PassAttachmentDesc = C.sg_pass_attachment_desc
 
-[typedef]
+@[typedef]
 struct C.sg_pass_desc {
 pub mut:
 	_start_canary u32
@@ -916,7 +916,7 @@ pub mut:
 
 pub type PassDesc = C.sg_pass_desc
 
-[typedef]
+@[typedef]
 struct C.sg_trace_hooks {
 pub mut:
 	user_data          voidptr
@@ -982,7 +982,7 @@ pub mut:
 
 pub type TraceHooks = C.sg_trace_hooks
 
-[typedef]
+@[typedef]
 struct C.sg_slot_info {
 pub mut:
 	state  ResourceState // the current state of this resource slot
@@ -992,7 +992,7 @@ pub mut:
 
 pub type SlotInfo = C.sg_slot_info
 
-[typedef]
+@[typedef]
 struct C.sg_buffer_info {
 pub mut:
 	slot               SlotInfo // resource pool slot info
@@ -1006,7 +1006,7 @@ pub mut:
 
 pub type BufferInfo = C.sg_buffer_info
 
-[typedef]
+@[typedef]
 struct C.sg_image_info {
 pub mut:
 	slot            SlotInfo // resource pool slot info
@@ -1019,7 +1019,7 @@ pub mut:
 
 pub type ImageInfo = C.sg_image_info
 
-[typedef]
+@[typedef]
 struct C.sg_sampler_info {
 pub mut:
 	slot SlotInfo // resource pool slot info
@@ -1027,7 +1027,7 @@ pub mut:
 
 pub type SamplerInfo = C.sg_sampler_info
 
-[typedef]
+@[typedef]
 struct C.sg_shader_info {
 pub mut:
 	slot SlotInfo // resoure pool slot info
@@ -1035,7 +1035,7 @@ pub mut:
 
 pub type ShaderInfo = C.sg_shader_info
 
-[typedef]
+@[typedef]
 struct C.sg_pipeline_info {
 pub mut:
 	slot SlotInfo // resource pool slot info
@@ -1043,7 +1043,7 @@ pub mut:
 
 pub type PipelineInfo = C.sg_pipeline_info
 
-[typedef]
+@[typedef]
 struct C.sg_pass_info {
 pub mut:
 	slot SlotInfo // resource pool slot info
@@ -1051,7 +1051,7 @@ pub mut:
 
 pub type PassInfo = C.sg_pass_info
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_gl {
 pub mut:
 	num_bind_buffer                 u32
@@ -1069,7 +1069,7 @@ pub mut:
 
 pub type FrameStatsGl = C.sg_frame_stats_gl
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_d3d11_pass {
 pub mut:
 	num_om_set_render_targets    u32
@@ -1080,7 +1080,7 @@ pub mut:
 
 pub type FrameStatsD3d11Pass = C.sg_frame_stats_d3d11_pass
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_d3d11_pipeline {
 pub mut:
 	num_rs_set_state               u32
@@ -1096,7 +1096,7 @@ pub mut:
 
 pub type FrameStatsD3d11Pipeline = C.sg_frame_stats_d3d11_pipeline
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_d3d11_bindings {
 pub mut:
 	num_ia_set_vertex_buffers   u32
@@ -1109,7 +1109,7 @@ pub mut:
 
 pub type FrameStatsD3d11Bindings = C.sg_frame_stats_d3d11_bindings
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_d3d11_uniforms {
 pub mut:
 	num_update_subresource u32
@@ -1117,7 +1117,7 @@ pub mut:
 
 pub type FrameStatsD3d11Uniforms = C.sg_frame_stats_d3d11_uniforms
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_d3d11_draw {
 pub mut:
 	num_draw_indexed_instanced u32
@@ -1128,7 +1128,7 @@ pub mut:
 
 pub type FrameStatsD3d11Draw = C.sg_frame_stats_d3d11_draw
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_d3d11 {
 pub mut:
 	pass      FrameStatsD3d11Pass
@@ -1142,7 +1142,7 @@ pub mut:
 
 pub type FrameStatsD3d11 = C.sg_frame_stats_d3d11
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_metal_idpool {
 pub mut:
 	num_added             u32
@@ -1152,7 +1152,7 @@ pub mut:
 
 pub type FrameStatsMetalIdpool = C.sg_frame_stats_metal_idpool
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_metal_pipeline {
 pub mut:
 	num_set_blend_color             u32
@@ -1166,7 +1166,7 @@ pub mut:
 
 pub type FrameStatsMetalPipeline = C.sg_frame_stats_metal_pipeline
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_metal_bindings {
 pub mut:
 	num_set_vertex_buffer          u32
@@ -1178,7 +1178,7 @@ pub mut:
 
 pub type FrameStatsMetalBindings = C.sg_frame_stats_metal_bindings
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_metal_uniforms {
 pub mut:
 	num_set_vertex_buffer_offset   u32
@@ -1187,7 +1187,7 @@ pub mut:
 
 pub type FrameStatsMetalUniforms = C.sg_frame_stats_metal_uniforms
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_metal {
 pub mut:
 	idpool   FrameStatsMetalIdpool
@@ -1198,7 +1198,7 @@ pub mut:
 
 pub type FrameStatsMetal = C.sg_frame_stats_metal
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_wgpu_uniforms {
 pub mut:
 	num_set_bindgroup u32
@@ -1207,7 +1207,7 @@ pub mut:
 
 pub type FrameStatsWgpuUniforms = C.sg_frame_stats_wgpu_uniforms
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_wgpu_bindings {
 pub mut:
 	num_set_vertex_buffer                    u32
@@ -1226,7 +1226,7 @@ pub mut:
 
 pub type FrameStatsWgpuBindings = C.sg_frame_stats_wgpu_bindings
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats_wgpu {
 pub mut:
 	uniforms FrameStatsWgpuUniforms
@@ -1235,7 +1235,7 @@ pub mut:
 
 pub type FrameStatsWgpu = C.sg_frame_stats_wgpu
 
-[typedef]
+@[typedef]
 struct C.sg_frame_stats {
 pub mut:
 	frame_index u32
@@ -1276,7 +1276,7 @@ TODO Non-numerical: #define _SG_LOGITEM_XMACRO(item,msg) SG_LOGITEM_##item,
 //	s = C._SG_LOG_ITEMS
 //}
 
-[typedef]
+@[typedef]
 struct C.sg_metal_context_desc {
 pub mut:
 	device                            voidptr
@@ -1289,7 +1289,7 @@ pub mut:
 
 pub type MetalContextDesc = C.sg_metal_context_desc
 
-[typedef]
+@[typedef]
 struct C.sg_d3d11_context_desc {
 pub mut:
 	device                         voidptr
@@ -1303,7 +1303,7 @@ pub mut:
 
 pub type D3d11ContextDesc = C.sg_d3d11_context_desc
 
-[typedef]
+@[typedef]
 struct C.sg_wgpu_context_desc {
 pub mut:
 	device                         voidptr       // WGPUDevice
@@ -1318,7 +1318,7 @@ pub mut:
 
 pub type WgpuContextDesc = C.sg_wgpu_context_desc
 
-[typedef]
+@[typedef]
 struct C.sg_gl_context_desc {
 pub mut:
 	default_framebuffer_cb          fn () u32
@@ -1328,7 +1328,7 @@ pub mut:
 
 pub type GlContextDesc = C.sg_gl_context_desc
 
-[typedef]
+@[typedef]
 struct C.sg_context_desc {
 pub mut:
 	color_format PixelFormat
@@ -1342,7 +1342,7 @@ pub mut:
 
 pub type ContextDesc = C.sg_context_desc
 
-[typedef]
+@[typedef]
 struct C.sg_commit_listener {
 pub mut:
 	func      fn (user_data voidptr) // user_data)
@@ -1351,7 +1351,7 @@ pub mut:
 
 pub type CommitListener = C.sg_commit_listener
 
-[typedef]
+@[typedef]
 struct C.sg_allocator {
 pub mut:
 	alloc_fn  fn (size usize, user_data voidptr) voidptr // size,
@@ -1373,7 +1373,7 @@ sg_logger
     compile in debug mode (e.g. NDEBUG *not* defined) and install
     a logger (for instance the standard logging function from sokol_log.h).
 */
-[typedef]
+@[typedef]
 struct C.sg_logger {
 pub mut:
 	func      LoggerFn
@@ -1382,7 +1382,7 @@ pub mut:
 
 pub type Logger = C.sg_logger
 
-[typedef]
+@[typedef]
 struct C.sg_desc {
 pub mut:
 	_start_canary                  u32

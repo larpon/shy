@@ -139,18 +139,18 @@ fn t_for_x(x f64, x1 f64, x2 f64) f64 {
 	return guess_t
 }
 
-[inline]
+@[inline]
 pub fn bezier_blend(t f64) f64 {
 	return t * t * (3.0 - 2.0 * t)
 }
 
-[inline]
+@[inline]
 pub fn parametric_blend(t f64) f64 {
 	sqt := t * t
 	return sqt / (2.0 * (sqt - t) + 1.0)
 }
 
-[inline]
+@[inline]
 pub fn in_out_quad_blend(t f64) f64 {
 	if t <= 0.5 {
 		return 2.0 * t * t
@@ -173,17 +173,17 @@ pub fn quad(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_quad(t f64) f64 {
 	return t * t
 }
 
-[inline]
+@[inline]
 pub fn out_quad(t f64) f64 {
 	return 1 - (1 - t) * (1 - t)
 }
 
-[inline]
+@[inline]
 pub fn in_out_quad(t f64) f64 {
 	return if t < 0.5 {
 		2 * t * t
@@ -206,18 +206,18 @@ pub fn cubic(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_cubic(t f64) f64 {
 	return t * t * t
 }
 
-[inline]
+@[inline]
 pub fn out_cubic(t f64) f64 {
 	tm := -(1 - t)
 	return tm * tm * tm + 1
 }
 
-[inline]
+@[inline]
 pub fn in_out_cubic(t f64) f64 {
 	return if t < 0.5 {
 		4 * t * t * t
@@ -240,18 +240,18 @@ pub fn quart(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_quart(t f64) f64 {
 	return t * t * t * t
 }
 
-[inline]
+@[inline]
 pub fn out_quart(t f64) f64 {
 	tm := -(1 - t)
 	return 1 - tm * tm * tm * tm
 }
 
-[inline]
+@[inline]
 pub fn in_out_quart(t f64) f64 {
 	return if t < 0.5 {
 		8 * t * t * t * t
@@ -275,19 +275,19 @@ pub fn quint(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_quint(t f64) f64 {
 	return t * t * t * t * t
 }
 
-[inline]
+@[inline]
 pub fn out_quint(t f64) f64 {
 	tm := -(1 - t)
 
 	return 1 + tm * tm * tm * tm * tm
 }
 
-[inline]
+@[inline]
 pub fn in_out_quint(t f64) f64 {
 	return if t < 0.5 {
 		16 * t * t * t * t * t
@@ -311,17 +311,17 @@ pub fn sine(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_sine(t f64) f64 {
 	return 1.0 - math.cos((t * mth.pi) / 2)
 }
 
-[inline]
+@[inline]
 pub fn out_sine(t f64) f64 {
 	return math.sin((t * mth.pi) / 2)
 }
 
-[inline]
+@[inline]
 pub fn in_out_sine(t f64) f64 {
 	return -(math.cos(mth.pi * t) - 1) / 2
 }
@@ -340,19 +340,19 @@ pub fn circ(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_circ(t f64) f64 {
 	return -(math.sqrt(1 - t * t) - 1)
 }
 
-[inline]
+@[inline]
 pub fn out_circ(t f64) f64 {
 	mt := t - 1
 
 	return math.sqrt(1 - mt * mt)
 }
 
-[inline]
+@[inline]
 pub fn in_out_circ(t f64) f64 {
 	mut mt := t * 2
 
@@ -393,17 +393,17 @@ pub fn expo(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_expo(t f64) f64 {
 	return math.pow(2, 10 * t - 10)
 }
 
-[inline]
+@[inline]
 pub fn out_expo(t f64) f64 {
 	return 1 - math.pow(2, -10 * t)
 }
 
-[inline]
+@[inline]
 pub fn in_out_expo(t f64) f64 {
 	return if t < 0.5 {
 		math.pow(2, 20 * t - 10) / 2
@@ -433,17 +433,17 @@ pub fn elastic(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_elastic(t f64) f64 {
 	return -math.pow(2, 10 * t) * math.sin((t * 10 - 10.75) * ease.c4)
 }
 
-[inline]
+@[inline]
 pub fn out_elastic(t f64) f64 {
 	return math.pow(2, -10 * t) * math.sin((t * 10 - 0.75) * ease.c4) + 1
 }
 
-[inline]
+@[inline]
 pub fn in_out_elastic(t f64) f64 {
 	return if t < 0.5 {
 		-(math.pow(2, 20 * t - 10) * math.sin((20 * t - 11.125) * ease.c5)) / 2
@@ -466,17 +466,17 @@ pub fn back(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_back(t f64) f64 {
 	return ease.c3 * t * t * t - ease.c1 * t * t
 }
 
-[inline]
+@[inline]
 pub fn out_back(t f64) f64 {
 	return 1.0 + ease.c3 * math.pow(t - 1, 3) + ease.c1 * math.pow(t - 1, 2)
 }
 
-[inline]
+@[inline]
 pub fn in_out_back(t f64) f64 {
 	return if t < 0.5 {
 		(math.pow(2 * t, 2) * ((ease.c2 + 1) * 2 * t - ease.c2)) / 2
@@ -499,12 +499,12 @@ pub fn bounce(t f64, mode Mode) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_bounce(t f64) f64 {
 	return 1 - out_bounce(1 - t)
 }
 
-[inline]
+@[inline]
 pub fn out_bounce(t f64) f64 {
 	n1 := 7.5625
 	d1 := 2.75
@@ -523,7 +523,7 @@ pub fn out_bounce(t f64) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn in_out_bounce(t f64) f64 {
 	return if t < 0.5 {
 		(1 - out_bounce(1 - 2 * t)) / 2
@@ -532,12 +532,12 @@ pub fn in_out_bounce(t f64) f64 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn mix_factor(v f64) f64 {
 	return mth.min(mth.max(1 - v * 2 + 0.3, 0.0), 1.0)
 }
 
-[inline]
+@[inline]
 pub fn sine_progress(v f64) f64 {
 	return math.sin((v * mth.pi) - mth.pi_div_2) / 2 + 0.5
 }

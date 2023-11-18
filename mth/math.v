@@ -10,28 +10,28 @@ pub const (
 )
 
 // min returns the minimum of `a` and `b`.
-[inline]
+@[inline]
 pub fn min[T](a T, b T) T {
 	return if a < b { a } else { b }
 }
 
 // max returns the maximum of `a` and `b`.
-[inline]
+@[inline]
 pub fn max[T](a T, b T) T {
 	return if a > b { a } else { b }
 }
 
 // abs returns the absolute value of `a`.
-[inline]
+@[inline]
 pub fn abs[T](a T) T {
 	return if a < 0 { -a } else { a }
 }
 
 // modf32
-[inline]
-pub fn modf32(x f32) (f32,f32) {
-  x_integer_f64, x_fraction_f64 := modf(x)
-  return f32(x_integer_f64), f32(x_fraction_f64)
+@[inline]
+pub fn modf32(x f32) (f32, f32) {
+	x_integer_f64, x_fraction_f64 := modf(x)
+	return f32(x_integer_f64), f32(x_fraction_f64)
 }
 
 // gcd finds the Greatest Common Divisor between two numbers.

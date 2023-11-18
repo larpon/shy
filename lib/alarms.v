@@ -15,7 +15,7 @@ pub enum AlarmEvent {
 	end
 }
 
-[heap; noinit]
+@[heap; noinit]
 pub struct Alarms {
 	ShyStruct
 mut:
@@ -44,7 +44,7 @@ fn (mut a Alarms) reset() ! {
 	}
 }
 
-[manualfree]
+@[manualfree]
 fn (mut a Alarms) shutdown() ! {
 	for alarm in a.active {
 		unsafe {
@@ -161,7 +161,7 @@ fn (mut a Alarms) new_alarm(config AlarmConfig) &Alarm {
 	return alarm
 }
 
-[params]
+@[params]
 pub struct AlarmConfig {
 pub mut:
 	running   bool = true
@@ -171,7 +171,7 @@ pub mut:
 	user_data voidptr
 }
 
-[noinit]
+@[noinit]
 pub struct Alarm {
 	ShyStruct
 mut:

@@ -19,7 +19,7 @@ struct AnchorResult {
 	flip bool
 }
 
-[inline]
+@[inline]
 fn anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, radius f32) AnchorResult {
 	// Original author Chris H.F. Tsang / CPOL License
 	// https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
@@ -90,17 +90,17 @@ fn anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, radius f32) AnchorResu
 	}
 }
 
-[inline]
+@[inline]
 fn line_segment_angle(x1 f32, y1 f32, x2 f32, y2 f32) f32 {
 	return mth.pi + f32(math.atan2(y1 - y2, x1 - x2))
 }
 
-[inline]
+@[inline]
 fn line_segment_length(x1 f32, y1 f32, x2 f32, y2 f32) f32 {
 	return math.sqrtf(((y2 - y1) * (y2 - y1)) + ((x2 - x1) * (x2 - x1)))
 }
 
-[inline]
+@[inline]
 fn rotate_point(cx f32, cy f32, px f32, py f32, angle_in_radians f32) (f32, f32) {
 	s := math.sinf(angle_in_radians)
 	c := math.cosf(angle_in_radians)
@@ -118,23 +118,23 @@ fn rotate_point(cx f32, cy f32, px f32, py f32, angle_in_radians f32) (f32, f32)
 	return npx, npy
 }
 
-[inline]
+@[inline]
 fn midpoint(x1 f32, y1 f32, x2 f32, y2 f32) (f32, f32) {
 	return (x1 + x2) / 2, (y1 + y2) / 2
 }
 
 // perpendicular anti-clockwise 90 degrees
-[inline]
+@[inline]
 fn perpendicular(x f32, y f32) (f32, f32) {
 	return -y, x
 }
 
-[inline]
+@[inline]
 fn signed_area(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) f32 {
 	return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1)
 }
 
-[inline]
+@[inline]
 fn normalize(x f32, y f32) (f32, f32) {
 	w := math.sqrtf(x * x + y * y)
 	return x / w, y / w
@@ -143,7 +143,7 @@ fn normalize(x f32, y f32) (f32, f32) {
 // x1, y1, x2, y2 = line 1
 // x3, y3, x4, y4 = line 2
 // output: (output point x,y, intersection type)
-[inline]
+@[inline]
 fn intersect(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, x4 f32, y4 f32) (f32, f32, int) {
 	// Determine the intersection point of two line steps
 	// http://paulbourke.net/geometry/lineline2d/

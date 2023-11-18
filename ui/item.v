@@ -12,7 +12,7 @@ import shy.lib as shy
 // the `Node` interface requirements - making them "automagically"
 // compliant with the scene graph - and allows for easy, user-land,
 // creation of new UI nodes that can be reused across code-bases.
-[heap]
+@[heap]
 pub struct Item {
 	shy.Rect
 pub:
@@ -71,7 +71,7 @@ fn (mut i Item) free() {
 	i.body.free()
 }*/
 
-[heap]
+@[heap]
 pub struct Rectangle {
 	Item
 }
@@ -101,7 +101,7 @@ pub fn (r &Rectangle) event(e Event) ?&Node {
 	return r.Item.event(e)
 }
 
-[heap]
+@[heap]
 pub struct EventArea {
 	Item
 }
@@ -121,7 +121,7 @@ pub fn (ea &EventArea) event(e Event) ?&Node {
 	return ea.Item.event(e)
 }
 
-[heap]
+@[heap]
 pub struct PointerEventArea {
 	EventArea
 	on_pointer_event []OnPointerEventFn

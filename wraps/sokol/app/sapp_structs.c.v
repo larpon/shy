@@ -7,7 +7,7 @@ const (
 	max_iconimages   = 8
 )
 
-[typedef]
+@[typedef]
 pub struct C.sapp_range {
 pub:
 	ptr  voidptr
@@ -16,7 +16,7 @@ pub:
 
 pub type Range = C.sapp_range
 
-[typedef]
+@[typedef]
 pub struct C.sapp_image_desc {
 pub:
 	width  int
@@ -26,7 +26,7 @@ pub:
 
 pub type ImageDesc = C.sapp_image_desc
 
-[typedef]
+@[typedef]
 pub struct C.sapp_icon_desc {
 	sokol_default bool
 	images        [max_iconimages]ImageDesc
@@ -34,7 +34,7 @@ pub struct C.sapp_icon_desc {
 
 pub type IconDesc = C.sapp_icon_desc
 
-[typedef]
+@[typedef]
 pub struct C.sapp_desc {
 pub:
 	init_cb    fn () // these are the user-provided callbacks without user data
@@ -78,7 +78,7 @@ pub:
 
 pub type Desc = C.sapp_desc
 
-[typedef]
+@[typedef]
 pub struct C.sapp_event {
 pub:
 	frame_count        u64
@@ -108,7 +108,7 @@ pub fn (e &C.sapp_event) str() string {
 	return 'evt: frame_count=${e.frame_count}, type=${e.@type}'
 }
 
-[typedef]
+@[typedef]
 pub struct C.sapp_touchpoint {
 pub:
 	identifier u64

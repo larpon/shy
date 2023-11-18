@@ -11,12 +11,12 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -25,12 +25,12 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.live_frame(dt)
 }
 
-[live]
+@[live]
 pub fn (mut a App) live_frame(dt f64) {
 	cx := shy.half * a.window.width()
 	cy := shy.half * a.window.height()

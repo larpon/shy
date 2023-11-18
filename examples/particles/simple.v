@@ -13,14 +13,14 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
 	eps &easy.ParticleSystem = shy.null
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -51,12 +51,12 @@ pub fn (mut a App) init() ! {
 	))
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.eps.draw()
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

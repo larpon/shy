@@ -11,7 +11,7 @@ module lib
 // context. The system opens a window in 600x480 pixels - but the accelerated
 // contexts's pixel buffer is *twice* as big: 1200x960 pixels. Then all the
 // stupid chaos begins and everything looks smaller etc.
-[noinit]
+@[noinit]
 pub struct Canvas {
 pub:
 	width    f32

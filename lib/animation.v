@@ -28,7 +28,7 @@ pub enum AnimLoop {
 	pingpong
 }
 
-[heap]
+@[heap]
 pub struct Anims {
 	ShyStruct
 mut:
@@ -65,7 +65,7 @@ pub fn (a &Anims) active() bool {
 	return !a.paused && a.active.len > 0
 }
 
-[manualfree]
+@[manualfree]
 pub fn (mut a Anims) shutdown() ! {
 	a.shy.assert_api_shutdown()
 	for anim in a.active {
@@ -208,9 +208,9 @@ pub fn (mut a Anims) new_follow_animator[T](config FollowAnimatorConfig) &Follow
 
 // IAnimator is what the Anims system can control
 interface IAnimator {
-	kind AnimatorKind
+	kind    AnimatorKind
 	running bool
-	paused bool // run()
+	paused  bool // run()
 	recycle bool
 	step(f64)
 	touch()
@@ -218,7 +218,7 @@ interface IAnimator {
 	reset()
 }
 
-[params]
+@[params]
 pub struct AnimatorConfig {
 pub mut:
 	running     bool
@@ -232,7 +232,7 @@ pub mut:
 	duration    i64 = 1000
 }
 
-[noinit]
+@[noinit]
 pub struct Animator[T] {
 	ShyStruct
 	kind AnimatorKind = .animator
@@ -370,7 +370,7 @@ fn (ima &Animator[T]) step(dt f64) {
 	a.prev_value = a.value
 }
 
-[params]
+@[params]
 pub struct FollowAnimatorConfig {
 pub mut:
 	running bool

@@ -61,7 +61,7 @@ pub enum MouseButton {
 	x2
 }
 
-[flag]
+@[flag]
 pub enum MouseButtons {
 	left
 	right

@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module lib
 
-[flag]
+@[flag]
 pub enum Fill {
 	stroke
 	body

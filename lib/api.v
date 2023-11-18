@@ -15,7 +15,7 @@ module lib
 // ... then redefine, call or overwrite the methods you need
 // ... and then change `ShyAPI` in the `API` struct below to the
 // name of the new custom API implementation e.g. "MyAPI"
-[shy: 'api']
+@[shy: 'api']
 struct API {
 	ShyAPI // shy:api
 }

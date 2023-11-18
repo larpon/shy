@@ -78,7 +78,7 @@ pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawSha
 }
 
 // DrawShape2DTriangle
-[params]
+@[params]
 pub struct DrawShape2DTriangle {
 	Triangle
 	factor f32 = 1.0
@@ -93,14 +93,14 @@ pub mut:
 	origin   Anchor
 }
 
-[inline]
+@[inline]
 pub fn (t &DrawShape2DTriangle) origin_offset() (f32, f32) {
 	bb := t.bbox().mul_scalar(t.factor)
 	p_x, p_y := t.origin.pos_wh(bb.width, bb.height)
 	return -p_x, -p_y
 }
 
-[inline]
+@[inline]
 pub fn (t &DrawShape2DTriangle) draw() {
 	scale_factor := t.factor
 
@@ -183,7 +183,7 @@ pub fn (t &DrawShape2DTriangle) draw() {
 	gl.pop_matrix()
 }
 
-[inline]
+@[inline]
 fn (t &DrawShape2DTriangle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	draw_anchor_config := DrawAnchorConfig{
 		...t.stroke
@@ -193,7 +193,7 @@ fn (t &DrawShape2DTriangle) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, 
 }
 
 // DrawShape2DRect
-[params]
+@[params]
 pub struct DrawShape2DRect {
 	Rect
 	factor f32 = 1.0
@@ -219,13 +219,13 @@ pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
 }
 */
 
-[inline]
+@[inline]
 pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
 	p_x, p_y := r.origin.pos_wh(r.width * r.factor, r.height * r.factor)
 	return -p_x, -p_y
 }
 
-[inline]
+@[inline]
 pub fn (r &DrawShape2DRect) draw() {
 	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
 	// this could/should maybe someday be switchable by a flag...?
@@ -320,7 +320,7 @@ pub fn (r &DrawShape2DRect) draw() {
 	gl.pop_matrix()
 }
 
-[inline]
+@[inline]
 fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	draw_anchor_config := DrawAnchorConfig{
 		...r.stroke
@@ -331,7 +331,7 @@ fn (r DrawShape2DRect) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f3
 
 // DrawShape2DLineSegment
 
-[params]
+@[params]
 pub struct DrawShape2DLineSegment {
 	Line
 	Stroke
@@ -344,14 +344,14 @@ pub mut:
 	origin   Anchor = .center_left //
 }
 
-[inline]
+@[inline]
 pub fn (l DrawShape2DLineSegment) origin_offset() (f32, f32) {
 	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
 	// return -p_x, -p_y
 	return 0, 0
 }
 
-[inline]
+@[inline]
 pub fn (l DrawShape2DLineSegment) draw() {
 	if !l.visible {
 		return
@@ -437,7 +437,7 @@ pub fn (l DrawShape2DLineSegment) draw() {
 }
 
 // DrawShape2DUniformPolygon
-[params]
+@[params]
 pub struct DrawShape2DUniformPolygon {
 	Circle
 	factor f32 = 1.0
@@ -453,19 +453,19 @@ pub mut:
 	origin   Anchor = .center
 }
 
-[inline]
+@[inline]
 pub fn (up &DrawShape2DUniformPolygon) bbox() Rect {
 	return up.Circle.bbox().mul_scalar(up.factor)
 }
 
-[inline]
+@[inline]
 pub fn (up &DrawShape2DUniformPolygon) origin_offset() (f32, f32) {
 	bbox := up.bbox()
 	p_x, p_y := up.origin.pos_wh(bbox.width, bbox.height)
 	return -p_x, -p_y
 }
 
-[inline]
+@[inline]
 pub fn (up &DrawShape2DUniformPolygon) draw() {
 	r := up.bbox()
 	// A sane default is to let uniform polygons (e.g. circles)
@@ -572,7 +572,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	gl.pop_matrix()
 }
 
-[inline]
+@[inline]
 fn (up &DrawShape2DUniformPolygon) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
 	draw_anchor_config := DrawAnchorConfig{
 		...up.stroke
@@ -583,7 +583,7 @@ fn (up &DrawShape2DUniformPolygon) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x
 
 // Utils
 
-[params]
+@[params]
 struct DrawAnchorConfig {
 	width   f32     = 1.0
 	connect Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
@@ -591,7 +591,7 @@ struct DrawAnchorConfig {
 	color   Color   = colors.shy.white
 }
 
-[inline]
+@[inline]
 fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchorConfig) {
 	// Original author Chris H.F. Tsang / CPOL License
 	// https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation

@@ -203,27 +203,27 @@ pub fn (mut c Color) variate(cv ColorVariation) {
 	}
 }
 
-[inline]
+@[inline]
 pub fn rgb_hex(hex u32) Color {
 	return Color{u8(((hex >> 16) & 0xff)), u8(((hex >> 8) & 0xff)), u8((hex & 0xff)), u8(255)}
 }
 
-[inline]
+@[inline]
 pub fn rgba_hex(hex u32) Color {
 	return Color{u8(((hex >> 24) & 0xff)), u8(((hex >> 16) & 0xff)), u8(((hex >> 8) & 0xff)), u8((hex & 0xff))}
 }
 
-[inline]
+@[inline]
 pub fn rgb(r u8, g u8, b u8) Color {
 	return Color{r, g, b, u8(255)}
 }
 
-[inline]
+@[inline]
 pub fn rgba(r u8, g u8, b u8, a u8) Color {
 	return Color{r, g, b, a}
 }
 
-[inline]
+@[inline]
 pub fn rgb_f32(r f32, g f32, b f32) Color {
 	return Color{
 		r: utils.remap_f32_to_u8(r, 0.0, 1.0, 0, 255)
@@ -233,7 +233,7 @@ pub fn rgb_f32(r f32, g f32, b f32) Color {
 	}
 }
 
-[inline]
+@[inline]
 pub fn rgba_f32(r f32, g f32, b f32, a f32) Color {
 	return Color{
 		r: utils.remap_f32_to_u8(r, 0.0, 1.0, 0, 255)

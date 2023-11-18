@@ -44,14 +44,14 @@ struct ShyFrame {
 	ShyStruct
 }
 
-[if !prod]
+@[if !prod]
 fn (mut sf ShyFrame) begin() {
 	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 	assert sf.shy.state.rendering, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 
-[if !prod]
+@[if !prod]
 fn (mut sf ShyFrame) end() {
 	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 	assert sf.shy.state.rendering, '${@STRUCT}.${@FN}' +
@@ -59,7 +59,7 @@ fn (mut sf ShyFrame) end() {
 }
 
 // Shy carries all of shy's internal state.
-[heap]
+@[heap]
 pub struct Shy {
 pub:
 	log    Log
@@ -83,12 +83,12 @@ mut:
 	api API
 }
 
-[inline; unsafe]
+@[inline; unsafe]
 pub fn (s Shy) api() API {
 	return s.api
 }
 
-[inline]
+@[inline]
 pub fn (mut s Shy) init() ! {
 	$if debug ? {
 		s.log.set(.debug)
@@ -115,7 +115,7 @@ pub fn (mut s Shy) reset() ! {
 	s.timer.restart()
 }
 
-[inline]
+@[inline]
 pub fn (mut s Shy) shutdown() ! {
 	s.ready = false
 	s.alarms.paused = true // Pause so no alarms will fire during shutdown
@@ -135,7 +135,7 @@ pub fn new(config Config) !&Shy {
 }
 
 // run runs the application instance `T`.
-[manualfree]
+@[manualfree]
 pub fn run[T](mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
 	shy_instance.app = voidptr(ctx)
@@ -155,26 +155,26 @@ fn (s Shy) health() ! {
 
 // quit_request sends a request to quit and end execution.
 // quit requests can be cancelled in some cases.
-[inline]
+@[inline]
 pub fn (mut s Shy) quit_request() {
 	s.api.events.send_quit_event(false)
 }
 
 // quit sends out a quit event, ensuring all of `Shy`
 // shutsdown cleanly
-[inline]
+@[inline]
 pub fn (mut s Shy) quit() {
 	s.api.events.send_quit_event(true)
 }
 
 // window returns the `Window` instance with `id == window_id`
-[inline]
+@[inline]
 pub fn (s Shy) window(window_id u32) ?&Window {
 	assert !isnil(s.api.wm), '${@STRUCT}.${@FN}: ${@STRUCT}.api.wm is null'
 	return s.api.wm.find_window(window_id)
 }
 
-[inline]
+@[inline]
 pub fn (s Shy) user_data() ?voidptr {
 	if !isnil(s.custom_data) {
 		return s.custom_data
@@ -182,12 +182,12 @@ pub fn (s Shy) user_data() ?voidptr {
 	return none
 }
 
-[inline]
+@[inline]
 pub fn (mut s Shy) set_user_data(ptr voidptr) {
 	s.custom_data = ptr
 }
 
-[if !prod]
+@[if !prod]
 pub fn (s Shy) assert_api_init() {
 	$if test {
 		return
@@ -197,7 +197,7 @@ pub fn (s Shy) assert_api_init() {
 	assert !s.shutdown, '${@STRUCT} is shutting down'
 }
 
-[if !prod]
+@[if !prod]
 pub fn (s Shy) assert_api_shutdown() {
 	$if test {
 		return
@@ -216,7 +216,7 @@ pub enum VetArea {
 	hot_code
 }
 
-[if shy_vet ?]
+@[if shy_vet ?]
 pub fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string) {
 	mut prefix := caller + ' '
 	prefix += match area {

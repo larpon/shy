@@ -9,7 +9,7 @@ pub enum ScriptLanguages {
 }
 */
 
-[heap]
+@[heap]
 pub struct Scripts {
 	ShyStruct
 mut:
@@ -36,7 +36,7 @@ fn (sc Scripts) on_frame(dt f64) {
 	}
 }
 
-[manualfree]
+@[manualfree]
 pub fn (mut sc Scripts) shutdown() ! {
 	sc.shy.assert_api_shutdown()
 	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')

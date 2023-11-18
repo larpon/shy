@@ -11,12 +11,12 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		text: 'Hello Shy World!'

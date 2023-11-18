@@ -16,7 +16,7 @@ const (
 )
 
 // TODO
-[markused]
+@[markused]
 fn todo_() {
 	_ := log.default_flags
 }
@@ -29,7 +29,7 @@ fn get_default_flags_workaround() Flag {
 	}
 }
 
-[flag]
+@[flag]
 pub enum Flag {
 	log // On / off switch
 	// Outputs
@@ -183,7 +183,7 @@ fn (l &Log) changes(flag Flag) string {
 
 //
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) custom(id string, str string) {
 	if l.flags.has(.custom) {
 		if l.flags.has(.buffer) {
@@ -196,7 +196,7 @@ pub fn (l &Log) custom(id string, str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) info(str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
@@ -209,7 +209,7 @@ pub fn (l &Log) info(str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) warn(str string) {
 	if l.flags.has(.warn) {
 		if l.flags.has(.buffer) {
@@ -222,7 +222,7 @@ pub fn (l &Log) warn(str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) error(str string) {
 	if l.flags.has(.error) {
 		if l.flags.has(.buffer) {
@@ -235,7 +235,7 @@ pub fn (l &Log) error(str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) critical(str string) {
 	if l.flags.has(.critical) {
 		if l.flags.has(.buffer) {
@@ -248,7 +248,7 @@ pub fn (l &Log) critical(str string) {
 	}
 }
 
-[if debug && !shy_no_log ?]
+@[if debug && !shy_no_log ?]
 pub fn (l &Log) debug(str string) {
 	if l.flags.has(.debug) {
 		if l.flags.has(.buffer) {
@@ -263,7 +263,7 @@ pub fn (l &Log) debug(str string) {
 
 // Group
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) gcustom(id string, group string, str string) {
 	if l.flags.has(.custom) {
 		if l.flags.has(.buffer) {
@@ -276,7 +276,7 @@ pub fn (l &Log) gcustom(id string, group string, str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) ginfo(group string, str string) {
 	if l.flags.has(.info) {
 		if l.flags.has(.buffer) {
@@ -289,7 +289,7 @@ pub fn (l &Log) ginfo(group string, str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) gwarn(group string, str string) {
 	if l.flags.has(.warn) {
 		if l.flags.has(.buffer) {
@@ -303,7 +303,7 @@ pub fn (l &Log) gwarn(group string, str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) gerror(group string, str string) {
 	if l.flags.has(.error) {
 		if l.flags.has(.buffer) {
@@ -317,7 +317,7 @@ pub fn (l &Log) gerror(group string, str string) {
 	}
 }
 
-[if !shy_no_log ?]
+@[if !shy_no_log ?]
 pub fn (l &Log) gcritical(group string, str string) {
 	if l.flags.has(.critical) {
 		if l.flags.has(.buffer) {
@@ -331,7 +331,7 @@ pub fn (l &Log) gcritical(group string, str string) {
 	}
 }
 
-[if debug && !shy_no_log ?]
+@[if debug && !shy_no_log ?]
 pub fn (l &Log) gdebug(group string, str string) {
 	if l.flags.has(.debug) {
 		if l.flags.has(.buffer) {

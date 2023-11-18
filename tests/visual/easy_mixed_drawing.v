@@ -11,14 +11,14 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.TestApp
 }
 
 const image_path = 'images/shy.png'
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.TestApp.init()!
 
@@ -27,7 +27,7 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	win_size := a.window.size()
 	win_w := f32(win_size.width)

@@ -25,7 +25,7 @@ pub fn new_system(sc SystemConfig) &System {
 	return s
 }
 
-[heap; noinit]
+@[heap; noinit]
 pub struct System {
 	shy.Rect
 mut:

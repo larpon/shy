@@ -5,14 +5,14 @@ module ui
 
 // import shy.lib as shy
 
-[heap]
+@[heap]
 pub interface Node {
 	id u64
 	draw(ui &UI)
 	event(e Event) ?&Node
 mut:
 	parent &Node
-	body []&Node
+	body   []&Node
 }
 
 // collect collects all `Node`s matching `filter() == true` into `nodes`.

@@ -12,27 +12,27 @@ pub const (
 	stdout_is_a_pipe = (os.is_atty(1) == 0)
 )
 
-[inline]
+@[inline]
 pub fn remap[T](value T, min T, max T, new_min T, new_max T) T {
 	return (((value - min) * (new_max - new_min)) / (max - min)) + new_min
 }
 
-[inline]
+@[inline]
 pub fn remap_u8_to_f32(value u8, min u8, max u8, new_min f32, new_max f32) f32 {
 	return f32((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
 }
 
-[inline]
+@[inline]
 pub fn remap_f32_to_u8(value f32, min f32, max f32, new_min u8, new_max u8) u8 {
 	return u8((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
 }
 
-[inline]
+@[inline]
 pub fn lerp[T](x T, y T, s T) T {
 	return x + s * (y - x)
 }
 
-[inline]
+@[inline]
 pub fn clamp[T](val T, min T, max T) T {
 	return mth.min(mth.max(val, min), max)
 }

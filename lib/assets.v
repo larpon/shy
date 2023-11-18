@@ -11,7 +11,7 @@ import v.embed_file
 import shy.analyse
 
 // Assets is a manager of `Asset` instances.
-[heap]
+@[heap]
 pub struct Assets {
 	ShyStruct
 mut:
@@ -224,7 +224,7 @@ pub:
 }
 
 // Asset represents an binary blob
-[heap]
+@[heap]
 pub struct Asset {
 	ShyStruct
 	data []u8
@@ -486,7 +486,7 @@ pub fn (ifm ImageFillMode) prev() ImageFillMode {
 	}
 }
 
-[heap; noinit]
+@[heap; noinit]
 pub struct Image {
 	opt ImageOptions
 pub:
@@ -507,7 +507,7 @@ pub type ImageWrap = gfx.Wrap
 
 pub type ResizeValue = Size | f32 | f64
 
-[params]
+@[params]
 pub struct ImageOptions {
 	AssetLoadOptions
 mut:
@@ -530,10 +530,10 @@ pub fn (i &Image) source() AssetSource {
 	return i.asset.lo.source
 }
 
-[markused]
+@[markused]
 pub const no_sound = Sound{}
 
-[params]
+@[params]
 pub struct SoundOptions {
 	AssetLoadOptions
 	engine_id   u8   // Load sound into this engine
@@ -541,7 +541,7 @@ pub struct SoundOptions {
 	max_repeats u8
 }
 
-[heap; noinit]
+@[heap; noinit]
 pub struct Sound {
 pub:
 	asset  &Asset = null // TODO removing this results in compiler warnings a few places

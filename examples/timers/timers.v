@@ -23,7 +23,7 @@ fn main() {
 	)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
@@ -33,7 +33,7 @@ mut:
 	since      u64
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -66,7 +66,7 @@ pub fn (mut a App) init() ! {
 	}, 1000, shy.infinite)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	size := a.window.size()
 	a.info_text.x = shy.half * size.width
@@ -79,7 +79,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.clock_text.draw()
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

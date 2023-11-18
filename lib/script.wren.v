@@ -292,7 +292,7 @@ pub fn (mut w WrenVM) to_wren<T>(config WrenConvertConfig) ! {
 }
 */
 
-[manualfree]
+@[manualfree]
 fn wren_write_fn(vm &wren.VM, const_text &char) {
 	msg := wren_c2v_string(const_text).trim_space()
 
@@ -323,7 +323,7 @@ fn wren_c2v_string(ch_ptr &char) string {
 	return ''
 }
 
-[manualfree]
+@[manualfree]
 fn wren_error_fn(vm &wren.VM, error_type wren.ErrorType, const_module &char, const_line int, const_msg &char) {
 	mod := wren_c2v_string(const_module).trim_space()
 	msg := wren_c2v_string(const_msg).trim_space()
@@ -384,7 +384,7 @@ class ShyApp {
 // Shy.log("Shy!!")
 '
 
-[manualfree]
+@[manualfree]
 fn wren_bind_foreign_class(vm &wren.VM, const_module &char, const_class_name &char) wren.ForeignClassMethods {
 	methods := wren.ForeignClassMethods{
 		allocate: unsafe { nil }
@@ -407,7 +407,7 @@ fn wren_bind_foreign_class(vm &wren.VM, const_module &char, const_class_name &ch
 	return methods
 }
 
-[manualfree]
+@[manualfree]
 fn wren_bind_foreign_method(vm &wren.VM, const_module &char, const_class_name &char, is_static bool, const_signature &char) wren.ForeignMethodFn {
 	mod := unsafe { cstring_to_vstring(const_module) }
 	class := unsafe { cstring_to_vstring(const_class_name) }

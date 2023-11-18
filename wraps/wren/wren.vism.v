@@ -156,7 +156,7 @@ pub fn (vm &VM) set_slot_null(slot int) {
 // memory used by it after this is called. The length is calculated using
 // `strlen()`. If the string may contain any null bytes in the middle, then you
 // should use `wrenSetSlotBytes()` instead.
-[manualfree]
+@[manualfree]
 pub fn (vm &VM) set_slot_string(slot int, const_text string) {
 	set_slot_string(vm, slot, const_text.str)
 }

@@ -57,10 +57,10 @@ type C.ma_sound_group_config = C.ma_sound_config
 type C.ma_sound_group = C.ma_sound
 
 // va_list
-[typedef]
+@[typedef]
 pub struct C.va_list {}
 
-[typedef]
+@[typedef]
 struct C.ma_data_source {}
 
 pub type DataSource = C.ma_data_source
@@ -349,7 +349,7 @@ pub enum PerformanceProfile {
 	conservative = C.ma_performance_profile_conservative
 }
 
-[typedef]
+@[typedef]
 struct C.ma_allocation_callbacks {
 pub mut:
 	pUserData voidptr
@@ -360,7 +360,7 @@ pub mut:
 
 pub type AllocationCallbacks = C.ma_allocation_callbacks
 
-[typedef]
+@[typedef]
 struct C.ma_lcg {
 pub mut:
 	state int
@@ -380,7 +380,7 @@ pub enum ThreadPriority {
 	default  = C.ma_thread_priority_default // 0,
 }
 
-[typedef]
+@[typedef]
 struct C.ma_event {
 pub mut:
 	value u32
@@ -390,7 +390,7 @@ pub mut:
 
 pub type Event = C.ma_event
 
-[typedef]
+@[typedef]
 struct C.ma_semaphore {
 pub mut:
 	value int
@@ -452,7 +452,7 @@ pub const max_log_callbacks = 4
 // C: typedef void (* ma_log_callback_proc)(void* pUserData, ma_uint32 level, const char* pMessage);
 pub type LogCallbackProc = fn (p_user_data voidptr, level u32, const_p_message &char)
 
-[typedef]
+@[typedef]
 struct C.ma_log_callback {
 pub mut:
 	onLog     LogCallbackProc
@@ -469,7 +469,7 @@ pub fn log_callback_init(on_log LogCallbackProc, p_user_data voidptr) LogCallbac
 	return C.ma_log_callback_init(on_log, p_user_data)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_log {
 pub mut:
 	// TODO 	callbacks [MA_MAX_LOG_CALLBACKS]LogCallback
@@ -533,7 +533,7 @@ pub fn log_postv(p_log &Log, level u32, const_p_format &char, args C.va_list) Re
 MA_API ma_result ma_log_postf(ma_log* pLog, ma_uint32 level, const char* pFormat, ...) MA_ATTRIBUTE_FORMAT(3, 4);
 */
 
-[typedef]
+@[typedef]
 union C.ma_biquad_coefficient {
 pub mut:
 	f32 f32
@@ -542,7 +542,7 @@ pub mut:
 
 pub type BiquadCoefficient = C.ma_biquad_coefficient
 
-[typedef]
+@[typedef]
 struct C.ma_biquad_config {
 pub mut:
 	format   Format
@@ -565,7 +565,7 @@ pub fn biquad_config_init(format Format, channels u32, b0 f64, b1 f64, b2 f64, a
 	return C.ma_biquad_config_init(format, channels, b0, b1, b2, a0, a1, a2)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_biquad {
 pub mut:
 	format    Format
@@ -647,7 +647,7 @@ pub fn biquad_get_latency(const_p_bq &Biquad) u32 {
 	return C.ma_biquad_get_latency(const_p_bq)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf1_config {
 pub mut:
 	format          Format
@@ -659,7 +659,7 @@ pub mut:
 
 pub type Lpf1Config = C.ma_lpf1_config
 
-[typedef]
+@[typedef]
 struct C.ma_lpf2_config {
 pub mut:
 	format          Format
@@ -687,7 +687,7 @@ pub fn lpf2_config_init(format Format, channels u32, sample_rate u32, cutoff_fre
 	return C.ma_lpf2_config_init(format, channels, sample_rate, cutoff_frequency, q)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf1 {
 pub mut:
 	format    Format
@@ -764,7 +764,7 @@ pub fn lpf1_get_latency(const_p_lpf &Lpf1) u32 {
 	return C.ma_lpf1_get_latency(const_p_lpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf2 {
 pub mut:
 	bq Biquad // The second order low-pass filter is implemented as a biquad filter.
@@ -836,7 +836,7 @@ pub fn lpf2_get_latency(const_p_lpf &Lpf2) u32 {
 	return C.ma_lpf2_get_latency(const_p_lpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf_config {
 pub mut:
 	format          Format
@@ -856,7 +856,7 @@ pub fn lpf_config_init(format Format, channels u32, sample_rate u32, cutoff_freq
 	return C.ma_lpf_config_init(format, channels, sample_rate, cutoff_frequency, order)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf {
 pub mut:
 	format     Format
@@ -936,7 +936,7 @@ pub fn lpf_get_latency(const_p_lpf &Lpf) u32 {
 	return C.ma_lpf_get_latency(const_p_lpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf1_config {
 pub mut:
 	format          Format
@@ -948,7 +948,7 @@ pub mut:
 
 pub type Hpf1Config = C.ma_hpf1_config
 
-[typedef]
+@[typedef]
 struct C.ma_hpf2_config {
 pub mut:
 	format          Format
@@ -976,7 +976,7 @@ pub fn hpf2_config_init(format Format, channels u32, sample_rate u32, cutoff_fre
 	return C.ma_hpf2_config_init(format, channels, sample_rate, cutoff_frequency, q)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf1 {
 pub mut:
 	format    Format
@@ -1045,7 +1045,7 @@ pub fn hpf1_get_latency(const_p_hpf &Hpf1) u32 {
 	return C.ma_hpf1_get_latency(const_p_hpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf2 {
 pub mut:
 	bq Biquad // The second order high-pass filter is implemented as a biquad filter.
@@ -1109,7 +1109,7 @@ pub fn hpf2_get_latency(const_p_hpf &Hpf2) u32 {
 	return C.ma_hpf2_get_latency(const_p_hpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf_config {
 pub mut:
 	format          Format
@@ -1129,7 +1129,7 @@ pub fn hpf_config_init(format Format, channels u32, sample_rate u32, cutoff_freq
 	return C.ma_hpf_config_init(format, channels, sample_rate, cutoff_frequency, order)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf {
 pub mut:
 	format     Format
@@ -1201,7 +1201,7 @@ pub fn hpf_get_latency(const_p_hpf &Hpf) u32 {
 	return C.ma_hpf_get_latency(const_p_hpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_bpf2_config {
 pub mut:
 	format          Format
@@ -1221,7 +1221,7 @@ pub fn bpf2_config_init(format Format, channels u32, sample_rate u32, cutoff_fre
 	return C.ma_bpf2_config_init(format, channels, sample_rate, cutoff_frequency, q)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_bpf2 {
 pub mut:
 	bq Biquad // The second order band-pass filter is implemented as a biquad filter.
@@ -1285,7 +1285,7 @@ pub fn bpf2_get_latency(const_p_bpf &Bpf2) u32 {
 	return C.ma_bpf2_get_latency(const_p_bpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_bpf_config {
 pub mut:
 	format          Format
@@ -1305,7 +1305,7 @@ pub fn bpf_config_init(format Format, channels u32, sample_rate u32, cutoff_freq
 	return C.ma_bpf_config_init(format, channels, sample_rate, cutoff_frequency, order)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_bpf {
 pub mut:
 	format    Format
@@ -1374,7 +1374,7 @@ pub fn bpf_get_latency(const_p_bpf &Bpf) u32 {
 	return C.ma_bpf_get_latency(const_p_bpf)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_notch2_config {
 pub mut:
 	format     Format
@@ -1386,7 +1386,7 @@ pub mut:
 
 pub type Notch2Config = C.ma_notch2_config
 
-[typedef]
+@[typedef]
 struct C.ma_notch_config {
 pub mut:
 	format     Format
@@ -1406,7 +1406,7 @@ pub fn notch2_config_init(format Format, channels u32, sample_rate u32, q f64, f
 	return C.ma_notch2_config_init(format, channels, sample_rate, q, frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_notch2 {
 pub mut:
 	bq Biquad
@@ -1470,7 +1470,7 @@ pub fn notch2_get_latency(const_p_filter &Notch2) u32 {
 	return C.ma_notch2_get_latency(const_p_filter)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_peak2_config {
 pub mut:
 	format     Format
@@ -1483,7 +1483,7 @@ pub mut:
 
 pub type Peak2Config = C.ma_peak2_config
 
-[typedef]
+@[typedef]
 struct C.ma_peak_config {
 pub mut:
 	format     Format
@@ -1504,7 +1504,7 @@ pub fn peak2_config_init(format Format, channels u32, sample_rate u32, gain_db f
 	return C.ma_peak2_config_init(format, channels, sample_rate, gain_db, q, frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_peak2 {
 pub mut:
 	bq Biquad
@@ -1568,7 +1568,7 @@ pub fn peak2_get_latency(const_p_filter &Peak2) u32 {
 	return C.ma_peak2_get_latency(const_p_filter)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_loshelf2_config {
 pub mut:
 	format     Format
@@ -1581,7 +1581,7 @@ pub mut:
 
 pub type Loshelf2Config = C.ma_loshelf2_config
 
-[typedef]
+@[typedef]
 struct C.ma_loshelf_config {
 pub mut:
 	format     Format
@@ -1603,7 +1603,7 @@ pub fn loshelf2_config_init(format Format, channels u32, sample_rate u32, gain_d
 		frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_loshelf2 {
 pub mut:
 	bq Biquad
@@ -1668,7 +1668,7 @@ pub fn loshelf2_get_latency(const_p_filter &Loshelf2) u32 {
 	return C.ma_loshelf2_get_latency(const_p_filter)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hishelf2_config {
 pub mut:
 	format     Format
@@ -1681,7 +1681,7 @@ pub mut:
 
 pub type Hishelf2Config = C.ma_hishelf2_config
 
-[typedef]
+@[typedef]
 struct C.ma_hishelf_config {
 pub mut:
 	format     Format
@@ -1703,7 +1703,7 @@ pub fn hishelf2_config_init(format Format, channels u32, sample_rate u32, gain_d
 		frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hishelf2 {
 pub mut:
 	bq Biquad
@@ -1768,7 +1768,7 @@ pub fn hishelf2_get_latency(const_p_filter &Hishelf2) u32 {
 	return C.ma_hishelf2_get_latency(const_p_filter)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_delay_config {
 pub mut:
 	channels      u32
@@ -1791,7 +1791,7 @@ pub fn delay_config_init(channels u32, sample_rate u32, delay_in_frames u32, dec
 	return C.ma_delay_config_init(channels, sample_rate, delay_in_frames, decay)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_delay {
 pub mut:
 	config             DelayConfig
@@ -1874,7 +1874,7 @@ pub fn delay_get_decay(const_p_delay &Delay) f32 {
 	return C.ma_delay_get_decay(const_p_delay)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_gainer_config {
 pub mut:
 	channels           u32
@@ -1891,7 +1891,7 @@ pub fn gainer_config_init(channels u32, smooth_time_in_frames u32) GainerConfig 
 	return C.ma_gainer_config_init(channels, smooth_time_in_frames)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_gainer {
 pub mut:
 	config    GainerConfig
@@ -1966,7 +1966,7 @@ pub enum PanMode {
 	pan     = C.ma_pan_mode_pan // A true pan. The sound from one side will "move" to the other side and blend with it.
 }
 
-[typedef]
+@[typedef]
 struct C.ma_panner_config {
 pub mut:
 	format   Format
@@ -1985,7 +1985,7 @@ pub fn panner_config_init(format Format, channels u32) PannerConfig {
 	return C.ma_panner_config_init(format, channels)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_panner {
 pub mut:
 	format   Format
@@ -2044,7 +2044,7 @@ pub fn panner_get_pan(const_p_panner &Panner) f32 {
 	return C.ma_panner_get_pan(const_p_panner)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_fader_config {
 pub mut:
 	format     Format
@@ -2062,7 +2062,7 @@ pub fn fader_config_init(format Format, channels u32, sample_rate u32) FaderConf
 	return C.ma_fader_config_init(format, channels, sample_rate)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_fader {
 pub mut:
 	config         FaderConfig
@@ -2114,7 +2114,7 @@ pub fn fader_get_current_volume(p_fader &Fader) f32 {
 	return C.ma_fader_get_current_volume(p_fader)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_vec3f {
 pub mut:
 	x f32
@@ -2144,7 +2144,7 @@ pub enum Handedness {
 	left  = C.ma_handedness_left
 }
 
-[typedef]
+@[typedef]
 struct C.ma_spatializer_listener_config {
 pub mut:
 	channelsOut             u32
@@ -2167,7 +2167,7 @@ pub fn spatializer_listener_config_init(channels_out u32) SpatializerListenerCon
 	return C.ma_spatializer_listener_config_init(channels_out)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_spatializer_listener {
 pub mut:
 	config    SpatializerListenerConfig
@@ -2336,7 +2336,7 @@ pub fn spatializer_listener_is_enabled(const_p_listener &SpatializerListener) u3
 	return C.ma_spatializer_listener_is_enabled(const_p_listener)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_spatializer_config {
 pub mut:
 	channelsIn                   u32
@@ -2368,7 +2368,7 @@ pub fn spatializer_config_init(channels_in u32, channels_out u32) SpatializerCon
 	return C.ma_spatializer_config_init(channels_in, channels_out)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_spatializer {
 pub mut:
 	channelsIn                   u32
@@ -2676,7 +2676,7 @@ pub fn spatializer_get_relative_position_and_direction(const_p_spatializer &Spat
 		p_relative_pos, p_relative_dir)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_linear_resampler_config {
 pub mut:
 	format           Format
@@ -2697,7 +2697,7 @@ pub fn linear_resampler_config_init(format Format, channels u32, sample_rate_in 
 	return C.ma_linear_resampler_config_init(format, channels, sample_rate_in, sample_rate_out)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_linear_resampler {
 pub mut:
 	config        LinearResamplerConfig
@@ -2815,7 +2815,7 @@ pub fn linear_resampler_reset(p_resampler &LinearResampler) Result {
 	return C.ma_linear_resampler_reset(p_resampler)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resampling_backend_vtable {
 pub mut:
 	onGetHeapSize                 fn (p_user_data voidptr, const_p_config &ResamplerConfig, p_heap_size_in_bytes &usize) Result        // onGetHeapSize
@@ -2838,7 +2838,7 @@ pub enum ResampleAlgorithm {
 	custom = C.ma_resample_algorithm_custom
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resampler_config {
 pub mut:
 	format           Format // Must be either ma_format_f32 or ma_format_s16.
@@ -2863,7 +2863,7 @@ pub fn resampler_config_init(format Format, channels u32, sample_rate_in u32, sa
 		algorithm)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resampler {
 pub mut:
 	pBackend         voidptr
@@ -3024,7 +3024,7 @@ pub enum MonoExpansionMode {
 	default     = C.ma_mono_expansion_mode_default // ma_mono_expansion_mode_duplicate,
 }
 
-[typedef]
+@[typedef]
 struct C.ma_channel_converter_config {
 pub mut:
 	format      Format
@@ -3046,7 +3046,7 @@ pub fn channel_converter_config_init(format Format, channels_in u32, const_p_cha
 		channels_out, const_p_channel_map_out, mixing_mode)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_channel_converter {
 pub mut:
 	format         Format
@@ -3124,7 +3124,7 @@ pub fn channel_converter_get_output_channel_map(const_p_converter &ChannelConver
 		channel_map_cap)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_data_converter_config {
 pub mut:
 	formatIn               Format
@@ -3171,7 +3171,7 @@ pub enum DataConverterExecutionPath {
 	channels_first = C.ma_data_converter_execution_path_channels_first // All conversions, but channels as the first step.
 }
 
-[typedef]
+@[typedef]
 struct C.ma_data_converter {
 pub mut:
 	formatIn                Format
@@ -3634,7 +3634,7 @@ pub fn convert_frames_ex(p_out voidptr, frame_count_out u64, const_p_in voidptr,
 		const_p_config)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_rb {
 pub mut:
 	pBuffer                voidptr
@@ -3788,7 +3788,7 @@ pub fn rb_get_subbuffer_ptr(p_rb &Rb, subbuffer_index usize, p_buffer voidptr) v
 	return C.ma_rb_get_subbuffer_ptr(p_rb, subbuffer_index, p_buffer)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_pcm_rb {
 pub mut:
 	rb       Rb
@@ -3937,7 +3937,7 @@ pub fn pcm_rb_get_subbuffer_ptr(p_rb &PcmRb, subbuffer_index u32, p_buffer voidp
 	return C.ma_pcm_rb_get_subbuffer_ptr(p_rb, subbuffer_index, p_buffer)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_duplex_rb {
 pub mut:
 	rb PcmRb
@@ -4145,7 +4145,7 @@ pub fn event_signal(p_event &Event) Result {
 	return C.ma_event_signal(p_event)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_fence {
 pub mut:
 	// TODO 	MA_NO_THREADING C.#ifndef  // ma_event
@@ -4194,7 +4194,7 @@ pub fn fence_wait(p_fence &Fence) Result {
 	return C.ma_fence_wait(p_fence)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_async_notification_callbacks {
 pub mut:
 	onSignal fn (p_notification voidptr) // onSignal)(ma_async_notification*
@@ -4210,7 +4210,7 @@ pub fn async_notification_signal(p_notification voidptr) Result {
 	return C.ma_async_notification_signal(p_notification)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_async_notification_poll {
 pub mut:
 	cb        AsyncNotificationCallbacks
@@ -4235,7 +4235,7 @@ pub fn async_notification_poll_is_signalled(const_p_notification_poll &AsyncNoti
 	return C.ma_async_notification_poll_is_signalled(const_p_notification_poll)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_async_notification_event {
 pub mut:
 	cb AsyncNotificationCallbacks
@@ -4276,7 +4276,7 @@ pub fn async_notification_event_signal(p_notification_event &AsyncNotificationEv
 	return C.ma_async_notification_event_signal(p_notification_event)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_slot_allocator_config {
 pub mut:
 	capacity u32 // The number of slots to make available.
@@ -4292,14 +4292,14 @@ pub fn slot_allocator_config_init(capacity u32) SlotAllocatorConfig {
 	return C.ma_slot_allocator_config_init(capacity)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_slot_allocator_group {
 	// TODO MA_ATOMIC(4, ma_uint32) bitfield
 }
 
 pub type SlotAllocatorGroup = C.ma_slot_allocator_group
 
-[typedef]
+@[typedef]
 struct C.ma_slot_allocator {
 pub mut:
 	pGroups   &SlotAllocatorGroup = unsafe { nil } // Slots are grouped in chunks of 32.
@@ -4386,7 +4386,7 @@ pub enum JobType {
 	count                                  = C.MA_JOB_TYPE_COUNT
 }
 
-[typedef]
+@[typedef]
 struct C.ma_job {
 pub mut:
 	// TODO// union {
@@ -4446,7 +4446,7 @@ pub enum JobQueueFlags {
 	job_queue_flag_non_blocking = C.MA_JOB_QUEUE_FLAG_NON_BLOCKING // 0x00000001,
 }
 
-[typedef]
+@[typedef]
 struct C.ma_job_queue_config {
 pub mut:
 	flags    u32
@@ -4463,7 +4463,7 @@ pub fn job_queue_config_init(flags u32, capacity u32) JobQueueConfig {
 	return C.ma_job_queue_config_init(flags, capacity)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_job_queue {
 pub mut:
 	flags    u32 // Flags passed in at initialization time.
@@ -4580,7 +4580,7 @@ pub enum Backend {
 TODO Function: #define MA_BACKEND_COUNT (ma_backend_null+1)
 */
 
-[typedef]
+@[typedef]
 struct C.ma_device_job_thread_config {
 pub mut:
 	noThread         u32 // Set this to true if you want to process jobs yourself.
@@ -4598,7 +4598,7 @@ pub fn device_job_thread_config_init() DeviceJobThreadConfig {
 	return C.ma_device_job_thread_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_device_job_thread {
 pub mut:
 	thread     C.ma_thread
@@ -4649,7 +4649,7 @@ pub enum DeviceNotificationType {
 	interruption_ended = C.ma_device_notification_type_interruption_ended
 }
 
-[typedef]
+@[typedef]
 struct C.ma_device_notification {
 pub mut:
 	pDevice &Device = unsafe { nil }
@@ -4870,7 +4870,7 @@ pub enum AaudioInputPreset {
 	voice_performance   = C.ma_aaudio_input_preset_voice_performance // AAUDIO_INPUT_PRESET_VOICE_PERFORMANCE
 }
 
-[typedef]
+@[typedef]
 union C.ma_timer {
 pub mut:
 	counter  i64
@@ -4879,7 +4879,7 @@ pub mut:
 
 pub type Timer = C.ma_timer
 
-[typedef]
+@[typedef]
 union C.ma_device_id {
 pub mut:
 	// TODO 	wasapi [64]u16  // WASAPI uses a wchar_t string for identification.
@@ -4908,7 +4908,7 @@ TODO Function: #define MA_DATA_FORMAT_FLAG_EXCLUSIVE_MODE (1U << 1)
 
 pub const max_device_name_length = 255
 
-[typedef]
+@[typedef]
 struct C.ma_device_info {
 pub mut:
 	id DeviceId
@@ -4921,7 +4921,7 @@ pub mut:
 
 pub type DeviceInfo = C.ma_device_info
 
-[typedef]
+@[typedef]
 struct C.ma_device_config {
 pub mut:
 	deviceType                DeviceType
@@ -4982,7 +4982,7 @@ pub type DeviceConfig = C.ma_device_config
 // C: typedef ma_bool32 (* ma_enum_devices_callback_proc)(ma_context* pContext, ma_device_type deviceType, const ma_device_info* pInfo, void* pUserData);
 pub type EnumDevicesCallbackProc = fn (p_context &Context, device_type DeviceType, const_p_info &DeviceInfo, p_user_data voidptr) u32
 
-[typedef]
+@[typedef]
 struct C.ma_device_descriptor {
 pub mut:
 	// TODO 	ma_device_id* C.  // pDeviceID
@@ -4998,7 +4998,7 @@ pub mut:
 
 pub type DeviceDescriptor = C.ma_device_descriptor
 
-[typedef]
+@[typedef]
 struct C.ma_backend_callbacks {
 pub mut:
 	onContextInit             fn (p_context &Context, const_p_config &ContextConfig, p_callbacks &BackendCallbacks) Result // onContextInit)(ma_context*
@@ -5018,7 +5018,7 @@ pub mut:
 
 pub type BackendCallbacks = C.ma_backend_callbacks
 
-[typedef]
+@[typedef]
 struct C.ma_context_config {
 pub mut:
 	pLog                &Log = unsafe { nil }
@@ -5039,7 +5039,7 @@ pub mut:
 
 pub type ContextConfig = C.ma_context_config
 
-[typedef]
+@[typedef]
 struct C.ma_context_command__wasapi {
 pub mut:
 	code   int
@@ -5055,7 +5055,7 @@ pub mut:
 
 pub type ContextCommandWasapi = C.ma_context_command__wasapi
 
-[typedef]
+@[typedef]
 struct C.ma_context {
 pub mut:
 	callbacks               BackendCallbacks
@@ -5080,7 +5080,7 @@ pub mut:
 
 pub type Context = C.ma_context
 
-[typedef]
+@[typedef]
 struct C.ma_device {
 pub mut:
 	pContext   &Context = unsafe { nil }
@@ -7225,7 +7225,7 @@ pub fn volume_db_to_linear(gain f32) f32 {
 
 pub const data_source_self_managed_range_and_loop_point = 0x00000001
 
-[typedef]
+@[typedef]
 struct C.ma_data_source_vtable {
 pub mut:
 	onRead          fn (p_data_source voidptr, p_frames_out voidptr, frame_count u64, p_frames_read &u64) Result // onRead)(ma_data_source*
@@ -7243,7 +7243,7 @@ pub type DataSourceVtable = C.ma_data_source_vtable
 // C: typedef ma_data_source* (* ma_data_source_get_next_proc)(ma_data_source* pDataSource);
 pub type DataSourceGetNextProc = fn (p_data_source voidptr) voidptr
 
-[typedef]
+@[typedef]
 struct C.ma_data_source_config {
 	// TODO 	ma_data_source_vtable* C.  // vtable
 }
@@ -7258,7 +7258,7 @@ pub fn data_source_config_init() DataSourceConfig {
 	return C.ma_data_source_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_data_source_base {
 pub mut:
 	// TODO 	ma_data_source_vtable* C.  // vtable
@@ -7456,7 +7456,7 @@ pub fn data_source_get_next_callback(const_p_data_source voidptr) DataSourceGetN
 	return C.ma_data_source_get_next_callback(const_p_data_source)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_audio_buffer_ref {
 pub mut:
 	ds           DataSourceBase
@@ -7560,7 +7560,7 @@ pub fn audio_buffer_ref_get_available_frames(const_p_audio_buffer_ref &AudioBuff
 	return C.ma_audio_buffer_ref_get_available_frames(const_p_audio_buffer_ref, p_available_frames)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_audio_buffer_config {
 pub mut:
 	format       Format
@@ -7582,7 +7582,7 @@ pub fn audio_buffer_config_init(format Format, channels u32, size_in_frames u64,
 		const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_audio_buffer {
 pub mut:
 	ref                 AudioBufferRef
@@ -7698,7 +7698,7 @@ pub fn audio_buffer_get_available_frames(const_p_audio_buffer &AudioBuffer, p_av
 	return C.ma_audio_buffer_get_available_frames(const_p_audio_buffer, p_available_frames)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_paged_audio_buffer_page {
 pub mut:
 	// TODO MA_ATOMIC(MA_SIZEOF_PTR, ma_paged_audio_buffer_page*) pNext
@@ -7708,7 +7708,7 @@ pub mut:
 
 pub type PagedAudioBufferPage = C.ma_paged_audio_buffer_page
 
-[typedef]
+@[typedef]
 struct C.ma_paged_audio_buffer_data {
 pub mut:
 	format   Format
@@ -7793,7 +7793,7 @@ pub fn paged_audio_buffer_data_allocate_and_append_page(p_data &PagedAudioBuffer
 		const_p_initial_data, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_paged_audio_buffer_config {
 pub mut:
 	pData &PagedAudioBufferData = unsafe { nil } // Must not be null.
@@ -7809,7 +7809,7 @@ pub fn paged_audio_buffer_config_init(p_data &PagedAudioBufferData) PagedAudioBu
 	return C.ma_paged_audio_buffer_config_init(p_data)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_paged_audio_buffer {
 pub mut:
 	ds             DataSourceBase
@@ -7883,7 +7883,7 @@ pub enum SeekOrigin {
 	end     = C.ma_seek_origin_end // Not used by decoders.
 }
 
-[typedef]
+@[typedef]
 struct C.ma_file_info {
 pub mut:
 	sizeInBytes u64
@@ -7891,7 +7891,7 @@ pub mut:
 
 pub type FileInfo = C.ma_file_info
 
-[typedef]
+@[typedef]
 struct C.ma_vfs_callbacks {
 pub mut:
 	onOpen  fn (p_vfs voidptr, const_p_file_path &char, open_mode u32, p_file &C.ma_vfs_file) Result // onOpen)
@@ -7978,7 +7978,7 @@ pub fn vfs_open_and_read_file(p_vfs voidptr, const_p_file_path &char, pp_data vo
 	return C.ma_vfs_open_and_read_file(p_vfs, const_p_file_path, pp_data, p_size, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_default_vfs {
 pub mut:
 	cb                  VfsCallbacks
@@ -8016,7 +8016,7 @@ pub enum EncodingFormat {
 	vorbis  = C.ma_encoding_format_vorbis
 }
 
-[typedef]
+@[typedef]
 struct C.ma_decoding_backend_config {
 pub mut:
 	preferredFormat Format
@@ -8033,7 +8033,7 @@ pub fn decoding_backend_config_init(preferred_format Format, seek_point_count u3
 	return C.ma_decoding_backend_config_init(preferred_format, seek_point_count)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_decoding_backend_vtable {
 pub mut:
 	onInit       fn (p_user_data voidptr, on_read ReadProc, on_seek SeekProc, on_tell TellProc, p_read_seek_tell_user_data voidptr, const_p_config &DecodingBackendConfig, const_p_allocation_callbacks &AllocationCallbacks, pp_backend voidptr) Result // onInit
@@ -8057,7 +8057,7 @@ pub type DecoderSeekProc = fn (p_decoder &Decoder, byte_offset i64, origin SeekO
 // C: typedef ma_result (* ma_decoder_tell_proc)(ma_decoder* pDecoder, ma_int64* pCursor);
 pub type DecoderTellProc = fn (p_decoder &Decoder, p_cursor &i64) Result
 
-[typedef]
+@[typedef]
 struct C.ma_decoder_config {
 pub mut:
 	format                 Format // Set to 0 or ma_format_unknown to use the stream's internal format.
@@ -8077,7 +8077,7 @@ pub mut:
 
 pub type DecoderConfig = C.ma_decoder_config
 
-[typedef]
+@[typedef]
 struct C.ma_decoder {
 pub mut:
 	ds       DataSourceBase
@@ -8295,7 +8295,7 @@ pub type EncoderUninitProc = fn (p_encoder &Encoder)
 // C: typedef ma_result (* ma_encoder_write_pcm_frames_proc)(ma_encoder* pEncoder, const void* pFramesIn, ma_uint64 frameCount, ma_uint64* pFramesWritten);
 pub type EncoderWritePcmFramesProc = fn (p_encoder &Encoder, const_p_frames_in voidptr, frame_count u64, p_frames_written &u64) Result
 
-[typedef]
+@[typedef]
 struct C.ma_encoder_config {
 pub mut:
 	encodingFormat      EncodingFormat
@@ -8315,7 +8315,7 @@ pub fn encoder_config_init(encoding_format EncodingFormat, format Format, channe
 	return C.ma_encoder_config_init(encoding_format, format, channels, sample_rate)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_encoder {
 pub mut:
 	config           EncoderConfig
@@ -8397,7 +8397,7 @@ pub enum WaveformType {
 	sawtooth = C.ma_waveform_type_sawtooth
 }
 
-[typedef]
+@[typedef]
 struct C.ma_waveform_config {
 pub mut:
 	format     Format
@@ -8419,7 +8419,7 @@ pub fn waveform_config_init(format Format, channels u32, sample_rate u32, @type 
 		frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_waveform {
 pub mut:
 	ds      DataSourceBase
@@ -8501,7 +8501,7 @@ pub enum NoiseType {
 	brownian = C.ma_noise_type_brownian
 }
 
-[typedef]
+@[typedef]
 struct C.ma_noise_config {
 pub mut:
 	format            Format
@@ -8522,7 +8522,7 @@ pub fn noise_config_init(format Format, channels u32, @type NoiseType, seed int,
 	return C.ma_noise_config_init(format, channels, @type, seed, amplitude)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_noise {
 pub mut:
 	ds     DataSourceVtable
@@ -8616,7 +8616,7 @@ pub enum ResourceManagerDataSourceFlags {
 	unknown_length = C.MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_UNKNOWN_LENGTH // 0x00000010, Gives the resource manager a hint that the length of the data source is unknown and calling `ma_data_source_get_length_in_pcm_frames()` should be avoided.
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_pipeline_stage_notification {
 pub mut:
 	pNotification voidptr
@@ -8625,7 +8625,7 @@ pub mut:
 
 pub type ResourceManagerPipelineStageNotification = C.ma_resource_manager_pipeline_stage_notification
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_pipeline_notifications {
 pub mut:
 	init ResourceManagerPipelineStageNotification // Initialization of the decoder.
@@ -8701,7 +8701,7 @@ pub enum ResourceManagerFlags {
 	no_threading = C.MA_RESOURCE_MANAGER_FLAG_NO_THREADING
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_data_source_config {
 pub mut:
 	// TODO 	char* C.  // pFilePath
@@ -8734,7 +8734,7 @@ pub enum ResourceManagerDataSupplyType {
 	decoded_paged = C.ma_resource_manager_data_supply_type_decoded_paged // Data supply is a linked list of decoded buffers. Connector is ma_paged_audio_buffer.
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_data_supply {
 	// TODO MA_ATOMIC(4, ma_resource_manager_data_supply_type) type
 	// TODO// union {
@@ -8748,7 +8748,7 @@ struct C.ma_resource_manager_data_supply {
 
 pub type ResourceManagerDataSupply = C.ma_resource_manager_data_supply
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_data_buffer_node {
 pub mut:
 	hashedName32 u32 // The hashed name. This is the key.
@@ -8765,7 +8765,7 @@ pub mut:
 
 pub type ResourceManagerDataBufferNode = C.ma_resource_manager_data_buffer_node
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_data_buffer {
 pub mut:
 	ds               DataSourceBase   // Base data source. A data buffer is a data source.
@@ -8785,7 +8785,7 @@ pub mut:
 
 pub type ResourceManagerDataBuffer = C.ma_resource_manager_data_buffer
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_data_stream {
 pub mut:
 	ds                     DataSourceBase   // Base data source. A data stream is a data source.
@@ -8810,7 +8810,7 @@ pub mut:
 
 pub type ResourceManagerDataStream = C.ma_resource_manager_data_stream
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_data_source {
 pub mut:
 	// TODO// union {
@@ -8822,7 +8822,7 @@ pub mut:
 
 pub type ResourceManagerDataSource = C.ma_resource_manager_data_source
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager_config {
 pub mut:
 	allocationCallbacks            AllocationCallbacks
@@ -8849,7 +8849,7 @@ pub fn resource_manager_config_init() ResourceManagerConfig {
 	return C.ma_resource_manager_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_resource_manager {
 pub mut:
 	config              ResourceManagerConfig
@@ -9384,7 +9384,7 @@ pub enum NodeState {
 	stopped = C.ma_node_state_stopped // 1,
 }
 
-[typedef]
+@[typedef]
 struct C.ma_node_vtable {
 pub mut:
 	onProcess                    fn (p_node voidptr, const_pp_frames_in &&f32, p_frame_count_in &u32, pp_frames_out &&f32, p_frame_count_out &u32) // onProcess)(ma_node* A callback for retrieving the number of a input frames that are required to output the specified number of output frames. You would only want to implement this when the node performs resampling. This is optional, even for nodes that perform resampling, but it does offer a small reduction in latency as it allows miniaudio to calculate the exact number of input frames to read at a time instead of having to estimate.
@@ -9396,7 +9396,7 @@ pub mut:
 
 pub type NodeVtable = C.ma_node_vtable
 
-[typedef]
+@[typedef]
 struct C.ma_node_config {
 pub mut:
 	// TODO 	ma_node_vtable* C.  // vtable Should never be null. Initialization of the node will fail if so.
@@ -9416,7 +9416,7 @@ pub fn node_config_init() NodeConfig {
 	return C.ma_node_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_node_output_bus {
 pub mut:
 	pNode          voidptr // The node that owns this output bus. The input node. Will be null for dummy head and tail nodes.
@@ -9435,7 +9435,7 @@ pub mut:
 
 pub type NodeOutputBus = C.ma_node_output_bus
 
-[typedef]
+@[typedef]
 struct C.ma_node_input_bus {
 pub mut:
 	head NodeOutputBus // Dummy head node for simplifying some lock-free thread-safety stuff.
@@ -9446,7 +9446,7 @@ pub mut:
 
 pub type NodeInputBus = C.ma_node_input_bus
 
-[typedef]
+@[typedef]
 struct C.ma_node_base {
 pub mut:
 	pNodeGraph &NodeGraph = unsafe { nil } // The graph this node belongs to.
@@ -9648,7 +9648,7 @@ pub fn node_set_time(p_node voidptr, local_time u64) Result {
 	return C.ma_node_set_time(p_node, local_time)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_node_graph_config {
 pub mut:
 	channels             u32
@@ -9665,7 +9665,7 @@ pub fn node_graph_config_init(channels u32) NodeGraphConfig {
 	return C.ma_node_graph_config_init(channels)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_node_graph {
 pub mut:
 	base                 NodeBase // The node graph itself is a node so it can be connected as an input to different node graph. This has zero inputs and calls ma_node_graph_read_pcm_frames() to generate it's output.
@@ -9732,7 +9732,7 @@ pub fn node_graph_set_time(p_node_graph &NodeGraph, global_time u64) Result {
 	return C.ma_node_graph_set_time(p_node_graph, global_time)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_data_source_node_config {
 pub mut:
 	nodeConfig  NodeConfig
@@ -9749,7 +9749,7 @@ pub fn data_source_node_config_init(p_data_source voidptr) DataSourceNodeConfig 
 	return C.ma_data_source_node_config_init(p_data_source)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_data_source_node {
 pub mut:
 	base        NodeBase
@@ -9791,7 +9791,7 @@ pub fn data_source_node_is_looping(p_data_source_node &DataSourceNode) u32 {
 	return C.ma_data_source_node_is_looping(p_data_source_node)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_splitter_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -9808,7 +9808,7 @@ pub fn splitter_node_config_init(channels u32) SplitterNodeConfig {
 	return C.ma_splitter_node_config_init(channels)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_splitter_node {
 pub mut:
 	base NodeBase
@@ -9833,7 +9833,7 @@ pub fn splitter_node_uninit(p_splitter_node &SplitterNode, const_p_allocation_ca
 	C.ma_splitter_node_uninit(p_splitter_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_biquad_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -9850,7 +9850,7 @@ pub fn biquad_node_config_init(channels u32, b0 f32, b1 f32, b2 f32, a0 f32, a1 
 	return C.ma_biquad_node_config_init(channels, b0, b1, b2, a0, a1, a2)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_biquad_node {
 pub mut:
 	baseNode NodeBase
@@ -9884,7 +9884,7 @@ pub fn biquad_node_uninit(p_node &BiquadNode, const_p_allocation_callbacks &Allo
 	C.ma_biquad_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -9901,7 +9901,7 @@ pub fn lpf_node_config_init(channels u32, sample_rate u32, cutoff_frequency f64,
 	return C.ma_lpf_node_config_init(channels, sample_rate, cutoff_frequency, order)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_lpf_node {
 pub mut:
 	baseNode NodeBase
@@ -9935,7 +9935,7 @@ pub fn lpf_node_uninit(p_node &LpfNode, const_p_allocation_callbacks &Allocation
 	C.ma_lpf_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -9952,7 +9952,7 @@ pub fn hpf_node_config_init(channels u32, sample_rate u32, cutoff_frequency f64,
 	return C.ma_hpf_node_config_init(channels, sample_rate, cutoff_frequency, order)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hpf_node {
 pub mut:
 	baseNode NodeBase
@@ -9986,7 +9986,7 @@ pub fn hpf_node_uninit(p_node &HpfNode, const_p_allocation_callbacks &Allocation
 	C.ma_hpf_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_bpf_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -10003,7 +10003,7 @@ pub fn bpf_node_config_init(channels u32, sample_rate u32, cutoff_frequency f64,
 	return C.ma_bpf_node_config_init(channels, sample_rate, cutoff_frequency, order)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_bpf_node {
 pub mut:
 	baseNode NodeBase
@@ -10037,7 +10037,7 @@ pub fn bpf_node_uninit(p_node &BpfNode, const_p_allocation_callbacks &Allocation
 	C.ma_bpf_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_notch_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -10054,7 +10054,7 @@ pub fn notch_node_config_init(channels u32, sample_rate u32, q f64, frequency f6
 	return C.ma_notch_node_config_init(channels, sample_rate, q, frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_notch_node {
 pub mut:
 	baseNode NodeBase
@@ -10088,7 +10088,7 @@ pub fn notch_node_uninit(p_node &NotchNode, const_p_allocation_callbacks &Alloca
 	C.ma_notch_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_peak_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -10105,7 +10105,7 @@ pub fn peak_node_config_init(channels u32, sample_rate u32, gain_db f64, q f64, 
 	return C.ma_peak_node_config_init(channels, sample_rate, gain_db, q, frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_peak_node {
 pub mut:
 	baseNode NodeBase
@@ -10139,7 +10139,7 @@ pub fn peak_node_uninit(p_node &PeakNode, const_p_allocation_callbacks &Allocati
 	C.ma_peak_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_loshelf_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -10156,7 +10156,7 @@ pub fn loshelf_node_config_init(channels u32, sample_rate u32, gain_db f64, q f6
 	return C.ma_loshelf_node_config_init(channels, sample_rate, gain_db, q, frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_loshelf_node {
 pub mut:
 	baseNode NodeBase
@@ -10190,7 +10190,7 @@ pub fn loshelf_node_uninit(p_node &LoshelfNode, const_p_allocation_callbacks &Al
 	C.ma_loshelf_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hishelf_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -10207,7 +10207,7 @@ pub fn hishelf_node_config_init(channels u32, sample_rate u32, gain_db f64, q f6
 	return C.ma_hishelf_node_config_init(channels, sample_rate, gain_db, q, frequency)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_hishelf_node {
 pub mut:
 	baseNode NodeBase
@@ -10241,7 +10241,7 @@ pub fn hishelf_node_uninit(p_node &HishelfNode, const_p_allocation_callbacks &Al
 	C.ma_hishelf_node_uninit(p_node, const_p_allocation_callbacks)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_delay_node_config {
 pub mut:
 	nodeConfig NodeConfig
@@ -10258,7 +10258,7 @@ pub fn delay_node_config_init(channels u32, sample_rate u32, delay_in_frames u32
 	return C.ma_delay_node_config_init(channels, sample_rate, delay_in_frames, decay)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_delay_node {
 pub mut:
 	baseNode NodeBase
@@ -10355,7 +10355,7 @@ pub enum EngineNodeType {
 	group = C.ma_engine_node_type_group
 }
 
-[typedef]
+@[typedef]
 struct C.ma_engine_node_config {
 pub mut:
 	pEngine                  &Engine = unsafe { nil }
@@ -10378,7 +10378,7 @@ pub fn engine_node_config_init(p_engine &Engine, @type EngineNodeType, flags u32
 	return C.ma_engine_node_config_init(p_engine, @type, flags)
 }
 
-[typedef]
+@[typedef]
 struct C.ma_engine_node {
 pub mut:
 	baseNode    NodeBase // Must be the first member for compatiblity with the ma_node API.
@@ -10434,7 +10434,7 @@ pub fn engine_node_uninit(p_engine_node &EngineNode, const_p_allocation_callback
 
 pub const sound_source_channel_count = u32(0xFFFFFFFF)
 
-[typedef]
+@[typedef]
 struct C.ma_sound_config {
 pub mut:
 	// TODO 	char* C.  // pFilePath Set this to load from the resource manager.
@@ -10464,7 +10464,7 @@ pub fn sound_config_init() SoundConfig {
 	return C.ma_sound_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_sound {
 pub mut:
 	engineNode  EngineNode // Must be the first member for compatibility with the ma_node API.
@@ -10477,7 +10477,7 @@ pub mut:
 
 pub type Sound = C.ma_sound
 
-[typedef]
+@[typedef]
 struct C.ma_sound_inlined {
 pub mut:
 	sound Sound
@@ -10495,7 +10495,7 @@ pub fn sound_group_config_init() C.ma_sound_group_config {
 	return C.ma_sound_group_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_engine_config {
 pub mut:
 	// TODO #if !defined(MA_NO_RESOURCE_MANAGER) ma_resource_manager* pResourceManager
@@ -10527,7 +10527,7 @@ pub fn engine_config_init() EngineConfig {
 	return C.ma_engine_config_init()
 }
 
-[typedef]
+@[typedef]
 struct C.ma_engine {
 pub mut:
 	nodeGraph NodeGraph // An engine is a node graph. It should be able to be plugged into any ma_node_graph API (with a cast) which means this must be the first member of this struct.

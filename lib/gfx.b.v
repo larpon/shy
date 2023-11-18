@@ -311,7 +311,7 @@ fn (mut c Context) offscreen_reinit(width int, height int) ! {
 	c.offscreen.sampler = off_sampler
 }
 
-[manualfree]
+@[manualfree]
 pub fn (mut c Context) shutdown() ! {
 	// g.shy.assert_api_init()
 	mut s := c.shy

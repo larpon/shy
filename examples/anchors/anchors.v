@@ -12,7 +12,7 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
@@ -20,7 +20,7 @@ mut:
 	align  shy.TextAlign = .baseline | .left
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: shy.half * a.window.width
@@ -92,7 +92,7 @@ line 3'
 	)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

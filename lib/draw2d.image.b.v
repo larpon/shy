@@ -59,13 +59,13 @@ pub mut:
 	fill_mode ImageFillMode
 }
 
-[inline]
+@[inline]
 pub fn (i Draw2DImage) origin_offset() (f32, f32) {
 	p_x, p_y := i.origin.pos_wh(i.width * i.factor, i.height * i.factor)
 	return -p_x, -p_y
 }
 
-[inline]
+@[inline]
 pub fn (i Draw2DImage) draw() {
 	x := i.x * i.factor
 	y := i.y * i.factor
@@ -256,7 +256,7 @@ pub fn (i Draw2DImage) draw() {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	// x := f32(int(i.x * i.factor))
 	// y := f32(int(i.y * i.factor))

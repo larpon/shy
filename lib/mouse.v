@@ -14,7 +14,7 @@ pub enum MouseButton {
 	unknown // Only used as a last resort. I.e when converting from an external system fails.
 }
 
-[flag]
+@[flag]
 pub enum MouseButtons {
 	left
 	right
@@ -37,7 +37,7 @@ pub type OnMouseMotionFn = fn (event MouseMotionEvent) bool
 
 pub type OnMouseButtonFn = fn (event MouseButtonEvent) bool
 
-[heap]
+@[heap]
 pub struct Mouse {
 	ShyStruct
 pub:
@@ -81,7 +81,7 @@ pub fn (mut m Mouse) set_button_state(button MouseButton, button_state ButtonSta
 	}
 }
 
-[inline]
+@[inline]
 pub fn (m &Mouse) is_button_down(button MouseButton) bool {
 	if state := m.bs[int(button)] {
 		return state

@@ -12,7 +12,7 @@ fn init() &Analysis {
 	return &Analysis{}
 }
 
-[if shy_analyse ?]
+@[if shy_analyse ?]
 struct Analysis {
 mut:
 	entries map[string]string
@@ -20,7 +20,7 @@ mut:
 
 // taggged_count adds the `key` entry to the report, if not already there, and
 // increase it's value by `amount`.
-[if shy_analyse ?]
+@[if shy_analyse ?]
 fn tagged_count[T](tag string, key string, amount T) {
 	mut a := unsafe { analyse.hack } // TODO
 	nkey := '[${tag}]${key}'
@@ -44,7 +44,7 @@ fn tagged_count[T](tag string, key string, amount T) {
 
 // count adds the `key` entry to the report, if not already there, and
 // increase it's value by `amount`.
-[if shy_analyse ?]
+@[if shy_analyse ?]
 pub fn count[T](key string, amount T) {
 	tagged_count(@FN, key, amount)
 }
@@ -52,7 +52,7 @@ pub fn count[T](key string, amount T) {
 // count_and_sum adds the `key` entry to the report, if not already there, and
 // increase it's value by `amount`. `key` should end with `@<some key name>` denoting
 // a group for the total sum of that group.
-[if shy_analyse ?]
+@[if shy_analyse ?]
 pub fn count_and_sum[T](key string, amount T) {
 	sum_key := key.all_after_last('@')
 	if sum_key != '' {
@@ -61,7 +61,7 @@ pub fn count_and_sum[T](key string, amount T) {
 	count[T](key, amount)
 }
 
-[if shy_analyse ?]
+@[if shy_analyse ?]
 pub fn max[T](key string, amount T) {
 	mut a := unsafe { analyse.hack } // TODO
 	nkey := '[${@FN}]${key}'
@@ -101,7 +101,7 @@ pub fn max[T](key string, amount T) {
 	}
 }
 
-[if shy_analyse ?]
+@[if shy_analyse ?]
 pub fn min[T](key string, amount T) {
 	mut a := unsafe { analyse.hack } // TODO
 	nkey := '[${@FN}]${key}'
@@ -142,7 +142,7 @@ pub fn min[T](key string, amount T) {
 }
 
 // eprintln_report prints the report via `eprintln`.
-[if shy_analyse ?]
+@[if shy_analyse ?]
 pub fn eprintln_report() {
 	a := analyse.hack
 	eprintln('--- analysis report ---')

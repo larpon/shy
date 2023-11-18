@@ -12,7 +12,7 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp //
 mut:
@@ -20,7 +20,7 @@ mut:
 	a_s &shy.Animator[f32] = shy.null
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 	a.a_r = a.shy.new_animator[f32](
@@ -44,7 +44,7 @@ pub fn (mut a App) init() ! {
 	a.window.step(1, 60)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	if !a.a_r.running {
 		a.a_r.init(-5, 5, 1500)
@@ -76,7 +76,7 @@ FPS: ${win.fps()}'
 	)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	match e {

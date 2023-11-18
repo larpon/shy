@@ -19,7 +19,7 @@ pub enum TimerLoop {
 	loop
 }
 
-[heap]
+@[heap]
 pub struct Timers {
 	ShyStruct
 mut:
@@ -55,7 +55,7 @@ pub fn (t &Timers) active() bool {
 	return !t.paused && t.active.len > 0
 }
 
-[manualfree]
+@[manualfree]
 pub fn (mut t Timers) shutdown() ! {
 	t.shy.assert_api_shutdown()
 	for timer in t.active {
@@ -149,7 +149,7 @@ pub fn (mut t Timers) new_timer(config TimerConfig) &Timer {
 	return timer
 }
 
-[params]
+@[params]
 pub struct TimerConfig {
 pub mut:
 	running     bool = true
@@ -161,7 +161,7 @@ pub mut:
 	duration    u64 = 1000
 }
 
-[noinit]
+@[noinit]
 pub struct Timer {
 	ShyStruct
 pub mut:

@@ -66,7 +66,7 @@ pub fn (mut w Window) unstep() {
 	w.stepper.reset()
 }
 
-[params]
+@[params]
 pub struct WindowRefreshConfig {
 	sleep time.Duration
 }
@@ -84,7 +84,7 @@ pub fn (mut w Window) refresh(wdc WindowRefreshConfig) {
 // invaluable implementation in the `gg` module.
 const frame_record_config = new_shy_frame_record_config()
 
-[heap]
+@[heap]
 struct FrameRecordConfig {
 pub:
 	windows       []u64
@@ -96,7 +96,7 @@ pub:
 
 // record_frame records the current frame to a file.
 // record_frame acts according to the config specified in `shy.frame_record_config`.
-[if shy_record ?]
+@[if shy_record ?]
 fn (mut w Window) record_frame() {
 	rc := lib.frame_record_config
 	frame := w.state.frame
@@ -170,7 +170,7 @@ pub fn (wm WindowRenderMode) next() WindowRenderMode {
 }
 
 // Window
-[heap]
+@[heap]
 pub struct Window {
 	ShyStruct
 	Rect
@@ -258,7 +258,7 @@ pub fn (mut w Window) set_icon(source AssetSource) ! {
 	unsafe { shy_free(surf) }
 }
 
-[inline]
+@[inline]
 pub fn (w Window) fps() u32 {
 	return w.state.fps_snapshot
 }
@@ -881,26 +881,26 @@ pub fn (w &Window) canvas() Canvas {
 	}
 }
 
-[deprecated: 'use Window.canvas().wh() instead']
-[deprecated_after: '2024-08-30']
+@[deprecated: 'use Window.canvas().wh() instead']
+@[deprecated_after: '2024-08-30']
 pub fn (w &Window) drawable_wh() (int, int) {
 	return w.canvas().wh()
 }
 
-[deprecated: 'use Window.canvas().size() instead']
-[deprecated_after: '2024-08-30']
+@[deprecated: 'use Window.canvas().size() instead']
+@[deprecated_after: '2024-08-30']
 pub fn (w &Window) drawable_size() Size {
 	return w.canvas().size()
 }
 
-[deprecated: 'use Window.canvas().factor_xy() instead']
-[deprecated_after: '2024-08-30']
+@[deprecated: 'use Window.canvas().factor_xy() instead']
+@[deprecated_after: '2024-08-30']
 pub fn (w &Window) draw_factor_xy() (f32, f32) {
 	return w.canvas().factor_xy()
 }
 
-[deprecated: 'use Window.canvas().factor instead']
-[deprecated_after: '2024-08-30']
+@[deprecated: 'use Window.canvas().factor instead']
+@[deprecated_after: '2024-08-30']
 pub fn (w &Window) draw_factor() f32 {
 	return w.canvas().factor
 }

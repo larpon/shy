@@ -19,7 +19,7 @@ pub fn new(config UIConfig) !&UI {
 	return u
 }
 
-[params]
+@[params]
 pub struct UIConfig {
 	shy  &shy.Shy
 	easy &easy.Easy
@@ -30,7 +30,7 @@ pub struct UIConfig {
 // making up *one complete User Interface* for *one application*.
 // It holds the pointer to the root node of the tree/scene graph making
 // up the UI, from which any other node can be visited.
-[heap; noinit]
+@[heap; noinit]
 pub struct UI {
 	shy.ShyStruct
 mut:

@@ -51,7 +51,7 @@ pub enum WindowFocusKind {
 	offered
 }
 
-[params]
+@[params]
 pub struct EventSerializeConfig {
 	format         EventStringSerializeFormat
 	format_version int
@@ -223,8 +223,8 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 
 pub struct ShyEvent {
 pub:
-	timestamp u64 [required] // Value of Shy.ticks()
-	window_id u32 [required] // The id of the window, 0 = root window, -1 = no window
+	timestamp u64 @[required] // Value of Shy.ticks()
+	window_id u32 @[required] // The id of the window, 0 = root window, -1 = no window
 }
 
 fn (se ShyEvent) serialize_as_playback_string() string {

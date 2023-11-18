@@ -46,7 +46,7 @@ pub fn (w Window) areashot(area Rect, path string) ! {
 
 // areashot_ppm takes a screenshot of the current window and
 // saves it to `path` as a .ppm file.
-[manualfree]
+@[manualfree]
 fn (w Window) areashot_ppm(area Rect, path string) ! {
 	ss := w.dump_pixels(area)
 	defer {
@@ -59,7 +59,7 @@ fn (w Window) areashot_ppm(area Rect, path string) ! {
 
 // areashot_png takes a screenshot of the current window and
 // saves it to `path` as a .png file.
-[manualfree]
+@[manualfree]
 fn (w Window) areashot_png(area Rect, path string) ! {
 	ss := w.dump_pixels(area)
 	defer {
@@ -93,7 +93,7 @@ fn write_rgba_to_ppm(path string, w int, h int, components int, pixels &u8) ! {
 	}
 }
 
-[heap]
+@[heap]
 struct Screenshot {
 	width  int
 	height int
@@ -102,7 +102,7 @@ mut:
 	pixels &u8 = unsafe { nil }
 }
 
-[manualfree]
+@[manualfree]
 fn (w Window) dump_pixels(rect Rect) &Screenshot {
 	img_width := int(rect.width)
 	img_height := int(rect.height)
@@ -118,7 +118,7 @@ fn (w Window) dump_pixels(rect Rect) &Screenshot {
 }
 
 // free - free *only* the Screenshot pixels.
-[unsafe]
+@[unsafe]
 pub fn (mut ss Screenshot) free() {
 	unsafe {
 		shy_free(ss.pixels)
@@ -128,7 +128,7 @@ pub fn (mut ss Screenshot) free() {
 
 // destroy - free the Screenshot pixels,
 // then free the screenshot data structure itself.
-[unsafe]
+@[unsafe]
 pub fn (mut ss Screenshot) destroy() {
 	unsafe { ss.free() }
 	unsafe { shy_free(ss) }

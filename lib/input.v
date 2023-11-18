@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module lib
 
-[heap]
+@[heap]
 pub struct Input {
 	ShyStruct
 mut:
@@ -28,7 +28,7 @@ pub fn (ip Input) keyboard(n u8) ?&Keyboard {
 
 pub const default_keyboard_id = u8(0)
 
-[heap]
+@[heap]
 pub struct Keyboard {
 	ShyStruct
 pub:
@@ -37,7 +37,7 @@ mut:
 	keys map[int]bool // key states, TODO(lmp) should be i32
 }
 
-[inline]
+@[inline]
 pub fn (k &Keyboard) is_key_down(keycode KeyCode) bool {
 	// TODO(lmp) workaround memory leak in code below. See https://github.com/vlang/v/issues/19454
 	key_state := k.keys[int(keycode)]

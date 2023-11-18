@@ -149,7 +149,7 @@ pub mut:
 	}
 }
 
-[inline]
+@[inline]
 pub fn (t &Triangle) bbox() Rect {
 	a_x := t.a.x
 	a_y := t.a.y
@@ -169,14 +169,14 @@ pub fn (t &Triangle) bbox() Rect {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (t &Triangle) centroid() (f32, f32) {
 	sx := t.a.x + t.b.x + t.c.x
 	sy := t.a.y + t.b.y + t.c.y
 	return sx / 3, sy / 3
 }
 
-[inline]
+@[inline]
 pub fn (t &Triangle) segment_midpoint(segment TriangleSegment) (f32, f32) {
 	mut sx, mut sy := f32(0), f32(0)
 	match segment {
@@ -196,7 +196,7 @@ pub fn (t &Triangle) segment_midpoint(segment TriangleSegment) (f32, f32) {
 	return sx * 0.5, sy * 0.5
 }
 
-[inline]
+@[inline]
 pub fn (t &Triangle) length() f32 {
 	mut l := t.segment_length(.ab)
 	l += t.segment_length(.bc)
@@ -204,7 +204,7 @@ pub fn (t &Triangle) length() f32 {
 	return l
 }
 
-[inline]
+@[inline]
 pub fn (t &Triangle) segment_length(segment TriangleSegment) f32 {
 	mut l := f32(0)
 	match segment {
@@ -222,7 +222,7 @@ pub fn (t &Triangle) segment_length(segment TriangleSegment) f32 {
 }
 
 // contains returns `true` if `Triangle` contains the point given by `x` and `y`.
-[inline]
+@[inline]
 pub fn (t &Triangle) contains(x f32, y f32) bool {
 	a_x := t.a.x
 	a_y := t.a.y
@@ -240,7 +240,7 @@ pub fn (t &Triangle) contains(x f32, y f32) bool {
 }
 
 // area returns the area of `Triangle`.
-[inline]
+@[inline]
 pub fn (t &Triangle) area() f32 {
 	return 0.5 * ((t.a.x - t.c.x) * (t.b.y - t.c.y) - (t.a.y - t.c.y) * (t.b.x - t.c.x))
 }
@@ -255,24 +255,24 @@ pub mut:
 }
 
 // contains returns `true` if `Rect` contains the point given by `x` and `y`.
-[inline]
+@[inline]
 pub fn (r &Rect) contains(x f32, y f32) bool {
 	return x > r.x && y > r.y && x < r.x + r.width && y < r.y + r.height
 }
 
 // hit_rect returns `true` if `Rect` collides with the rectangle `rect`.
-[inline]
+@[inline]
 pub fn (r &Rect) hit_rect(rect Rect) bool {
 	return r.x <= rect.x + rect.width && r.x + r.width >= rect.x && r.y <= rect.y + rect.height
 		&& r.y + r.height >= rect.y
 }
 
-[inline]
+@[inline]
 pub fn (mut r Rect) displace_from(origin Anchor) {
 	r.x, r.y = origin.displace_rect(r)
 }
 
-[inline]
+@[inline]
 pub fn (r &Rect) displaced_from(origin Anchor) Rect {
 	rx, ry := origin.displace_rect(r)
 	return Rect{
@@ -283,7 +283,7 @@ pub fn (r &Rect) displaced_from(origin Anchor) Rect {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (r Rect) point_at(anchor Anchor) Vec2[f32] {
 	x, y := anchor.pos_wh(r.width, r.height)
 	return vec2(r.x + x, r.y + y)
@@ -299,7 +299,7 @@ pub fn (r &Rect) mul_scalar(scalar f32) Rect {
 }
 
 // scale_at returns a rectangle scaled by `factor_x`,`factor_y` at `origin_x`,`origin_y`
-[inline]
+@[inline]
 pub fn (r &Rect) scale_at(origin_x f32, origin_y f32, factor_x f32, factor_y f32) Rect {
 	return Rect{
 		x: origin_x + (r.x - origin_x) * factor_x
@@ -332,39 +332,39 @@ pub mut:
 	}
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) length() f32 {
 	return l.a.distance(l.b)
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) manhattan_length() f32 {
 	return l.a.manhattan_distance(l.b)
 }
 
-[inline]
+@[inline]
 pub fn (mut l Line) switch_a_b() {
 	l.a, l.b = l.b, l.a
 }
 
-[inline]
+@[inline]
 pub fn (mut l Line) ensure_a_left_b_right() {
 	if l.a.x > l.b.x {
 		l.switch_a_b()
 	}
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) slope() f32 {
 	return (l.b.y - l.a.y) / (l.b.x - l.a.x)
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) slope_angle() f32 {
 	return math.abs(f32(math.atan((l.b.y - l.a.y) / (l.b.x - l.a.x))))
 }
 
-[inline]
+@[inline]
 pub fn (mut l Line) grow_a(length f32) {
 	len_a_b := l.length()
 	c_x := l.b.x + (l.b.x - l.a.x) / len_a_b * length
@@ -373,7 +373,7 @@ pub fn (mut l Line) grow_a(length f32) {
 	l.a.y = c_y
 }
 
-[inline]
+@[inline]
 pub fn (mut l Line) grow_b(length f32) {
 	len_a_b := l.length()
 	c_x := l.b.x + (l.b.x - l.a.x) / len_a_b * length
@@ -382,7 +382,7 @@ pub fn (mut l Line) grow_b(length f32) {
 	l.b.y = c_y
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) to_ray() Ray {
 	return Ray{
 		origin: l.a
@@ -390,7 +390,7 @@ pub fn (l &Line) to_ray() Ray {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) intersect_rect(r Rect) (u8, f32, f32, f32, f32) {
 	x1 := l.a.x
 	y1 := l.a.y
@@ -455,7 +455,7 @@ pub fn (l &Line) intersect_rect(r Rect) (u8, f32, f32, f32, f32) {
 	return 0, 0, 0, 0, 0
 }
 
-[inline]
+@[inline]
 pub fn (l &Line) hit_rect(r Rect) bool {
 	// From https://www.jeffreythompson.org/collision-detection/line-rect.php
 
@@ -484,7 +484,7 @@ pub fn (l &Line) hit_rect(r Rect) bool {
 	return false
 }
 
-[inline]
+@[inline]
 pub fn (l1 &Line) hit_line(l2 Line) bool {
 	x1 := l1.a.x
 	y1 := l1.a.y
@@ -499,7 +499,7 @@ pub fn (l1 &Line) hit_line(l2 Line) bool {
 	return line_hit_line(x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
-[inline]
+@[inline]
 pub fn line_hit_line(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, x4 f32, y4 f32) bool {
 	// From https://www.jeffreythompson.org/collision-detection/line-rect.php
 	// calculate the direction of the lines
@@ -515,7 +515,7 @@ pub fn line_hit_line(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, x4 f32, y4 
 	return false
 }
 
-[inline]
+@[inline]
 pub fn line_line_intersect(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, x4 f32, y4 f32) (bool, f32, f32) {
 	// From https://www.jeffreythompson.org/collision-detection/line-rect.php
 	// calculate the direction of the lines
@@ -539,7 +539,7 @@ pub mut:
 	radius f32 = 50
 }
 
-[inline]
+@[inline]
 pub fn (c &Circle) bbox() Rect {
 	return Rect{
 		x: c.x - (c.radius * 0.5)
@@ -556,13 +556,13 @@ pub mut:
 }
 
 // + returns the resulting size of the addition of `s1` and `s2`.
-[inline]
+@[inline]
 pub fn (s1 Size) + (s2 Size) Size {
 	return Size{s1.width + s2.height, s1.width + s2.height}
 }
 
 // - returns the resulting size of the subtraction of `s1` and `s2`.
-[inline]
+@[inline]
 pub fn (s1 Size) - (s2 Size) Size {
 	return Size{s1.width - s2.height, s1.width - s2.height}
 }

@@ -12,14 +12,14 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
 	sound shy.Sound = shy.no_sound
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -31,7 +31,7 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	is_looping_str := if a.sound.is_looping() { 'looping' } else { 'not looping' }
 	is_playing_str := if a.sound.is_playing() { 'playing' } else { 'not playing' }
@@ -40,7 +40,7 @@ pub fn (mut a App) frame(dt f64) {
 	)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

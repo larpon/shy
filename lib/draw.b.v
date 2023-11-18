@@ -6,7 +6,7 @@ module lib
 import shy.wraps.sokol.gl
 import shy.wraps.sokol.gfx
 
-[heap]
+@[heap]
 pub struct Draw {
 	ShyStruct
 mut:

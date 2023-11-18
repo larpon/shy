@@ -30,7 +30,7 @@ pub fn (mut e Easy) new_particle_system(psc ParticleSystemConfig) &ParticleSyste
 	}
 }
 
-[params]
+@[params]
 pub struct ParticleSystemConfig {
 	shy.Rect
 pub mut:
@@ -40,7 +40,7 @@ pub mut:
 	pool     u32 = 500
 }
 
-[noinit]
+@[noinit]
 pub struct ParticleSystem {
 	shy.ShyStruct
 mut:
@@ -52,7 +52,7 @@ pub mut:
 	offset   vec.Vec2[f32]
 }
 
-[inline]
+@[inline]
 pub fn (ps &ParticleSystem) draw() {
 	// draw := ps.shy.draw()
 
@@ -60,7 +60,7 @@ pub fn (ps &ParticleSystem) draw() {
 	ps.system.draw(1.0) // NOTE doesn't support frame deltas yet, it's not a problem so far
 }
 
-[inline]
+@[inline]
 pub fn (mut ps ParticleSystem) add(component particle.Component) {
 	match component {
 		particle.Emitter {
@@ -88,7 +88,7 @@ pub fn (ps &ParticleSystem) emitters() []&particle.Emitter {
 	return ps.system.emitters()
 }
 
-[inline]
+@[inline]
 pub fn (ps &ParticleSystem) emitters_in_groups(groups []string) []&particle.Emitter {
 	return ps.system.emitters_in_groups(groups)
 }
@@ -116,7 +116,7 @@ fn default_particle_painter(mut e Easy) ImageParticlePainter {
 	)
 }
 
-[params]
+@[params]
 pub struct ImageParticlePainterConfig {
 mut:
 	groups          []string  = ['default']
@@ -125,7 +125,7 @@ mut:
 	source          shy.AssetSource = easy.default_particle_image
 }
 
-[noinit: 'Easy.make_image_particle_painter']
+@[noinit: 'Easy.make_image_particle_painter']
 pub struct ImageParticlePainter {
 	easy &Easy
 mut:

@@ -12,14 +12,14 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp //
 mut:
 	ui &ui.UI = shy.null
 }
 
-[heap]
+@[heap]
 pub struct MyUIItem {
 	ui.EventArea
 }
@@ -37,7 +37,7 @@ pub fn (m &MyUIItem) event(e ui.Event) ?&ui.Node {
 	return m.EventArea.event(e)
 }
 
-[heap]
+@[heap]
 pub struct MyRect {
 	ui.Rectangle
 }
@@ -55,7 +55,7 @@ pub fn (m &MyRect) event(e ui.Event) ?&ui.Node {
 	return m.Rectangle.event(e)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -221,13 +221,13 @@ pub fn (mut a App) init() ! {
 	)!
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	// win := a.window
 	a.ui.draw(dt)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	a.window.refresh() // In case we're running in UI mode signal that we want the screen to be re-drawn on next frame.

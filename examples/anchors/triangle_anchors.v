@@ -12,7 +12,7 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
@@ -20,7 +20,7 @@ mut:
 	origin shy.Anchor = .center
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -43,7 +43,7 @@ pub fn (mut a App) init() ! {
 	}
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	center := shy.vec2((shy.half * a.window.width), (shy.half * a.window.height))
 
@@ -78,7 +78,7 @@ Rotation: ${rotation * shy.rad2deg:.1f}°'
 	)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	match e {

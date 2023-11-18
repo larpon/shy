@@ -28,7 +28,7 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.TestApp
 mut:
@@ -37,7 +37,7 @@ mut:
 	image     string = '64x128'
 }
 
-[markused]
+@[markused]
 pub fn (a App) asset_fill_mode(path string, fill_mode shy.ImageFillMode) shy.AssetSource {
 	return match fill_mode {
 		.tile {
@@ -61,7 +61,7 @@ pub fn (a App) asset_fill_mode(path string, fill_mode shy.ImageFillMode) shy.Ass
 	}
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.TestApp.init()!
 
@@ -85,7 +85,7 @@ pub fn (mut a App) init() ! {
 	}
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.live_frame(dt)
 }
@@ -179,7 +179,7 @@ FillMode (left/right): ${a.fill_mode}'
 	)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.TestApp.event(e)
 	match e {

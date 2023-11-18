@@ -31,7 +31,7 @@ TODO Function: #define WREN_VERSION_NUMBER (WREN_VERSION_MAJOR * 1000000 +      
 //
 // Wren has no global state, so all state stored by a running interpreter lives
 // here.
-[typedef]
+@[typedef]
 pub struct C.WrenVM {}
 
 pub type VM = C.WrenVM
@@ -41,7 +41,7 @@ pub type VM = C.WrenVM
 // This lets code outside of the VM hold a persistent reference to an object.
 // After a handle is acquired, and until it is released, this ensures the
 // garbage collector will not reclaim the object it references.
-[typedef]
+@[typedef]
 pub struct C.WrenHandle {}
 
 pub type Handle = C.WrenHandle
@@ -83,7 +83,7 @@ pub type ResolveModuleFn = fn (vm &VM, const_importer &char, const_name &char)
 // C: typedef void (*WrenLoadModuleCompleteFn)(WrenVM* vm, const char* name, struct WrenLoadModuleResult result);
 pub type LoadModuleCompleteFn = fn (vm &VM, const_name &char, result LoadModuleResult)
 
-[typedef]
+@[typedef]
 pub struct C.WrenLoadModuleResult {
 pub mut:
 	source &char = unsafe { nil }
@@ -133,7 +133,7 @@ pub enum ErrorType {
 // C: typedef void (*WrenErrorFn)(WrenVM* vm, WrenErrorType type, const char* module, int line,  const char* message);
 pub type ErrorFn = fn (vm &VM, typ ErrorType, const_module &char, line int, const_message &char)
 
-[typedef]
+@[typedef]
 pub struct C.WrenForeignClassMethods {
 pub mut:
 	// The callback invoked when the foreign object is created.
@@ -158,7 +158,7 @@ pub type ForeignClassMethods = C.WrenForeignClassMethods
 // C: typedef WrenForeignClassMethods (*WrenBindForeignClassFn)(WrenVM* vm, const char* module, const char* className);
 pub type BindForeignClassFn = fn (vm &VM, const_module &char, const_class_name &char) ForeignClassMethods
 
-[typedef]
+@[typedef]
 pub struct C.WrenConfiguration {
 pub mut:
 	// The callback Wren will use to allocate, reallocate, and deallocate memory.

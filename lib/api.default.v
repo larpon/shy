@@ -110,7 +110,7 @@ pub fn (mut a ShyAPI) shutdown() ! {
 	unsafe { a.free() }
 }
 
-[manualfree; unsafe]
+@[manualfree; unsafe]
 fn (mut a ShyAPI) free() {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	unsafe {

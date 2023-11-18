@@ -79,7 +79,7 @@ fn vsynctype_from_string(str string) VSync {
 	}
 }
 
-[params]
+@[params]
 pub struct Config {
 pub:
 	debug  bool
@@ -88,7 +88,7 @@ pub:
 	input  InputConfig
 }
 
-[params]
+@[params]
 pub struct WindowConfig {
 	Rect
 pub:

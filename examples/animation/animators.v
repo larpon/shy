@@ -13,7 +13,7 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp
 mut:
@@ -26,7 +26,7 @@ mut:
 	timer time.StopWatch = time.new_stopwatch()
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -50,7 +50,7 @@ pub fn (mut a App) init() ! {
 	a.fa_y = a.shy.new_follow_animator[f32](multiply: 1.5)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	mouse := a.mouse
 	mut text := a.easy.text()

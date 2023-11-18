@@ -12,14 +12,14 @@ fn main() {
 	shy.run[App](mut app)!
 }
 
-[heap]
+@[heap]
 struct App {
 	embed.ExampleApp //
 mut:
 	a_r &shy.Animator[f32] = shy.null
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -35,7 +35,7 @@ pub fn (mut a App) init() ! {
 	a.window.mode = .ui
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: shy.half * a.window.width
@@ -60,7 +60,7 @@ FPS: ${win.fps()}'
 	)
 }
 
-[markused]
+@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	a.window.refresh()
