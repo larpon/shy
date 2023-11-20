@@ -138,8 +138,8 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen ${display_index} `${dn}` ${dw}x${dh}@${display_mode.refresh_rate}hz')
 	}
 
-	win_w := int(f32(display_bounds[display_index].w) * 0.75)
-	win_h := int(f32(display_bounds[display_index].h) * 0.60)
+	win_w := int(f32(display_bounds[display_index].w) * 0.90)
+	win_h := int(f32(display_bounds[display_index].h) * 0.85)
 
 	// x := int(sdl.windowpos_centered_display(u32(display_index)))
 	// y := int(sdl.windowpos_centered_display(u32(display_index)))
