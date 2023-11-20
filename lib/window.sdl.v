@@ -207,7 +207,9 @@ pub fn (w &Window) find_window(window_id u32) ?&Window {
 		return w
 	}
 	for win in w.children {
-		return win.find_window(window_id)
+		if win_found := win.find_window(window_id) {
+			return win_found
+		}
 	}
 	return none
 }
@@ -248,7 +250,7 @@ pub fn (mut w Window) set_icon(source AssetSource) ! {
 		source: source
 	})!*/
 
-	// TODO surf should be freed when program ends... :( ...
+	// TODO surface should be freed when program ends... :( ...
 	// That's a bit yuk if we want to keep Assets agnostic from SDL2
 	mut surf := asset.to_sdl_surface(ImageOptions{
 		source: source
