@@ -173,6 +173,11 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
 	}
 
+	// NOTE this is a specialcase for Shy's visual tests
+	if os.getenv('SHY_CI_VISUAL_TEST').len > 0 {
+		window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
+ 	}
+
 	// $if opengl ? {
 	window_flags = window_flags | u32(sdl.WindowFlags.opengl) | u32(sdl.WindowFlags.allow_highdpi)
 	// }

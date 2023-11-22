@@ -23,6 +23,7 @@ jobs:
       DISPLAY: :99
       LIBGL_ALWAYS_SOFTWARE: true
       SDL2_VERSION: 2.28.2
+      SHY_CI_VISUAL_TEST: 1
     steps:
     - name: Checkout V
       uses: actions/checkout@v2
@@ -90,7 +91,7 @@ jobs:
       id: compare
       continue-on-error: true
       run: |
-        Xvfb $DISPLAY -dpi 96 -screen 0 1280x1024x24 &
+        Xvfb $DISPLAY -dpi 96 -screen 0 960x614x24 &
         sleep 1 # give xvfb time to start
         v gret -r ~/.vmodules/shy -t ./shy-visual-tests/vgret.shy_examples.toml -v ./fresh-examples ./shy-visual-tests
         v gret -r ~/.vmodules/shy -t ./shy-visual-tests/vgret.shy_visual_tests.toml -v ./fresh-visual-tests ./shy-visual-tests
