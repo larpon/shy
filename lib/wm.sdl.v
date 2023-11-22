@@ -148,7 +148,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 	mut win_y := display_bounds[display_index].y +
 		((f32(display_bounds[display_index].h) - win_h) * 0.5)
 
-	// Force window size to same size as fullscreen
+	// Force window size to same size as the display the window will be fullscreen on
 	if s.config.window.fullscreen {
 		win_w = int(display_bounds[display_index].w)
 		win_h = int(display_bounds[display_index].h)
