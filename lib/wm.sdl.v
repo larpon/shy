@@ -138,19 +138,28 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen ${display_index} `${dn}` ${dw}x${dh}@${display_mode.refresh_rate}hz')
 	}
 
-	win_w := int(f32(display_bounds[display_index].w) * 0.90)
-	win_h := int(f32(display_bounds[display_index].h) * 0.85)
+	// Center the window per default on desktop with a little margin
+	mut win_w := int(f32(display_bounds[display_index].w) * 0.90)
+	mut win_h := int(f32(display_bounds[display_index].h) * 0.85)
+	// mut win_x := int(sdl.windowpos_centered_display(u32(display_index)))
+	// mut win_y := int(sdl.windowpos_centered_display(u32(display_index)))
+	mut win_x := display_bounds[display_index].x +
+		((f32(display_bounds[display_index].w) - win_w) * 0.5)
+	mut win_y := display_bounds[display_index].y +
+		((f32(display_bounds[display_index].h) - win_h) * 0.5)
 
-	// x := int(sdl.windowpos_centered_display(u32(display_index)))
-	// y := int(sdl.windowpos_centered_display(u32(display_index)))
-
-	x := display_bounds[display_index].x + ((f32(display_bounds[display_index].w) - win_w) * 0.5)
-	y := display_bounds[display_index].y + ((f32(display_bounds[display_index].h) - win_h) * 0.5)
+	// Force window size to same size as fullscreen
+	if s.config.window.fullscreen {
+		win_w = int(display_bounds[display_index].w)
+		win_h = int(display_bounds[display_index].h)
+		win_x = 0
+		win_y = 0
+	}
 
 	window_config := WindowConfig{
 		...s.config.window
-		x: x
-		y: y
+		x: win_x
+		y: win_y
 		width: win_w
 		height: win_h
 	}
@@ -163,24 +172,18 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
 	s := wm.shy
 
-	// Fullscreen option need to change the config, since opening a window != 0,0
-	// in fullscreen does not make much sense.
-	mut used_config := config
-
 	mut window_flags := u32(sdl.WindowFlags.hidden)
-	if used_config.visible {
+	if config.visible {
 		window_flags = u32(sdl.WindowFlags.shown)
 	}
 
-	if used_config.resizable {
+	if config.resizable {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'is resizable')
 		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
 	}
 
-	if used_config.fullscreen {
+	if config.fullscreen {
 		window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
-		used_config.x = 0
-		used_config.y = 0
 	}
 
 	// $if opengl ? {
@@ -189,12 +192,12 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	// window_flags := u32(sdl.null)
 	// window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
 
-	window := sdl.create_window(used_config.title.str, int(used_config.x), int(used_config.y),
-		int(used_config.width), int(used_config.height), window_flags)
+	window := sdl.create_window(config.title.str, int(config.x), int(config.y), int(config.width),
+		int(config.height), window_flags)
 	if window == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-		return error('Could not create SDL window "${used_config.title}", SDL says:\n${sdl_error_msg}')
+		return error('Could not create SDL window "${config.title}", SDL says:\n${sdl_error_msg}')
 	}
 
 	// }
@@ -205,7 +208,7 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	wm.w_id++
 	mut win := &Window{
 		shy: s
-		config: used_config
+		config: config
 		id: wm.w_id
 		handle: window
 	}
