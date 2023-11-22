@@ -47,9 +47,10 @@ pub:
 
 	window struct {
 	pub:
-		title     string = 'Shy Window'
-		resizable bool   = true // Root window is resizable, can be toggled at run time
-		color     Color  = Color{0, 0, 0, 255} // Default background color of the root window
+		title      string = 'Shy Window'
+		fullscreen bool   = os.getenv('SHY_CI_VISUAL_TEST').len > 0 // default: false. Window open in fullscreen, can be toggled at run time. NOTE the specialcase for Shy's visual tests
+		resizable  bool   = true // Window is resizable and can be toggled at run time
+		color      Color  = Color{0, 0, 0, 255} // Default background color of the root window
 	}
 	/*
 	TODO
@@ -92,10 +93,11 @@ pub:
 pub struct WindowConfig {
 	Rect
 pub:
-	title     string = lib.defaults.window.title
-	resizable bool   = lib.defaults.window.resizable
-	visible   bool   = true
-	color     Color  = lib.defaults.window.color
+	title      string = lib.defaults.window.title
+	resizable  bool   = lib.defaults.window.resizable
+	fullscreen bool   = lib.defaults.window.fullscreen
+	visible    bool   = true
+	color      Color  = lib.defaults.window.color
 	// TODO ? flags WindowFlag
 	render RenderConfig
 }

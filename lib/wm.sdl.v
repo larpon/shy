@@ -138,19 +138,28 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'opening on screen ${display_index} `${dn}` ${dw}x${dh}@${display_mode.refresh_rate}hz')
 	}
 
-	win_w := int(f32(display_bounds[display_index].w) * 0.90)
-	win_h := int(f32(display_bounds[display_index].h) * 0.85)
+	// Center the window per default on desktop with a little margin
+	mut win_w := int(f32(display_bounds[display_index].w) * 0.90)
+	mut win_h := int(f32(display_bounds[display_index].h) * 0.85)
+	// mut win_x := int(sdl.windowpos_centered_display(u32(display_index)))
+	// mut win_y := int(sdl.windowpos_centered_display(u32(display_index)))
+	mut win_x := display_bounds[display_index].x +
+		((f32(display_bounds[display_index].w) - win_w) * 0.5)
+	mut win_y := display_bounds[display_index].y +
+		((f32(display_bounds[display_index].h) - win_h) * 0.5)
 
-	// x := int(sdl.windowpos_centered_display(u32(display_index)))
-	// y := int(sdl.windowpos_centered_display(u32(display_index)))
-
-	x := display_bounds[display_index].x + ((f32(display_bounds[display_index].w) - win_w) * 0.5)
-	y := display_bounds[display_index].y + ((f32(display_bounds[display_index].h) - win_h) * 0.5)
+	// Force window size to same size as fullscreen
+	if s.config.window.fullscreen {
+		win_w = int(display_bounds[display_index].w)
+		win_h = int(display_bounds[display_index].h)
+		win_x = 0
+		win_y = 0
+	}
 
 	window_config := WindowConfig{
 		...s.config.window
-		x: x
-		y: y
+		x: win_x
+		y: win_y
 		width: win_w
 		height: win_h
 	}
@@ -171,6 +180,10 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	if config.resizable {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'is resizable')
 		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
+	}
+
+	if config.fullscreen {
+		window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
 	}
 
 	// $if opengl ? {
