@@ -163,18 +163,24 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
 	s := wm.shy
 
+	// Fullscreen option need to change the config, since opening a window != 0,0
+	// in fullscreen does not make much sense.
+	mut used_config := config
+
 	mut window_flags := u32(sdl.WindowFlags.hidden)
-	if config.visible {
+	if used_config.visible {
 		window_flags = u32(sdl.WindowFlags.shown)
 	}
 
-	if config.resizable {
+	if used_config.resizable {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'is resizable')
 		window_flags = window_flags | u32(sdl.WindowFlags.resizable)
 	}
 
-	if config.fullscreen {
+	if used_config.fullscreen {
 		window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
+		used_config.x = 0
+		used_config.y = 0
 	}
 
 	// $if opengl ? {
@@ -183,12 +189,12 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	// window_flags := u32(sdl.null)
 	// window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
 
-	window := sdl.create_window(config.title.str, int(config.x), int(config.y), int(config.width),
-		int(config.height), window_flags)
+	window := sdl.create_window(used_config.title.str, int(used_config.x), int(used_config.y),
+		int(used_config.width), int(used_config.height), window_flags)
 	if window == sdl.null {
 		sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 		s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-		return error('Could not create SDL window "${config.title}", SDL says:\n${sdl_error_msg}')
+		return error('Could not create SDL window "${used_config.title}", SDL says:\n${sdl_error_msg}')
 	}
 
 	// }
@@ -199,7 +205,7 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	wm.w_id++
 	mut win := &Window{
 		shy: s
-		config: config
+		config: used_config
 		id: wm.w_id
 		handle: window
 	}
