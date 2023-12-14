@@ -16,6 +16,7 @@ pub const exe_short_name = os.file_name(os.executable()).replace('.exe', '')
 pub const exe_dir = os.dir(os.real_path(os.executable()))
 pub const exe_args_description = 'input
 or:    [options] input'
+
 pub const exe_description = 'export exports both plain V applications and shy-based applications.
 The exporter is based on the shy.export module.
 
@@ -29,6 +30,7 @@ Flags:
 
 Sub-commands:
   run                       Run the output package after successful export'
+
 pub const rip_vflags = ['-autofree', '-gc', '-g', '-cg', 'run', '-showcc']
 pub const accepted_input_files = ['.v']
 
