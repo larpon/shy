@@ -6,6 +6,9 @@ import math // TODO
 pub const pi_div_2 = pi / 2
 pub const deg2rad = f32((pi * 2) / 360)
 pub const rad2deg = f32(360 / (pi * 2))
+pub const deg_90_in_rad = f32(90) * f32((pi * 2) / 360)
+pub const deg_180_in_rad = f32(180) * f32((pi * 2) / 360)
+pub const deg_270_in_rad = f32(270) * f32((pi * 2) / 360)
 
 // min returns the minimum of `a` and `b`.
 @[inline]

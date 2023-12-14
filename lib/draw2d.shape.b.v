@@ -25,12 +25,12 @@ pub fn (mut d2d DrawShape2D) end() {
 
 fn radius_to_segments(r f32) u32 {
 	div := if r < 20 { u32(4) } else { u32(8) }
-	/*
+
 	// Logic:
-	if r < 20 {
-		div /= 2
-	}
-	*/
+	// if r < 20 {
+	// 	div /= 2
+	//}
+
 	$if shy_debug_radius_to_segments ? {
 		segments := u32(mth.ceil(math.tau * r / div))
 		eprintln('Segments: ${segments} r: ${r}')
@@ -202,22 +202,12 @@ pub mut:
 	color    Color = colors.shy.red
 	stroke   Stroke
 	rotation f32
+	radius   f32 // for rounded corners
 	scale    f32  = 1.0
 	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
 	origin   Anchor
 }
-
-/*
-pub fn (mut r DrawShape2DRect) set(config DrawShape2DRect) {
-	r.Rect = config.Rect
-	r.color = config.color
-	r.radius = config.radius
-	r.scale = config.scale
-	r.fills = config.fills
-	r.offset = config.offset
-}
-*/
 
 @[inline]
 pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
@@ -234,8 +224,6 @@ pub fn (r &DrawShape2DRect) draw() {
 	y := r.y * scale_factor
 	w := r.width * scale_factor
 	h := r.height * scale_factor
-	sx := f32(0.0)
-	sy := f32(0.0)
 
 	mut o_off_x, mut o_off_y := r.origin_offset()
 	o_off_x = int(o_off_x)
@@ -257,6 +245,22 @@ pub fn (r &DrawShape2DRect) draw() {
 		gl.translate(o_off_x, o_off_y, 0)
 	}
 
+	if r.radius != 0 {
+		r.draw_rounded(x, y, w, h)
+	} else {
+		r.draw_rectangle(x, y, w, h)
+	}
+
+	gl.translate(-x, -y, 0)
+	gl.pop_matrix()
+}
+
+@[inline]
+fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
+	sx := f32(0.0)
+	sy := f32(0.0)
+	w := width
+	h := height
 	if r.fills.has(.body) {
 		color := r.color
 		gl.c4b(color.r, color.g, color.b, color.a)
@@ -269,6 +273,7 @@ pub fn (r &DrawShape2DRect) draw() {
 		gl.end()
 	}
 	if r.fills.has(.stroke) {
+		scale_factor := r.factor
 		stroke_width := r.stroke.width * scale_factor
 		color := r.stroke.color
 		gl.c4b(color.r, color.g, color.b, color.a)
@@ -315,9 +320,249 @@ pub fn (r &DrawShape2DRect) draw() {
 			gl.end()
 		}
 	}
+}
 
-	gl.translate(-x, -y, 0)
-	gl.pop_matrix()
+@[inline]
+fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
+	w := width
+	h := height
+	scale_factor := r.factor
+	mut radius := r.radius * scale_factor
+
+	assert radius > 0, '${@LOCATION}, rectangle radius should be > 0' // TODO(lmp) decide if undefined behaviour is ok here, if it should be checked in higher level API layers? hmm...
+
+	if w >= h && radius > h / 2 {
+		radius = h / 2
+	} else if radius > w / 2 {
+		radius = w / 2
+	}
+	sx := f32(0.0)
+	sy := f32(0.0)
+
+	// TODO mut segments := radius_to_segments(radius)
+
+	// circle center coordinates
+	ltx := sx + radius
+	lty := sy + radius
+	rtx := sx + w - radius
+	rty := lty
+	rbx := rtx
+	rby := sy + h - radius
+	lbx := ltx
+	lby := rby
+
+	mut rad := f32(0)
+	mut dx := f32(0)
+	mut dy := f32(0)
+
+	// NOTE the separate begin/end drawing is to prevent transparent color overlap
+	if r.fills.has(.body) {
+		color := r.color
+		gl.c4b(color.r, color.g, color.b, color.a)
+
+		// TODO(lmp) the 0 .. X range should change on small radii
+
+		// left top quarter
+		gl.begin_triangle_strip()
+		for i in 0 .. 31 {
+			rad = f32(math.radians(i * 3))
+			dx = radius * math.cosf(rad)
+			dy = radius * math.sinf(rad)
+			gl.v2f(ltx - dx, lty - dy)
+			gl.v2f(ltx, lty)
+		}
+		gl.end()
+
+		// right top quarter
+		gl.begin_triangle_strip()
+		for i in 0 .. 31 {
+			rad = f32(math.radians(i * 3))
+			dx = radius * math.cosf(rad)
+			dy = radius * math.sinf(rad)
+			gl.v2f(rtx + dx, rty - dy)
+			gl.v2f(rtx, rty)
+		}
+		gl.end()
+
+		// right bottom quarter
+		gl.begin_triangle_strip()
+		for i in 0 .. 31 {
+			rad = f32(math.radians(i * 3))
+			dx = radius * math.cosf(rad)
+			dy = radius * math.sinf(rad)
+			gl.v2f(rbx + dx, rby + dy)
+			gl.v2f(rbx, rby)
+		}
+		gl.end()
+
+		// left bottom quarter
+		gl.begin_triangle_strip()
+		for i in 0 .. 31 {
+			rad = f32(math.radians(i * 3))
+			dx = radius * math.cosf(rad)
+			dy = radius * math.sinf(rad)
+			gl.v2f(lbx - dx, lby + dy)
+			gl.v2f(lbx, lby)
+		}
+		gl.end()
+
+		// top rectangle
+		gl.begin_quads()
+		gl.v2f(ltx, sy)
+		gl.v2f(rtx, sy)
+		gl.v2f(rtx, rty)
+		gl.v2f(ltx, lty)
+		gl.end()
+		// middle rectangle
+		gl.begin_quads()
+		gl.v2f(sx, lty)
+		gl.v2f(rtx + radius, rty)
+		gl.v2f(rbx + radius, rby)
+		gl.v2f(sx, lby)
+		gl.end()
+		// bottom rectangle
+		gl.begin_quads()
+		gl.v2f(lbx, lby)
+		gl.v2f(rbx, rby)
+		gl.v2f(rbx, rby + radius)
+		gl.v2f(lbx, rby + radius)
+		gl.end()
+
+		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', (4 * (2 * 30)) + 3 * 4)
+	}
+	if r.fills.has(.stroke) {
+		mut stroke_width := r.stroke.width * scale_factor
+		// TODO edgecase: render goes boom when stroke_width is X larger than the rect
+		color := r.stroke.color
+		gl.c4b(color.r, color.g, color.b, color.a)
+		if stroke_width <= 0 {
+			// Do nothing
+		} else if stroke_width > 1 {
+			start_radians := mth.deg_180_in_rad
+			end_radians := mth.deg_270_in_rad
+			stroke_width_0_5 := stroke_width * 0.5
+			radius_minus_stroke_width_0_5 := radius - stroke_width_0_5
+			// top left arc
+			gl.begin_triangle_strip()
+			plot_arc_line_thick(ltx, lty, radius_minus_stroke_width_0_5, stroke_width,
+				start_radians, end_radians, 32)
+			gl.end()
+
+			// top right arc
+			gl.begin_triangle_strip()
+			plot_arc_line_thick(rtx, rty, radius_minus_stroke_width_0_5, stroke_width,
+				start_radians - mth.deg_90_in_rad, end_radians - mth.deg_90_in_rad, 32)
+			gl.end()
+
+			// bottom right arc
+			gl.begin_triangle_strip()
+			plot_arc_line_thick(rbx, rby, radius_minus_stroke_width_0_5, stroke_width,
+				start_radians - mth.deg_180_in_rad, end_radians - mth.deg_180_in_rad,
+				32)
+			gl.end()
+
+			// bottom left arc
+			gl.begin_triangle_strip()
+			plot_arc_line_thick(lbx, rby, radius_minus_stroke_width_0_5, stroke_width,
+				start_radians - mth.deg_270_in_rad, end_radians - mth.deg_270_in_rad,
+				32)
+			gl.end()
+
+			// top border rectangle
+			gl.begin_quads()
+			gl.v2f(ltx, sy - stroke_width_0_5)
+			gl.v2f(rtx, sy - stroke_width_0_5)
+			gl.v2f(rtx, sy + stroke_width_0_5)
+			gl.v2f(ltx, sy + stroke_width_0_5)
+			gl.end()
+
+			// right border rectangle
+			gl.begin_quads()
+			gl.v2f(sx + w - stroke_width_0_5, rty)
+			gl.v2f(sx + w + stroke_width_0_5, rty)
+			gl.v2f(sx + w + stroke_width_0_5, rby)
+			gl.v2f(sx + w - stroke_width_0_5, rbx)
+			gl.end()
+
+			// bottom border rectangle
+			gl.begin_quads()
+			gl.v2f(lbx, sy + h - stroke_width_0_5)
+			gl.v2f(rbx, sy + h - stroke_width_0_5)
+			gl.v2f(rbx, sy + h + stroke_width_0_5)
+			gl.v2f(lbx, sy + h + stroke_width_0_5)
+			gl.end()
+
+			// left border rectangle
+			gl.begin_quads()
+			gl.v2f(sx - stroke_width_0_5, lty)
+			gl.v2f(sx + stroke_width_0_5, lty)
+			gl.v2f(sx + stroke_width_0_5, lby)
+			gl.v2f(sx - stroke_width_0_5, lby)
+			gl.end()
+
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 4 * 4)
+		} else {
+			// left top quarter
+			gl.begin_line_strip()
+			for i in 0 .. 31 {
+				rad = f32(math.radians(i * 3))
+				dx = radius * math.cosf(rad)
+				dy = radius * math.sinf(rad)
+				gl.v2f(ltx - dx, lty - dy)
+			}
+			gl.end()
+
+			// right top quarter
+			gl.begin_line_strip()
+			for i in 0 .. 31 {
+				rad = f32(math.radians(i * 3))
+				dx = radius * math.cosf(rad)
+				dy = radius * math.sinf(rad)
+				gl.v2f(rtx + dx, rty - dy)
+			}
+			gl.end()
+
+			// right bottom quarter
+			gl.begin_line_strip()
+			for i in 0 .. 31 {
+				rad = f32(math.radians(i * 3))
+				dx = radius * math.cosf(rad)
+				dy = radius * math.sinf(rad)
+				gl.v2f(rbx + dx, rby + dy)
+			}
+			gl.end()
+
+			// left bottom quarter
+			gl.begin_line_strip()
+			for i in 0 .. 31 {
+				rad = f32(math.radians(i * 3))
+				dx = radius * math.cosf(rad)
+				dy = radius * math.sinf(rad)
+				gl.v2f(lbx - dx, lby + dy)
+			}
+			gl.end()
+
+			gl.begin_lines()
+			// top
+			gl.v2f(ltx, sy)
+			gl.v2f(rtx, sy)
+			// right
+			gl.v2f(rtx + radius, rty)
+			gl.v2f(rtx + radius, rby)
+			// bottom
+			// Note: test on native windows, macos, and linux if you need to change the offset literal here,
+			// with `v run vlib/gg/testdata/draw_rounded_rect_empty.vv` . Using 1 here, looks good on windows,
+			// and on linux with LIBGL_ALWAYS_SOFTWARE=true, but misaligned on native macos and linux.
+			gl.v2f(lbx, lby + radius - 0.5)
+			gl.v2f(rbx, rby + radius - 0.5)
+			// left
+			gl.v2f(sx + 1, lty)
+			gl.v2f(sx + 1, lby)
+			gl.end()
+
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', (4 * (1 * 30)) + 8)
+		}
+	}
 }
 
 @[inline]
@@ -740,4 +985,94 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 	line(x1, y1, x2, y2)
 	line(x2, y2, x3, y3)
 	*/
+}
+
+// From sgldraw/plot/plot.v
+/*
+@[inline]
+pub fn plot_arc(x f32, y f32, radius f32, start_angle_in_rad f32, angle_in_rad f32, steps u32, fill Fill) {
+	theta := f32(angle_in_rad / f32(steps))
+	tan_factor := math.tanf(theta)
+	rad_factor := math.cosf(theta)
+	mut x1 := f32(radius * math.cosf(start_angle_in_rad))
+	mut y1 := f32(radius * math.sinf(start_angle_in_rad))
+	for i := 0; i < steps + 1; i++ {
+		gl.v2f(x1 + x, y1 + y)
+		if fill == .body {
+			gl.v2f(x, y)
+		}
+		tx := -y1
+		ty := x1
+		x1 += tx * tan_factor
+		y1 += ty * tan_factor
+		x1 *= rad_factor
+		y1 *= rad_factor
+	}
+}
+
+*/
+
+/*
+@[inline]
+pub fn plot_arc_line(x f32, y f32, radius f32, width f32, start_angle_in_rad f32, angle_in_rad f32, steps u32) {
+	mut theta := f32(0)
+	for i := 0; i < steps; i++ {
+		theta = start_angle_in_rad + angle_in_rad * f32(i) / f32(steps)
+		mut x1 := (radius + width) * math.cosf(theta)
+		mut y1 := (radius + width) * math.sinf(theta)
+		mut x2 := (radius - width) * math.cosf(theta)
+		mut y2 := (radius - width) * math.sinf(theta)
+		gl.v2f(x + x1, y + y1)
+		gl.v2f(x + x2, y + y2)
+		theta = start_angle_in_rad + angle_in_rad * f32(i + 1) / f32(steps)
+		mut nx1 := (radius + width) * math.cosf(theta)
+		mut ny1 := (radius + width) * math.sinf(theta)
+		mut nx2 := (radius - width) * math.cosf(theta)
+		mut ny2 := (radius - width) * math.sinf(theta)
+		gl.v2f(x + nx1, y + ny1)
+		gl.v2f(x + nx2, y + ny2)
+	}
+}
+*/
+
+// plot_arc_line_thick plots a filled arc.
+// `x`,`y` defines the central point of the arc (center of the circle that the arc is part of).
+// `radius` defines the radius of the arc (length from the center point where the arc is drawn).
+// `thickness` defines how wide the arc is drawn.
+// `start_angle_in_rad` is the angle in radians at which the arc starts.
+// `end_angle_in_rad` is the angle in radians at which the arc ends.
+// `segments` affects how smooth/round the arc is.
+pub fn plot_arc_line_thick(x f32, y f32, radius f32, thickness f32, start_angle_in_rad f32, end_angle_in_rad f32, segments u16) {
+	start_angle := start_angle_in_rad
+	end_angle := end_angle_in_rad
+	outer_radius := radius + thickness
+	if outer_radius < 0 {
+		return
+	}
+
+	nx := x //* scale
+	ny := y //* scale
+	theta := f32(end_angle - start_angle) / f32(segments)
+	tan_factor := math.tanf(theta)
+	rad_factor := math.cosf(theta)
+	mut ix := math.sinf(start_angle) // * scale
+	mut iy := math.cosf(start_angle) // * scale
+	mut ox := outer_radius * ix
+	mut oy := outer_radius * iy
+	ix *= radius
+	iy *= radius
+
+	gl.v2f(nx + ix, ny + iy)
+	gl.v2f(nx + ox, ny + oy)
+	for i := 0; i < segments; i++ {
+		ix, iy = ix + iy * tan_factor, iy - ix * tan_factor
+		ix *= rad_factor
+		iy *= rad_factor
+		gl.v2f(nx + ix, ny + iy)
+		ox, oy = ox + oy * tan_factor, oy - ox * tan_factor
+		ox *= rad_factor
+		oy *= rad_factor
+		gl.v2f(nx + ox, ny + oy)
+	}
+	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 2 + (2 * segments))
 }

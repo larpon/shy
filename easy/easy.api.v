@@ -160,6 +160,7 @@ pub struct EasyRectConfig {
 pub mut:
 	stroke   shy.Stroke
 	rotation f32
+	radius   f32 // for rounded corners
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
@@ -174,6 +175,7 @@ pub struct EasyRect {
 pub mut:
 	stroke   shy.Stroke
 	rotation f32
+	radius   f32 // for rounded corners
 	scale    f32       = 1.0
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
@@ -193,6 +195,7 @@ pub fn (er &EasyRect) draw() {
 	r.height = er.height
 	r.stroke = er.stroke
 	r.rotation = er.rotation
+	r.radius = er.radius
 	r.scale = er.scale
 	r.color = er.color
 	r.fills = er.fills
