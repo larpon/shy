@@ -7,10 +7,8 @@ import math // TODO this can probably be shaved off at the end of development
 import mth
 import os
 
-pub const (
-	stdin_is_a_pipe  = (os.is_atty(0) == 0)
-	stdout_is_a_pipe = (os.is_atty(1) == 0)
-)
+pub const stdin_is_a_pipe = (os.is_atty(0) == 0)
+pub const stdout_is_a_pipe = (os.is_atty(1) == 0)
 
 @[inline]
 pub fn remap[T](value T, min T, max T, new_min T, new_max T) T {

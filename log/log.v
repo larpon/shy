@@ -6,14 +6,12 @@ module log
 import term
 import strings
 
-const (
-	label_info     = 'INFO'
-	label_warn     = 'WARN'
-	label_error    = 'ERROR'
-	label_debug    = 'DEBUG'
-	label_critical = 'CRITICAL'
-	default_flags  = get_default_flags_workaround()
-)
+const label_info = 'INFO'
+const label_warn = 'WARN'
+const label_error = 'ERROR'
+const label_debug = 'DEBUG'
+const label_critical = 'CRITICAL'
+const default_flags = get_default_flags_workaround()
 
 // TODO
 @[markused]

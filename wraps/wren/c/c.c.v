@@ -1,9 +1,7 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 module c
 
-pub const (
-	used_import = 1 // TODO
-)
+pub const used_import = 1 // TODO
 
 #flag -I @VMODROOT/c/wren/src/include
 #flag -I @VMODROOT/c/wren/src/vm

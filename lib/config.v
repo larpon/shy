@@ -6,9 +6,7 @@ module lib
 import os
 import toml
 
-pub const (
-	defaults = Defaults{}
-)
+pub const defaults = Defaults{}
 
 struct Defaults {
 pub:

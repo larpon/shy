@@ -3,11 +3,9 @@ module mth
 import math // TODO
 // TODO v module BUG prevents calling this "math"?!, also consider "manmade math"
 
-pub const (
-	pi_div_2 = pi / 2
-	deg2rad  = f32((pi * 2) / 360)
-	rad2deg  = f32(360 / (pi * 2))
-)
+pub const pi_div_2 = pi / 2
+pub const deg2rad = f32((pi * 2) / 360)
+pub const rad2deg = f32(360 / (pi * 2))
 
 // min returns the minimum of `a` and `b`.
 @[inline]

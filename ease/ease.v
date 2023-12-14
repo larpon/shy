@@ -364,13 +364,11 @@ pub fn in_out_circ(t f64) f64 {
 	}
 }
 
-const (
-	c1 = 1.70158
-	c2 = 1.70158 * 1.525
-	c3 = 1.70158 + 1.0
-	c4 = (2 * mth.pi) / 3
-	c5 = (2 * mth.pi) / 4.5
-)
+const c1 = 1.70158
+const c2 = 1.70158 * 1.525
+const c3 = 1.70158 + 1.0
+const c4 = (2 * mth.pi) / 3
+const c5 = (2 * mth.pi) / 4.5
 
 pub fn expo(t f64, mode Mode) f64 {
 	if t == 0.0 {

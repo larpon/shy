@@ -8,11 +8,9 @@ import shy.vec
 import shy.utils
 import shy.analyse
 
-const (
-	default_size      = vec.Vec2[f32]{6, 6}
-	default_life_time = 1000.0
-	default_color     = shy.Color{255, 255, 255, 255}
-)
+const default_size = vec.Vec2[f32]{6, 6}
+const default_life_time = 1000.0
+const default_color = shy.Color{255, 255, 255, 255}
 
 pub fn (mut s System) new_particle() &Particle {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)

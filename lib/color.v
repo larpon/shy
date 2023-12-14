@@ -7,9 +7,7 @@ import shy.utils
 import shy.mth
 import rand
 
-pub const (
-	colors = BaseColors{}
-)
+pub const colors = BaseColors{}
 
 pub struct Colorf32 {
 pub mut:

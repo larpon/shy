@@ -1,11 +1,9 @@
 module app
 
-const (
-	max_touchpoints  = 8
-	max_mousebuttons = 3
-	max_keycodes     = 512
-	max_iconimages   = 8
-)
+const max_touchpoints = 8
+const max_mousebuttons = 3
+const max_keycodes = 512
+const max_iconimages = 8
 
 @[typedef]
 pub struct C.sapp_range {

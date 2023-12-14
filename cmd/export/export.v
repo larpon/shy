@@ -9,14 +9,14 @@ import flag
 import shy.cli
 import shy.export
 
-pub const (
-	exe_version          = '0.0.1' // version()
-	exe_name             = os.file_name(os.executable())
-	exe_short_name       = os.file_name(os.executable()).replace('.exe', '')
-	exe_dir              = os.dir(os.real_path(os.executable()))
-	exe_args_description = 'input
+pub const exe_version = '0.0.1' // version()
+
+pub const exe_name = os.file_name(os.executable())
+pub const exe_short_name = os.file_name(os.executable()).replace('.exe', '')
+pub const exe_dir = os.dir(os.real_path(os.executable()))
+pub const exe_args_description = 'input
 or:    [options] input'
-	exe_description = 'export exports both plain V applications and shy-based applications.
+pub const exe_description = 'export exports both plain V applications and shy-based applications.
 The exporter is based on the shy.export module.
 
 export can compile, package and deploy V apps for production use on a wide range of platforms like:
@@ -29,9 +29,8 @@ Flags:
 
 Sub-commands:
   run                       Run the output package after successful export'
-	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', 'run', '-showcc']
-	accepted_input_files = ['.v']
-)
+pub const rip_vflags = ['-autofree', '-gc', '-g', '-cg', 'run', '-showcc']
+pub const accepted_input_files = ['.v']
 
 pub const export_env_vars = [
 	'SHY_FLAGS',

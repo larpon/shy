@@ -6,14 +6,13 @@ module cli
 import os
 import shy.vxt
 
-pub const (
-	exe_version          = version()
-	exe_name             = os.file_name(os.executable())
-	exe_short_name       = os.file_name(os.executable()).replace('.exe', '')
-	exe_dir              = os.dir(os.real_path(os.executable()))
-	exe_args_description = 'input
+pub const exe_version = version()
+pub const exe_name = os.file_name(os.executable())
+pub const exe_short_name = os.file_name(os.executable()).replace('.exe', '')
+pub const exe_dir = os.dir(os.real_path(os.executable()))
+pub const exe_args_description = 'input
 or:    shy <sub-command> [options] input'
-	exe_description = 'shy is a module and tool made with love.
+pub const exe_description = 'shy is a module and tool made with love.
 It is primarily aimed at V developers roaming the creative corners of coding.
 
 shy can compile, package and deploy V apps for a wide range of platforms like:
@@ -28,13 +27,12 @@ Sub-commands:
   run                       Run the V code
   export                    Export shy based project
   doctor                    Display useful info about your system for bug reports'
-	exe_git_hash         = shy_commit_hash()
-	work_directory       = shy_tmp_work_dir()
-	cache_directory      = shy_cache_dir()
-	rip_vflags           = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', '-showcc']
-	subcmds              = ['complete', 'test-cleancode', 'export']
-	accepted_input_files = ['.v']
-)
+pub const exe_git_hash = shy_commit_hash()
+pub const work_directory = shy_tmp_work_dir()
+pub const cache_directory = shy_cache_dir()
+pub const rip_vflags = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', '-showcc']
+pub const subcmds = ['complete', 'test-cleancode', 'export']
+pub const accepted_input_files = ['.v']
 
 pub const shy_env_vars = [
 	'SHY_FLAGS',

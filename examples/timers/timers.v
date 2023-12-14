@@ -8,10 +8,8 @@ import shy.easy
 import shy.embed
 import time
 
-const (
-	info = 'Press "T" or left-click\nto start a new timer'
-	wait = 'Wait for it...'
-)
+const info = 'Press "T" or left-click\nto start a new timer'
+const wait = 'Wait for it...'
 
 fn main() {
 	mut app := &App{}

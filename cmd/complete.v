@@ -41,10 +41,10 @@ module main
 
 import os
 
-const (
-	auto_complete_shells = ['bash', 'fish', 'zsh', 'powershell'] // list of supported shells
-	shyexe               = os.getenv('SHY_EXE')
-	help_text            = "Usage:
+const auto_complete_shells = ['bash', 'fish', 'zsh', 'powershell'] // list of supported shells
+
+const shyexe = os.getenv('SHY_EXE')
+const help_text = "Usage:
   shy complete [options] [SUBCMD] QUERY...
 
 Description:
@@ -72,52 +72,49 @@ SUBCMD:
   fish      : [QUERY]       - returns Fish compatible completion code with completions computed from QUERY
   zsh       : [QUERY]       - returns ZSH  compatible completion code with completions computed from QUERY
   powershell: [QUERY]       - returns PowerShell compatible completion code with completions computed from QUERY"
-)
 
 // Snooped from shy.v
-const (
-	auto_complete_commands       = [
-		// tools in one .v file
-		'complete',
-		'test-cleancode',
-		// commands
-		'run',
-		'doctor',
-	]
-	// Entries in the flag arrays below should be entered as is:
-	// * Short flags, e.g.: "-v", should be entered: '-v'
-	// * Long flags, e.g.: "--version", should be entered: '--version'
-	// * Single-dash flags, e.g.: "-version", should be entered: '-version'
-	auto_complete_flags          = [
-		// V related flags
-		'-autofree',
-		'-gc',
-		'-g',
-		'-cg',
-		'-prod',
-		'-showcc',
-		// shy flags
-		'--verbosity',
-		'-v',
-		'--version',
-		'--assets',
-		'-a',
-		'--flag',
-		'-f',
-		'--cflag',
-		'-c',
-		'--gles',
-		'--help',
-		'-h',
-		'--nocache',
-		'--output',
-		'-o',
-	]
-	auto_complete_flags_complete = [
-		'--help',
-		'-h',
-	]
-)
+const auto_complete_commands = [
+	// tools in one .v file
+	'complete',
+	'test-cleancode',
+	// commands
+	'run',
+	'doctor',
+]
+// Entries in the flag arrays below should be entered as is:
+// * Short flags, e.g.: "-v", should be entered: '-v'
+// * Long flags, e.g.: "--version", should be entered: '--version'
+// * Single-dash flags, e.g.: "-version", should be entered: '-version'
+const auto_complete_flags = [
+	// V related flags
+	'-autofree',
+	'-gc',
+	'-g',
+	'-cg',
+	'-prod',
+	'-showcc',
+	// shy flags
+	'--verbosity',
+	'-v',
+	'--version',
+	'--assets',
+	'-a',
+	'--flag',
+	'-f',
+	'--cflag',
+	'-c',
+	'--gles',
+	'--help',
+	'-h',
+	'--nocache',
+	'--output',
+	'-o',
+]
+const auto_complete_flags_complete = [
+	'--help',
+	'-h',
+]
 
 // auto_complete prints auto completion results back to the calling shell's completion system.
 // auto_complete acts as communication bridge between the calling shell and V's completions.
