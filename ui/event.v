@@ -17,7 +17,6 @@ pub enum ButtonState {
 pub struct UIEvent {
 pub:
 	timestamp u64
-	// window    &Window // Since ui is based on shy.easy we have only one window
 }
 
 pub struct PointerEvent {

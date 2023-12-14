@@ -16,7 +16,7 @@ import shy.lib as shy
 pub struct Item {
 	shy.Rect
 pub:
-	id u64
+	id u64 = 1
 mut:
 	// NOTE The `unsafe { nil }` assignment once resulted in several V bugs: https://github.com/vlang/v/issues/16882
 	// ... which was quickly fixed but one of them couldn't be made as an MRE (minimal reproducible example) - so it's
@@ -29,8 +29,16 @@ mut:
 // parent returns this `Item`'s parent.
 pub fn (i &Item) parent() &Node {
 	assert i != unsafe { nil }
-	// TODO returning ?&Node is not possible currently: if isnil(i.parent) { return none }
+	// TODO BUG returning ?&Node is not possible currently: if isnil(i.parent) { return none }
 	return i.parent
+}
+
+// reparent sets this `Item`'s `parent` to `new_parent`.
+pub fn (i &Item) reparent(new_parent &Node) {
+	assert i != unsafe { nil }
+	unsafe {
+		i.parent = new_parent
+	}
 }
 
 // draw draws the `Item` and/or any child nodes.
@@ -40,7 +48,26 @@ pub fn (i &Item) draw(ui &UI) {
 	}
 }
 
-// event sends an `Event` any child nodes and/or it's own listeners.
+// visual_state returns this `Item`'s `VisualState`.
+@[inline]
+pub fn (i &Item) visual_state() VisualState {
+	assert i != unsafe { nil }
+	p := i.parent()
+	if !isnil(p) && p.id != 0 {
+		p_vs := p.visual_state()
+		return VisualState{
+			x: p_vs.x + i.Rect.x
+			y: p_vs.y + i.Rect.y
+			width: i.Rect.width
+			height: i.Rect.height
+		}
+	}
+	return VisualState{
+		Rect: i.Rect
+	}
+}
+
+// event delegates `e` `Event` to any child nodes and/or it's own listeners.
 pub fn (i &Item) event(e Event) ?&Node {
 	// By sending the event on to the children nodes
 	// it's effectively *bubbling* the event upwards in the
@@ -50,12 +77,26 @@ pub fn (i &Item) event(e Event) ?&Node {
 			return node
 		}
 	}
-	for on_event in i.on_event {
-		assert !isnil(on_event)
-		if on_event(i, e) {
-			// If `on_event` returns true, it means
-			// a listener on *this* item has accepted the event
-			return i
+
+	hit := match e {
+		MouseButtonEvent, MouseMotionEvent, MouseWheelEvent {
+			vs := i.visual_state()
+			vs.Rect.contains(e.x, e.y)
+		}
+		else {
+			true
+		}
+	}
+
+	if hit {
+		for on_event in i.on_event {
+			assert !isnil(on_event)
+
+			if on_event(i, e) {
+				// If `on_event` returns true, it means
+				// a listener on *this* item has accepted the event
+				return i
+			}
 		}
 	}
 	return none
@@ -76,50 +117,72 @@ pub struct Rectangle {
 	Item
 }
 
+/*
 // parent returns the parent Node.
 pub fn (r &Rectangle) parent() &Node {
 	return r.Item.parent()
 }
-
+*/
 // draw draws the `Item` and/or any child nodes.
 pub fn (r &Rectangle) draw(ui &UI) {
-	// println('${@STRUCT}.${@FN} ${ptr_str(r)}')
-	// println('${@STRUCT}.${@FN} ${r}')
+	p_vs := r.visual_state()
 	er := ui.easy.rect(
-		x: r.x
-		y: r.y
-		width: r.width
-		height: r.height
+		x: p_vs.x
+		y: p_vs.y
+		width: p_vs.width
+		height: p_vs.height
 	)
 	er.draw()
-
+	// Draw rest of tree (children) on top
 	r.Item.draw(ui)
 }
 
+/*
+// visual_state returns this `Item`'s `VisualState`.
+@[inline]
+pub fn (r &Rectangle) visual_state() VisualState {
+	return r.Item.visual_state()
+}
+*/
+
+/*
 // event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (r &Rectangle) event(e Event) ?&Node {
 	return r.Item.event(e)
-}
+}*/
 
 @[heap]
 pub struct EventArea {
 	Item
 }
 
+/*
 // parent returns the parent Node.
 pub fn (ea &EventArea) parent() &Node {
 	return ea.Item.parent()
 }
+*/
 
+/*
 // draw draws the `Item` and/or any child nodes.
 pub fn (ea &EventArea) draw(ui &UI) {
 	ea.Item.draw(ui)
 }
+*/
 
+/*
+// rect returns this `Item`'s rectangle.
+pub fn (ea &EventArea) visual_state() VisualState {
+	return ea.Item.visual_state()
+}
+*/
+
+/*
 // event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (ea &EventArea) event(e Event) ?&Node {
 	return ea.Item.event(e)
 }
+*/
 
 @[heap]
 pub struct PointerEventArea {
@@ -127,6 +190,7 @@ pub struct PointerEventArea {
 	on_pointer_event []OnPointerEventFn
 }
 
+/*
 // parent returns the parent Node.
 pub fn (pea &PointerEventArea) parent() &Node {
 	return pea.EventArea.parent()
@@ -136,6 +200,11 @@ pub fn (pea &PointerEventArea) parent() &Node {
 pub fn (pea &PointerEventArea) draw(ui &UI) {
 	pea.EventArea.draw(ui)
 }
+
+// rect returns this `Item`'s rectangle.
+pub fn (pea &PointerEventArea) visual_state() VisualState {
+	return pea.EventArea.visual_state()
+}*/
 
 // event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (pea &PointerEventArea) event(e Event) ?&Node {

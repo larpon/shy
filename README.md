@@ -37,7 +37,7 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 music, sounds etc.
 * [WIP] Export to different platforms via the `shy export` command.
 * [WIP] Intuitive Qt/Widgets/QML (scene graph) inspired `ui` module
-  supporting *custom* UI items (currently full of BUGS).
+  supporting *custom* UI items.
 * [WIP] ... much more :)
 
 # Currently known downsides

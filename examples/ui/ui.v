@@ -32,6 +32,10 @@ pub fn (m &MyUIItem) draw(ui_ &ui.UI) {
 	m.EventArea.draw(ui_)
 }
 
+pub fn (m &MyUIItem) visual_state() ui.VisualState {
+	return m.EventArea.visual_state()
+}
+
 pub fn (m &MyUIItem) event(e ui.Event) ?&ui.Node {
 	// println('MyUIItem event called ${m.id}')
 	return m.EventArea.event(e)
@@ -48,6 +52,10 @@ pub fn (m &MyRect) parent() &ui.Node {
 
 pub fn (m &MyRect) draw(ui_ &ui.UI) {
 	m.Rectangle.draw(ui_)
+}
+
+pub fn (m &MyRect) visual_state() ui.VisualState {
+	return m.Rectangle.visual_state()
 }
 
 pub fn (m &MyRect) event(e ui.Event) ?&ui.Node {
@@ -67,6 +75,7 @@ pub fn (mut a App) init() ! {
 		height: 100
 		body: [
 			&ui.Rectangle{
+				id: 43
 				x: 50
 				y: 50
 				width: 50
@@ -78,94 +87,91 @@ pub fn (mut a App) init() ! {
 						width: 25
 						height: 25
 						body: [
-							/*
 							&MyRect{
 								id: 800
 								width: 20
 								on_event: [
 									fn (n &ui.Node, e ui.Event) bool {
 										node := &&MyRect(n) // TODO this is a weird V quirk
-										eprintln('MyRect in call: ${ptr_str(n)}')
+										// eprintln('MyRect in call: ${ptr_str(n)} VS ${ptr_str(node)}')
 										assert node.id == n.id
 
-										// println('MyUIItem on_event reached ${node.id}/${n.id}')
-										// mut mmui := unsafe { node }
-										// mmui.width++
-										// println('${@STRUCT}/MyUIItem on_event was called ${mmui.width}')
+										mut mmui := unsafe { node }
+										if mmui.width < 80 {
+											mmui.width += 0.1
+										} else if mmui.width >= 50 {
+											mmui.width = 25
+										}
 										// return true
 										return false
 									},
 								]
 							},
-							*/
-							/*
 							&MyUIItem{
 								id: 400
 								width: 10
 								on_event: [
 									fn (n &ui.Node, e ui.Event) bool {
 										node := &&MyUIItem(n) // TODO this is a weird V quirk
-										eprintln('MyUIItem this in call: ${ptr_str(n)}')
+										// eprintln('MyUIItem this in call: ${ptr_str(n)} VS ${ptr_str(node)}')
 										assert node.id == n.id
 
 										// println('MyUIItem on_event reached ${node.id}/${n.id}')
-										// mut mmui := unsafe { node }
-										// mmui.width++
+										mut mmui := unsafe { node }
+										mmui.width += 0.01
 										// println('${@STRUCT}/MyUIItem on_event was called ${mmui.width}')
 										// return true
 										return false
 									},
 								]
-							},*/
+							},
 						]
 					},
 				]
 			},
-			/*
 			&ui.PointerEventArea{
 				id: 100
 				x: 50
 				y: 50
 				width: 500
 				height: 500
-				/*
 				on_event: [
 					fn (n &ui.Node, e ui.Event) bool {
-						//println('ui.EventArea on_event reached ${n.id}')
+						// println('ui.EventArea on_event reached ${n.id}')
 
 						ea := &&ui.EventArea(n)
 						assert ea.id == n.id
 						mut mea := unsafe { ea }
 						println('EventArea ${mea.id} found .x: ${mea.x}')
 						// mea.x += 1
-						// return true
-						return false
+						return true
+						// return false
 					},
-				]*/
+				]
 				on_pointer_event: [
 					fn (n &ui.Node, e ui.PointerEvent) bool {
 						// println('PointerEventArea on_pointer_event reached ${n.id}')
 
 						// TODO BUG V mixes up the pointer here see also `shy/ui/item.v` etc.
 						// dump(typeof(n))
-						/*
+
 						mut pea := &&ui.PointerEventArea(n)
 						eprintln('PointerEventArea n in call: ${ptr_str(n)}')
-						eprintln('PointerEventArea this in call: ${ptr_str(n.this)}')
+						// eprintln('PointerEventArea this in call: ${ptr_str(n.this)}')
 						eprintln('PointerEventArea &n in call: ${ptr_str(&n)}')
 						eprintln('PointerEventArea pea in call: ${ptr_str(pea)}')
 						// TODO  `n &ui.Node` -> `n` pointer is not the same as in `ui/item.v`????
 						assert pea.id == n.id, 'HARD TO REPRODUCE V BUG'
 
 						println('PointerEventArea ${pea.id} found .x: ${pea.x}')
-						pea.x += 1
+						// pea.x += 1
 
 						// mut mpea := unsafe { pea }
 						// println('PointerEventArea ${mpea.id} found .x: ${mpea.x}')
 						// mpea.x += 1
 
 						// return true
-						*/
+
 						return false
 					},
 				]
@@ -211,7 +217,7 @@ pub fn (mut a App) init() ! {
 						]
 					},
 				]
-			},*/
+			},
 		]
 	}
 	a.ui = ui.new(
@@ -234,37 +240,23 @@ pub fn (mut a App) event(e shy.Event) {
 
 	ui_event := ui.shy_to_ui_event(e) or { panic('${@STRUCT}.${@FN}: ${err}') }
 	if handled_by_node := a.ui.event(ui_event) {
-		// printing the whole node will make things crash at runtime...
+		// TODO BUG printing the whole node will make things crash at runtime...
 		println('Event was handled by ui.Node.id(${handled_by_node.id})')
-	} else {
 	}
 
 	// Mutability test
 	a.ui.modify(fn (mut n ui.Node) {
-		// TODO BUG broken - V doesn't allow for retreiving back the original pointer of a *custom* type implementing ui.Node...
-		// The horrible thing is that it ~works... sometimes :(
-		// mut maybe := ui.cast[MyRect](n)
-		//
-
-		/*
-		if n.id == 420 {
-			mut my_rect := &&MyRect(n)
-			// println('oi ${maybe}')
-			my_rect.x += 0.5
-			my_rect.y += 0.25
+		if mut n is MyRect {
+			println('oi ${n.id}')
+			if n.id == 420 {
+				n.x += 0.5
+				n.y += 0.25
+			} else {
+				n.y += 0.1
+			}
 		}
-		*/
 
-		// mut maybe := &&MyRect(n)
-		// println('oi ${maybe}')
-		// if maybe.id == 420 {
-		// 	// println('oi ${maybe}')
-		//	maybe.x += 0.5
-		// 	maybe.y += 0.25
-		//}
-		/*
 		if mut n is ui.Rectangle {
-			// mut n := unsafe { node }
 			if n.id == 42 {
 				if n.x < 200 {
 					n.x += 1
@@ -272,14 +264,12 @@ pub fn (mut a App) event(e shy.Event) {
 					n.x = 0
 				}
 			}
-			// pid := n.parent() or { 0 }.id
-			// pid := n.parent().id
 			if n.id == 43 {
-				// ppid := n.parent() or { 0 }.id
-				// ppid := n.parent().id
-				// println('${pid} vs. ${ppid}')
+				// pid := n.parent() or { -1 }.id
+				pid := n.parent().id
+				println('parent id ${pid}')
 			}
-		}*/
+		}
 	})
 
 	/*
