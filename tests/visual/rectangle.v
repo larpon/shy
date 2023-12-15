@@ -26,8 +26,8 @@ struct App {
 	embed.TestApp
 mut:
 	origin    shy.Anchor
-	dimension u16 = 256
-	dim_index u16 = 2 // index of "256" in dimensions
+	dimension u16 = 128
+	dim_index u16 = 1 // index of "128" in dimensions
 }
 
 @[markused]
@@ -52,30 +52,28 @@ pub fn (mut a App) live_frame(dt f64) {
 	min_y, max_y := mth.max(max_height * 0.1, 20), mth.max(max_height * 0.9, 220)
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: a.dimension
-		height: a.dimension
-		origin: .center
-		radius: a.dimension / 2
-		color: shy.rgba(255, 0, 0, 127)
-		stroke: shy.Stroke{
-			color: shy.rgba(255, 255, 255, 127)
-			width: a.dimension * 2 // test if rendering overflows on too big lines
-		}
-	)
-
-	a.quick.rect(
 		x: min_x
 		y: min_y
 		width: a.dimension
 		height: a.dimension
 		origin: a.origin
-		radius: a.dimension / 2
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
-			width: a.dimension / 2
+			width: a.dimension // test that exact rendering works
+		}
+	)
+
+	a.quick.rect(
+		x: cx
+		y: cy
+		width: a.dimension
+		height: a.dimension
+		origin: .center
+		color: shy.rgba(0, 0, 255, 127)
+		stroke: shy.Stroke{
+			color: shy.rgba(255, 255, 255, 127)
+			width: a.dimension * 2 // test that rendering does not overflow
 		}
 	)
 
@@ -85,11 +83,10 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: a.dimension
 		height: a.dimension
 		origin: .bottom_left
-		radius: a.dimension / 10
 		color: shy.rgba(0, 0, 255, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
-			width: 10
+			width: a.dimension / 4
 		}
 	)
 
@@ -99,7 +96,6 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: a.dimension
 		height: a.dimension
 		origin: .bottom_right
-		radius: a.dimension / 8
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
@@ -113,7 +109,6 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: a.dimension
 		height: a.dimension
 		origin: .top_right
-		radius: a.dimension / 8
 		color: shy.rgba(255, 0, 0, 127)
 		fills: .body
 	)
