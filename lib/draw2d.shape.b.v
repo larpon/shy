@@ -147,7 +147,7 @@ pub fn (t &DrawShape2DTriangle) draw() {
 		gl.v2f(x3, y3)
 		gl.end()
 
-		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 3)
+		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 3)
 	}
 	if t.fills.has(.stroke) {
 		stroke_width := t.stroke.width * scale_factor
@@ -176,7 +176,7 @@ pub fn (t &DrawShape2DTriangle) draw() {
 
 			gl.end()
 
-			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 4)
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 4)
 		}
 	}
 	gl.translate(-x, -y, 0)
@@ -269,7 +269,7 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 		gl.v2f((sx + w), sy)
 		gl.v2f((sx + w), (sy + h))
 		gl.v2f(sx, (sy + h))
-		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 4)
+		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 4)
 		gl.end()
 	}
 	if r.fills.has(.stroke) {
@@ -305,7 +305,7 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 				//
 				gl.v2f(sx + 0.5, (sy + 0.5 + h - 1))
 				gl.v2f(sx + 0.5, sy + 0.5)
-				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 8)
+				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 8)
 			} else {
 				gl.v2f(sx, sy)
 				gl.v2f((sx + w), sy)
@@ -315,7 +315,7 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 				gl.v2f(sx, (sy + h))
 				//
 				gl.v2f(sx, sy)
-				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 5)
+				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 5)
 			}
 			gl.end()
 		}
@@ -428,7 +428,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 		gl.v2f(lbx, rby + radius)
 		gl.end()
 
-		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', (4 * (2 * 30)) + 3 * 4)
+		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', (4 * (2 * 30)) + 3 * 4)
 	}
 	if r.fills.has(.stroke) {
 		mut stroke_width := r.stroke.width * scale_factor
@@ -500,7 +500,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 			gl.v2f(sx - stroke_width_0_5, lby)
 			gl.end()
 
-			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 4 * 4)
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 4 * 4)
 		} else {
 			// left top quarter
 			gl.begin_line_strip()
@@ -560,7 +560,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 			gl.v2f(sx + 1, lby)
 			gl.end()
 
-			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', (4 * (1 * 30)) + 8)
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', (4 * (1 * 30)) + 8)
 		}
 	}
 }
@@ -667,13 +667,13 @@ pub fn (l DrawShape2DLineSegment) draw() {
 		gl.v2f(br_x, br_y)
 		gl.v2f(bl_x, bl_y)
 		gl.end()
-		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 4)
+		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 4)
 	} else {
 		gl.begin_line_strip()
 		gl.v2f(x1_, y1_)
 		gl.v2f(x2_, y2_)
 		gl.end()
-		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 2)
+		analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 2)
 	}
 
 	// gl.translate(-f32(x), -f32(y), 0)
@@ -765,7 +765,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 			gl.v2f(px, py)
 			gl.v2f(xx + sx, yy + sy)
 			gl.v2f(sx, sy)
-			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 3)
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 3)
 			px = xx + sx
 			py = yy + sy
 		}
@@ -804,7 +804,7 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 
 				gl.v2f(px, py)
 				gl.v2f(xx, yy)
-				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 2)
+				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 2)
 
 				px = xx + sx
 				py = yy + sy
@@ -857,7 +857,7 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 		gl.begin_line_strip()
 		gl.v2f(x1_, y1_)
 		gl.v2f(x2_, y2_)
-		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices', 2)
+		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices2D', 2)
 		gl.end()
 		return
 	}
@@ -899,7 +899,7 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 		gl.v2f(vpp_x, vpp_y)
 		gl.v2f(t2r_x, t2r_y)
 		gl.v2f(t2_x, t2_y)
-		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices', 12)
+		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices2D', 12)
 		gl.end()
 	} else if connect == .bevel {
 		gl.begin_triangles()
@@ -923,7 +923,7 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 		gl.v2f(t2_x, t2_y)
 		gl.v2f(t2r_x, t2r_y)
 
-		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices', 15)
+		analyse.count_and_sum[u64]('${@MOD}.${@FN}@vertices2D', 15)
 		gl.end()
 
 		/*
@@ -1074,5 +1074,5 @@ pub fn plot_arc_line_thick(x f32, y f32, radius f32, thickness f32, start_angle_
 		oy *= rad_factor
 		gl.v2f(nx + ox, ny + oy)
 	}
-	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices', 2 + (2 * segments))
+	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', 2 + (2 * segments))
 }
