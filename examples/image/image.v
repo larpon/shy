@@ -31,6 +31,6 @@ pub fn (mut a App) frame(dt f64) {
 		x: shy.half * a.window.width
 		y: shy.half * a.window.height
 		source: a.asset('images/shy.png')
-		origin: .center
+		origin: shy.Anchor.center
 	)
 }

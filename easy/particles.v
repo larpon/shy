@@ -156,7 +156,7 @@ fn (ip &ImageParticlePainter) draw(p &particle.Particle, frame_dt f64) {
 		color: color
 		rotation: p.rotation
 		scale: p.scale
-		origin: .center
+		origin: shy.Anchor.center
 	)
 	i.draw()
 }

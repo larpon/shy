@@ -53,7 +53,7 @@ pub fn (mut a App) frame(dt f64) {
 		x: 0.75 * f32(a.window.width)
 		y: shy.half * a.window.height
 		source: a.asset(image_path)
-		origin: .center
+		origin: shy.Anchor.center
 	)
 
 	a.quick.text(
@@ -80,7 +80,7 @@ pub fn (mut a App) frame(dt f64) {
 		x: 0.90 * f32(a.window.width)
 		y: shy.half * a.window.height
 		source: a.asset(image_path)
-		origin: .center
+		origin: shy.Anchor.center
 	)
 
 	a.quick.circle(

@@ -595,7 +595,7 @@ pub:
 	rotation  f32
 	scale     f32 = 1.0
 	offset    vec.Vec2[f32]
-	origin    shy.Anchor
+	origin    shy.Origin
 	region    shy.Rect = shy.Rect{0, 0, -1, -1}
 	fill_mode shy.ImageFillMode
 }
@@ -610,7 +610,7 @@ pub:
 	rotation  f32
 	scale     f32 = 1.0
 	offset    vec.Vec2[f32]
-	origin    shy.Anchor
+	origin    shy.Origin
 	region    shy.Rect = shy.Rect{0, 0, -1, -1}
 	fill_mode shy.ImageFillMode
 }

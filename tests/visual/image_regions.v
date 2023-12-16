@@ -47,7 +47,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: rw
 		height: rh
 		source: a.asset('images/shy.png')
-		origin: .bottom_right
+		origin: shy.Anchor.bottom_right
 		scale: rs
 		offset: shy.vec2(-margin, -margin)
 		region: shy.Rect{0, 0, 256, 256}
@@ -58,7 +58,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: rw
 		height: rh
 		source: a.asset('images/shy.png')
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		scale: rs
 		offset: shy.vec2(margin, -margin)
 		region: shy.Rect{256, 0, 256, 256}
@@ -70,7 +70,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: rw
 		height: rh
 		source: a.asset('images/shy.png')
-		origin: .top_left
+		origin: shy.Anchor.top_left
 		scale: rs
 		offset: shy.vec2(margin, margin)
 		region: shy.Rect{256, 256, 256, 256}
@@ -82,7 +82,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		width: rw
 		height: rh
 		source: a.asset('images/shy.png')
-		origin: .top_right
+		origin: shy.Anchor.top_right
 		scale: rs
 		offset: shy.vec2(-margin, margin)
 		region: shy.Rect{0, 256, 256, 256}
