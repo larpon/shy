@@ -90,7 +90,7 @@ pub mut:
 	scale    f32  = 1.0
 	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
-	origin   Anchor
+	origin   Origin
 }
 
 @[inline]
@@ -765,11 +765,12 @@ pub mut:
 	rotation f32
 	scale    f32 = 1.0
 	offset   Vec2[f32]
-	origin   Anchor = .center_left //
+	origin   Origin = Anchor.center_left //
 }
 
 @[inline]
 pub fn (l DrawShape2DLineSegment) origin_displacement() (f32, f32) {
+	// TODO
 	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
 	// return -p_x, -p_y
 	return 0, 0

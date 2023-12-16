@@ -234,7 +234,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor
+	origin   shy.Origin
 }
 
 @[noinit]
@@ -250,7 +250,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor
+	origin   shy.Origin
 }
 
 @[inline]
@@ -316,7 +316,7 @@ pub mut:
 	scale    f32 = 1.0
 	ray      bool
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor = .center_left
+	origin   shy.Origin = shy.Anchor.center_left
 }
 
 @[noinit]
@@ -329,7 +329,7 @@ pub mut:
 	scale    f32 = 1.0
 	ray      bool
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor = .center_left
+	origin   shy.Origin = shy.Anchor.center_left
 }
 
 @[inline]
