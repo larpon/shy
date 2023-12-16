@@ -39,8 +39,8 @@ pub fn (mut a App) init() ! {
 @[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.circle(
-		x: (shy.half * a.window.width())
-		y: (shy.half * a.window.height())
+		x: (shy.half * a.window.width)
+		y: (shy.half * a.window.height)
 		radius: a.a_r.value()
 		stroke: shy.Stroke{
 			width: 10

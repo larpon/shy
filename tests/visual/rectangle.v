@@ -42,8 +42,8 @@ pub fn (mut a App) frame(dt f64) {
 
 @[live]
 pub fn (mut a App) live_frame(dt f64) {
-	max_width := a.canvas().width
-	max_height := a.canvas().height
+	max_width := a.window.width
+	max_height := a.window.height
 
 	cx := max_width * 0.5
 	cy := max_height * 0.5
@@ -56,7 +56,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: min_y
 		width: a.dimension
 		height: a.dimension
-		origin: a.origin
+		origin: shy.Anchor.center
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
@@ -69,7 +69,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: cy
 		width: a.dimension
 		height: a.dimension
-		origin: .center
+		origin: shy.Anchor.center
 		color: shy.rgba(0, 0, 255, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
@@ -82,7 +82,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: max_y
 		width: a.dimension
 		height: a.dimension
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		color: shy.rgba(0, 0, 255, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
@@ -95,7 +95,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: max_y
 		width: a.dimension
 		height: a.dimension
-		origin: .bottom_right
+		origin: shy.Anchor.bottom_right
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
@@ -108,14 +108,14 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: min_y
 		width: a.dimension
 		height: a.dimension
-		origin: .top_right
+		origin: shy.Anchor.top_right
 		color: shy.rgba(255, 0, 0, 127)
 		fills: .body
 	)
 
 	a.quick.text(
 		y: a.canvas().height
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Press "D" to change dimensions
 Origin (up/down): ${a.origin}
 Dimensions ${a.dimension}x${a.dimension}'

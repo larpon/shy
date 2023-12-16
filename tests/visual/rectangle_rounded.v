@@ -42,8 +42,8 @@ pub fn (mut a App) frame(dt f64) {
 
 @[live]
 pub fn (mut a App) live_frame(dt f64) {
-	max_width := a.canvas().width
-	max_height := a.canvas().height
+	max_width := a.window.width
+	max_height := a.window.height
 
 	cx := max_width * 0.5
 	cy := max_height * 0.5
@@ -56,7 +56,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: cy
 		width: a.dimension
 		height: a.dimension
-		origin: .center
+		origin: shy.Anchor.center
 		radius: a.dimension / 2
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
@@ -70,7 +70,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: min_y
 		width: a.dimension
 		height: a.dimension
-		origin: a.origin
+		origin: shy.Anchor.center
 		radius: a.dimension / 2
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
@@ -84,7 +84,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: max_y
 		width: a.dimension
 		height: a.dimension
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		radius: a.dimension / 10
 		color: shy.rgba(0, 0, 255, 127)
 		stroke: shy.Stroke{
@@ -98,7 +98,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: max_y
 		width: a.dimension
 		height: a.dimension
-		origin: .bottom_right
+		origin: shy.Anchor.bottom_right
 		radius: a.dimension / 8
 		color: shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
@@ -112,7 +112,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: min_y
 		width: a.dimension
 		height: a.dimension
-		origin: .top_right
+		origin: shy.Anchor.top_right
 		radius: a.dimension / 8
 		color: shy.rgba(255, 0, 0, 127)
 		fills: .body

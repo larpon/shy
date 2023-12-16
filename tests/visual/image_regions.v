@@ -32,8 +32,8 @@ pub fn (mut a App) frame(dt f64) {
 
 @[live]
 pub fn (mut a App) live_frame(dt f64) {
-	cx := shy.half * a.window.width()
-	cy := shy.half * a.window.height()
+	cx := shy.half * a.window.width
+	cy := shy.half * a.window.height
 
 	rw := -1 // 256 // -1 // 256
 	rh := -1 // 256 // -1 // 256

@@ -46,12 +46,12 @@ pub fn (mut a App) frame(dt f64) {
 		width: 100
 		height: 100
 		rotation: 45 * shy.deg2rad
-		origin: .center
+		origin: shy.Anchor.center
 	)
 
 	a.quick.image(
-		x: 0.75 * f32(a.window.width())
-		y: shy.half * a.window.height()
+		x: 0.75 * f32(a.window.width)
+		y: shy.half * a.window.height
 		source: a.asset(image_path)
 		origin: .center
 	)
@@ -77,8 +77,8 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.image(
-		x: 0.90 * f32(a.window.width())
-		y: shy.half * a.window.height()
+		x: 0.90 * f32(a.window.width)
+		y: shy.half * a.window.height
 		source: a.asset(image_path)
 		origin: .center
 	)
@@ -105,6 +105,6 @@ pub fn (mut a App) frame(dt f64) {
 		width: 100
 		height: 100
 		rotation: 45 * shy.deg2rad
-		origin: .center
+		origin: shy.Anchor.center
 	)
 }

@@ -100,7 +100,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: cy
 		width: test_width
 		height: test_height
-		origin: .center
+		origin: shy.Anchor.center
 		fills: .stroke
 		stroke: shy.Stroke{
 			width: 9
@@ -112,7 +112,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: cy
 		width: shy.half * test_width
 		height: test_height
-		origin: .center
+		origin: shy.Anchor.center
 		fills: .stroke
 		stroke: shy.Stroke{
 			width: 9
@@ -124,7 +124,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: cy
 		width: test_width
 		height: shy.half * test_height
-		origin: .center
+		origin: shy.Anchor.center
 		fills: .stroke
 		stroke: shy.Stroke{
 			width: 9
@@ -162,7 +162,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: cy
 		width: 3
 		height: 3
-		origin: .center
+		origin: shy.Anchor.center
 		fills: .body
 		color: shy.colors.blue
 	)

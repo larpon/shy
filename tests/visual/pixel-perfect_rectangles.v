@@ -28,7 +28,7 @@ pub fn (mut a App) frame(dt f64) {
 		y: canvas.height / 2
 		width: canvas.width
 		height: canvas.height
-		origin: .center
+		origin: shy.Anchor.center
 		stroke: shy.Stroke{
 			width: 1
 		}
@@ -39,7 +39,7 @@ pub fn (mut a App) frame(dt f64) {
 		y: canvas.height / 2
 		width: canvas.width / 2
 		height: canvas.height / 2
-		origin: .center
+		origin: shy.Anchor.center
 		stroke: shy.Stroke{
 			width: 1
 		}
