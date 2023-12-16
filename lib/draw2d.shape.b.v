@@ -94,7 +94,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (t &DrawShape2DTriangle) origin_offset() (f32, f32) {
+pub fn (t &DrawShape2DTriangle) origin_displacement() (f32, f32) {
 	bb := t.bbox().mul_scalar(t.factor)
 	p_x, p_y := t.origin.pos_wh(bb.width, bb.height)
 	return -p_x, -p_y
@@ -116,25 +116,25 @@ pub fn (t &DrawShape2DTriangle) draw() {
 	y3 := (t.c.y * scale_factor - y)
 	offset := t.offset.mul_scalar(scale_factor)
 
-	mut o_off_x, mut o_off_y := t.origin_offset()
+	mut o_dis_x, mut o_dis_y := t.origin_displacement()
 
-	o_off_x = int(o_off_x)
-	o_off_y = int(o_off_y)
+	o_dis_x = int(o_dis_x)
+	o_dis_y = int(o_dis_y)
 
 	gl.push_matrix()
-	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(o_dis_x, o_dis_y, 0)
 	gl.translate(x + offset.x, y + offset.y, 0)
 
 	if t.rotation != 0 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.rotate(t.rotation, 0, 0, 1.0)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	if t.scale != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(t.scale, t.scale, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	if t.fills.has(.body) {
@@ -206,13 +206,20 @@ pub mut:
 	scale    f32  = 1.0
 	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
-	origin   Anchor
+	origin   Origin
 }
 
 @[inline]
-pub fn (r DrawShape2DRect) origin_offset() (f32, f32) {
-	p_x, p_y := r.origin.pos_wh(r.width * r.factor, r.height * r.factor)
-	return -p_x, -p_y
+pub fn (r DrawShape2DRect) origin_displacement() (f32, f32) {
+	return match r.origin {
+		Anchor {
+			p_x, p_y := r.origin.pos_wh(r.width * r.factor, r.height * r.factor)
+			-p_x, -p_y
+		}
+		Vec2[f32] {
+			-r.origin.x, -r.origin.y
+		}
+	}
 }
 
 @[inline]
@@ -225,24 +232,24 @@ pub fn (r &DrawShape2DRect) draw() {
 	w := r.width * scale_factor
 	h := r.height * scale_factor
 
-	mut o_off_x, mut o_off_y := r.origin_offset()
-	o_off_x = int(o_off_x)
-	o_off_y = int(o_off_y)
+	mut o_dis_x, mut o_dis_y := r.origin_displacement()
+	o_dis_x = int(o_dis_x)
+	o_dis_y = int(o_dis_y)
 
 	gl.push_matrix()
-	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(o_dis_x, o_dis_y, 0)
 	gl.translate(x + r.offset.x, y + r.offset.y, 0)
 
 	if r.rotation != 0 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.rotate(r.rotation, 0, 0, 1.0)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	if r.scale != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(r.scale, r.scale, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	if r.radius != 0 {
@@ -333,7 +340,6 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 				gl.v2f(sx, sy + h)
 				gl.v2f(sx, sy + h + stroke_width_0_5)
 				gl.end()
-
 				// left border rect
 				gl.begin_quads()
 				gl.v2f((sx - stroke_width_0_5), sy)
@@ -341,7 +347,6 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 				gl.v2f(sx, (sy + h))
 				gl.v2f((sx - stroke_width_0_5), (sy + h))
 				gl.end()
-
 				// body
 				gl.begin_quads()
 				gl.v2f(sx, sy)
@@ -350,7 +355,7 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 				gl.v2f(sx, (sy + h))
 				gl.end()
 
-				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', (4*3)+(5*4))
+				analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', (4 * 3) + (5 * 4))
 			} else {
 				m12x, m12y := midpoint(sx, sy, sx + w, sy)
 				m23x, m23y := midpoint(sx + w, sy, sx + w, sy + h)
@@ -764,7 +769,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (l DrawShape2DLineSegment) origin_offset() (f32, f32) {
+pub fn (l DrawShape2DLineSegment) origin_displacement() (f32, f32) {
 	// p_x, p_y := l.origin.pos_wh(l.a.x - l.b.x, l.a.y - l.b.y)
 	// return -p_x, -p_y
 	return 0, 0
@@ -792,20 +797,20 @@ pub fn (l DrawShape2DLineSegment) draw() {
 	y2_ := y2 - dy
 
 	gl.push_matrix()
-	o_off_x, o_off_y := l.origin_offset()
+	o_dis_x, o_dis_y := l.origin_displacement()
 
-	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(o_dis_x, o_dis_y, 0)
 	// gl.translate(x + r.offset.x, y + r.offset.y + r.offset.y, 0)
 
 	if l.rotation != 0 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.rotate(l.rotation, 0, 0, 1.0)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 	if l.scale != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(l.scale, l.scale, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	if stroke_width > 1 {
@@ -878,7 +883,7 @@ pub fn (up &DrawShape2DUniformPolygon) bbox() Rect {
 }
 
 @[inline]
-pub fn (up &DrawShape2DUniformPolygon) origin_offset() (f32, f32) {
+pub fn (up &DrawShape2DUniformPolygon) origin_displacement() (f32, f32) {
 	bbox := up.bbox()
 	p_x, p_y := up.origin.pos_wh(bbox.width, bbox.height)
 	return -p_x, -p_y
@@ -900,22 +905,22 @@ pub fn (up &DrawShape2DUniformPolygon) draw() {
 	}
 	sx := 0 // x //* scale_factor
 	sy := 0 // y //* scale_factor
-	o_off_x, o_off_y := up.origin_offset()
+	o_dis_x, o_dis_y := up.origin_displacement()
 
 	gl.push_matrix()
 
-	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(o_dis_x, o_dis_y, 0)
 	gl.translate(x + offset.x, y + offset.y, 0)
 
 	if up.rotation != 0 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.rotate(up.rotation, 0, 0, 1.0)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 	if up.scale != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(up.scale, up.scale, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	mut theta := f32(0)

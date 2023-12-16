@@ -74,7 +74,7 @@ rect.y ${a.fa_y.value}'
 		x: a.fa_x.value
 		y: a.fa_y.value
 		rotation: rotation
-		origin: .center
+		origin: shy.Anchor.center
 	)
 
 	a.quick.text(

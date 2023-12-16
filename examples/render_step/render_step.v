@@ -60,7 +60,7 @@ pub fn (mut a App) frame(dt f64) {
 		y: shy.half * a.window.height
 		rotation: a.a_r.value() * shy.deg2rad
 		scale: a.a_s.value()
-		origin: .center
+		origin: shy.Anchor.center
 	)
 
 	win := a.window

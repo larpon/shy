@@ -24,6 +24,6 @@ pub fn (mut a App) frame(dt f64) {
 		y: (shy.half * a.window.height)
 		width: 100
 		height: 100
-		origin: .center
+		origin: shy.Anchor.center
 	)
 }

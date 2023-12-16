@@ -165,7 +165,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor
+	origin   shy.Origin = shy.Anchor.top_left
 }
 
 @[noinit]
@@ -180,7 +180,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor
+	origin   shy.Origin = shy.Anchor.top_left
 }
 
 @[inline]

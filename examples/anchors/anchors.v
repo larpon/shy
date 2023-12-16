@@ -16,7 +16,7 @@ fn main() {
 struct App {
 	embed.ExampleApp
 mut:
-	origin shy.Anchor
+	anchor shy.Anchor
 	align  shy.TextAlign = .baseline | .left
 }
 
@@ -25,7 +25,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: shy.half * a.window.width
 		y: shy.half * a.window.height
-		origin: a.origin
+		origin: a.anchor
 		width: 50
 		height: 50
 		color: shy.colors.blue
@@ -37,15 +37,15 @@ pub fn (mut a App) frame(dt f64) {
 		origin: .bottom_center
 		// align: .left | .bottom
 		offset: vec.vec2[f32](0, -50 - 20)
-		text: 'Current draw origin:\n${a.origin}'
+		text: 'Current draw anchor:\n${a.anchor}'
 	)
 
-	tx, ty := a.origin.pos_wh(a.window.width, a.window.height)
+	tx, ty := a.anchor.pos_wh(a.window.width, a.window.height)
 	a.quick.text(
 		x: tx
 		y: ty
-		origin: a.origin
-		text: '${a.origin} / ' + a.align.str_clean()
+		origin: a.anchor
+		text: '${a.anchor} / ' + a.align.str_clean()
 		size: 42
 	)
 
@@ -53,7 +53,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: tx
 		y: ty
-		origin: .center
+		origin: shy.Anchor.center
 		width: 4
 		height: 4
 	)
@@ -62,7 +62,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x: shy.half * a.window.width
 		y: shy.half * a.window.height
-		origin: .center
+		origin: shy.Anchor.center
 		width: 2
 		height: 2
 	)
@@ -78,7 +78,7 @@ line 3'
 	a.quick.text(
 		x: at_x
 		y: at_y
-		origin: a.origin
+		origin: a.anchor
 		align: a.align
 		text: test_text
 	)
@@ -86,7 +86,7 @@ line 3'
 	a.quick.rect(
 		x: at_x
 		y: at_y
-		origin: .center
+		origin: shy.Anchor.center
 		width: 4
 		height: 4
 	)
@@ -101,10 +101,10 @@ pub fn (mut a App) event(e shy.Event) {
 			if e.state == .down {
 				match e.key_code {
 					.left {
-						a.origin = a.origin.prev()
+						a.anchor = a.anchor.prev()
 					}
 					.right {
-						a.origin = a.origin.next()
+						a.anchor = a.anchor.next()
 					}
 					else {}
 				}
@@ -114,7 +114,7 @@ pub fn (mut a App) event(e shy.Event) {
 			if e.state == .down {
 				match e.button {
 					.left {
-						a.origin = a.origin.next()
+						a.anchor = a.anchor.next()
 					}
 					.right {
 						a.align = a.align.next()

@@ -60,7 +60,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (i Draw2DImage) origin_offset() (f32, f32) {
+pub fn (i Draw2DImage) origin_displacement() (f32, f32) {
 	p_x, p_y := i.origin.pos_wh(i.width * i.factor, i.height * i.factor)
 	return -p_x, -p_y
 }
@@ -85,7 +85,7 @@ pub fn (i Draw2DImage) draw() {
 	image := i.image
 
 	mut scissor_rect := Rect{0, 0, -1, -1}
-	mut o_off_x, mut o_off_y := i.origin_offset()
+	mut o_dis_x, mut o_dis_y := i.origin_displacement()
 	match i.fill_mode {
 		.stretch {
 			// default mode
@@ -110,8 +110,8 @@ pub fn (i Draw2DImage) draw() {
 			y1 = image.height * ratio
 			i_x, i_y := i.origin.pos_wh(w, h)
 			x1x, y1y := i.origin.pos_wh(x1, y1)
-			o_off_x += i_x - x1x
-			o_off_y += i_y - y1y
+			o_dis_x += i_x - x1x
+			o_dis_y += i_y - y1y
 		}
 		.aspect_crop {
 			ratio := mth.max(f32(h) / (image.height), f32(w) / (image.width))
@@ -121,21 +121,21 @@ pub fn (i Draw2DImage) draw() {
 			i_x, i_y := i.origin.pos_wh(w, h)
 			x1x, y1y := i.origin.pos_wh(x1, y1)
 			// TODO(lmp) this offset circus should be able to use *less* branching
-			o_off_x += i_x - x1x
-			o_off_y += i_y - y1y
+			o_dis_x += i_x - x1x
+			o_dis_y += i_y - y1y
 			if i.origin in [.top_left, .top_center, .top_right, .bottom_left, .bottom_center,
 				.bottom_right] {
 				if image.width > image.height {
-					o_off_x -= i_x - x1x
-					o_off_x -= w * 0.5
+					o_dis_x -= i_x - x1x
+					o_dis_x -= w * 0.5
 				} else if image.width < image.height {
-					o_off_y -= i_y - y1y
-					o_off_y -= h * 0.5
+					o_dis_y -= i_y - y1y
+					o_dis_y -= h * 0.5
 				}
 			} else if i.origin in [.center_left, .center_right] {
 				if image.width > image.height {
-					o_off_x -= i_x - x1x
-					o_off_x -= w * 0.5
+					o_dis_x -= i_x - x1x
+					o_dis_x -= w * 0.5
 				}
 			}
 
@@ -214,23 +214,23 @@ pub fn (i Draw2DImage) draw() {
 	gl.enable_texture()
 	gl.texture(i.image.gfx_image, i.image.gfx_sampler)
 
-	// o_off_x = int(o_off_x)
-	// o_off_y = int(o_off_y)
+	// o_dis_x = int(o_dis_x)
+	// o_dis_y = int(o_dis_y)
 
-	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(o_dis_x, o_dis_y, 0)
 	gl.translate(x + i.offset.x, y + i.offset.y, 0)
 
-	// println('${o_off_x} x: ${x} w: ${w} h: ${h}')
+	// println('${o_dis_x} x: ${x} w: ${w} h: ${h}')
 
 	if i.rotation != 0 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.rotate(i.rotation, 0, 0, 1.0)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 	if i.scale != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(i.scale, i.scale, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	// gl.push_pipeline()
@@ -293,22 +293,22 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	gl.enable_texture()
 	gl.texture(i.image.gfx_image, i.image.gfx_sampler)
 
-	mut o_off_x, mut o_off_y := i.origin_offset()
-	// o_off_x = int(o_off_x)
-	// o_off_y = int(o_off_y)
+	mut o_dis_x, mut o_dis_y := i.origin_displacement()
+	// o_dis_x = int(o_dis_x)
+	// o_dis_y = int(o_dis_y)
 
-	gl.translate(o_off_x, o_off_y, 0)
+	gl.translate(o_dis_x, o_dis_y, 0)
 	gl.translate(x + i.offset.x, y + i.offset.y, 0)
 
 	if i.rotation != 0 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.rotate(i.rotation, 0, 0, 1.0)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 	if i.scale != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(i.scale, i.scale, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	// eprintln('image: ${w}x${h}\nsrc: ${src} dst: ${dst}')
@@ -316,9 +316,9 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	dw := mth.min(used_dst.width, w) / mth.max(used_dst.width, w)
 	dh := mth.min(used_dst.height, h) / mth.max(used_dst.height, h)
 	if dw != 1 || dh != 1 {
-		gl.translate(-o_off_x, -o_off_y, 0)
+		gl.translate(-o_dis_x, -o_dis_y, 0)
 		gl.scale(dw, dh, 1)
-		gl.translate(o_off_x, o_off_y, 0)
+		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 
 	// gl.push_pipeline()
