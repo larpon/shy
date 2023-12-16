@@ -11,7 +11,22 @@ import shy.vec { Vec2 }
 
 // basic primitives
 
+// Origin is a sumtype for points with origin at 0,0
 pub type Origin = Anchor | Vec2[f32]
+
+pub fn (o Origin) pos_wh[T](w T, h T) (T, T) {
+	mut x, mut y := T(0), T(0)
+	match o {
+		Anchor {
+			x, y = o.pos_wh(w, h)
+		}
+		Vec2[f32] {
+			x = T(o.x)
+			y = T(o.y)
+		}
+	}
+	return x, y
+}
 
 pub enum TriangleSegment {
 	ab
@@ -268,25 +283,45 @@ pub fn (r &Rect) hit_rect(rect Rect) bool {
 }
 
 @[inline]
-pub fn (mut r Rect) displace_from(origin Anchor) {
-	r.x, r.y = origin.displace_rect(r)
-}
-
-@[inline]
-pub fn (r &Rect) displaced_from(origin Anchor) Rect {
-	rx, ry := origin.displace_rect(r)
-	return Rect{
-		x: rx
-		y: ry
-		width: r.width
-		height: r.height
+pub fn (mut r Rect) displace_from(origin Origin) {
+	match origin {
+		Anchor {
+			r.x, r.y = origin.displace_rect(r)
+		}
+		Vec2[f32] {
+			r.x = r.x - origin.x
+			r.y = r.y - origin.y
+		}
 	}
 }
 
 @[inline]
-pub fn (r Rect) point_at(anchor Anchor) Vec2[f32] {
+pub fn (r &Rect) displaced_from(origin Origin) Rect {
+	return match origin {
+		Anchor {
+			rx, ry := origin.displace_rect(r)
+			Rect{
+				x: rx
+				y: ry
+				width: r.width
+				height: r.height
+			}
+		}
+		Vec2[f32] {
+			Rect{
+				x: r.x - origin.x
+				y: r.y - origin.y
+				width: r.width
+				height: r.height
+			}
+		}
+	}
+}
+
+@[inline]
+pub fn (r Rect) point_at(anchor Anchor) (f32, f32) {
 	x, y := anchor.pos_wh(r.width, r.height)
-	return vec2(r.x + x, r.y + y)
+	return r.x + x, r.y + y
 }
 
 pub fn (r &Rect) mul_scalar(scalar f32) Rect {

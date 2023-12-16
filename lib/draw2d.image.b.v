@@ -52,7 +52,7 @@ mut:
 	draw &Draw // For scissor state restoring
 pub mut:
 	color     Color = rgb(255, 255, 255)
-	origin    Anchor
+	origin    Origin
 	rotation  f32
 	scale     f32 = 1.0
 	offset    Vec2[f32]
@@ -61,8 +61,47 @@ pub mut:
 
 @[inline]
 pub fn (i Draw2DImage) origin_displacement() (f32, f32) {
-	p_x, p_y := i.origin.pos_wh(i.width * i.factor, i.height * i.factor)
-	return -p_x, -p_y
+	return match i.origin {
+		Anchor {
+			p_x, p_y := i.origin.pos_wh(i.width * i.factor, i.height * i.factor)
+			-p_x, -p_y
+		}
+		Vec2[f32] {
+			-i.origin.x, -i.origin.y
+		}
+	}
+}
+
+// Horrible workaround for something that was written and tweaked in some coding session.
+// The workaround is for a `match` statement inside another `match` statement.
+fn workaround_match_bug(image &Image, origin Origin, dis_x f32, dis_y f32, i_x f32, i_y f32, x1x f32, y1y f32, w f32, h f32) (f32, f32) {
+	mut o_dis_x := dis_x
+	mut o_dis_y := dis_y
+	match origin {
+		Anchor {
+			// TODO(lmp) this offset circus should be able to use *less* branching
+			if origin in [.top_left, .top_center, .top_right, .bottom_left, .bottom_center,
+				.bottom_right] {
+				if image.width > image.height {
+					o_dis_x -= i_x - x1x
+					o_dis_x -= w * 0.5
+				} else if image.width < image.height {
+					o_dis_y -= i_y - y1y
+					o_dis_y -= h * 0.5
+				}
+			} else if origin in [.center_left, .center_right] {
+				if image.width > image.height {
+					o_dis_x -= i_x - x1x
+					o_dis_x -= w * 0.5
+				}
+			}
+		}
+		Vec2[f32] {
+			o_dis_x -= i_x - x1x - origin.x
+			o_dis_y -= i_y - y1y - origin.y
+		}
+	}
+	return o_dis_x, o_dis_y
 }
 
 @[inline]
@@ -120,25 +159,12 @@ pub fn (i Draw2DImage) draw() {
 
 			i_x, i_y := i.origin.pos_wh(w, h)
 			x1x, y1y := i.origin.pos_wh(x1, y1)
-			// TODO(lmp) this offset circus should be able to use *less* branching
+
+			o_dis_x, o_dis_y = workaround_match_bug(image, i.origin, o_dis_x, o_dis_y,
+				i_x, i_y, x1x, y1y, w, h)
+
 			o_dis_x += i_x - x1x
 			o_dis_y += i_y - y1y
-			if i.origin in [.top_left, .top_center, .top_right, .bottom_left, .bottom_center,
-				.bottom_right] {
-				if image.width > image.height {
-					o_dis_x -= i_x - x1x
-					o_dis_x -= w * 0.5
-				} else if image.width < image.height {
-					o_dis_y -= i_y - y1y
-					o_dis_y -= h * 0.5
-				}
-			} else if i.origin in [.center_left, .center_right] {
-				if image.width > image.height {
-					o_dis_x -= i_x - x1x
-					o_dis_x -= w * 0.5
-				}
-			}
-
 			scissor_rect = i.draw.scissor_rect
 			mut scissor := Rect{
 				x: x
