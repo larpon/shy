@@ -67,7 +67,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		x: a.window.width * 0.01
 		y: a.window.height * (1.0 - 0.01)
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Press "s" to step 135 frames, hold "s+shift" to go out of step mode.
 Mode: ${win.mode}
 Frame: ${win.state.frame}

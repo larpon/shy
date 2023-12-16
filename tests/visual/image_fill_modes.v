@@ -172,7 +172,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		y: a.canvas().height
 		// width: rw
 		// height: rh
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Image (n/m): ${images[a.image]}
 Origin (up/down): ${a.origin}
 FillMode (left/right): ${a.fill_mode}'

@@ -41,21 +41,21 @@ pub fn (mut a App) init() ! {
 		x: shy.half * size.width
 		y: shy.half * size.height
 		size: 50
-		origin: .center
+		origin: shy.Anchor.center
 		align: .center
 	)
 
 	a.info_text = a.easy.new_text(
 		x: shy.half * size.width
 		y: 10
-		origin: .top_center
+		origin: shy.Anchor.top_center
 		align: .center
 		text: info
 	)
 
 	a.clock_text = a.easy.new_text(
 		y: size.height
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Local time: ${time.now().format_ss()}'
 	)
 

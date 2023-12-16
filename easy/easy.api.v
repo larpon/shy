@@ -57,8 +57,8 @@ pub mut:
 	rotation f32
 	scale    f32 = 1.0
 	text     string
-	size     f32 = shy.defaults.font.size
-	origin   shy.Anchor
+	size     f32           = shy.defaults.font.size
+	origin   shy.Origin    = shy.Anchor.top_left
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
 	color    shy.Color = shy.rgba(255, 255, 255, 255) // BUG shy.defaults.font.color
@@ -74,8 +74,8 @@ pub mut:
 	rotation f32
 	scale    f32 = 1.0
 	text     string
-	size     f32 = shy.defaults.font.size
-	origin   shy.Anchor
+	size     f32           = shy.defaults.font.size
+	origin   shy.Origin    = shy.Anchor.top_left
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
 	color    shy.Color = shy.defaults.font.color

@@ -53,7 +53,7 @@ pub fn (mut a App) frame(dt f64) {
 		a: center
 		b: center + shy.vec2(f32(50), -50) // TODO origin bug
 		c: center + shy.vec2(f32(100), 0)
-		origin: .center
+		origin: shy.Anchor.center
 	)*/
 
 	origin := a.origin // shy.Anchor.top_center
@@ -131,7 +131,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		x: a.canvas().width * 0.01
 		y: a.canvas().height * (1.0 - 0.01)
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Click mouse left/right to change transform origin
 Origin: ${a.origin}'
 	)

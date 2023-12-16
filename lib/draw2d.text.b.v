@@ -129,9 +129,9 @@ mut:
 pub mut:
 	text     string
 	rotation f32
-	font     string = defaults.font.name
-	color    Color  = defaults.font.color
-	origin   Anchor
+	font     string    = defaults.font.name
+	color    Color     = defaults.font.color
+	origin   Origin    = Anchor.top_left
 	align    TextAlign = .baseline | .left // TODO V BUG lib.defaults.font.align
 	size     f32       = defaults.font.size
 	scale    f32       = 1.0
@@ -139,6 +139,45 @@ pub mut:
 	offset   Vec2[f32]
 	blur     f32
 }
+
+/*
+fn calculate_text_offset_from_anchor(anchor Anchor, max_w f32, max_h f32) ( f32, f32) {
+	mut off_x := f32(0)
+	mut off_y := f32(0)
+	match anchor {
+			.top_left {}
+			.top_center {
+				off_x = -(max_w / 2)
+			}
+			.top_right {
+				off_x = -max_w
+			}
+			.center_left {
+				off_y = -(max_h / 2)
+			}
+			.center {
+				off_x = -(max_w / 2)
+				off_y = -(max_h / 2)
+			}
+			.center_right {
+				off_x = -max_w
+				off_y = -(max_h / 2)
+			}
+			.bottom_left {
+				off_y = -max_h
+			}
+			.bottom_center {
+				off_x = -(max_w / 2)
+				off_y = -max_h
+			}
+			.bottom_right {
+				off_x = -max_w
+				off_y = -max_h
+			}
+	}
+	return off_x, off_y
+}
+*/
 
 @[inline]
 pub fn (t Draw2DText) draw() {
@@ -243,37 +282,12 @@ pub fn (t Draw2DText) draw() {
 			0
 		}
 		off_x += align_off_x
-		match t.origin {
-			.top_left {}
-			.top_center {
-				off_x += -(max_w / 2)
-			}
-			.top_right {
-				off_x += -max_w
-			}
-			.center_left {
-				off_y += -(max_h / 2)
-			}
-			.center {
-				off_x += -(max_w / 2)
-				off_y += -(max_h / 2)
-			}
-			.center_right {
-				off_x += -max_w
-				off_y += -(max_h / 2)
-			}
-			.bottom_left {
-				off_y += -max_h
-			}
-			.bottom_center {
-				off_x += -(max_w / 2)
-				off_y += -max_h
-			}
-			.bottom_right {
-				off_x += -max_w
-				off_y += -max_h
-			}
-		}
+
+		o_off_x, o_off_y := t.origin.pos_wh(max_w, max_h)
+
+		off_x += -o_off_x
+		off_y += -o_off_y
+
 		y_accu += prev_line_height
 		prev_line_height = line_height - 2 // lines.len
 

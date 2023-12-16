@@ -34,7 +34,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		x: shy.half * a.window.width
 		y: shy.half * a.window.height
-		origin: .bottom_center
+		origin: shy.Anchor.bottom_center
 		// align: .left | .bottom
 		offset: vec.vec2[f32](0, -50 - 20)
 		text: 'Current draw anchor:\n${a.anchor}'

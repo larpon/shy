@@ -35,6 +35,6 @@ pub fn (mut a App) frame(dt f64) {
 		x: mx + 20
 		y: my + 20
 		text: 'Shy Mouse at ${mx},${my}\nButtons pressed: ${buttons}'
-		origin: .top_left
+		origin: shy.Anchor.top_left
 	)
 }

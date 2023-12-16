@@ -120,7 +120,7 @@ pub fn (mut a App) live_frame(dt f64) {
 
 	a.quick.text(
 		y: a.canvas().height
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Press "D" to change dimensions
 Origin (up/down): ${a.origin}
 Dimensions ${a.dimension}x${a.dimension}'

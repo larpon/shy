@@ -60,7 +60,7 @@ pub fn (mut a App) frame(dt f64) {
 		x: win_w
 		y: win_h
 		text: 'Shy Test!'
-		origin: .bottom_right
+		origin: shy.Anchor.bottom_right
 	)
 
 	a.quick.line_segment(
@@ -96,7 +96,7 @@ pub fn (mut a App) frame(dt f64) {
 		x: (win_w * 0.25)
 		y: (win_h * 0.75)
 		text: 'Shy'
-		origin: .center
+		origin: shy.Anchor.center
 	)
 
 	a.quick.rect(

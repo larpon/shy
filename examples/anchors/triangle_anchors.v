@@ -71,7 +71,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		x: a.window.width * 0.01
 		y: a.window.height * (1.0 - 0.01)
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Click mouse left/right to change transform origin
 Origin: ${a.origin}
 Rotation: ${rotation * shy.rad2deg:.1f}°'

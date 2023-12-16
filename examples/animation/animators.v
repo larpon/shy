@@ -97,7 +97,7 @@ pub fn (mut a App) frame(dt f64) {
 	a.quick.text(
 		x: a.window.width * 0.01
 		y: a.window.height * (1.0 - 0.01)
-		origin: .bottom_left
+		origin: shy.Anchor.bottom_left
 		text: 'Animation running for ${es:.1f} seconds
 Frame: ${win.state.frame}
 follow at ${a.fa_x.value():.1f},${a.fa_y.value():.1f} running: ${a.fa_x.running}
