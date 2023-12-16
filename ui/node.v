@@ -4,14 +4,21 @@
 module ui
 
 import shy.lib as shy
+import shy.vec
 
 pub struct VisualState {
 	shy.Rect
+pub:
+	rotation f32
+	scale    f32 = 1.0
+	offset   vec.Vec2[f32]
+	origin   shy.Anchor
 }
 
 @[heap]
 pub interface Node {
 	id u64
+	init() !
 	draw(ui &UI)
 	event(e Event) ?&Node
 	visual_state() VisualState
@@ -32,6 +39,7 @@ pub fn (n &Node) parent() &Node {
 // reparent sets `parent` to `new_parent` on this `&Node`.
 pub fn (n &Node) reparent(new_parent &Node) {
 	assert n != unsafe { nil }
+	assert new_parent != unsafe { nil }
 	unsafe {
 		n.parent = new_parent
 	}

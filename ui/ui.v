@@ -14,6 +14,7 @@ pub fn new(config UIConfig) !&UI {
 		shy: config.shy
 		easy: config.easy
 		root: config.root
+		theme: config.theme
 	}
 	u.init()!
 	return u
@@ -21,9 +22,10 @@ pub fn new(config UIConfig) !&UI {
 
 @[params]
 pub struct UIConfig {
-	shy  &shy.Shy
-	easy &easy.Easy
-	root &Node
+	shy   &shy.Shy
+	easy  &easy.Easy
+	root  &Node
+	theme Theme
 }
 
 // UI is the base struct of a logical tree/collection of UI items
@@ -37,6 +39,8 @@ mut:
 	dt   f64
 	easy &easy.Easy
 	root &Node // = shy.null
+	//
+	theme Theme
 	//
 	// uiid u64
 	// id_map map[u64]u64
@@ -52,6 +56,9 @@ fn (mut u UI) init() ! {
 			node.parent = unsafe { n }
 		}
 	})
+	if u.root != unsafe { nil } {
+		u.root.init()!
+	}
 }
 
 // pub fn id(cid ID) !u64 {

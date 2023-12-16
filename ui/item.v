@@ -4,6 +4,7 @@
 module ui
 
 import shy.lib as shy
+import shy.vec
 
 // Item is the base type for all UI elements.
 // By embedding `Item` in a struct - the struct fulfills
@@ -24,6 +25,19 @@ mut:
 	parent   &Node = unsafe { nil }
 	body     []&Node
 	on_event []OnEventFn
+	// Transformations
+	rotation f32
+	scale    f32 = 1.0
+	offset   vec.Vec2[f32]
+	origin   shy.Anchor
+}
+
+// init initialize this `Item` and it's children.
+pub fn (i &Item) init() ! {
+	assert i != unsafe { nil }
+	for child in i.body {
+		child.init()!
+	}
 }
 
 // parent returns this `Item`'s parent.
@@ -36,6 +50,7 @@ pub fn (i &Item) parent() &Node {
 // reparent sets this `Item`'s `parent` to `new_parent`.
 pub fn (i &Item) reparent(new_parent &Node) {
 	assert i != unsafe { nil }
+	assert new_parent != unsafe { nil }
 	unsafe {
 		i.parent = new_parent
 	}
@@ -43,6 +58,7 @@ pub fn (i &Item) reparent(new_parent &Node) {
 
 // draw draws the `Item` and/or any child nodes.
 pub fn (i &Item) draw(ui &UI) {
+	// Items are invisible, they have a size only
 	for child in i.body {
 		child.draw(ui)
 	}
@@ -54,16 +70,28 @@ pub fn (i &Item) visual_state() VisualState {
 	assert i != unsafe { nil }
 	p := i.parent()
 	if !isnil(p) && p.id != 0 {
+		// TODO switch to matricies and actually do the needed transformation math here
 		p_vs := p.visual_state()
+
+		// scale := p_vs.scale * i.scale
 		return VisualState{
 			x: p_vs.x + i.Rect.x
 			y: p_vs.y + i.Rect.y
 			width: i.Rect.width
 			height: i.Rect.height
+			rotation: i.rotation
+			scale: i.scale
+			offset: i.offset
+			origin: i.origin
 		}
 	}
+	// No parent, return as-is
 	return VisualState{
 		Rect: i.Rect
+		rotation: i.rotation
+		scale: i.scale
+		offset: i.offset
+		origin: i.origin
 	}
 }
 
@@ -103,18 +131,25 @@ pub fn (i &Item) event(e Event) ?&Node {
 }
 
 /*
-fn (mut i Item) free() {
+fn (mut i Item) shutdown() {
 	for child in i.body {
-		child.free()
-		unsafe { free(child) }
+		child.shutdown()
+		// unsafe { child.free() }
+		// unsafe { free(child) }
 	}
 	i.body.clear()
-	i.body.free()
+	//i.body.free()
 }*/
 
 @[heap]
 pub struct Rectangle {
 	Item
+pub mut:
+	// extra parts
+	stroke shy.Stroke
+	radius f32 // rounded corner radius. 0 = none
+	color  shy.Color = shy.colors.shy.red
+	fills  shy.Fill  = .body | .stroke
 }
 
 /*
@@ -123,7 +158,8 @@ pub fn (r &Rectangle) parent() &Node {
 	return r.Item.parent()
 }
 */
-// draw draws the `Item` and/or any child nodes.
+
+// draw draws the `Rectangle` and/or any child nodes.
 pub fn (r &Rectangle) draw(ui &UI) {
 	p_vs := r.visual_state()
 	er := ui.easy.rect(
@@ -131,6 +167,15 @@ pub fn (r &Rectangle) draw(ui &UI) {
 		y: p_vs.y
 		width: p_vs.width
 		height: p_vs.height
+		rotation: p_vs.rotation
+		scale: p_vs.scale
+		offset: p_vs.offset
+		origin: p_vs.origin
+		// easy rect config
+		stroke: r.stroke
+		radius: r.radius
+		color: r.color
+		fills: r.fills
 	)
 	er.draw()
 	// Draw rest of tree (children) on top
@@ -138,7 +183,7 @@ pub fn (r &Rectangle) draw(ui &UI) {
 }
 
 /*
-// visual_state returns this `Item`'s `VisualState`.
+// visual_state returns this `Rectangle`'s `VisualState`.
 @[inline]
 pub fn (r &Rectangle) visual_state() VisualState {
 	return r.Item.visual_state()
@@ -149,7 +194,8 @@ pub fn (r &Rectangle) visual_state() VisualState {
 // event sends an `Event` any child nodes and/or it's own listeners.
 pub fn (r &Rectangle) event(e Event) ?&Node {
 	return r.Item.event(e)
-}*/
+}
+*/
 
 @[heap]
 pub struct EventArea {
@@ -260,4 +306,13 @@ pub fn (pea &PointerEventArea) event(e Event) ?&Node {
 		}
 	}
 	return pea.EventArea.event(e)
+}
+
+@[heap]
+pub struct TextArea {
+	Item
+pub mut:
+	// extra parts
+	text  string
+	color shy.Color = shy.colors.shy.white
 }

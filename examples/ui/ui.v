@@ -19,50 +19,6 @@ mut:
 	ui &ui.UI = shy.null
 }
 
-@[heap]
-pub struct MyUIItem {
-	ui.EventArea
-}
-
-pub fn (m &MyUIItem) parent() &ui.Node {
-	return m.EventArea.parent()
-}
-
-pub fn (m &MyUIItem) draw(ui_ &ui.UI) {
-	m.EventArea.draw(ui_)
-}
-
-pub fn (m &MyUIItem) visual_state() ui.VisualState {
-	return m.EventArea.visual_state()
-}
-
-pub fn (m &MyUIItem) event(e ui.Event) ?&ui.Node {
-	// println('MyUIItem event called ${m.id}')
-	return m.EventArea.event(e)
-}
-
-@[heap]
-pub struct MyRect {
-	ui.Rectangle
-}
-
-pub fn (m &MyRect) parent() &ui.Node {
-	return m.Rectangle.parent()
-}
-
-pub fn (m &MyRect) draw(ui_ &ui.UI) {
-	m.Rectangle.draw(ui_)
-}
-
-pub fn (m &MyRect) visual_state() ui.VisualState {
-	return m.Rectangle.visual_state()
-}
-
-pub fn (m &MyRect) event(e ui.Event) ?&ui.Node {
-	// println('MyRect event called ${m.id}')
-	return m.Rectangle.event(e)
-}
-
 @[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
@@ -70,153 +26,16 @@ pub fn (mut a App) init() ! {
 	a.window.mode = .ui
 
 	root := &ui.Rectangle{
-		id: 42
-		width: 100
-		height: 100
+		width: a.canvas().width
+		height: a.canvas().height
+		fills: .body
 		body: [
-			&ui.Rectangle{
-				id: 43
+			&ui.Button{
 				x: 50
 				y: 50
 				width: 50
 				height: 50
-				body: [
-					&ui.Rectangle{
-						x: 0
-						y: 0
-						width: 25
-						height: 25
-						body: [
-							&MyRect{
-								id: 800
-								width: 20
-								on_event: [
-									fn (n &ui.Node, e ui.Event) bool {
-										node := &&MyRect(n) // TODO this is a weird V quirk
-										// eprintln('MyRect in call: ${ptr_str(n)} VS ${ptr_str(node)}')
-										assert node.id == n.id
-
-										mut mmui := unsafe { node }
-										if mmui.width < 80 {
-											mmui.width += 0.1
-										} else if mmui.width >= 50 {
-											mmui.width = 25
-										}
-										// return true
-										return false
-									},
-								]
-							},
-							&MyUIItem{
-								id: 400
-								width: 10
-								on_event: [
-									fn (n &ui.Node, e ui.Event) bool {
-										node := &&MyUIItem(n) // TODO this is a weird V quirk
-										// eprintln('MyUIItem this in call: ${ptr_str(n)} VS ${ptr_str(node)}')
-										assert node.id == n.id
-
-										// println('MyUIItem on_event reached ${node.id}/${n.id}')
-										mut mmui := unsafe { node }
-										mmui.width += 0.01
-										// println('${@STRUCT}/MyUIItem on_event was called ${mmui.width}')
-										// return true
-										return false
-									},
-								]
-							},
-						]
-					},
-				]
-			},
-			&ui.PointerEventArea{
-				id: 100
-				x: 50
-				y: 50
-				width: 500
-				height: 500
-				on_event: [
-					fn (n &ui.Node, e ui.Event) bool {
-						// println('ui.EventArea on_event reached ${n.id}')
-
-						ea := &&ui.EventArea(n)
-						assert ea.id == n.id
-						mut mea := unsafe { ea }
-						println('EventArea ${mea.id} found .x: ${mea.x}')
-						// mea.x += 1
-						return true
-						// return false
-					},
-				]
-				on_pointer_event: [
-					fn (n &ui.Node, e ui.PointerEvent) bool {
-						// println('PointerEventArea on_pointer_event reached ${n.id}')
-
-						// TODO BUG V mixes up the pointer here see also `shy/ui/item.v` etc.
-						// dump(typeof(n))
-
-						mut pea := &&ui.PointerEventArea(n)
-						eprintln('PointerEventArea n in call: ${ptr_str(n)}')
-						// eprintln('PointerEventArea this in call: ${ptr_str(n.this)}')
-						eprintln('PointerEventArea &n in call: ${ptr_str(&n)}')
-						eprintln('PointerEventArea pea in call: ${ptr_str(pea)}')
-						// TODO  `n &ui.Node` -> `n` pointer is not the same as in `ui/item.v`????
-						assert pea.id == n.id, 'HARD TO REPRODUCE V BUG'
-
-						println('PointerEventArea ${pea.id} found .x: ${pea.x}')
-						// pea.x += 1
-
-						// mut mpea := unsafe { pea }
-						// println('PointerEventArea ${mpea.id} found .x: ${mpea.x}')
-						// mpea.x += 1
-
-						// return true
-
-						return false
-					},
-				]
-				body: [
-					&MyRect{
-						id: 420
-						x: 300
-						y: 300
-						width: 6
-						height: 6
-						on_event: [
-							fn (n &ui.Node, e ui.Event) bool {
-								// if n is ui.Rectangle {
-								// ur := &ui.Rectangle(n)
-
-								mut mr := &&MyRect(n)
-								assert mr.id == n.id
-
-								if mr.width < 50 {
-									mr.width += 0.1
-								}
-
-								if mr.height < 50 {
-									mr.height += 0.1
-								}
-
-								if mr.width >= 50 {
-									mr.width = 6
-								}
-								if mr.height >= 50 {
-									mr.height = 6
-								}
-
-								// mut mr := unsafe { n }
-								// println('mr.x: ${mr.x}')
-								// println('ur.x: ${ur.x} mr.x: ${mr.x}')
-								// mr.x += 1
-								// return true
-
-								//}
-								return false
-							},
-						]
-					},
-				]
+				radius: 3
 			},
 		]
 	}
@@ -243,71 +62,4 @@ pub fn (mut a App) event(e shy.Event) {
 		// TODO BUG printing the whole node will make things crash at runtime...
 		println('Event was handled by ui.Node.id(${handled_by_node.id})')
 	}
-
-	// Mutability test
-	a.ui.modify(fn (mut n ui.Node) {
-		if mut n is MyRect {
-			println('oi ${n.id}')
-			if n.id == 420 {
-				n.x += 0.5
-				n.y += 0.25
-			} else {
-				n.y += 0.1
-			}
-		}
-
-		if mut n is ui.Rectangle {
-			if n.id == 42 {
-				if n.x < 200 {
-					n.x += 1
-				} else {
-					n.x = 0
-				}
-			}
-			if n.id == 43 {
-				// pid := n.parent() or { -1 }.id
-				pid := n.parent().id
-				println('parent id ${pid}')
-			}
-		}
-	})
-
-	/*
-	rects := a.ui.collect(fn (n &ui.Node) bool {
-		if n is ui.Rectangle {
-			//i := n as ui.Item
-			//println('n is $n')
-			return true
-		}
-// 		if n is ui.EventArea {
-// 			//i := n as ui.Item
-// 			//println('n is $n')
-// 			return true
-// 		}
-
-		return false
-	})
-
-	mut rs := []&ui.Rectangle{cap: rects.len}
-	for n in rects {
-		//mut rect := unsafe { r as ui.Rectangle }
-		//println('-'.repeat(30))
-		//println(r)
-		if n is ui.Rectangle {
-			//mut r := n as ui.Rectangle
-			mut r := unsafe { n }
-			rs << r
-// 			if r.id == 42 {
-// 				//println(n)
-// 				r.x = 200
-// 				//r.draw(a.ui)
-// 			}
-		}
-	}
-
-	for mut r in rs {
-		if r.id == 42 {
-			r.x = 200
-		}
-	}*/
 }
