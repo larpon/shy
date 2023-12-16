@@ -393,7 +393,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor = .center
+	origin   shy.Origin = shy.Anchor.center
 }
 
 @[noinit]
@@ -407,7 +407,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor = .center
+	origin   shy.Origin = shy.Anchor.center
 }
 
 @[inline]
@@ -458,7 +458,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor = .center
+	origin   shy.Origin = shy.Anchor.center
 }
 
 @[noinit]
@@ -473,7 +473,7 @@ pub mut:
 	color    shy.Color = shy.colors.shy.red
 	fills    shy.Fill  = .body | .stroke
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor = .center
+	origin   shy.Origin = shy.Anchor.center
 }
 
 @[inline]

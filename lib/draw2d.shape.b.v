@@ -874,7 +874,7 @@ pub mut:
 	scale    f32  = 1.0
 	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
-	origin   Anchor = .center
+	origin   Origin = Anchor.center
 }
 
 @[inline]
