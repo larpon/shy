@@ -37,7 +37,7 @@ pub fn (mut a App) frame(dt f64) {
 		origin: shy.Anchor.bottom_center
 		// align: .left | .bottom
 		offset: vec.vec2[f32](0, -50 - 20)
-		text: 'Current draw anchor:\n${a.anchor}'
+		text: 'Current draw origin:\n${a.anchor}'
 	)
 
 	tx, ty := a.anchor.pos_wh(a.window.width, a.window.height)
