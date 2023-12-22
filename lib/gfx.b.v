@@ -14,7 +14,7 @@ pub enum EndEnum {
 	passthru
 }
 
-[params]
+@[params]
 pub struct EndOptions {
 	how EndEnum
 }
@@ -521,7 +521,7 @@ const dontcare_pass = gfx.PassAction{
 pub fn make_clear_pass(r f32, g f32, b f32, a f32) gfx.PassAction {
 	mut color_action := gfx.ColorAttachmentAction{
 		load_action: .clear
-		clear_value: Color{
+		clear_value: gfx.Color{
 			r: r
 			g: g
 			b: b

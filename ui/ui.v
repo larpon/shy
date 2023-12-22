@@ -57,7 +57,7 @@ fn (mut u UI) init() ! {
 		}
 	})
 	if u.root != unsafe { nil } {
-		u.root.init()!
+		u.root.init(u)!
 	}
 }
 
@@ -144,16 +144,16 @@ pub fn (mut u UI) shutdown() ! {
 }
 
 // draw draws the current frame of the UI's state.
-pub fn (u &UI) draw(dt f64) {
+pub fn (mut u UI) draw(dt f64) {
 	unsafe {
 		u.dt = dt
 	}
 	// TODO surround in a separate render pass?
-	u.root.draw(u)
+	u.root.draw()
 }
 
 // event sends `event` to relevant node event handlers in the UI.
-pub fn (u &UI) event(e Event) ?&Node {
+pub fn (mut u UI) event(e Event) ?&Node {
 	// Start event bubbling
 	return u.root.event(e)
 }

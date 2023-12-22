@@ -19,56 +19,75 @@ pub struct Item {
 pub:
 	id u64 = 1
 mut:
+	ui &UI = unsafe { nil }
 	// NOTE The `unsafe { nil }` assignment once resulted in several V bugs: https://github.com/vlang/v/issues/16882
 	// ... which was quickly fixed but one of them couldn't be made as an MRE (minimal reproducible example) - so it's
 	// a target of regression: https://github.com/vlang/v/commit/2119a24 <- this commit has the fix.
 	parent   &Node = unsafe { nil }
 	body     []&Node
 	on_event []OnEventFn
+	// nice to have state
+	hovered_by_pointer_device bool
+pub mut:
 	// Transformations
 	rotation f32
 	scale    f32 = 1.0
 	offset   vec.Vec2[f32]
-	origin   shy.Anchor
+	origin   shy.Origin
 }
 
 // init initialize this `Item` and it's children.
-pub fn (i &Item) init() ! {
-	assert i != unsafe { nil }
-	for child in i.body {
-		child.init()!
+pub fn (mut i Item) init(ui &UI) ! {
+	// TODO V BUG #20220 (https://github.com/vlang/v/issues/20220)
+	// TODO V BUG #20229 (https://github.com/vlang/v/issues/20229)
+	// assert i != unsafe { nil }
+	i.ui = ui
+	for mut child in i.body {
+		child.init(ui)!
+	}
+	i.update()
+}
+
+// update is called when the `Item` needs to e.g. update it's layout.
+pub fn (mut i Item) update() {
+	// assert i != unsafe { nil }
+	for mut child in i.body {
+		child.update()
 	}
 }
 
+/*
 // parent returns this `Item`'s parent.
 pub fn (i &Item) parent() &Node {
-	assert i != unsafe { nil }
+	//assert i != unsafe { nil }
 	// TODO BUG returning ?&Node is not possible currently: if isnil(i.parent) { return none }
 	return i.parent
 }
+*/
 
 // reparent sets this `Item`'s `parent` to `new_parent`.
-pub fn (i &Item) reparent(new_parent &Node) {
-	assert i != unsafe { nil }
-	assert new_parent != unsafe { nil }
+pub fn (mut i Item) reparent(new_parent &Node) {
+	//	assert i != unsafe { nil }
+	// assert new_parent != unsafe { nil }
 	unsafe {
 		i.parent = new_parent
 	}
 }
 
 // draw draws the `Item` and/or any child nodes.
-pub fn (i &Item) draw(ui &UI) {
+pub fn (mut i Item) draw() {
+	// println(ptr_str(i.ui))
 	// Items are invisible, they have a size only
-	for child in i.body {
-		child.draw(ui)
+	for mut child in i.body {
+		child.draw()
 	}
 }
 
 // visual_state returns this `Item`'s `VisualState`.
 @[inline]
 pub fn (i &Item) visual_state() VisualState {
-	assert i != unsafe { nil }
-	p := i.parent()
+	// assert i != unsafe { nil }
+	p := i.parent //()
 	if !isnil(p) && p.id != 0 {
 		// TODO switch to matricies and actually do the needed transformation math here
 		p_vs := p.visual_state()
@@ -96,11 +115,11 @@ pub fn (i &Item) visual_state() VisualState {
 }
 
 // event delegates `e` `Event` to any child nodes and/or it's own listeners.
-pub fn (i &Item) event(e Event) ?&Node {
+pub fn (mut i Item) event(e Event) ?&Node {
 	// By sending the event on to the children nodes
 	// it's effectively *bubbling* the event upwards in the
 	// tree / scene graph
-	for child in i.body {
+	for mut child in i.body {
 		if node := child.event(e) {
 			return node
 		}
@@ -112,11 +131,13 @@ pub fn (i &Item) event(e Event) ?&Node {
 			vs.Rect.contains(e.x, e.y)
 		}
 		else {
-			true
+			false
 		}
 	}
 
+	i.hovered_by_pointer_device = false
 	if hit {
+		i.hovered_by_pointer_device = true
 		for on_event in i.on_event {
 			assert !isnil(on_event)
 
@@ -130,6 +151,12 @@ pub fn (i &Item) event(e Event) ?&Node {
 	return none
 }
 
+// contains_pointer_device returns `true` if this item contains the coordinates for
+// a pointer device, such as a computer mouse.
+pub fn (i &Item) contains_pointer_device() bool {
+	return i.hovered_by_pointer_device
+}
+
 /*
 fn (mut i Item) shutdown() {
 	for child in i.body {
@@ -140,62 +167,6 @@ fn (mut i Item) shutdown() {
 	i.body.clear()
 	//i.body.free()
 }*/
-
-@[heap]
-pub struct Rectangle {
-	Item
-pub mut:
-	// extra parts
-	stroke shy.Stroke
-	radius f32 // rounded corner radius. 0 = none
-	color  shy.Color = shy.colors.shy.red
-	fills  shy.Fill  = .body | .stroke
-}
-
-/*
-// parent returns the parent Node.
-pub fn (r &Rectangle) parent() &Node {
-	return r.Item.parent()
-}
-*/
-
-// draw draws the `Rectangle` and/or any child nodes.
-pub fn (r &Rectangle) draw(ui &UI) {
-	p_vs := r.visual_state()
-	er := ui.easy.rect(
-		x: p_vs.x
-		y: p_vs.y
-		width: p_vs.width
-		height: p_vs.height
-		rotation: p_vs.rotation
-		scale: p_vs.scale
-		offset: p_vs.offset
-		origin: p_vs.origin
-		// easy rect config
-		stroke: r.stroke
-		radius: r.radius
-		color: r.color
-		fills: r.fills
-	)
-	er.draw()
-	// Draw rest of tree (children) on top
-	r.Item.draw(ui)
-}
-
-/*
-// visual_state returns this `Rectangle`'s `VisualState`.
-@[inline]
-pub fn (r &Rectangle) visual_state() VisualState {
-	return r.Item.visual_state()
-}
-*/
-
-/*
-// event sends an `Event` any child nodes and/or it's own listeners.
-pub fn (r &Rectangle) event(e Event) ?&Node {
-	return r.Item.event(e)
-}
-*/
 
 @[heap]
 pub struct EventArea {
@@ -253,7 +224,7 @@ pub fn (pea &PointerEventArea) visual_state() VisualState {
 }*/
 
 // event sends an `Event` any child nodes and/or it's own listeners.
-pub fn (pea &PointerEventArea) event(e Event) ?&Node {
+pub fn (mut pea PointerEventArea) event(e Event) ?&Node {
 	if e is MouseButtonEvent || e is MouseMotionEvent || e is MouseWheelEvent {
 		ex := match e {
 			MouseButtonEvent, MouseMotionEvent, MouseWheelEvent {

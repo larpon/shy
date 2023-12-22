@@ -26,8 +26,8 @@ pub fn (mut a App) init() ! {
 	a.window.mode = .ui
 
 	root := &ui.Rectangle{
-		width: a.canvas().width
-		height: a.canvas().height
+		width: a.window.width
+		height: a.window.height
 		fills: .body
 		body: [
 			&ui.Button{
@@ -35,7 +35,7 @@ pub fn (mut a App) init() ! {
 				y: 50
 				width: 50
 				height: 50
-				radius: 3
+				label: 'Hello World'
 			},
 		]
 	}
