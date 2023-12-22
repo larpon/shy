@@ -9,6 +9,16 @@ import shy.wraps.sokol.gfx
 import shy.wraps.sokol.gl
 import shy.wraps.sokol.sfons
 
+pub enum EndEnum {
+	clear
+	passthru
+}
+
+[params]
+pub struct EndOptions {
+	how EndEnum
+}
+
 pub struct GFX {
 	ShyStruct
 mut:
@@ -57,11 +67,6 @@ mut:
 
 fn (d Display) destroy() {
 	gl.destroy_pipeline(d.gl_pip)
-}
-
-pub fn (mut g GFX) make_clear_color_pass_action(color Color) gfx.PassAction {
-	c := color.as_f32()
-	return gfx.create_clear_pass(c.r, c.g, c.b, c.a)
 }
 
 pub fn (mut g GFX) init() ! {
@@ -226,7 +231,7 @@ fn (mut c Context) sokol_gl_init() ! {
 	}
 
 	display := Display{
-		pass_action: gfx.create_clear_pass(0.5, 0.7, 1.0, 1.0)
+		pass_action: make_clear_pass(0.5, 0.7, 1.0, 1.0)
 		gl_pip: gl.context_make_pipeline(gl.default_context, &gl_pip_desc)
 	}
 
@@ -265,7 +270,7 @@ fn (mut c Context) sokol_gl_init() ! {
 		width: w
 		height: h
 		pass: gfx.make_pass(&off_pass_desc)
-		pass_action: gfx.create_clear_pass(0.0, 0.0, 0.0, 1.0)
+		pass_action: make_clear_pass(0.0, 0.0, 0.0, 1.0)
 		pass_desc: off_pass_desc
 		gl_ctx: gl.make_context(gl_ctx_desc)
 		img: off_img
@@ -361,7 +366,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 	}
 }
 
-pub fn (mut g GFX) end_easy_frame() {
+pub fn (mut g GFX) end_easy_frame(options EndOptions) {
 	win := g.shy.active_window()
 	dw, dh := win.canvas().wh()
 
@@ -407,13 +412,29 @@ pub fn (mut g GFX) end_easy_frame() {
 	gl.disable_texture()
 
 	// do the actual offscreen and display rendering in sokol-gfx passes
-	gfx.begin_pass(off.pass, &off.pass_action)
+	match options.how {
+		.clear {
+			gfx.begin_pass(off.pass, &off.pass_action)
+		}
+		.passthru {
+			gfx.begin_pass(off.pass, &lib.dontcare_pass)
+		}
+	}
+
 	// Alternative: gl.context_draw(off.gl_ctx)
 	gl.set_context(off.gl_ctx)
 	gl.draw()
 	gfx.end_pass()
 
-	gfx.begin_default_pass(&dis.pass_action, int(dw), int(dh))
+	match options.how {
+		.clear {
+			gfx.begin_default_pass(&dis.pass_action, int(dw), int(dh))
+		}
+		.passthru {
+			gfx.begin_default_pass(&lib.dontcare_pass, int(dw), int(dh))
+		}
+	}
+
 	// Alternative: gl.context_draw(gl.default_context)
 	gl.set_context(gl.default_context)
 	gl.draw()
@@ -473,4 +494,46 @@ pub fn (mut g GFX) get_font_context(cid u32) &FontContext {
 		return ctx.font
 	}
 	panic('no font context in context ${cid} found')
+}
+
+// Utils
+const dontcare_pass = gfx.PassAction{
+	colors: [
+		gfx.ColorAttachmentAction{
+			load_action: .dontcare
+			clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+		},
+		gfx.ColorAttachmentAction{
+			load_action: .dontcare
+			clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+		},
+		gfx.ColorAttachmentAction{
+			load_action: .dontcare
+			clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+		},
+		gfx.ColorAttachmentAction{
+			load_action: .dontcare
+			clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+		},
+	]!
+}
+
+pub fn make_clear_pass(r f32, g f32, b f32, a f32) gfx.PassAction {
+	mut color_action := gfx.ColorAttachmentAction{
+		load_action: .clear
+		clear_value: Color{
+			r: r
+			g: g
+			b: b
+			a: a
+		}
+	}
+	mut pass_action := gfx.PassAction{}
+	pass_action.colors[0] = color_action
+	return pass_action
+}
+
+pub fn make_clear_color_pass_action(color Color) gfx.PassAction {
+	c := color.as_f32()
+	return make_clear_pass(c.r, c.g, c.b, c.a)
 }
