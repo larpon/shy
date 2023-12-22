@@ -38,6 +38,7 @@ jobs:
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
+        sudo apt-get update
         # vgret dependencies
         # imagemagick              : convert, mogrify, import
         # xvfb                     : xvfb
