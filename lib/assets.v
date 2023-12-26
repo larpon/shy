@@ -28,13 +28,22 @@ pub fn (mut a Assets) init() ! {
 }
 
 pub fn (mut a Assets) shutdown() ! {
+	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload
+	// keys := a.ass.keys()
+	// values := a.ass.values()
+	// println('Keys ${keys} ${keys.len} vs ${values.len}')
+	for _, mut asset in a.ass {
+		// asset.shy = a.shy
+		asset.shutdown()!
+		unsafe { free(&asset) }
+	}
+	a.ass.clear()
 	for _, mut image in a.image_cache {
-		image.free()
+		image.shutdown()!
+		// a.image_cache.delete(k)
 	}
 	a.image_cache.clear()
-	for _, mut asset in a.ass {
-		asset.shutdown()!
-	}
+
 	// Sounds are handled by the AudioEngine
 	a.sound_cache.clear()
 
@@ -43,27 +52,26 @@ pub fn (mut a Assets) shutdown() ! {
 
 // load loads a binary blob from a variety of sources and return
 // a reference to an `Asset`.
+// See also: unload
 pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	source := alo.source
-	if asset := a.ass[source.cache_key(mut a.sb)] {
+	if asset := a.ass[source.str()] {
 		return asset
 	}
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
 
 	// TODO enable network fetching etc.
 	if alo.async {
-		return error('${@STRUCT}.${@FN}: "${source}" asynchronously loading not implemented')
-		/*
-		asset := &Asset{
-			shy: a.shy
-			lo: alo
-			status: .loading
-		}
-		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${source}"')
-		a.ass[source.str()] = asset
-		return asset
-		*/
+		return error('${@STRUCT}.${@FN}: "${source}" asynchronously loading not implemented yet')
+		// asset := &Asset{
+		//	shy: a.shy
+		//	lo: alo
+		//	status: .loading
+		//}
+		// a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${source}"')
+		// a.ass[source.str()] = asset
+		// return asset
 	}
 
 	mut bytes := []u8{}
@@ -105,6 +113,33 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	return asset
 }
 
+// unload unloads a binary blob from a range of targets
+pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
+	source := auo.source
+	source_cache_key := source.cache_key(mut a.sb)
+	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Asset.shutdown / Assets.shutdown
+	if mut asset := a.ass[source_cache_key] {
+		a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when deallocating in hot code paths. It is, in general, better to unload data on shutdown. Unloading "${source}"')
+
+		if mut image := a.image_cache[source_cache_key] {
+			image.shutdown()!
+			a.image_cache.delete(source_cache_key)
+		}
+		if _ := a.sound_cache[source_cache_key] {
+			a.sound_cache.delete(source_cache_key)
+		}
+
+		asset.shutdown()!
+		unsafe { free(asset) }
+
+		a.ass[source.str()] = null
+		a.ass.delete(source.str())
+		return
+	}
+	return error('Asset ${source.str()} not loaded, nothing to unload')
+}
+
 /*
 pub fn (mut a Assets) cache[T](asset T) ! {
 	$if T is Image {
@@ -139,7 +174,7 @@ pub fn (a &Assets) get[T](source AssetSource) !T {
 			return sound
 		}
 	} $else $if T is &Asset {
-		return a.ass[source.cache_key(mut sb)]
+		return a.ass[source.str()]
 	} $else {
 		// t := T{}
 		// tof := typeof(t).name
@@ -190,7 +225,7 @@ fn (a AssetSource) cache_key(mut sb strings.Builder) string {
 			a.path
 		}
 		TaggedSource {
-			//'${a.source.str()}#${a.tag}'
+			// TODO '${a.source.str()}#${a.tag}'
 			sb.write_string(a.source.str())
 			sb.write_string('#')
 			sb.write_string(a.tag)
@@ -223,20 +258,34 @@ pub:
 	cache  bool = true
 }
 
+@[param]
+pub struct AssetUnloadOptions {
+pub:
+	source AssetSource
+	// async  bool
+	// memory bool = true // Unload from memory
+	// cache  bool = true // Unloads from cache
+}
+
 // Asset represents an binary blob
 @[heap]
 pub struct Asset {
 	ShyStruct
 	data []u8
 pub:
-	lo     AssetLoadOptions
-	status AssetStatus
+	lo AssetLoadOptions
+pub mut:
+	status AssetStatus // TODO(lmp) should be pub read-only to the outside world if V ever gets that access modifier
 }
 
 pub fn (mut a Asset) shutdown() ! {
+	if isnil(a) {
+		println('Crashing at hard-to-reproduce V memory BUG...')
+	}
 	unsafe {
 		a.data.free()
 	}
+	a.status = .freed
 	a.ShyStruct.shutdown()!
 }
 
@@ -326,7 +375,6 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		channels: stb_img.use_channels
 		mipmaps: opt.mipmaps
 		ready: stb_img.ok
-		// data: stb_img.data
 		kind: .png // TODO stb_img.ext
 	}
 
@@ -519,11 +567,9 @@ mut:
 	wrap_v  ImageWrap = .clamp_to_edge
 }
 
-pub fn (mut i Image) free() {
-	unsafe {
-		gfx.destroy_image(i.gfx_image)
-		gfx.destroy_sampler(i.gfx_sampler)
-	}
+pub fn (mut i Image) shutdown() ! {
+	gfx.destroy_image(i.gfx_image)
+	gfx.destroy_sampler(i.gfx_sampler)
 }
 
 pub fn (i &Image) source() AssetSource {
