@@ -34,8 +34,9 @@ fn (s ShyStruct) init() ! {
 	assert !isnil(s.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 }
 
-fn (s ShyStruct) shutdown() ! {
+fn (mut s ShyStruct) shutdown() ! {
 	assert !isnil(s.shy), '${@STRUCT}.${@FN}' + 'shy is null'
+	s.shy = lib.null
 }
 
 struct ShyFrame {
