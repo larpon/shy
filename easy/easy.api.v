@@ -600,11 +600,16 @@ pub:
 	fill_mode shy.ImageFillMode
 }
 
+pub struct EasyImageMetaData {
+pub:
+	size_raw shy.Size = shy.Size{0, 0}
+}
+
 @[noinit]
 pub struct EasyImage {
 	shy.ShyStruct
 	shy.Rect
-pub:
+pub mut:
 	source    shy.AssetSource
 	color     shy.Color = shy.rgb(255, 255, 255)
 	rotation  f32
@@ -613,12 +618,12 @@ pub:
 	origin    shy.Origin
 	region    shy.Rect = shy.Rect{0, 0, -1, -1}
 	fill_mode shy.ImageFillMode
+pub:
+	meta EasyImageMetaData
 }
 
 pub fn (ei &EasyImage) draw() {
 	if image := ei.shy.assets().get[shy.Image](ei.source) {
-		// if img := ei.shy.assets().get_cached_image(ei.source) {
-
 		draw := ei.shy.draw()
 		mut d := draw.image()
 		d.begin()
@@ -669,9 +674,6 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		return EasyImage{
 			shy: e.shy
 			Rect: r
-			// y: r.y
-			// w: r.width
-			// h: r.height
 			source: eic.source
 			color: eic.color
 			rotation: eic.rotation
@@ -680,11 +682,40 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 			origin: eic.origin
 			region: eic.region
 			fill_mode: eic.fill_mode
+			meta: EasyImageMetaData{
+				size_raw: shy.Size{
+					width: image.width
+					height: image.height
+				}
+			}
 		}
 	}
-	// return
-	// TODO
-	panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
+
+	return EasyImage{
+		shy: e.shy
+		Rect: shy.Rect{
+			x: 0
+			y: 0
+			width: 0
+			height: 0
+		}
+		source: eic.source
+		color: eic.color
+		rotation: eic.rotation
+		scale: eic.scale
+		offset: eic.offset
+		origin: eic.origin
+		region: eic.region
+		fill_mode: eic.fill_mode
+		meta: EasyImageMetaData{
+			size_raw: shy.Size{
+				width: 0
+				height: 0
+			}
+		}
+	}
+	// TODO decide if we should have a strict mode of some sort??
+	// panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
 }
 
 @[inline]
@@ -694,6 +725,7 @@ pub fn (q &Quick) image(eic EasyImageConfig) {
 }
 
 // Assets
+
 // load returns a reference `shy.Asset`. Note that the asset may not be fully loaded
 // depending on the load options passed.
 pub fn (e &Easy) load(alo shy.AssetLoadOptions) !&shy.Asset {
@@ -724,6 +756,18 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 		}
 	}
 	return error('${@STRUCT}.${@FN}: TODO ${ao} type not implemented yet')
+}
+
+// unload unloads a `shy.Asset`.
+pub fn (e &Easy) unload(auo shy.AssetUnloadOptions) ! {
+	mut assets := e.shy.assets()
+	assets.unload(auo)!
+}
+
+@[inline]
+pub fn (q &Quick) unload(auo shy.AssetUnloadOptions) ! {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.unload(auo)!
 }
 
 /*
