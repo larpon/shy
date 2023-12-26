@@ -11,14 +11,24 @@ fn trace_allocation(message string) {
 
 @[export: 'stbi__callback_malloc']
 fn cb_malloc(s usize) voidptr {
-	res := unsafe { malloc(isize(s)) }
+	mut res := unsafe { nil }
+	$if stbi_memory_no_gc ? {
+		res = unsafe { C.malloc(s) }
+	} $else {
+		res = unsafe { malloc(isize(s)) }
+	}
 	trace_allocation('> stbi__callback_malloc: ${s} => ${ptr_str(res)}')
 	return res
 }
 
 @[export: 'stbi__callback_realloc']
 fn cb_realloc(p voidptr, s usize) voidptr {
-	res := unsafe { v_realloc(p, isize(s)) }
+	mut res := unsafe { nil }
+	$if stbi_memory_no_gc ? {
+		res = unsafe { C.realloc(&u8(p), int(s)) }
+	} $else {
+		res = unsafe { v_realloc(p, isize(s)) }
+	}
 	trace_allocation('> stbi__callback_realloc: ${ptr_str(p)} , ${s} => ${ptr_str(res)}')
 	return res
 }
@@ -26,7 +36,11 @@ fn cb_realloc(p voidptr, s usize) voidptr {
 @[export: 'stbi__callback_free']
 fn cb_free(p voidptr) {
 	trace_allocation('> stbi__callback_free: ${ptr_str(p)}')
-	unsafe { free(p) }
+	$if stbi_memory_no_gc ? {
+		unsafe { C.free(p) }
+	} $else {
+		unsafe { free(p) }
+	}
 }
 
 #flag -I @VMODROOT/thirdparty/stb
