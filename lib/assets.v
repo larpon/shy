@@ -28,12 +28,16 @@ pub fn (mut a Assets) init() ! {
 }
 
 pub fn (mut a Assets) shutdown() ! {
-	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload
+	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload that may, or may not, be the function that causes it
 	// keys := a.ass.keys()
 	// values := a.ass.values()
 	// println('Keys ${keys} ${keys.len} vs ${values.len}')
-	for _, mut asset in a.ass {
+	for k, mut asset in a.ass {
 		// asset.shy = a.shy
+		if isnil(asset) {
+			eprintln('${@LOCATION}: Upcoming crash at null pointer at key "${k}"')
+			continue
+		}
 		asset.shutdown()!
 		unsafe { free(&asset) }
 	}
@@ -120,7 +124,7 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 	source_cache_key := source.cache_key(mut a.sb)
 	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Asset.shutdown / Assets.shutdown
 	if mut asset := a.ass[source_cache_key] {
-		a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when deallocating in hot code paths. It is, in general, better to unload data on shutdown. Unloading "${source}"')
+		a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when deallocating in hot code paths. It is, in general, better to unload data on shutdown. Unloading "${source.str()}"')
 
 		if mut image := a.image_cache[source_cache_key] {
 			image.shutdown()!
@@ -133,7 +137,7 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 		asset.shutdown()!
 		unsafe { free(asset) }
 
-		a.ass[source.str()] = null
+		//a.ass[source.str()] = null
 		a.ass.delete(source.str())
 		return
 	}
@@ -225,7 +229,7 @@ fn (a AssetSource) cache_key(mut sb strings.Builder) string {
 			a.path
 		}
 		TaggedSource {
-			// TODO '${a.source.str()}#${a.tag}'
+			// TODO memory leaks '${a.source.str()}#${a.tag}'
 			sb.write_string(a.source.str())
 			sb.write_string('#')
 			sb.write_string(a.tag)
@@ -267,7 +271,7 @@ pub:
 	// cache  bool = true // Unloads from cache
 }
 
-// Asset represents an binary blob
+// Asset represents a binary blob of data in memory
 @[heap]
 pub struct Asset {
 	ShyStruct
@@ -280,7 +284,7 @@ pub mut:
 
 pub fn (mut a Asset) shutdown() ! {
 	if isnil(a) {
-		println('Crashing at hard-to-reproduce V memory BUG...')
+		println('${@LOCATION}: Crashing at hard-to-reproduce V memory BUG...\nTry using `v -d sdl_memory_no_gc ...`')
 	}
 	unsafe {
 		a.data.free()
