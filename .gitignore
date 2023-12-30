@@ -28,3 +28,5 @@ a.out
 /temp
 /tmp
 wip/
+# Ignore ctags "tags" file
+/tags
