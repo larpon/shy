@@ -97,3 +97,12 @@ fn test_vec4_f64_utils_2() {
 	assert invv2.z == 0.25
 	assert invv2.w == 1.0
 }
+
+fn test_vec4_as_vec4() {
+	mut v1_f64 := shy.vec4(4.0, 9.0, 30.5, 51.9)
+	v2_int := v1_f64.as_vec4[int]()
+	assert v2_int.x == int(4)
+	assert v2_int.y == int(9)
+	assert v2_int.z == int(30)
+	assert v2_int.w == int(51)
+}

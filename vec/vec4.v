@@ -75,6 +75,11 @@ pub fn (v Vec4[T]) as_vec3[U]() Vec3[U] {
 	return Vec3[U]{v.x, v.y, v.z}
 }
 
+// as_vec4 returns a Vec4 with `x`, `y`, `z` and `w` as type U.
+pub fn (v Vec4[T]) as_vec4[U]() Vec4[U] {
+	return Vec4[U]{U(v.x), U(v.y), U(v.z), U(v.w)}
+}
+
 //
 // Addition
 //

@@ -85,3 +85,10 @@ fn test_vec2_f64_utils_2() {
 	assert invv2.x == 0.5
 	assert invv2.y == 0.5
 }
+
+fn test_vec2_as_vec2() {
+	mut v1_f64 := shy.vec2(4.0, 9.0)
+	v2_int := v1_f64.as_vec2[int]()
+	assert v2_int.x == int(4)
+	assert v2_int.y == int(9)
+}

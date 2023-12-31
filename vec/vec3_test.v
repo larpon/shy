@@ -88,3 +88,11 @@ fn test_vec3_f64_utils_2() {
 	assert invv2.y == 0.5
 	assert invv2.z == 0.25
 }
+
+fn test_vec3_as_vec3() {
+	mut v1_f64 := shy.vec3(4.0, 9.0, 30.5)
+	v2_int := v1_f64.as_vec3[int]()
+	assert v2_int.x == int(4)
+	assert v2_int.y == int(9)
+	assert v2_int.z == int(30)
+}

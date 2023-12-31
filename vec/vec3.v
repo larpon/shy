@@ -58,6 +58,11 @@ pub fn (mut v Vec3[T]) as_vec2[T]() Vec2[T] {
 	return Vec2[T]{v.x, v.y}
 }
 
+// as_vec3 returns a Vec3 with `x`, `y` and `z` as type U.
+pub fn (v Vec3[T]) as_vec3[U]() Vec3[U] {
+	return Vec3[U]{U(v.x), U(v.y), U(v.z)}
+}
+
 // from_vec4 sets the `x`,`y` and `z` fields from `u`.
 pub fn (mut v Vec3[T]) from_vec4[U](u Vec4[U]) {
 	v.x = T(u.x)
