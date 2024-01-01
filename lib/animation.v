@@ -449,7 +449,7 @@ fn (fa &FollowAnimator[T]) step(dt f64) {
 	value := a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.multiply)
 	// value := utils.remap(a.t, 0, 1.0, a.from, a.to)
 	lerp_value := utils.lerp(value, a.prev_value, dt)
-	a.value = lerp_value
+	a.value = T(lerp_value)
 
 	// round_to_even() ?? (Banker's round)
 	p_running := a.running
