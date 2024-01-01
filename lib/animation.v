@@ -366,7 +366,7 @@ fn (ima &Animator[T]) step(dt f64) {
 	value := utils.remap(a.t, 0, 1.0, a.from, a.to)
 	lerp_value := utils.lerp(value, a.prev_value, dt)
 	// println('v: $value pv: $a.prev_value lv: $lerp_value')
-	a.value = lerp_value
+	a.value = T(lerp_value)
 	a.prev_value = a.value
 }
 
