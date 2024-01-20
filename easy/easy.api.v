@@ -50,7 +50,7 @@ pub fn (mut e Easy) variable_update(dt f64) {
 }
 
 @[params]
-pub struct EasyTextConfig {
+pub struct TextConfig {
 pub mut:
 	x        f32
 	y        f32
@@ -66,7 +66,7 @@ pub mut:
 }
 
 @[noinit]
-pub struct EasyText {
+pub struct Text {
 	shy.ShyStruct
 pub mut:
 	x        f32
@@ -83,7 +83,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (et &EasyText) draw() {
+pub fn (et &Text) draw() {
 	draw := et.shy.draw()
 	mut dt := draw.text()
 	dt.begin()
@@ -104,7 +104,7 @@ pub fn (et &EasyText) draw() {
 }
 
 @[inline]
-pub fn (et &EasyText) bounds() shy.Rect {
+pub fn (et &Text) bounds() shy.Rect {
 	draw := et.shy.draw()
 	mut dt := draw.text()
 	dt.begin()
@@ -127,25 +127,25 @@ pub fn (et &EasyText) bounds() shy.Rect {
 }
 
 @[inline]
-pub fn (e &Easy) new_text(etc EasyTextConfig) &EasyText {
+pub fn (e &Easy) new_text(etc TextConfig) &Text {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return &EasyText{
+	return &Text{
 		...etc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
+pub fn (e &Easy) text(etc TextConfig) Text {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyText{
+	return Text{
 		...etc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (q &Quick) text(etc EasyTextConfig) {
+pub fn (q &Quick) text(etc TextConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.text(etc).draw()
 }
@@ -155,7 +155,7 @@ pub fn (q &Quick) text(etc EasyTextConfig) {
 // Rect
 
 @[params]
-pub struct EasyRectConfig {
+pub struct RectConfig {
 	shy.Rect
 pub mut:
 	stroke   shy.Stroke
@@ -169,7 +169,7 @@ pub mut:
 }
 
 @[noinit]
-pub struct EasyRect {
+pub struct Rect {
 	shy.ShyStruct
 	shy.Rect
 pub mut:
@@ -184,7 +184,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (er &EasyRect) draw() {
+pub fn (er &Rect) draw() {
 	draw := er.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
@@ -206,16 +206,16 @@ pub fn (er &EasyRect) draw() {
 }
 
 @[inline]
-pub fn (e &Easy) rect(erc EasyRectConfig) EasyRect {
+pub fn (e &Easy) rect(erc RectConfig) Rect {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyRect{
+	return Rect{
 		...erc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (q &Quick) rect(erc EasyRectConfig) {
+pub fn (q &Quick) rect(erc RectConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.rect(erc).draw()
 }
@@ -223,7 +223,7 @@ pub fn (q &Quick) rect(erc EasyRectConfig) {
 // Triangle
 
 @[params]
-pub struct EasyTriangleConfig {
+pub struct TriangleConfig {
 pub mut:
 	a        vec.Vec2[f32]
 	b        vec.Vec2[f32]
@@ -238,7 +238,7 @@ pub mut:
 }
 
 @[noinit]
-pub struct EasyTriangle {
+pub struct Triangle {
 	shy.ShyStruct
 pub mut:
 	a        vec.Vec2[f32]
@@ -254,7 +254,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (et &EasyTriangle) bbox() shy.Rect {
+pub fn (et &Triangle) bbox() shy.Rect {
 	t := shy.Triangle{
 		a: et.a
 		b: et.b
@@ -271,7 +271,7 @@ pub fn (et &EasyTriangle) bbox() shy.Rect {
 }
 
 @[inline]
-pub fn (et &EasyTriangle) draw() {
+pub fn (et &Triangle) draw() {
 	draw := et.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
@@ -291,16 +291,16 @@ pub fn (et &EasyTriangle) draw() {
 }
 
 @[inline]
-pub fn (e &Easy) triangle(etc EasyTriangleConfig) EasyTriangle {
+pub fn (e &Easy) triangle(etc TriangleConfig) Triangle {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyTriangle{
+	return Triangle{
 		...etc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (q &Quick) triangle(etc EasyTriangleConfig) {
+pub fn (q &Quick) triangle(etc TriangleConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.triangle(etc).draw()
 }
@@ -308,7 +308,7 @@ pub fn (q &Quick) triangle(etc EasyTriangleConfig) {
 // Line
 
 @[params]
-pub struct EasyLineConfig {
+pub struct LineConfig {
 	shy.Line
 	shy.Stroke
 pub mut:
@@ -320,7 +320,7 @@ pub mut:
 }
 
 @[noinit]
-pub struct EasyLine {
+pub struct Line {
 	shy.ShyStruct
 	shy.Line
 	shy.Stroke
@@ -333,7 +333,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (el &EasyLine) draw() {
+pub fn (el &Line) draw() {
 	draw := el.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
@@ -343,7 +343,7 @@ pub fn (el &EasyLine) draw() {
 	if el.ray {
 		// Draw line as a ray - this is basically just done by extending the line towards the
 		// drawable area's edges - giving an illusion of an "infinite" ray passing through the drawable area.
-		mut nl := EasyLine{
+		mut nl := Line{
 			a: el.a
 			b: el.b
 		}
@@ -367,16 +367,16 @@ pub fn (el &EasyLine) draw() {
 }
 
 @[inline]
-pub fn (e &Easy) line_segment(elc EasyLineConfig) EasyLine {
+pub fn (e &Easy) line_segment(elc LineConfig) Line {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyLine{
+	return Line{
 		...elc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (q &Quick) line_segment(elc EasyLineConfig) {
+pub fn (q &Quick) line_segment(elc LineConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.line_segment(elc).draw()
 }
@@ -384,7 +384,7 @@ pub fn (q &Quick) line_segment(elc EasyLineConfig) {
 // Circle
 
 @[params]
-pub struct EasyCircleConfig {
+pub struct CircleConfig {
 	shy.Circle
 pub mut:
 	stroke   shy.Stroke
@@ -397,7 +397,7 @@ pub mut:
 }
 
 @[noinit]
-pub struct EasyCircle {
+pub struct Circle {
 	shy.ShyStruct
 	shy.Circle
 pub mut:
@@ -411,7 +411,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (ec &EasyCircle) draw() {
+pub fn (ec &Circle) draw() {
 	draw := ec.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
@@ -431,16 +431,16 @@ pub fn (ec &EasyCircle) draw() {
 }
 
 @[inline]
-pub fn (e &Easy) circle(ecc EasyCircleConfig) EasyCircle {
+pub fn (e &Easy) circle(ecc CircleConfig) Circle {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyCircle{
+	return Circle{
 		...ecc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (q &Quick) circle(ecc EasyCircleConfig) {
+pub fn (q &Quick) circle(ecc CircleConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.circle(ecc).draw()
 }
@@ -448,7 +448,7 @@ pub fn (q &Quick) circle(ecc EasyCircleConfig) {
 // Uniform Polygon
 
 @[params]
-pub struct EasyUniformPolyConfig {
+pub struct UniformPolyConfig {
 	shy.Circle
 pub mut:
 	stroke   shy.Stroke
@@ -462,7 +462,7 @@ pub mut:
 }
 
 @[noinit]
-pub struct EasyUniformPoly {
+pub struct UniformPoly {
 	shy.ShyStruct
 	shy.Circle
 pub mut:
@@ -477,7 +477,7 @@ pub mut:
 }
 
 @[inline]
-pub fn (eup &EasyUniformPoly) draw() {
+pub fn (eup &UniformPoly) draw() {
 	draw := eup.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
@@ -497,16 +497,16 @@ pub fn (eup &EasyUniformPoly) draw() {
 }
 
 @[inline]
-pub fn (e &Easy) uniform_poly(eupc EasyUniformPolyConfig) EasyUniformPoly {
+pub fn (e &Easy) uniform_poly(eupc UniformPolyConfig) UniformPoly {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyUniformPoly{
+	return UniformPoly{
 		...eupc
 		shy: e.shy
 	}
 }
 
 @[inline]
-pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
+pub fn (q &Quick) uniform_poly(eupc UniformPolyConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.uniform_poly(eupc).draw()
 }
@@ -514,7 +514,7 @@ pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
 // Audio sub-system
 
 // [noinit]
-// pub struct EasySound {
+// pub struct Sound {
 // 	shy.ShyStruct
 // 	engine &shy.AudioEngine
 // 	id     u16
@@ -524,14 +524,14 @@ pub fn (q &Quick) uniform_poly(eupc EasyUniformPolyConfig) {
 // }
 
 // [params]
-// pub struct EasySoundConfig {
+// pub struct SoundConfig {
 // 	source      shy.AssetSource
 // 	loop        bool
 //  	max_repeats u8 // number of copies of the sound, needed to support repeated playback of the same sound
 // }
 
 @[params]
-pub struct EasySoundPlayOptions {
+pub struct SoundPlayOptions {
 	source shy.AssetSource @[required]
 	loops  u16
 	pitch  f32
@@ -539,7 +539,7 @@ pub struct EasySoundPlayOptions {
 }
 
 @[inline]
-pub fn (q &Quick) play(opt EasySoundPlayOptions) {
+pub fn (q &Quick) play(opt SoundPlayOptions) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 
 	// TODO
@@ -556,7 +556,7 @@ pub fn (q &Quick) play(opt EasySoundPlayOptions) {
 	sound.play()
 }
 
-// pub fn (e &Easy) new_sound(esc EasySoundConfig) !&EasySound {
+// pub fn (e &Easy) new_sound(esc SoundConfig) !&Sound {
 // 	assert !isnil(e.shy), 'Easy struct is not initialized'
 // 	e.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data.')
 // 	mut audio := e.audio_engine
@@ -568,7 +568,7 @@ pub fn (q &Quick) play(opt EasySoundPlayOptions) {
 // 	} else {
 // 		id = audio.load(esc.path)!
 // 	}
-// 	return &EasySound{
+// 	return &Sound{
 // 		shy: e.shy
 // 		engine: e.audio_engine
 // 		id: id
@@ -577,7 +577,7 @@ pub fn (q &Quick) play(opt EasySoundPlayOptions) {
 // 	}
 // }
 
-pub struct EasyImageConfigRect {
+pub struct ImageConfigRect {
 	x      f32
 	y      f32
 	width  f32 = -1
@@ -586,9 +586,9 @@ pub struct EasyImageConfigRect {
 
 // Image drawing sub-system
 @[params]
-pub struct EasyImageConfig {
+pub struct ImageConfig {
 	// shy.Rect: shy.Rect{0,0,-1,-1}
-	EasyImageConfigRect
+	ImageConfigRect
 pub:
 	source    shy.AssetSource
 	color     shy.Color = shy.rgb(255, 255, 255)
@@ -600,13 +600,13 @@ pub:
 	fill_mode shy.ImageFillMode
 }
 
-pub struct EasyImageMetaData {
+pub struct ImageMetaData {
 pub:
 	size_raw shy.Size = shy.Size{0, 0}
 }
 
 @[noinit]
-pub struct EasyImage {
+pub struct Image {
 	shy.ShyStruct
 	shy.Rect
 pub mut:
@@ -619,10 +619,10 @@ pub mut:
 	region    shy.Rect = shy.Rect{0, 0, -1, -1}
 	fill_mode shy.ImageFillMode
 pub:
-	meta EasyImageMetaData
+	meta ImageMetaData
 }
 
-pub fn (ei &EasyImage) draw() {
+pub fn (ei &Image) draw() {
 	if image := ei.shy.assets().get[shy.Image](ei.source) {
 		draw := ei.shy.draw()
 		mut d := draw.image()
@@ -657,7 +657,7 @@ pub fn (ei &EasyImage) draw() {
 }
 
 @[inline]
-pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
+pub fn (e &Easy) image(eic ImageConfig) Image {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 
 	if image := e.shy.assets().get[shy.Image](eic.source) {
@@ -670,8 +670,8 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		r.height = if eic.height < 0 { f32(image.height) } else { eic.height }
 
 		// TODO WORKAROUND "...eic" spread does not work
-		// with the EasyImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
-		return EasyImage{
+		// with the ImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
+		return Image{
 			shy: e.shy
 			Rect: r
 			source: eic.source
@@ -682,7 +682,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 			origin: eic.origin
 			region: eic.region
 			fill_mode: eic.fill_mode
-			meta: EasyImageMetaData{
+			meta: ImageMetaData{
 				size_raw: shy.Size{
 					width: image.width
 					height: image.height
@@ -691,7 +691,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		}
 	}
 
-	return EasyImage{
+	return Image{
 		shy: e.shy
 		Rect: shy.Rect{
 			x: 0
@@ -707,7 +707,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 		origin: eic.origin
 		region: eic.region
 		fill_mode: eic.fill_mode
-		meta: EasyImageMetaData{
+		meta: ImageMetaData{
 			size_raw: shy.Size{
 				width: 0
 				height: 0
@@ -719,7 +719,7 @@ pub fn (e &Easy) image(eic EasyImageConfig) EasyImage {
 }
 
 @[inline]
-pub fn (q &Quick) image(eic EasyImageConfig) {
+pub fn (q &Quick) image(eic ImageConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.image(eic).draw()
 }

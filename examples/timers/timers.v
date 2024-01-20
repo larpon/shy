@@ -25,9 +25,9 @@ fn main() {
 struct App {
 	embed.ExampleApp
 mut:
-	info_text  &easy.EasyText = shy.null
-	once_text  &easy.EasyText = shy.null
-	clock_text &easy.EasyText = shy.null
+	info_text  &easy.Text = shy.null
+	once_text  &easy.Text = shy.null
+	clock_text &easy.Text = shy.null
 	since      u64
 }
 

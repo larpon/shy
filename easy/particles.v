@@ -163,16 +163,16 @@ fn (ip &ImageParticlePainter) draw(p &particle.Particle, frame_dt f64) {
 
 /*
 [inline]
-pub fn (e &Easy) text(etc EasyTextConfig) EasyText {
+pub fn (e &Easy) text(etc TextConfig) Text {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
-	return EasyText{
+	return Text{
 		...etc
 		shy: e.shy
 	}
 }
 
 [inline]
-pub fn (q &Quick) text(etc EasyTextConfig) {
+pub fn (q &Quick) text(etc TextConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.text(etc).draw()
 }
