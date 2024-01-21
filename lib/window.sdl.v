@@ -559,8 +559,7 @@ fn (mut w Window) variable_update(dt f64) {
 	}
 }
 
-fn (mut w Window) fixed_update(dt f64) {
-}
+fn (mut w Window) fixed_update(dt f64) {}
 
 pub fn (mut w Window) end_frame() {
 	w.record_frame() // NOTE Compiled out unless using `-d shy_record`

@@ -51,8 +51,7 @@ pub fn (mut opt Options) extend_from_dot_shy() ! {
 }
 
 // validate_env ensures that `Options` meet all runtime requirements.
-pub fn (opt &Options) validate_env() ! {
-}
+pub fn (opt &Options) validate_env() ! {}
 
 pub fn (opt &Options) ensure_work_dir() !string {
 	return ensure_path(opt.work_dir)

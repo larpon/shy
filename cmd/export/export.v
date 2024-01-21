@@ -94,8 +94,7 @@ pub fn (mut opt Options) extend_from_dot_shy() ! {
 }
 
 // validate_env ensures that `Options` meet all runtime requirements.
-pub fn (opt &Options) validate_env() ! {
-}
+pub fn (opt &Options) validate_env() ! {}
 
 // args_to_options returns an `Option` merged from (CLI/Shell) `arguments` using `defaults` as
 // values where no value can be obtained from `arguments`.
