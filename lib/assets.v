@@ -285,6 +285,7 @@ pub mut:
 pub fn (mut a Asset) shutdown() ! {
 	if isnil(a) {
 		println('${@LOCATION}: Crashing at hard-to-reproduce V memory BUG...\nTry using `v -d sdl_memory_no_gc ...`')
+		println('${@LOCATION}: Crashing at hard-to-fix V memory BUG...\nTry using `v -d sdl_memory_no_gc ...`')
 	}
 	unsafe {
 		a.data.free()
