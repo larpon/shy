@@ -274,6 +274,36 @@ pub fn (v Vec2[T]) eq_epsilon(u Vec2[T]) bool {
 	return v.eq_approx[T, f32](u, vec.vec_epsilon)
 }
 
+// x_eq_approx returns whether the `v.x` component of vector `v` is approximately equal to `x`, within `tolerance`.
+pub fn (v Vec2[T]) x_eq_approx[T, U](x T, tolerance U) bool {
+	diff_x := math.abs(v.x - x)
+	if diff_x <= tolerance {
+		return true
+	}
+
+	max_x := math.max(math.abs(v.x), math.abs(x))
+	if diff_x < max_x * tolerance {
+		return true
+	}
+
+	return false
+}
+
+// y_eq_approx returns whether the `v.y` component of vector `v` is approximately equal to `y`, within `tolerance`.
+pub fn (v Vec2[T]) y_eq_approx[T, U](y T, tolerance U) bool {
+	diff_y := math.abs(v.y - y)
+	if diff_y <= tolerance {
+		return true
+	}
+
+	max_y := math.max(math.abs(v.y), math.abs(y))
+	if diff_y < max_y * tolerance {
+		return true
+	}
+
+	return false
+}
+
 // eq_approx returns whether these vectors are approximately equal within `tolerance`.
 pub fn (v Vec2[T]) eq_approx[T, U](u Vec2[T], tolerance U) bool {
 	diff_x := math.abs(v.x - u.x)
@@ -297,6 +327,12 @@ pub fn (v Vec2[T]) is_approx_zero(tolerance T) bool {
 		return true
 	}
 	return false
+}
+
+// cast_back returns a version of `v` where all compontents have been cast to `U` and then back to `T`.
+@[inline]
+pub fn (v Vec2[T]) cast_back[U]() Vec2[T] {
+	return Vec2[T]{U(v.x), U(v.y)}
 }
 
 // eq_scalar returns a bool indicating if the `x` and `y` fields both equals `scalar`.
