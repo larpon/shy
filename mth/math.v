@@ -44,6 +44,12 @@ pub fn gcd[T](a T, b T) T {
 	})
 }
 
+// clamp clamps `num` to be between `min` and `max`.
+@[inline]
+pub fn clamp[T](num T, min_in_range T, max_in_range T) T {
+	return max[T](min_in_range, min[T](max_in_range, num))
+}
+
 // reduce reduces a fraction by finding the Greatest Common Divisor and dividing by it.
 pub fn reduce_fraction[T](numerator T, denominator T) (T, T) {
 	g_c_d := gcd(numerator, denominator)
