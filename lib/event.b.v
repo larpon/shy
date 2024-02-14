@@ -12,7 +12,7 @@ pub enum ButtonState {
 	down
 }
 
-const empty_event = Event(UnkownEvent{
+pub const empty_event = Event(UnkownEvent{
 	timestamp: 0
 	window_id: no_window
 })
