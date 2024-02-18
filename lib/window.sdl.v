@@ -627,7 +627,6 @@ pub fn (mut w Window) init() ! {
 	sdl.gl_set_attribute(.stencil_size, 8)
 	//
 
-	/*
 	if s.config.render.msaa > 0 {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'enabling MSAA (Multi-Sample AntiAliasing)')
 		sdl.gl_set_attribute(.multisamplebuffers, 1)
@@ -635,7 +634,6 @@ pub fn (mut w Window) init() ! {
 		// Setting multi-samples here will result in SDL applying yet another pass of anti-aliasing...
 		sdl.gl_set_attribute(.multisamplesamples, s.config.render.msaa)
 	}
-	*/
 
 	gl_context := sdl.gl_create_context(w.handle)
 	if gl_context == sdl.null {
