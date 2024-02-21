@@ -3,7 +3,6 @@
 // that can be found in the LICENSE file.
 module utils
 
-import math // TODO this can probably be shaved off at the end of development
 import mth
 import os
 
@@ -51,16 +50,41 @@ pub fn loop_int(value int, from int, to int) int {
 	return (offset_value - int((mth.floor(offset_value / range) * range))) + from
 }
 
+fn osc_mod(num f32, div f32) f32 {
+	ratio := num / div
+	return div * (ratio - f32(mth.floor(ratio)))
+}
+
 // oscillate_int e.g. "wave" or "ping-pong" `value` between `min` and `max`.
 pub fn oscillate_int(value int, min int, max int) int {
-	range := max - min
-	return min + mth.abs(((value + range) % (range * 2)) - range)
+	rmin := if min < max { min } else { max }
+	rmax := if min > max { min } else { max }
+
+	range := rmax - rmin
+	cycle_length := 2 * range
+
+	mut state := osc_mod(value - rmin, cycle_length)
+	if state > range {
+		state = cycle_length - state
+	}
+
+	return int(mth.round(state + min))
 }
 
 // oscillate_f32 e.g. "wave" or "ping-pong" `value` between `min` and `max`.
 pub fn oscillate_f32(value f32, min f32, max f32) f32 {
-	range := max - min
-	return f32(min + mth.abs(math.fmod((value + range), (range * 2)) - range))
+	rmin := if min < max { min } else { max }
+	rmax := if min > max { min } else { max }
+
+	range := rmax - rmin
+	cycle_length := 2 * range
+
+	mut state := osc_mod(value - rmin, cycle_length)
+	if state > range {
+		state = cycle_length - state
+	}
+
+	return state + min
 }
 
 // manhattan_distance returns the "manhattan" distance between 2 points.
