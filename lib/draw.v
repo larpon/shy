@@ -57,7 +57,7 @@ pub struct Stroke {
 }
 
 pub fn (d &Draw) shape_2d() DrawShape2D {
-	s := d.shy
+	mut s := d.shy
 	mut d2d := DrawShape2D{
 		shy: s
 		factor: d.canvas.factor
@@ -71,7 +71,7 @@ pub fn (d &Draw) shape_2d() DrawShape2D {
 }
 
 pub fn (d &Draw) text() DrawText {
-	s := d.shy
+	mut s := d.shy
 	mut dt := DrawText{
 		shy: s
 		factor: d.canvas.factor
@@ -85,7 +85,7 @@ pub fn (d &Draw) text() DrawText {
 }
 
 pub fn (d &Draw) image() DrawImage {
-	s := d.shy
+	mut s := d.shy
 	mut di := DrawImage{
 		shy: s
 		factor: d.canvas.factor

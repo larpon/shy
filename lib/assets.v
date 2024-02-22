@@ -137,7 +137,7 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 		asset.shutdown()!
 		unsafe { free(asset) }
 
-		//a.ass[source.str()] = null
+		// a.ass[source.str()] = null
 		a.ass.delete(source.str())
 		return
 	}
@@ -571,6 +571,13 @@ mut:
 	wrap_v  ImageWrap = .clamp_to_edge
 }
 
+//@[params]
+// pub struct ImageUnloadOptions {
+//	AssetUnloadOptions
+// pub:
+//	graphics_memory bool
+//}
+
 pub fn (mut i Image) shutdown() ! {
 	gfx.destroy_image(i.gfx_image)
 	gfx.destroy_sampler(i.gfx_sampler)
@@ -720,7 +727,7 @@ pub fn (s &Sound) pause(pause bool) {
 pub fn (s &Sound) is_looping() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
 	engine := s.engine()
-	mut id := s.id
+	id := s.id
 	if s.id_end > 0 {
 		for i in id .. s.id_end {
 			if engine.is_looping(i) {
@@ -736,7 +743,7 @@ pub fn (s &Sound) is_playing() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
 	engine := s.engine()
 	assert !isnil(engine), 'Sound engine is not initialized'
-	mut id := s.id
+	id := s.id
 	if s.id_end > 0 {
 		for i in id .. s.id_end {
 			if engine.is_playing(i) {
