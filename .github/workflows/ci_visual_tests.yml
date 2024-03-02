@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      VFLAGS: -cc tcc -no-retry-compilation
+      VFLAGS: -cg -cc tcc -no-retry-compilation
       CFLAGS: -DMA_ENABLE_ONLY_SPECIFIC_BACKENDS -DMA_ENABLE_NULL
       VTMP: /tmp
       DISPLAY: :99
