@@ -12,7 +12,7 @@ jobs:
       VFLAGS: -cc tcc
     steps:
     - name: Checkout V
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: vlang/v
 
@@ -20,7 +20,7 @@ jobs:
       run: make -j4 && sudo ./v symlink
 
     - name: Checkout shy
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: shy
 
@@ -40,7 +40,7 @@ jobs:
       MOPTIONS: --relative-paths --exclude /tests/
     steps:
       - name: Checkout V
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: vlang/v
 
@@ -48,12 +48,12 @@ jobs:
         run: make -j4 && sudo ./v symlink
 
       - name: Checkout shy
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: shy
 
       - name: Checkout previous shy
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: larpon/shy
           ref: master
