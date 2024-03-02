@@ -19,12 +19,12 @@ jobs:
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
+      CFLAGS: -DMA_ENABLE_ONLY_SPECIFIC_BACKENDS -DMA_ENABLE_NULL
       VTMP: /tmp
       DISPLAY: :99
       LIBGL_ALWAYS_SOFTWARE: true
       SDL2_VERSION: 2.28.2
       SHY_CI_VISUAL_TEST: 1
-      SDL_AUDIODRIVER: "disk"
 
     steps:
     - name: Checkout V
