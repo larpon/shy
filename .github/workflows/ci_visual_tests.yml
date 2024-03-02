@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      VFLAGS: -cg -cc tcc -no-retry-compilation
+      VFLAGS: -cc tcc -no-retry-compilation -d sdl_memory_no_gc
       CFLAGS: -DMA_ENABLE_ONLY_SPECIFIC_BACKENDS -DMA_ENABLE_NULL
       VTMP: /tmp
       DISPLAY: :99
@@ -28,7 +28,7 @@ jobs:
 
     steps:
     - name: Checkout V
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: vlang/v
 
@@ -71,7 +71,7 @@ jobs:
         v run ~/.vmodules/sdl/setup.vsh
 
     - name: Checkout shy
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: shy
 
