@@ -18,15 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      VFLAGS: -cc tcc -no-retry-compilation
+      VFLAGS: -cc tcc -no-retry-compilation -d sdl_memory_no_gc
+      CFLAGS: -DMA_ENABLE_ONLY_SPECIFIC_BACKENDS -DMA_ENABLE_NULL
       VTMP: /tmp
       DISPLAY: :99
       LIBGL_ALWAYS_SOFTWARE: true
       SDL2_VERSION: 2.28.2
       SHY_CI_VISUAL_TEST: 1
+
     steps:
     - name: Checkout V
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: vlang/v
 
@@ -45,8 +47,7 @@ jobs:
         # openimageio-tools        : idiff
         # libgl1-mesa-dri          : For headless rendering / software DRI driver (LIBGL_ALWAYS_SOFTWARE=true)
         # freeglut3-dev            : Fixes graphic apps compilation with tcc
-        # alsa-utils               : Fixes `ALSA lib confmisc.c:855:(parse_card) cannot find card '0'` errors on newer ubuntu-images
-        sudo apt-get install imagemagick openimageio-tools freeglut3-dev libgl1-mesa-dri xvfb alsa-utils
+        sudo apt-get install imagemagick openimageio-tools freeglut3-dev libgl1-mesa-dri xvfb
 
         # Get imgur upload script
         wget https://raw.githubusercontent.com/tremby/imgur.sh/c98345d/imgur.sh
@@ -70,7 +71,7 @@ jobs:
         v run ~/.vmodules/sdl/setup.vsh
 
     - name: Checkout shy
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: shy
 
