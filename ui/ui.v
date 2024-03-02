@@ -143,6 +143,11 @@ pub fn (mut u UI) shutdown() ! {
 	// unsafe { free(u.root) }
 }
 
+// update calls `update` on the UI's root node.
+pub fn (mut u UI) update() {
+	u.root.update()
+}
+
 // draw draws the current frame of the UI's state.
 pub fn (mut u UI) draw(dt f64) {
 	unsafe {

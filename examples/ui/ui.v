@@ -47,6 +47,11 @@ pub fn (mut a App) init() ! {
 }
 
 @[markused]
+pub fn (mut a App) update(dt f64) {
+	a.ui.update()
+}
+
+@[markused]
 pub fn (mut a App) frame(dt f64) {
 	// win := a.window
 	a.ui.draw(dt)

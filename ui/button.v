@@ -17,11 +17,15 @@ pub struct Button {
 	Rectangle
 pub mut:
 	label string
+mut:
+	bounds shy.Rect
+	//
+	update_bounds bool = true
 }
 
 // init initialize this `Button` and it's children.
 pub fn (mut b Button) init(ui &UI) ! {
-	// assert i != unsafe { nil }
+	// assert b != unsafe { nil }
 	b.radius = 3
 	b.color = ui.theme.colors.button_background
 
@@ -32,6 +36,13 @@ pub fn (mut b Button) init(ui &UI) ! {
 pub fn (mut b Button) update() {
 	// assert i != unsafe { nil }
 	//
+	// vs := b.visual_state()
+
+	//
+	// text_bounds := b.bounds
+	// displaced_from := text_bounds.displaced_from(shy.Anchor.center)
+	// b.Rectangle.x -= displaced_from.x
+	// b.Rectangle.y -= displaced_from.y
 	b.Rectangle.update()
 }
 
@@ -41,9 +52,7 @@ pub fn (mut b Button) draw() {
 	// mut mb := unsafe { b }
 	b.Rectangle.draw()
 
-	// Draw text
 	vs := b.visual_state()
-
 	et := b.ui.easy.text(
 		x: vs.x
 		y: vs.y
@@ -52,7 +61,12 @@ pub fn (mut b Button) draw() {
 		origin: shy.Anchor.center
 		text: b.label
 	)
+	// Draw text
 	et.draw()
+	if b.update_bounds {
+		b.bounds = et.bounds()
+		b.update_bounds = false
+	}
 
 	for mut child in b.body {
 		child.draw()
