@@ -24,6 +24,8 @@ jobs:
       LIBGL_ALWAYS_SOFTWARE: true
       SDL2_VERSION: 2.28.2
       SHY_CI_VISUAL_TEST: 1
+      SDL_AUDIODRIVER: "disk"
+
     steps:
     - name: Checkout V
       uses: actions/checkout@v2
@@ -46,11 +48,6 @@ jobs:
         # libgl1-mesa-dri          : For headless rendering / software DRI driver (LIBGL_ALWAYS_SOFTWARE=true)
         # freeglut3-dev            : Fixes graphic apps compilation with tcc
         sudo apt-get install imagemagick openimageio-tools freeglut3-dev libgl1-mesa-dri xvfb
-
-        # Fix for some ubuntu error : Fixes `ALSA lib confmisc.c:855:(parse_card) cannot find card '0'` errors on ubuntu-latest (Ubuntu 22) images
-        sudo apt-get remove --purge pulseaudio
-        sudo apt-get install alsa-base
-        sudo apt-get install pulseaudio
 
         # Get imgur upload script
         wget https://raw.githubusercontent.com/tremby/imgur.sh/c98345d/imgur.sh
