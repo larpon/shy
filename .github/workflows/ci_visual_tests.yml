@@ -47,9 +47,10 @@ jobs:
         # freeglut3-dev            : Fixes graphic apps compilation with tcc
         sudo apt-get install imagemagick openimageio-tools freeglut3-dev libgl1-mesa-dri xvfb
 
-        # Fix for some ubuntu error : Fixes `ALSA lib confmisc.c:855:(parse_card) cannot find card '0'` errors on newer ubuntu-images
-        sudo touch /usr/share/pipewire/media-session.d/with-pulseaudio
-        systemctl --user restart pipewire-session-manager
+        # Fix for some ubuntu error : Fixes `ALSA lib confmisc.c:855:(parse_card) cannot find card '0'` errors on ubuntu-latest (Ubuntu 22) images
+        sudo apt-get remove --purge pulseaudio
+        sudo apt-get install alsa-base
+        sudo apt-get install pulseaudio
 
         # Get imgur upload script
         wget https://raw.githubusercontent.com/tremby/imgur.sh/c98345d/imgur.sh
