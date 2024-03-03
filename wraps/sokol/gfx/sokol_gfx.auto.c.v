@@ -71,7 +71,9 @@ pub struct C.sg_pipeline {
 pub type Pipeline = C.sg_pipeline
 
 @[typedef]
-pub struct C.sg_attachments {}
+pub struct C.sg_attachments {
+	id u32 // NOTE Added from chew config
+}
 
 pub type Attachments = C.sg_attachments
 

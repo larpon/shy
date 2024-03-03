@@ -270,6 +270,12 @@ pub fn win32_get_hwnd() voidptr {
 	return voidptr(C.sapp_win32_get_hwnd())
 }
 
+// GL: get framebuffer object
+@[inline]
+pub fn gl_get_framebuffer() u32 {
+	return C.sapp_gl_get_framebuffer()
+}
+
 // Android: get native activity handle
 @[inline]
 pub fn android_get_native_activity() voidptr {

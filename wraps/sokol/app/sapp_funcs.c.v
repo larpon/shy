@@ -134,7 +134,7 @@ fn C.sapp_d3d11_get_device_context() voidptr
 // D3D11: get pointer to IDXGISwapChain object
 fn C.sapp_d3d11_get_swap_chain() voidptr
 
-// D3D11: get pointer to ID3D11RenderTargetView object
+// D3D11: get pointer to ID3D11RenderView object
 fn C.sapp_d3d11_get_render_view() voidptr
 
 // D3D11: get pointer ID3D11RenderTargetView object for msaa-resolve (may return null)
@@ -157,6 +157,9 @@ fn C.sapp_wgpu_get_resolve_view() voidptr
 
 // WebGPU: get swapchain's WGPUTextureView for the depth-stencil surface
 fn C.sapp_wgpu_get_depth_stencil_view() voidptr
+
+// GL: get framebuffer object
+fn C.sapp_gl_get_framebuffer() u32
 
 // Android: get native activity handle
 fn C.sapp_android_get_native_activity() voidptr
