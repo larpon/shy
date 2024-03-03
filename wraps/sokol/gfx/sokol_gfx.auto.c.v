@@ -36,56 +36,47 @@ TODO Non-numerical: #define SOKOL_GFX_API_DECL extern
 */
 
 @[typedef]
-struct C.sg_buffer {
+pub struct C.sg_buffer {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Buffer = C.sg_buffer
 
 @[typedef]
-struct C.sg_image {
+pub struct C.sg_image {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Image = C.sg_image
 
 @[typedef]
-struct C.sg_sampler {
+pub struct C.sg_sampler {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Sampler = C.sg_sampler
 
 @[typedef]
-struct C.sg_shader {
+pub struct C.sg_shader {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Shader = C.sg_shader
 
 @[typedef]
-struct C.sg_pipeline {
+pub struct C.sg_pipeline {
 	id u32 // NOTE Added from chew config
 }
 
 pub type Pipeline = C.sg_pipeline
 
 @[typedef]
-struct C.sg_pass {
-	id u32 // NOTE Added from chew config
-}
+pub struct C.sg_attachments {}
 
-pub type Pass = C.sg_pass
+pub type Attachments = C.sg_attachments
 
 @[typedef]
-struct C.sg_context {
-	id u32 // NOTE Added from chew config
-}
-
-pub type Context = C.sg_context
-
-@[typedef]
-struct C.sg_range {
+pub struct C.sg_range {
 pub mut:
 	ptr  voidptr
 	size usize
@@ -110,7 +101,7 @@ TODO Function: #define SG_RANGE_REF(x) &(sg_range){ &x, sizeof(x) }
 */
 
 @[typedef]
-struct C.sg_color {
+pub struct C.sg_color {
 	r f32 // NOTE Added from chew config
 	g f32 // NOTE Added from chew config
 	b f32 // NOTE Added from chew config
@@ -164,6 +155,7 @@ pub enum PixelFormat {
 	bgra8           = C.SG_PIXELFORMAT_BGRA8
 	rgb10a2         = C.SG_PIXELFORMAT_RGB10A2
 	rg11b10f        = C.SG_PIXELFORMAT_RG11B10F
+	rgb9e5          = C.SG_PIXELFORMAT_RGB9E5
 	rg32ui          = C.SG_PIXELFORMAT_RG32UI
 	rg32si          = C.SG_PIXELFORMAT_RG32SI
 	rg32f           = C.SG_PIXELFORMAT_RG32F
@@ -175,11 +167,14 @@ pub enum PixelFormat {
 	rgba32ui        = C.SG_PIXELFORMAT_RGBA32UI
 	rgba32si        = C.SG_PIXELFORMAT_RGBA32SI
 	rgba32f         = C.SG_PIXELFORMAT_RGBA32F
+	// NOTE: when adding/removing pixel formats before DEPTH, also update sokol_app.h/_SAPP_PIXELFORMAT_*
 	depth           = C.SG_PIXELFORMAT_DEPTH
 	depth_stencil   = C.SG_PIXELFORMAT_DEPTH_STENCIL
+	// NOTE: don't put any new compressed format in front of here
 	bc1_rgba        = C.SG_PIXELFORMAT_BC1_RGBA
 	bc2_rgba        = C.SG_PIXELFORMAT_BC2_RGBA
 	bc3_rgba        = C.SG_PIXELFORMAT_BC3_RGBA
+	bc3_srgba       = C.SG_PIXELFORMAT_BC3_SRGBA
 	bc4_r           = C.SG_PIXELFORMAT_BC4_R
 	bc4_rsn         = C.SG_PIXELFORMAT_BC4_RSN
 	bc5_rg          = C.SG_PIXELFORMAT_BC5_RG
@@ -187,22 +182,26 @@ pub enum PixelFormat {
 	bc6h_rgbf       = C.SG_PIXELFORMAT_BC6H_RGBF
 	bc6h_rgbuf      = C.SG_PIXELFORMAT_BC6H_RGBUF
 	bc7_rgba        = C.SG_PIXELFORMAT_BC7_RGBA
-	pvrtc_rgb_2bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_2BPP
-	pvrtc_rgb_4bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_4BPP
-	pvrtc_rgba_2bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_2BPP
-	pvrtc_rgba_4bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_4BPP
+	bc7_srgba       = C.SG_PIXELFORMAT_BC7_SRGBA
+	pvrtc_rgb_2bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_2BPP // FIXME: deprecated
+	pvrtc_rgb_4bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_4BPP // FIXME: deprecated
+	pvrtc_rgba_2bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_2BPP // FIXME: deprecated
+	pvrtc_rgba_4bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_4BPP // FIXME: deprecated
 	etc2_rgb8       = C.SG_PIXELFORMAT_ETC2_RGB8
+	etc2_srgb8      = C.SG_PIXELFORMAT_ETC2_SRGB8
 	etc2_rgb8a1     = C.SG_PIXELFORMAT_ETC2_RGB8A1
 	etc2_rgba8      = C.SG_PIXELFORMAT_ETC2_RGBA8
+	etc2_srgb8a8    = C.SG_PIXELFORMAT_ETC2_SRGB8A8
 	etc2_rg11       = C.SG_PIXELFORMAT_ETC2_RG11
 	etc2_rg11sn     = C.SG_PIXELFORMAT_ETC2_RG11SN
-	rgb9e5          = C.SG_PIXELFORMAT_RGB9E5
+	astc_4x4_rgba   = C.SG_PIXELFORMAT_ASTC_4x4_RGBA
+	astc_4x4_srgba  = C.SG_PIXELFORMAT_ASTC_4x4_SRGBA
 	num             = C._SG_PIXELFORMAT_NUM
 	force_u32       = C._SG_PIXELFORMAT_FORCE_U32 // 0x7FFFFFFF,
 }
 
 @[typedef]
-struct C.sg_pixelformat_info {
+pub struct C.sg_pixelformat_info {
 pub mut:
 	sample bool
 }
@@ -210,7 +209,7 @@ pub mut:
 pub type PixelformatInfo = C.sg_pixelformat_info
 
 @[typedef]
-struct C.sg_features {
+pub struct C.sg_features {
 pub mut:
 	origin_top_left             bool // framebuffer and texture origin is in top left corner
 	image_clamp_to_border       bool // border color and clamp-to-border UV-wrap mode is supported
@@ -221,9 +220,16 @@ pub mut:
 pub type Features = C.sg_features
 
 @[typedef]
-struct C.sg_limits {
+pub struct C.sg_limits {
 pub mut:
-	max_image_size_2d int
+	max_image_size_2d                   int // max width/height of SG_IMAGETYPE_2D images
+	max_image_size_cube                 int // max width/height of SG_IMAGETYPE_CUBE images
+	max_image_size_3d                   int // max width/height/depth of SG_IMAGETYPE_3D images
+	max_image_size_array                int // max width/height of SG_IMAGETYPE_ARRAY images
+	max_image_array_layers              int // max number of layers in SG_IMAGETYPE_ARRAY images
+	max_vertex_attrs                    int // max number of vertex attributes, clamped to SG_MAX_VERTEX_ATTRIBUTES
+	gl_max_vertex_uniform_components    int // <= GL_MAX_VERTEX_UNIFORM_COMPONENTS (only on GL backends)
+	gl_max_combined_texture_image_units int // <= GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS (only on GL backends)
 }
 
 pub type Limits = C.sg_limits
@@ -278,14 +284,16 @@ pub enum ImageType as u32 {
 	_force_u32 = C._SG_IMAGETYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
+// ImageSampleType is C.sg_image_sample_type
 pub enum ImageSampleType as u32 {
-	_default   = C._SG_IMAGESAMPLETYPE_DEFAULT // value 0 reserved for default-init
-	float      = C.SG_IMAGESAMPLETYPE_FLOAT
-	depth      = C.SG_IMAGESAMPLETYPE_DEPTH
-	sint       = C.SG_IMAGESAMPLETYPE_SINT
-	uint       = C.SG_IMAGESAMPLETYPE_UINT
-	_num       = C._SG_IMAGESAMPLETYPE_NUM
-	_force_u32 = C._SG_IMAGESAMPLETYPE_FORCE_U32 // 0x7FFFFFFF
+	_default           = C._SG_IMAGESAMPLETYPE_DEFAULT // value 0 reserved for default-init
+	float              = C.SG_IMAGESAMPLETYPE_FLOAT
+	depth              = C.SG_IMAGESAMPLETYPE_DEPTH
+	sint               = C.SG_IMAGESAMPLETYPE_SINT
+	uint               = C.SG_IMAGESAMPLETYPE_UINT
+	unfilterable_float = C.SG_IMAGESAMPLETYPE_UNFILTERABLE_FLOAT
+	_num               = C._SG_IMAGESAMPLETYPE_NUM
+	_force_u32         = C._SG_IMAGESAMPLETYPE_FORCE_U32 // 0x7FFFFFFF
 }
 
 // SamplerType is C.sg_sampler_type
@@ -332,12 +340,9 @@ pub enum PrimitiveType as u32 {
 // Filter is C.sg_filter
 pub enum Filter as u32 {
 	_default   = C._SG_FILTER_DEFAULT // value 0 reserved for default-init
+	@none      = C.SG_FILTER_NONE // FIXME: deprecated
 	nearest    = C.SG_FILTER_NEAREST
 	linear     = C.SG_FILTER_LINEAR
-	// nearest_mipmap_nearest = C.SG_FILTER_NEAREST_MIPMAP_NEAREST
-	// nearest_mipmap_linear  = C.SG_FILTER_NEAREST_MIPMAP_LINEAR
-	// linear_mipmap_nearest  = C.SG_FILTER_LINEAR_MIPMAP_NEAREST
-	// linear_mipmap_linear   = C.SG_FILTER_LINEAR_MIPMAP_LINEAR
 	_num       = C._SG_FILTER_NUM
 	_force_u32 = C._SG_FILTER_FORCE_U32 // 0x7FFFFFFF,
 }
@@ -542,55 +547,116 @@ pub enum StoreAction as u32 {
 }
 
 @[typedef]
-struct C.sg_color_attachment_action {
+pub struct C.sg_color_attachment_action {
 pub mut:
-	load_action LoadAction
-	clear_value Color
+	load_action  LoadAction  // default: SG_LOADACTION_CLEAR
+	store_action StoreAction // default: SG_STOREACTION_STORE
+	clear_value  Color       // default: { 0.5f, 0.5f, 0.5f, 1.0f }
 }
 
 pub type ColorAttachmentAction = C.sg_color_attachment_action
 
 @[typedef]
-struct C.sg_depth_attachment_action {
+pub struct C.sg_depth_attachment_action {
 pub mut:
-	load_action LoadAction
-	clear_value f32
+	load_action  LoadAction  // default: SG_LOADACTION_CLEAR
+	store_action StoreAction // default: SG_STOREACTION_DONTCARE
+	clear_value  f32 // default: 1.0
 }
 
 pub type DepthAttachmentAction = C.sg_depth_attachment_action
 
 @[typedef]
-struct C.sg_stencil_attachment_action {
+pub struct C.sg_stencil_attachment_action {
 pub mut:
-	load_action LoadAction
-	clear_value u8
+	load_action  LoadAction  // default: SG_LOADACTION_CLEAR
+	store_action StoreAction // default: SG_STOREACTION_DONTCARE
+	clear_value  u8 // default: 0
 }
 
 pub type StencilAttachmentAction = C.sg_stencil_attachment_action
 
 @[typedef]
-struct C.sg_pass_action {
+pub struct C.sg_pass_action {
 pub mut:
-	_start_canary u32
-	// TODO 	colors [SG_MAX_COLOR_ATTACHMENTS]ColorAttachmentAction
-	colors      [4]ColorAttachmentAction
-	depth       DepthAttachmentAction
-	stencil     StencilAttachmentAction
-	_end_canary u32
+	colors  [4]ColorAttachmentAction
+	depth   DepthAttachmentAction
+	stencil StencilAttachmentAction
 }
 
 pub type PassAction = C.sg_pass_action
 
 @[typedef]
-struct C.sg_stage_bindings {
-	images   [12]Image  // 12 TODO C.SG_MAX_SHADERSTAGE_IMAGES
-	samplers [8]Sampler // 8 TODO C.SG_MAX_SHADERSTAGE_SAMPLERS
+pub struct C.sg_metal_swapchain {
+pub mut:
+	current_drawable voidptr
+}
+
+pub type MetalSwapchain = C.sg_metal_swapchain
+
+@[typedef]
+pub struct C.sg_d3d11_swapchain {
+pub mut:
+	render_view voidptr
+}
+
+pub type D3d11Swapchain = C.sg_d3d11_swapchain
+
+@[typedef]
+pub struct C.sg_wgpu_swapchain {
+pub mut:
+	render_view voidptr
+}
+
+pub type WgpuSwapchain = C.sg_wgpu_swapchain
+
+@[typedef]
+pub struct C.sg_gl_swapchain {
+pub mut:
+	framebuffer u32
+}
+
+pub type GlSwapchain = C.sg_gl_swapchain
+
+@[typedef]
+pub struct C.sg_swapchain {
+pub mut:
+	width        int
+	height       int
+	sample_count int
+	color_format PixelFormat
+	depth_format PixelFormat
+	metal        MetalSwapchain
+	d3d11        D3d11Swapchain
+	wgpu         WgpuSwapchain
+	gl           GlSwapchain
+}
+
+pub type Swapchain = C.sg_swapchain
+
+@[typedef]
+pub struct C.sg_pass {
+pub mut:
+	_start_canary u32
+	action        PassAction
+	attachments   Attachments
+	swapchain     Swapchain
+	label         &char = unsafe { nil }
+	_end_canary   u32
+}
+
+pub type Pass = C.sg_pass
+
+@[typedef]
+pub struct C.sg_stage_bindings {
+	// TODO 	images [SG_MAX_SHADERSTAGE_IMAGES]Image
+	// TODO 	samplers [SG_MAX_SHADERSTAGE_SAMPLERS]Sampler
 }
 
 pub type StageBindings = C.sg_stage_bindings
 
 @[typedef]
-struct C.sg_bindings {
+pub struct C.sg_bindings {
 pub mut:
 	_start_canary         u32
 	vertex_buffers        [8]Buffer
@@ -605,17 +671,18 @@ pub mut:
 pub type Bindings = C.sg_bindings
 
 @[typedef]
-struct C.sg_buffer_desc {
+pub struct C.sg_buffer_desc {
 pub mut:
 	_start_canary u32
 	size          usize
 	@type         BufferType
 	usage         Usage
 	data          Range
-	label         &char = unsafe { nil } // GL specific
-	// TODO 	gl_buffers [SG_NUM_INFLIGHT_FRAMES]u32 // Metal specific
-	// TODO 	mtl_buffers [SG_NUM_INFLIGHT_FRAMES]voidptr // D3D11 specific
-	d3d11_buffer voidptr // WebGPU specific
+	label         &char = unsafe { nil }
+	// optionally inject backend-specific resources
+	// TODO 	gl_buffers [SG_NUM_INFLIGHT_FRAMES]u32
+	// TODO 	mtl_buffers [SG_NUM_INFLIGHT_FRAMES]voidptr
+	d3d11_buffer voidptr
 	wgpu_buffer  voidptr
 	_end_canary  u32
 }
@@ -627,16 +694,15 @@ pub const sg_cubeface_num = 6
 pub const sg_max_mipmaps = 16
 
 @[typedef]
-struct C.sg_image_data {
+pub struct C.sg_image_data {
 pub mut:
-	// TODO 	subimage [SG_CUBEFACE_NUM][SG_MAX_MIPMAPS]Range
 	subimage [sg_cubeface_num][sg_max_mipmaps]Range
 }
 
 pub type ImageData = C.sg_image_data
 
 @[typedef]
-struct C.sg_image_desc {
+pub struct C.sg_image_desc {
 pub mut:
 	_start_canary u32
 	@type         ImageType
@@ -649,21 +715,22 @@ pub mut:
 	pixel_format  PixelFormat
 	sample_count  int
 	data          ImageData
-	label         &char = unsafe { nil } // GL specific
+	label         &char = unsafe { nil }
 	// optionally inject backend-specific resources
 	// TODO 	gl_textures [SG_NUM_INFLIGHT_FRAMES]u32
-	gl_texture_target u32 // GL specific
-	// TODO 	mtl_textures [SG_NUM_INFLIGHT_FRAMES]voidptr // D3D11 specific
+	gl_texture_target u32
+	// TODO 	mtl_textures [SG_NUM_INFLIGHT_FRAMES]voidptr
 	d3d11_texture              voidptr
-	d3d11_shader_resource_view voidptr // WebGPU specific
+	d3d11_shader_resource_view voidptr
 	wgpu_texture               voidptr
+	wgpu_texture_view          voidptr
 	_end_canary                u32
 }
 
 pub type ImageDesc = C.sg_image_desc
 
 @[typedef]
-struct C.sg_sampler_desc {
+pub struct C.sg_sampler_desc {
 pub mut:
 	_start_canary  u32
 	min_filter     Filter
@@ -691,7 +758,7 @@ pub mut:
 pub type SamplerDesc = C.sg_sampler_desc
 
 @[typedef]
-struct C.sg_shader_attr_desc {
+pub struct C.sg_shader_attr_desc {
 pub mut:
 	name &char = unsafe { nil }
 }
@@ -699,7 +766,7 @@ pub mut:
 pub type ShaderAttrDesc = C.sg_shader_attr_desc
 
 @[typedef]
-struct C.sg_shader_uniform_desc {
+pub struct C.sg_shader_uniform_desc {
 pub mut:
 	name        &char = unsafe { nil }
 	@type       UniformType
@@ -709,7 +776,7 @@ pub mut:
 pub type ShaderUniformDesc = C.sg_shader_uniform_desc
 
 @[typedef]
-struct C.sg_shader_uniform_block_desc {
+pub struct C.sg_shader_uniform_block_desc {
 pub mut:
 	size   usize
 	layout UniformLayout
@@ -719,7 +786,7 @@ pub mut:
 pub type ShaderUniformBlockDesc = C.sg_shader_uniform_block_desc
 
 @[typedef]
-struct C.sg_shader_image_desc {
+pub struct C.sg_shader_image_desc {
 pub mut:
 	used         bool
 	multisampled bool
@@ -730,7 +797,7 @@ pub mut:
 pub type ShaderImageDesc = C.sg_shader_image_desc
 
 @[typedef]
-struct C.sg_shader_sampler_desc {
+pub struct C.sg_shader_sampler_desc {
 pub mut:
 	used         bool
 	sampler_type SamplerType
@@ -739,7 +806,7 @@ pub mut:
 pub type ShaderSamplerDesc = C.sg_shader_sampler_desc
 
 @[typedef]
-struct C.sg_shader_image_sampler_pair_desc {
+pub struct C.sg_shader_image_sampler_pair_desc {
 pub mut:
 	used         bool
 	image_slot   int
@@ -750,7 +817,7 @@ pub mut:
 pub type ShaderImageSamplerPairDesc = C.sg_shader_image_sampler_pair_desc
 
 @[typedef]
-struct C.sg_shader_stage_desc {
+pub struct C.sg_shader_stage_desc {
 pub mut:
 	source       &char = unsafe { nil }
 	bytecode     Range
@@ -765,7 +832,7 @@ pub mut:
 pub type ShaderStageDesc = C.sg_shader_stage_desc
 
 @[typedef]
-struct C.sg_shader_desc {
+pub struct C.sg_shader_desc {
 pub mut:
 	_start_canary u32
 	// TODO 	attrs [C.SG_MAX_VERTEX_ATTRIBUTES]ShaderAttrDesc // 16
@@ -778,29 +845,27 @@ pub mut:
 pub type ShaderDesc = C.sg_shader_desc
 
 @[typedef]
-struct C.sg_vertex_buffer_layout_state {
+pub struct C.sg_vertex_buffer_layout_state {
 pub mut:
 	stride    int
 	step_func VertexStep
 	step_rate int
-	// TODO #if defined(SOKOL_ZIG_BINDINGS) uint32_t __pad[2]
 }
 
 pub type VertexBufferLayoutState = C.sg_vertex_buffer_layout_state
 
 @[typedef]
-struct C.sg_vertex_attr_state {
+pub struct C.sg_vertex_attr_state {
 pub mut:
 	buffer_index int
 	offset       int
 	format       VertexFormat
-	// TODO #if defined(SOKOL_ZIG_BINDINGS) uint32_t __pad[2]
 }
 
 pub type VertexAttrState = C.sg_vertex_attr_state
 
 @[typedef]
-struct C.sg_vertex_layout_state {
+pub struct C.sg_vertex_layout_state {
 pub mut:
 	buffers [8]VertexBufferLayoutState
 	attrs   [16]VertexAttrState
@@ -809,7 +874,7 @@ pub mut:
 pub type VertexLayoutState = C.sg_vertex_layout_state
 
 @[typedef]
-struct C.sg_stencil_face_state {
+pub struct C.sg_stencil_face_state {
 pub mut:
 	compare       CompareFunc
 	fail_op       StencilOp
@@ -820,7 +885,7 @@ pub mut:
 pub type StencilFaceState = C.sg_stencil_face_state
 
 @[typedef]
-struct C.sg_stencil_state {
+pub struct C.sg_stencil_state {
 pub mut:
 	enabled    bool
 	front      StencilFaceState
@@ -833,7 +898,7 @@ pub mut:
 pub type StencilState = C.sg_stencil_state
 
 @[typedef]
-struct C.sg_depth_state {
+pub struct C.sg_depth_state {
 pub mut:
 	pixel_format     PixelFormat
 	compare          CompareFunc
@@ -846,7 +911,7 @@ pub mut:
 pub type DepthState = C.sg_depth_state
 
 @[typedef]
-struct C.sg_blend_state {
+pub struct C.sg_blend_state {
 pub mut:
 	enabled          bool
 	src_factor_rgb   BlendFactor
@@ -860,7 +925,7 @@ pub mut:
 pub type BlendState = C.sg_blend_state
 
 @[typedef]
-struct C.sg_color_target_state {
+pub struct C.sg_color_target_state {
 pub mut:
 	pixel_format PixelFormat
 	write_mask   ColorMask
@@ -870,7 +935,7 @@ pub mut:
 pub type ColorTargetState = C.sg_color_target_state
 
 @[typedef]
-struct C.sg_pipeline_desc {
+pub struct C.sg_pipeline_desc {
 pub mut:
 	_start_canary             u32
 	shader                    Shader
@@ -893,7 +958,7 @@ pub mut:
 pub type PipelineDesc = C.sg_pipeline_desc
 
 @[typedef]
-struct C.sg_pass_attachment_desc {
+pub struct C.sg_attachment_desc {
 pub mut:
 	image     Image
 	mip_level int
@@ -901,99 +966,97 @@ pub mut:
 	// TODO 	texture: C.array // layer
 }
 
-pub type PassAttachmentDesc = C.sg_pass_attachment_desc
+pub type AttachmentDesc = C.sg_attachment_desc
 
 @[typedef]
-struct C.sg_pass_desc {
+pub struct C.sg_attachments_desc {
 pub mut:
 	_start_canary u32
-	// TODO 	color_attachments [SG_MAX_COLOR_ATTACHMENTS]PassAttachmentDesc
-	color_attachments        [4]PassAttachmentDesc
-	depth_stencil_attachment PassAttachmentDesc
-	label                    &char = unsafe { nil }
-	_end_canary              u32
+	colors        [4]AttachmentDesc // SG_MAX_COLOR_ATTACHMENTS
+	resolves      [4]AttachmentDesc
+	depth_stencil AttachmentDesc
+	label         &char = unsafe { nil }
+	_end_canary   u32
 }
 
-pub type PassDesc = C.sg_pass_desc
+pub type AttachmentsDesc = C.sg_attachments_desc
 
 @[typedef]
-struct C.sg_trace_hooks {
+pub struct C.sg_trace_hooks {
 pub mut:
-	user_data          voidptr
-	reset_state_cache  fn (user_data voidptr) // user_data)
-	make_buffer        fn (const_desc &BufferDesc, result Buffer, user_data voidptr)     // sg_buffer_desc*
-	make_image         fn (const_desc &ImageDesc, result Image, user_data voidptr)       // sg_image_desc*
-	make_sampler       fn (const_desc &SamplerDesc, result Sampler, user_data voidptr)   // sg_sampler_desc*
-	make_shader        fn (const_desc &ShaderDesc, result Shader, user_data voidptr)     // sg_shader_desc*
-	make_pipeline      fn (const_desc &PipelineDesc, result Pipeline, user_data voidptr) // sg_pipeline_desc*
-	make_pass          fn (const_desc &PassDesc, result Pass, user_data voidptr) // sg_pass_desc*
-	destroy_buffer     fn (buf Buffer, user_data voidptr)   // buf,
-	destroy_image      fn (img Image, user_data voidptr)    // img,
-	destroy_sampler    fn (smp Sampler, user_data voidptr)  // smp,
-	destroy_shader     fn (shd Shader, user_data voidptr)   // shd,
-	destroy_pipeline   fn (pip Pipeline, user_data voidptr) // pip,
-	destroy_pass       fn (pass Pass, user_data voidptr)    // pass,
-	update_buffer      fn (buf Buffer, const_data &Range, user_data voidptr)    // buf,
-	update_image       fn (img Image, const_data &ImageData, user_data voidptr) // img,
-	append_buffer      fn (buf Buffer, const_data &Range, result int, user_data voidptr) // buf,
-	begin_default_pass fn (const_pass_action &PassAction, width int, height int, user_data voidptr) // sg_pass_action*
-	begin_pass         fn (pass Pass, const_pass_action &PassAction, user_data voidptr) // pass,
-	apply_viewport     fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
-	apply_scissor_rect fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
-	apply_pipeline     fn (pip Pipeline, user_data voidptr) // pip,
-	apply_bindings     fn (const_bindings &Bindings, user_data voidptr) // sg_bindings*
-	apply_uniforms     fn (stage ShaderStage, ub_index int, const_data &Range, user_data voidptr)    // stage,
-	draw               fn (base_element int, num_elements int, num_instances int, user_data voidptr) // base_element,
-	end_pass           fn (user_data voidptr) // user_data)
-	commit             fn (user_data voidptr) // user_data)
-	alloc_buffer       fn (result Buffer, user_data voidptr)   // result,
-	alloc_image        fn (result Image, user_data voidptr)    // result,
-	alloc_sampler      fn (result Sampler, user_data voidptr)  // result,
-	alloc_shader       fn (result Shader, user_data voidptr)   // result,
-	alloc_pipeline     fn (result Pipeline, user_data voidptr) // result,
-	alloc_pass         fn (result Pass, user_data voidptr)     // result,
-	dealloc_buffer     fn (buf_id Buffer, user_data voidptr)   // buf_id,
-	dealloc_image      fn (img_id Image, user_data voidptr)    // img_id,
-	dealloc_sampler    fn (smp_id Sampler, user_data voidptr)  // smp_id,
-	dealloc_shader     fn (shd_id Shader, user_data voidptr)   // shd_id,
-	dealloc_pipeline   fn (pip_id Pipeline, user_data voidptr) // pip_id,
-	dealloc_pass       fn (pass_id Pass, user_data voidptr)    // pass_id,
-	init_buffer        fn (buf_id Buffer, const_desc &BufferDesc, user_data voidptr)     // buf_id,
-	init_image         fn (img_id Image, const_desc &ImageDesc, user_data voidptr)       // img_id,
-	init_sampler       fn (smp_id Sampler, const_desc &SamplerDesc, user_data voidptr)   // smp_id,
-	init_shader        fn (shd_id Shader, const_desc &ShaderDesc, user_data voidptr)     // shd_id,
-	init_pipeline      fn (pip_id Pipeline, const_desc &PipelineDesc, user_data voidptr) // pip_id,
-	init_pass          fn (pass_id Pass, const_desc &PassDesc, user_data voidptr)        // pass_id,
-	uninit_buffer      fn (buf_id Buffer, user_data voidptr)    // buf_id,
-	uninit_image       fn (img_id Image, user_data voidptr)     // img_id,
-	uninit_sampler     fn (smp_id Sampler, user_data voidptr)   // smp_id,
-	uninit_shader      fn (shd_id Shader, user_data voidptr)    // shd_id,
-	uninit_pipeline    fn (pip_id Pipeline, user_data voidptr)  // pip_id,
-	uninit_pass        fn (pass_id Pass, user_data voidptr)     // pass_id,
-	fail_buffer        fn (buf_id Buffer, user_data voidptr)    // buf_id,
-	fail_image         fn (img_id Image, user_data voidptr)     // img_id,
-	fail_sampler       fn (smp_id Sampler, user_data voidptr)   // smp_id,
-	fail_shader        fn (shd_id Shader, user_data voidptr)    // shd_id,
-	fail_pipeline      fn (pip_id Pipeline, user_data voidptr)  // pip_id,
-	fail_pass          fn (pass_id Pass, user_data voidptr)     // pass_id,
-	push_debug_group   fn (const_name &char, user_data voidptr) // char*
-	pop_debug_group    fn (user_data voidptr) // user_data)
+	user_data           voidptr
+	reset_state_cache   fn (user_data voidptr) // user_data)
+	make_buffer         fn (const_desc &BufferDesc, result Buffer, user_data voidptr)           // sg_buffer_desc*
+	make_image          fn (const_desc &ImageDesc, result Image, user_data voidptr)             // sg_image_desc*
+	make_sampler        fn (const_desc &SamplerDesc, result Sampler, user_data voidptr)         // sg_sampler_desc*
+	make_shader         fn (const_desc &ShaderDesc, result Shader, user_data voidptr)           // sg_shader_desc*
+	make_pipeline       fn (const_desc &PipelineDesc, result Pipeline, user_data voidptr)       // sg_pipeline_desc*
+	make_attachments    fn (const_desc &AttachmentsDesc, result Attachments, user_data voidptr) // sg_attachments_desc*
+	destroy_buffer      fn (buf Buffer, user_data voidptr)       // buf,
+	destroy_image       fn (img Image, user_data voidptr)        // img,
+	destroy_sampler     fn (smp Sampler, user_data voidptr)      // smp,
+	destroy_shader      fn (shd Shader, user_data voidptr)       // shd,
+	destroy_pipeline    fn (pip Pipeline, user_data voidptr)     // pip,
+	destroy_attachments fn (atts Attachments, user_data voidptr) // atts,
+	update_buffer       fn (buf Buffer, const_data &Range, user_data voidptr)    // buf,
+	update_image        fn (img Image, const_data &ImageData, user_data voidptr) // img,
+	append_buffer       fn (buf Buffer, const_data &Range, result int, user_data voidptr) // buf,
+	begin_pass          fn (const_pass &Pass, user_data voidptr) // sg_pass*
+	apply_viewport      fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
+	apply_scissor_rect  fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
+	apply_pipeline      fn (pip Pipeline, user_data voidptr) // pip,
+	apply_bindings      fn (const_bindings &Bindings, user_data voidptr) // sg_bindings*
+	apply_uniforms      fn (stage ShaderStage, ub_index int, const_data &Range, user_data voidptr)    // stage,
+	draw                fn (base_element int, num_elements int, num_instances int, user_data voidptr) // base_element,
+	end_pass            fn (user_data voidptr) // user_data)
+	commit              fn (user_data voidptr) // user_data)
+	alloc_buffer        fn (result Buffer, user_data voidptr)       // result,
+	alloc_image         fn (result Image, user_data voidptr)        // result,
+	alloc_sampler       fn (result Sampler, user_data voidptr)      // result,
+	alloc_shader        fn (result Shader, user_data voidptr)       // result,
+	alloc_pipeline      fn (result Pipeline, user_data voidptr)     // result,
+	alloc_attachments   fn (result Attachments, user_data voidptr)  // result,
+	dealloc_buffer      fn (buf_id Buffer, user_data voidptr)       // buf_id,
+	dealloc_image       fn (img_id Image, user_data voidptr)        // img_id,
+	dealloc_sampler     fn (smp_id Sampler, user_data voidptr)      // smp_id,
+	dealloc_shader      fn (shd_id Shader, user_data voidptr)       // shd_id,
+	dealloc_pipeline    fn (pip_id Pipeline, user_data voidptr)     // pip_id,
+	dealloc_attachments fn (atts_id Attachments, user_data voidptr) // atts_id,
+	init_buffer         fn (buf_id Buffer, const_desc &BufferDesc, user_data voidptr)            // buf_id,
+	init_image          fn (img_id Image, const_desc &ImageDesc, user_data voidptr)              // img_id,
+	init_sampler        fn (smp_id Sampler, const_desc &SamplerDesc, user_data voidptr)          // smp_id,
+	init_shader         fn (shd_id Shader, const_desc &ShaderDesc, user_data voidptr)            // shd_id,
+	init_pipeline       fn (pip_id Pipeline, const_desc &PipelineDesc, user_data voidptr)        // pip_id,
+	init_attachments    fn (atts_id Attachments, const_desc &AttachmentsDesc, user_data voidptr) // atts_id,
+	uninit_buffer       fn (buf_id Buffer, user_data voidptr)       // buf_id,
+	uninit_image        fn (img_id Image, user_data voidptr)        // img_id,
+	uninit_sampler      fn (smp_id Sampler, user_data voidptr)      // smp_id,
+	uninit_shader       fn (shd_id Shader, user_data voidptr)       // shd_id,
+	uninit_pipeline     fn (pip_id Pipeline, user_data voidptr)     // pip_id,
+	uninit_attachments  fn (atts_id Attachments, user_data voidptr) // atts_id,
+	fail_buffer         fn (buf_id Buffer, user_data voidptr)       // buf_id,
+	fail_image          fn (img_id Image, user_data voidptr)        // img_id,
+	fail_sampler        fn (smp_id Sampler, user_data voidptr)      // smp_id,
+	fail_shader         fn (shd_id Shader, user_data voidptr)       // shd_id,
+	fail_pipeline       fn (pip_id Pipeline, user_data voidptr)     // pip_id,
+	fail_attachments    fn (atts_id Attachments, user_data voidptr) // atts_id,
+	push_debug_group    fn (const_name &char, user_data voidptr)    // char*
+	pop_debug_group     fn (user_data voidptr) // user_data)
 }
 
 pub type TraceHooks = C.sg_trace_hooks
 
 @[typedef]
-struct C.sg_slot_info {
+pub struct C.sg_slot_info {
 pub mut:
 	state  ResourceState // the current state of this resource slot
 	res_id u32 // type-neutral resource if (e.g. sg_buffer.id)
-	ctx_id u32 // the context this resource belongs to
 }
 
 pub type SlotInfo = C.sg_slot_info
 
 @[typedef]
-struct C.sg_buffer_info {
+pub struct C.sg_buffer_info {
 pub mut:
 	slot               SlotInfo // resource pool slot info
 	update_frame_index u32      // frame index of last sg_update_buffer()
@@ -1007,20 +1070,18 @@ pub mut:
 pub type BufferInfo = C.sg_buffer_info
 
 @[typedef]
-struct C.sg_image_info {
+pub struct C.sg_image_info {
 pub mut:
 	slot            SlotInfo // resource pool slot info
 	upd_frame_index u32      // frame index of last sg_update_image()
 	num_slots       int      // number of renaming-slots for dynamically updated images
 	active_slot     int      // currently active write-slot for dynamically updated images
-	width           int      // image width
-	height          int      // image height
 }
 
 pub type ImageInfo = C.sg_image_info
 
 @[typedef]
-struct C.sg_sampler_info {
+pub struct C.sg_sampler_info {
 pub mut:
 	slot SlotInfo // resource pool slot info
 }
@@ -1028,7 +1089,7 @@ pub mut:
 pub type SamplerInfo = C.sg_sampler_info
 
 @[typedef]
-struct C.sg_shader_info {
+pub struct C.sg_shader_info {
 pub mut:
 	slot SlotInfo // resoure pool slot info
 }
@@ -1036,7 +1097,7 @@ pub mut:
 pub type ShaderInfo = C.sg_shader_info
 
 @[typedef]
-struct C.sg_pipeline_info {
+pub struct C.sg_pipeline_info {
 pub mut:
 	slot SlotInfo // resource pool slot info
 }
@@ -1044,15 +1105,15 @@ pub mut:
 pub type PipelineInfo = C.sg_pipeline_info
 
 @[typedef]
-struct C.sg_pass_info {
+pub struct C.sg_attachments_info {
 pub mut:
 	slot SlotInfo // resource pool slot info
 }
 
-pub type PassInfo = C.sg_pass_info
+pub type AttachmentsInfo = C.sg_attachments_info
 
 @[typedef]
-struct C.sg_frame_stats_gl {
+pub struct C.sg_frame_stats_gl {
 pub mut:
 	num_bind_buffer                 u32
 	num_active_texture              u32
@@ -1070,7 +1131,7 @@ pub mut:
 pub type FrameStatsGl = C.sg_frame_stats_gl
 
 @[typedef]
-struct C.sg_frame_stats_d3d11_pass {
+pub struct C.sg_frame_stats_d3d11_pass {
 pub mut:
 	num_om_set_render_targets    u32
 	num_clear_render_target_view u32
@@ -1081,7 +1142,7 @@ pub mut:
 pub type FrameStatsD3d11Pass = C.sg_frame_stats_d3d11_pass
 
 @[typedef]
-struct C.sg_frame_stats_d3d11_pipeline {
+pub struct C.sg_frame_stats_d3d11_pipeline {
 pub mut:
 	num_rs_set_state               u32
 	num_om_set_depth_stencil_state u32
@@ -1097,7 +1158,7 @@ pub mut:
 pub type FrameStatsD3d11Pipeline = C.sg_frame_stats_d3d11_pipeline
 
 @[typedef]
-struct C.sg_frame_stats_d3d11_bindings {
+pub struct C.sg_frame_stats_d3d11_bindings {
 pub mut:
 	num_ia_set_vertex_buffers   u32
 	num_ia_set_index_buffer     u32
@@ -1110,7 +1171,7 @@ pub mut:
 pub type FrameStatsD3d11Bindings = C.sg_frame_stats_d3d11_bindings
 
 @[typedef]
-struct C.sg_frame_stats_d3d11_uniforms {
+pub struct C.sg_frame_stats_d3d11_uniforms {
 pub mut:
 	num_update_subresource u32
 }
@@ -1118,7 +1179,7 @@ pub mut:
 pub type FrameStatsD3d11Uniforms = C.sg_frame_stats_d3d11_uniforms
 
 @[typedef]
-struct C.sg_frame_stats_d3d11_draw {
+pub struct C.sg_frame_stats_d3d11_draw {
 pub mut:
 	num_draw_indexed_instanced u32
 	num_draw_indexed           u32
@@ -1129,7 +1190,7 @@ pub mut:
 pub type FrameStatsD3d11Draw = C.sg_frame_stats_d3d11_draw
 
 @[typedef]
-struct C.sg_frame_stats_d3d11 {
+pub struct C.sg_frame_stats_d3d11 {
 pub mut:
 	pass      FrameStatsD3d11Pass
 	pipeline  FrameStatsD3d11Pipeline
@@ -1143,7 +1204,7 @@ pub mut:
 pub type FrameStatsD3d11 = C.sg_frame_stats_d3d11
 
 @[typedef]
-struct C.sg_frame_stats_metal_idpool {
+pub struct C.sg_frame_stats_metal_idpool {
 pub mut:
 	num_added             u32
 	num_released          u32
@@ -1153,7 +1214,7 @@ pub mut:
 pub type FrameStatsMetalIdpool = C.sg_frame_stats_metal_idpool
 
 @[typedef]
-struct C.sg_frame_stats_metal_pipeline {
+pub struct C.sg_frame_stats_metal_pipeline {
 pub mut:
 	num_set_blend_color             u32
 	num_set_cull_mode               u32
@@ -1167,7 +1228,7 @@ pub mut:
 pub type FrameStatsMetalPipeline = C.sg_frame_stats_metal_pipeline
 
 @[typedef]
-struct C.sg_frame_stats_metal_bindings {
+pub struct C.sg_frame_stats_metal_bindings {
 pub mut:
 	num_set_vertex_buffer          u32
 	num_set_vertex_texture         u32
@@ -1179,7 +1240,7 @@ pub mut:
 pub type FrameStatsMetalBindings = C.sg_frame_stats_metal_bindings
 
 @[typedef]
-struct C.sg_frame_stats_metal_uniforms {
+pub struct C.sg_frame_stats_metal_uniforms {
 pub mut:
 	num_set_vertex_buffer_offset   u32
 	num_set_fragment_buffer_offset u32
@@ -1188,7 +1249,7 @@ pub mut:
 pub type FrameStatsMetalUniforms = C.sg_frame_stats_metal_uniforms
 
 @[typedef]
-struct C.sg_frame_stats_metal {
+pub struct C.sg_frame_stats_metal {
 pub mut:
 	idpool   FrameStatsMetalIdpool
 	pipeline FrameStatsMetalPipeline
@@ -1199,7 +1260,7 @@ pub mut:
 pub type FrameStatsMetal = C.sg_frame_stats_metal
 
 @[typedef]
-struct C.sg_frame_stats_wgpu_uniforms {
+pub struct C.sg_frame_stats_wgpu_uniforms {
 pub mut:
 	num_set_bindgroup u32
 	size_write_buffer u32
@@ -1208,7 +1269,7 @@ pub mut:
 pub type FrameStatsWgpuUniforms = C.sg_frame_stats_wgpu_uniforms
 
 @[typedef]
-struct C.sg_frame_stats_wgpu_bindings {
+pub struct C.sg_frame_stats_wgpu_bindings {
 pub mut:
 	num_set_vertex_buffer                    u32
 	num_skip_redundant_vertex_buffer         u32
@@ -1227,7 +1288,7 @@ pub mut:
 pub type FrameStatsWgpuBindings = C.sg_frame_stats_wgpu_bindings
 
 @[typedef]
-struct C.sg_frame_stats_wgpu {
+pub struct C.sg_frame_stats_wgpu {
 pub mut:
 	uniforms FrameStatsWgpuUniforms
 	bindings FrameStatsWgpuBindings
@@ -1236,7 +1297,7 @@ pub mut:
 pub type FrameStatsWgpu = C.sg_frame_stats_wgpu
 
 @[typedef]
-struct C.sg_frame_stats {
+pub struct C.sg_frame_stats {
 pub mut:
 	frame_index u32
 	// current frame counter, starts at 0 uint32_t num_passes
@@ -1277,73 +1338,53 @@ TODO Non-numerical: #define _SG_LOGITEM_XMACRO(item,msg) SG_LOGITEM_##item,
 //}
 
 @[typedef]
-struct C.sg_metal_context_desc {
-pub mut:
-	device                            voidptr
-	renderpass_descriptor_cb          fn () voidptr
-	renderpass_descriptor_userdata_cb fn () voidptr
-	drawable_cb                       fn () voidptr
-	drawable_userdata_cb              fn () voidptr
-	user_data                         voidptr
-}
-
-pub type MetalContextDesc = C.sg_metal_context_desc
-
-@[typedef]
-struct C.sg_d3d11_context_desc {
-pub mut:
-	device                         voidptr
-	device_context                 voidptr
-	render_target_view_cb          fn () voidptr
-	render_target_view_userdata_cb fn () voidptr
-	depth_stencil_view_cb          fn () voidptr
-	depth_stencil_view_userdata_cb fn () voidptr
-	user_data                      voidptr
-}
-
-pub type D3d11ContextDesc = C.sg_d3d11_context_desc
-
-@[typedef]
-struct C.sg_wgpu_context_desc {
-pub mut:
-	device                         voidptr       // WGPUDevice
-	render_view_cb                 fn () voidptr // returns WGPUTextureView
-	render_view_userdata_cb        fn () voidptr
-	resolve_view_cb                fn () voidptr // returns WGPUTextureView
-	resolve_view_userdata_cb       fn () voidptr
-	depth_stencil_view_cb          fn () voidptr // returns WGPUTextureView, must be WGPUTextureFormat_Depth24Plus8
-	depth_stencil_view_userdata_cb fn () voidptr
-	user_data                      voidptr
-}
-
-pub type WgpuContextDesc = C.sg_wgpu_context_desc
-
-@[typedef]
-struct C.sg_gl_context_desc {
-pub mut:
-	default_framebuffer_cb          fn () u32
-	default_framebuffer_userdata_cb fn () u32
-	user_data                       voidptr
-}
-
-pub type GlContextDesc = C.sg_gl_context_desc
-
-@[typedef]
-struct C.sg_context_desc {
+pub struct C.sg_environment_defaults {
 pub mut:
 	color_format PixelFormat
 	depth_format PixelFormat
 	sample_count int
-	metal        MetalContextDesc
-	d3d11        D3d11ContextDesc
-	wgpu         WgpuContextDesc
-	gl           GlContextDesc
 }
 
-pub type ContextDesc = C.sg_context_desc
+pub type EnvironmentDefaults = C.sg_environment_defaults
 
 @[typedef]
-struct C.sg_commit_listener {
+pub struct C.sg_metal_environment {
+pub mut:
+	device voidptr
+}
+
+pub type MetalEnvironment = C.sg_metal_environment
+
+@[typedef]
+pub struct C.sg_d3d11_environment {
+pub mut:
+	device         voidptr
+	device_context voidptr
+}
+
+pub type D3d11Environment = C.sg_d3d11_environment
+
+@[typedef]
+pub struct C.sg_wgpu_environment {
+pub mut:
+	device voidptr
+}
+
+pub type WgpuEnvironment = C.sg_wgpu_environment
+
+@[typedef]
+pub struct C.sg_environment {
+pub mut:
+	defaults EnvironmentDefaults
+	metal    MetalEnvironment
+	d3d11    D3d11Environment
+	wgpu     WgpuEnvironment
+}
+
+pub type Environment = C.sg_environment
+
+@[typedef]
+pub struct C.sg_commit_listener {
 pub mut:
 	func      fn (user_data voidptr) // user_data)
 	user_data voidptr
@@ -1352,7 +1393,7 @@ pub mut:
 pub type CommitListener = C.sg_commit_listener
 
 @[typedef]
-struct C.sg_allocator {
+pub struct C.sg_allocator {
 pub mut:
 	alloc_fn  fn (size usize, user_data voidptr) voidptr // size,
 	free_fn   fn (ptr voidptr, user_data voidptr)        // ptr,
@@ -1374,7 +1415,7 @@ sg_logger
     a logger (for instance the standard logging function from sokol_log.h).
 */
 @[typedef]
-struct C.sg_logger {
+pub struct C.sg_logger {
 pub mut:
 	func      LoggerFn
 	user_data voidptr
@@ -1383,24 +1424,26 @@ pub mut:
 pub type Logger = C.sg_logger
 
 @[typedef]
-struct C.sg_desc {
+pub struct C.sg_desc {
 pub mut:
-	_start_canary                  u32
-	buffer_pool_size               int
-	image_pool_size                int
-	sampler_pool_size              int
-	shader_pool_size               int
-	pipeline_pool_size             int
-	pass_pool_size                 int
-	context_pool_size              int
-	uniform_buffer_size            int
-	max_commit_listeners           int
-	disable_validation             bool
-	mtl_force_managed_storage_mode bool // for debugging: use Metal managed storage mode for resources even with UMA
-	allocator                      Allocator
-	logger                         Logger // optional log function override
-	context                        ContextDesc
-	_end_canary                    u32
+	_start_canary                                   u32
+	buffer_pool_size                                int
+	image_pool_size                                 int
+	sampler_pool_size                               int
+	shader_pool_size                                int
+	pipeline_pool_size                              int
+	attachments_pool_size                           int
+	uniform_buffer_size                             int
+	max_commit_listeners                            int
+	disable_validation                              bool // disable validation layer even in debug mode, useful for tests
+	mtl_force_managed_storage_mode                  bool // for debugging: use Metal managed storage mode for resources even with UMA
+	mtl_use_command_buffer_with_retained_references bool // Metal: use a managed MTLCommandBuffer which ref-counts used resources
+	wgpu_disable_bindgroups_cache                   bool // set to true to disable the WebGPU backend BindGroup cache
+	wgpu_bindgroups_cache_size                      int  // number of slots in the WebGPU bindgroup cache (must be 2^N)
+	allocator                                       Allocator
+	logger                                          Logger // optional log function override
+	environment                                     Environment
+	_end_canary                                     u32
 }
 
 pub type Desc = C.sg_desc
@@ -1517,12 +1560,12 @@ pub fn make_pipeline(const_desc &PipelineDesc) Pipeline {
 	return C.sg_make_pipeline(const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL sg_pass sg_make_pass(const sg_pass_desc* desc)`
-fn C.sg_make_pass(const_desc &PassDesc) Pass
+// C: `SOKOL_GFX_API_DECL sg_attachments sg_make_attachments(const sg_attachments_desc* desc)`
+fn C.sg_make_attachments(const_desc &AttachmentsDesc) Attachments
 
-// make_pass is currently undocumented
-pub fn make_pass(const_desc &PassDesc) Pass {
-	return C.sg_make_pass(const_desc)
+// make_attachments is currently undocumented
+pub fn make_attachments(const_desc &AttachmentsDesc) Attachments {
+	return C.sg_make_attachments(const_desc)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_destroy_buffer(sg_buffer buf)`
@@ -1565,12 +1608,12 @@ pub fn destroy_pipeline(pip Pipeline) {
 	C.sg_destroy_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_destroy_pass(sg_pass pass)`
-fn C.sg_destroy_pass(pass Pass)
+// C: `SOKOL_GFX_API_DECL void sg_destroy_attachments(sg_attachments atts)`
+fn C.sg_destroy_attachments(atts Attachments)
 
-// destroy_pass is currently undocumented
-pub fn destroy_pass(pass Pass) {
-	C.sg_destroy_pass(pass)
+// destroy_attachments is currently undocumented
+pub fn destroy_attachments(atts Attachments) {
+	C.sg_destroy_attachments(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_update_buffer(sg_buffer buf, const sg_range* data)`
@@ -1613,28 +1656,12 @@ pub fn query_buffer_will_overflow(buf Buffer, size usize) bool {
 	return C.sg_query_buffer_will_overflow(buf, size)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_begin_default_pass(const sg_pass_action* pass_action, int width, int height)`
-fn C.sg_begin_default_pass(const_pass_action &PassAction, width int, height int)
+// C: `SOKOL_GFX_API_DECL void sg_begin_pass(const sg_pass* pass)`
+fn C.sg_begin_pass(const_pass &Pass)
 
-// begin_default_pass renderings functions
-pub fn begin_default_pass(const_pass_action &PassAction, width int, height int) {
-	C.sg_begin_default_pass(const_pass_action, width, height)
-}
-
-// C: `SOKOL_GFX_API_DECL void sg_begin_default_passf(const sg_pass_action* pass_action, float width, float height)`
-fn C.sg_begin_default_passf(const_pass_action &PassAction, width f32, height f32)
-
-// begin_default_passf is currently undocumented
-pub fn begin_default_passf(const_pass_action &PassAction, width f32, height f32) {
-	C.sg_begin_default_passf(const_pass_action, width, height)
-}
-
-// C: `SOKOL_GFX_API_DECL void sg_begin_pass(sg_pass pass, const sg_pass_action* pass_action)`
-fn C.sg_begin_pass(pass Pass, const_pass_action &PassAction)
-
-// begin_pass is currently undocumented
-pub fn begin_pass(pass Pass, const_pass_action &PassAction) {
-	C.sg_begin_pass(pass, const_pass_action)
+// begin_pass //s rendering functions
+pub fn begin_pass(const_pass &Pass) {
+	C.sg_begin_pass(const_pass)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_apply_viewport(int x, int y, int width, int height, bool origin_top_left)`
@@ -1720,7 +1747,7 @@ pub fn commit() {
 // C: `SOKOL_GFX_API_DECL sg_desc sg_query_desc(void)`
 fn C.sg_query_desc() Desc
 
-// query_desc gettings information
+// query_desc getting information
 pub fn query_desc() Desc {
 	return C.sg_query_desc()
 }
@@ -1755,6 +1782,22 @@ fn C.sg_query_pixelformat(fmt PixelFormat) PixelformatInfo
 // query_pixelformat is currently undocumented
 pub fn query_pixelformat(fmt PixelFormat) PixelformatInfo {
 	return C.sg_query_pixelformat(fmt)
+}
+
+// C: `SOKOL_GFX_API_DECL int sg_query_row_pitch(sg_pixel_format fmt, int width, int row_align_bytes)`
+fn C.sg_query_row_pitch(fmt PixelFormat, width int, row_align_bytes int) int
+
+// query_row_pitch is currently undocumented
+pub fn query_row_pitch(fmt PixelFormat, width int, row_align_bytes int) int {
+	return C.sg_query_row_pitch(fmt, width, row_align_bytes)
+}
+
+// C: `SOKOL_GFX_API_DECL int sg_query_surface_pitch(sg_pixel_format fmt, int width, int height, int row_align_bytes)`
+fn C.sg_query_surface_pitch(fmt PixelFormat, width int, height int, row_align_bytes int) int
+
+// query_surface_pitch is currently undocumented
+pub fn query_surface_pitch(fmt PixelFormat, width int, height int, row_align_bytes int) int {
+	return C.sg_query_surface_pitch(fmt, width, height, row_align_bytes)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_resource_state sg_query_buffer_state(sg_buffer buf)`
@@ -1797,12 +1840,12 @@ pub fn query_pipeline_state(pip Pipeline) ResourceState {
 	return C.sg_query_pipeline_state(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL sg_resource_state sg_query_pass_state(sg_pass pass)`
-fn C.sg_query_pass_state(pass Pass) ResourceState
+// C: `SOKOL_GFX_API_DECL sg_resource_state sg_query_attachments_state(sg_attachments atts)`
+fn C.sg_query_attachments_state(atts Attachments) ResourceState
 
-// query_pass_state is currently undocumented
-pub fn query_pass_state(pass Pass) ResourceState {
-	return C.sg_query_pass_state(pass)
+// query_attachments_state is currently undocumented
+pub fn query_attachments_state(atts Attachments) ResourceState {
+	return C.sg_query_attachments_state(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_buffer_info sg_query_buffer_info(sg_buffer buf)`
@@ -1845,12 +1888,12 @@ pub fn query_pipeline_info(pip Pipeline) PipelineInfo {
 	return C.sg_query_pipeline_info(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL sg_pass_info sg_query_pass_info(sg_pass pass)`
-fn C.sg_query_pass_info(pass Pass) PassInfo
+// C: `SOKOL_GFX_API_DECL sg_attachments_info sg_query_attachments_info(sg_attachments atts)`
+fn C.sg_query_attachments_info(atts Attachments) AttachmentsInfo
 
-// query_pass_info is currently undocumented
-pub fn query_pass_info(pass Pass) PassInfo {
-	return C.sg_query_pass_info(pass)
+// query_attachments_info is currently undocumented
+pub fn query_attachments_info(atts Attachments) AttachmentsInfo {
+	return C.sg_query_attachments_info(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_buffer_desc sg_query_buffer_desc(sg_buffer buf)`
@@ -1893,12 +1936,12 @@ pub fn query_pipeline_desc(pip Pipeline) PipelineDesc {
 	return C.sg_query_pipeline_desc(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL sg_pass_desc sg_query_pass_desc(sg_pass pass)`
-fn C.sg_query_pass_desc(pass Pass) PassDesc
+// C: `SOKOL_GFX_API_DECL sg_attachments_desc sg_query_attachments_desc(sg_attachments atts)`
+fn C.sg_query_attachments_desc(atts Attachments) AttachmentsDesc
 
-// query_pass_desc is currently undocumented
-pub fn query_pass_desc(pass Pass) PassDesc {
-	return C.sg_query_pass_desc(pass)
+// query_attachments_desc is currently undocumented
+pub fn query_attachments_desc(atts Attachments) AttachmentsDesc {
+	return C.sg_query_attachments_desc(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_buffer_desc sg_query_buffer_defaults(const sg_buffer_desc* desc)`
@@ -1941,12 +1984,12 @@ pub fn query_pipeline_defaults(const_desc &PipelineDesc) PipelineDesc {
 	return C.sg_query_pipeline_defaults(const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL sg_pass_desc sg_query_pass_defaults(const sg_pass_desc* desc)`
-fn C.sg_query_pass_defaults(const_desc &PassDesc) PassDesc
+// C: `SOKOL_GFX_API_DECL sg_attachments_desc sg_query_attachments_defaults(const sg_attachments_desc* desc)`
+fn C.sg_query_attachments_defaults(const_desc &AttachmentsDesc) AttachmentsDesc
 
-// query_pass_defaults is currently undocumented
-pub fn query_pass_defaults(const_desc &PassDesc) PassDesc {
-	return C.sg_query_pass_defaults(const_desc)
+// query_attachments_defaults is currently undocumented
+pub fn query_attachments_defaults(const_desc &AttachmentsDesc) AttachmentsDesc {
+	return C.sg_query_attachments_defaults(const_desc)
 }
 
 // C: `SOKOL_GFX_API_DECL sg_buffer sg_alloc_buffer(void)`
@@ -1989,12 +2032,12 @@ pub fn alloc_pipeline() Pipeline {
 	return C.sg_alloc_pipeline()
 }
 
-// C: `SOKOL_GFX_API_DECL sg_pass sg_alloc_pass(void)`
-fn C.sg_alloc_pass() Pass
+// C: `SOKOL_GFX_API_DECL sg_attachments sg_alloc_attachments(void)`
+fn C.sg_alloc_attachments() Attachments
 
-// alloc_pass is currently undocumented
-pub fn alloc_pass() Pass {
-	return C.sg_alloc_pass()
+// alloc_attachments is currently undocumented
+pub fn alloc_attachments() Attachments {
+	return C.sg_alloc_attachments()
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_dealloc_buffer(sg_buffer buf)`
@@ -2037,12 +2080,12 @@ pub fn dealloc_pipeline(pip Pipeline) {
 	C.sg_dealloc_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_dealloc_pass(sg_pass pass)`
-fn C.sg_dealloc_pass(pass Pass)
+// C: `SOKOL_GFX_API_DECL void sg_dealloc_attachments(sg_attachments attachments)`
+fn C.sg_dealloc_attachments(attachments Attachments)
 
-// dealloc_pass is currently undocumented
-pub fn dealloc_pass(pass Pass) {
-	C.sg_dealloc_pass(pass)
+// dealloc_attachments is currently undocumented
+pub fn dealloc_attachments(attachments Attachments) {
+	C.sg_dealloc_attachments(attachments)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_init_buffer(sg_buffer buf, const sg_buffer_desc* desc)`
@@ -2085,12 +2128,12 @@ pub fn init_pipeline(pip Pipeline, const_desc &PipelineDesc) {
 	C.sg_init_pipeline(pip, const_desc)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_init_pass(sg_pass pass, const sg_pass_desc* desc)`
-fn C.sg_init_pass(pass Pass, const_desc &PassDesc)
+// C: `SOKOL_GFX_API_DECL void sg_init_attachments(sg_attachments attachments, const sg_attachments_desc* desc)`
+fn C.sg_init_attachments(attachments Attachments, const_desc &AttachmentsDesc)
 
-// init_pass is currently undocumented
-pub fn init_pass(pass Pass, const_desc &PassDesc) {
-	C.sg_init_pass(pass, const_desc)
+// init_attachments is currently undocumented
+pub fn init_attachments(attachments Attachments, const_desc &AttachmentsDesc) {
+	C.sg_init_attachments(attachments, const_desc)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_uninit_buffer(sg_buffer buf)`
@@ -2133,12 +2176,12 @@ pub fn uninit_pipeline(pip Pipeline) {
 	C.sg_uninit_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_uninit_pass(sg_pass pass)`
-fn C.sg_uninit_pass(pass Pass)
+// C: `SOKOL_GFX_API_DECL void sg_uninit_attachments(sg_attachments atts)`
+fn C.sg_uninit_attachments(atts Attachments)
 
-// uninit_pass is currently undocumented
-pub fn uninit_pass(pass Pass) {
-	C.sg_uninit_pass(pass)
+// uninit_attachments is currently undocumented
+pub fn uninit_attachments(atts Attachments) {
+	C.sg_uninit_attachments(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_fail_buffer(sg_buffer buf)`
@@ -2181,12 +2224,12 @@ pub fn fail_pipeline(pip Pipeline) {
 	C.sg_fail_pipeline(pip)
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_fail_pass(sg_pass pass)`
-fn C.sg_fail_pass(pass Pass)
+// C: `SOKOL_GFX_API_DECL void sg_fail_attachments(sg_attachments atts)`
+fn C.sg_fail_attachments(atts Attachments)
 
-// fail_pass is currently undocumented
-pub fn fail_pass(pass Pass) {
-	C.sg_fail_pass(pass)
+// fail_attachments is currently undocumented
+pub fn fail_attachments(atts Attachments) {
+	C.sg_fail_attachments(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL void sg_enable_frame_stats(void)`
@@ -2221,29 +2264,181 @@ pub fn query_frame_stats() FrameStats {
 	return C.sg_query_frame_stats()
 }
 
-// C: `SOKOL_GFX_API_DECL sg_context sg_setup_context(void)`
-fn C.sg_setup_context() Context
-
-// setup_context renderings contexts (optional)
-pub fn setup_context() Context {
-	return C.sg_setup_context()
+@[typedef]
+pub struct C.sg_d3d11_buffer_info {
+pub mut:
+	buf voidptr
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_activate_context(sg_context ctx_id)`
-fn C.sg_activate_context(ctx_id Context)
+pub type D3d11BufferInfo = C.sg_d3d11_buffer_info
 
-// activate_context is currently undocumented
-pub fn activate_context(ctx_id Context) {
-	C.sg_activate_context(ctx_id)
+@[typedef]
+pub struct C.sg_d3d11_image_info {
+pub mut:
+	tex2d voidptr
 }
 
-// C: `SOKOL_GFX_API_DECL void sg_discard_context(sg_context ctx_id)`
-fn C.sg_discard_context(ctx_id Context)
+pub type D3d11ImageInfo = C.sg_d3d11_image_info
 
-// discard_context is currently undocumented
-pub fn discard_context(ctx_id Context) {
-	C.sg_discard_context(ctx_id)
+@[typedef]
+pub struct C.sg_d3d11_sampler_info {
+pub mut:
+	smp voidptr
 }
+
+pub type D3d11SamplerInfo = C.sg_d3d11_sampler_info
+
+@[typedef]
+pub struct C.sg_d3d11_shader_info {
+	// TODO 	vs_cbufs [SG_MAX_SHADERSTAGE_UBS]voidptr
+}
+
+pub type D3d11ShaderInfo = C.sg_d3d11_shader_info
+
+@[typedef]
+pub struct C.sg_d3d11_pipeline_info {
+pub mut:
+	il voidptr
+}
+
+pub type D3d11PipelineInfo = C.sg_d3d11_pipeline_info
+
+@[typedef]
+pub struct C.sg_d3d11_attachments_info {
+	// TODO 	color_rtv [SG_MAX_COLOR_ATTACHMENTS]voidptr
+}
+
+pub type D3d11AttachmentsInfo = C.sg_d3d11_attachments_info
+
+@[typedef]
+pub struct C.sg_mtl_buffer_info {
+	// TODO 	buf [SG_NUM_INFLIGHT_FRAMES]voidptr
+}
+
+pub type MtlBufferInfo = C.sg_mtl_buffer_info
+
+@[typedef]
+pub struct C.sg_mtl_image_info {
+	// TODO 	tex [SG_NUM_INFLIGHT_FRAMES]voidptr
+}
+
+pub type MtlImageInfo = C.sg_mtl_image_info
+
+@[typedef]
+pub struct C.sg_mtl_sampler_info {
+pub mut:
+	smp voidptr
+}
+
+pub type MtlSamplerInfo = C.sg_mtl_sampler_info
+
+@[typedef]
+pub struct C.sg_mtl_shader_info {
+pub mut:
+	vs_lib voidptr
+}
+
+pub type MtlShaderInfo = C.sg_mtl_shader_info
+
+@[typedef]
+pub struct C.sg_mtl_pipeline_info {
+pub mut:
+	rps voidptr
+}
+
+pub type MtlPipelineInfo = C.sg_mtl_pipeline_info
+
+@[typedef]
+pub struct C.sg_wgpu_buffer_info {
+pub mut:
+	buf voidptr
+}
+
+pub type WgpuBufferInfo = C.sg_wgpu_buffer_info
+
+@[typedef]
+pub struct C.sg_wgpu_image_info {
+pub mut:
+	tex voidptr
+}
+
+pub type WgpuImageInfo = C.sg_wgpu_image_info
+
+@[typedef]
+pub struct C.sg_wgpu_sampler_info {
+pub mut:
+	smp voidptr
+}
+
+pub type WgpuSamplerInfo = C.sg_wgpu_sampler_info
+
+@[typedef]
+pub struct C.sg_wgpu_shader_info {
+pub mut:
+	vs_mod voidptr
+}
+
+pub type WgpuShaderInfo = C.sg_wgpu_shader_info
+
+@[typedef]
+pub struct C.sg_wgpu_pipeline_info {
+pub mut:
+	pip voidptr
+}
+
+pub type WgpuPipelineInfo = C.sg_wgpu_pipeline_info
+
+@[typedef]
+pub struct C.sg_wgpu_attachments_info {
+	// TODO 	color_view [SG_MAX_COLOR_ATTACHMENTS]voidptr
+}
+
+pub type WgpuAttachmentsInfo = C.sg_wgpu_attachments_info
+
+@[typedef]
+pub struct C.sg_gl_buffer_info {
+pub mut:
+	// TODO 	buf [SG_NUM_INFLIGHT_FRAMES]u32
+	active_slot int
+}
+
+pub type GlBufferInfo = C.sg_gl_buffer_info
+
+@[typedef]
+pub struct C.sg_gl_image_info {
+pub mut:
+	// TODO 	tex [SG_NUM_INFLIGHT_FRAMES]u32
+	tex_target         u32
+	msaa_render_buffer u32
+	active_slot        int
+}
+
+pub type GlImageInfo = C.sg_gl_image_info
+
+@[typedef]
+pub struct C.sg_gl_sampler_info {
+pub mut:
+	smp u32
+}
+
+pub type GlSamplerInfo = C.sg_gl_sampler_info
+
+@[typedef]
+pub struct C.sg_gl_shader_info {
+pub mut:
+	prog u32
+}
+
+pub type GlShaderInfo = C.sg_gl_shader_info
+
+@[typedef]
+pub struct C.sg_gl_attachments_info {
+pub mut:
+	framebuffer u32
+	// TODO 	msaa_resolve_framebuffer [SG_MAX_COLOR_ATTACHMENTS]u32
+}
+
+pub type GlAttachmentsInfo = C.sg_gl_attachments_info
 
 // C: `SOKOL_GFX_API_DECL const void* sg_d3d11_device(void)`
 fn C.sg_d3d11_device() voidptr
@@ -2251,6 +2446,62 @@ fn C.sg_d3d11_device() voidptr
 // d3d11_device d3d11:s return ID3D11Device
 pub fn d3d11_device() voidptr {
 	return C.sg_d3d11_device()
+}
+
+// C: `SOKOL_GFX_API_DECL const void* sg_d3d11_device_context(void)`
+fn C.sg_d3d11_device_context() voidptr
+
+// d3d11_device_context //s D3D11: return ID3D11DeviceContext
+pub fn d3d11_device_context() voidptr {
+	return C.sg_d3d11_device_context()
+}
+
+// C: `SOKOL_GFX_API_DECL sg_d3d11_buffer_info sg_d3d11_query_buffer_info(sg_buffer buf)`
+fn C.sg_d3d11_query_buffer_info(buf Buffer) D3d11BufferInfo
+
+// d3d11_query_buffer_info //s D3D11: get internal buffer resource objects
+pub fn d3d11_query_buffer_info(buf Buffer) D3d11BufferInfo {
+	return C.sg_d3d11_query_buffer_info(buf)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_d3d11_image_info sg_d3d11_query_image_info(sg_image img)`
+fn C.sg_d3d11_query_image_info(img Image) D3d11ImageInfo
+
+// d3d11_query_image_info //s D3D11: get internal image resource objects
+pub fn d3d11_query_image_info(img Image) D3d11ImageInfo {
+	return C.sg_d3d11_query_image_info(img)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_d3d11_sampler_info sg_d3d11_query_sampler_info(sg_sampler smp)`
+fn C.sg_d3d11_query_sampler_info(smp Sampler) D3d11SamplerInfo
+
+// d3d11_query_sampler_info //s D3D11: get internal sampler resource objects
+pub fn d3d11_query_sampler_info(smp Sampler) D3d11SamplerInfo {
+	return C.sg_d3d11_query_sampler_info(smp)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_d3d11_shader_info sg_d3d11_query_shader_info(sg_shader shd)`
+fn C.sg_d3d11_query_shader_info(shd Shader) D3d11ShaderInfo
+
+// d3d11_query_shader_info //s D3D11: get internal shader resource objects
+pub fn d3d11_query_shader_info(shd Shader) D3d11ShaderInfo {
+	return C.sg_d3d11_query_shader_info(shd)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_d3d11_pipeline_info sg_d3d11_query_pipeline_info(sg_pipeline pip)`
+fn C.sg_d3d11_query_pipeline_info(pip Pipeline) D3d11PipelineInfo
+
+// d3d11_query_pipeline_info //s D3D11: get internal pipeline resource objects
+pub fn d3d11_query_pipeline_info(pip Pipeline) D3d11PipelineInfo {
+	return C.sg_d3d11_query_pipeline_info(pip)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_d3d11_attachments_info sg_d3d11_query_attachments_info(sg_attachments atts)`
+fn C.sg_d3d11_query_attachments_info(atts Attachments) D3d11AttachmentsInfo
+
+// d3d11_query_attachments_info //s D3D11: get internal pass resource objects
+pub fn d3d11_query_attachments_info(atts Attachments) D3d11AttachmentsInfo {
+	return C.sg_d3d11_query_attachments_info(atts)
 }
 
 // C: `SOKOL_GFX_API_DECL const void* sg_mtl_device(void)`
@@ -2267,6 +2518,46 @@ fn C.sg_mtl_render_command_encoder() voidptr
 // mtl_render_command_encoder metal:s return __bridge-casted MTLRenderCommandEncoder in current pass (or zero if outside pass)
 pub fn mtl_render_command_encoder() voidptr {
 	return C.sg_mtl_render_command_encoder()
+}
+
+// C: `SOKOL_GFX_API_DECL sg_mtl_buffer_info sg_mtl_query_buffer_info(sg_buffer buf)`
+fn C.sg_mtl_query_buffer_info(buf Buffer) MtlBufferInfo
+
+// mtl_query_buffer_info //s Metal: get internal __bridge-casted buffer resource objects
+pub fn mtl_query_buffer_info(buf Buffer) MtlBufferInfo {
+	return C.sg_mtl_query_buffer_info(buf)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_mtl_image_info sg_mtl_query_image_info(sg_image img)`
+fn C.sg_mtl_query_image_info(img Image) MtlImageInfo
+
+// mtl_query_image_info //s Metal: get internal __bridge-casted image resource objects
+pub fn mtl_query_image_info(img Image) MtlImageInfo {
+	return C.sg_mtl_query_image_info(img)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_mtl_sampler_info sg_mtl_query_sampler_info(sg_sampler smp)`
+fn C.sg_mtl_query_sampler_info(smp Sampler) MtlSamplerInfo
+
+// mtl_query_sampler_info //s Metal: get internal __bridge-casted sampler resource objects
+pub fn mtl_query_sampler_info(smp Sampler) MtlSamplerInfo {
+	return C.sg_mtl_query_sampler_info(smp)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_mtl_shader_info sg_mtl_query_shader_info(sg_shader shd)`
+fn C.sg_mtl_query_shader_info(shd Shader) MtlShaderInfo
+
+// mtl_query_shader_info //s Metal: get internal __bridge-casted shader resource objects
+pub fn mtl_query_shader_info(shd Shader) MtlShaderInfo {
+	return C.sg_mtl_query_shader_info(shd)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_mtl_pipeline_info sg_mtl_query_pipeline_info(sg_pipeline pip)`
+fn C.sg_mtl_query_pipeline_info(pip Pipeline) MtlPipelineInfo
+
+// mtl_query_pipeline_info //s Metal: get internal __bridge-casted pipeline resource objects
+pub fn mtl_query_pipeline_info(pip Pipeline) MtlPipelineInfo {
+	return C.sg_mtl_query_pipeline_info(pip)
 }
 
 // C: `SOKOL_GFX_API_DECL const void* sg_wgpu_device(void)`
@@ -2296,7 +2587,95 @@ pub fn wgpu_command_encoder() voidptr {
 // C: `SOKOL_GFX_API_DECL const void* sg_wgpu_render_pass_encoder(void)`
 fn C.sg_wgpu_render_pass_encoder() voidptr
 
-// wgpu_render_pass_encoder //s WebGPU: return WGPURenderPassEncoder of currrent pass
+// wgpu_render_pass_encoder //s WebGPU: return WGPURenderPassEncoder of current pass
 pub fn wgpu_render_pass_encoder() voidptr {
 	return C.sg_wgpu_render_pass_encoder()
+}
+
+// C: `SOKOL_GFX_API_DECL sg_wgpu_buffer_info sg_wgpu_query_buffer_info(sg_buffer buf)`
+fn C.sg_wgpu_query_buffer_info(buf Buffer) WgpuBufferInfo
+
+// wgpu_query_buffer_info //s WebGPU: get internal buffer resource objects
+pub fn wgpu_query_buffer_info(buf Buffer) WgpuBufferInfo {
+	return C.sg_wgpu_query_buffer_info(buf)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_wgpu_image_info sg_wgpu_query_image_info(sg_image img)`
+fn C.sg_wgpu_query_image_info(img Image) WgpuImageInfo
+
+// wgpu_query_image_info //s WebGPU: get internal image resource objects
+pub fn wgpu_query_image_info(img Image) WgpuImageInfo {
+	return C.sg_wgpu_query_image_info(img)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_wgpu_sampler_info sg_wgpu_query_sampler_info(sg_sampler smp)`
+fn C.sg_wgpu_query_sampler_info(smp Sampler) WgpuSamplerInfo
+
+// wgpu_query_sampler_info //s WebGPU: get internal sampler resource objects
+pub fn wgpu_query_sampler_info(smp Sampler) WgpuSamplerInfo {
+	return C.sg_wgpu_query_sampler_info(smp)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_wgpu_shader_info sg_wgpu_query_shader_info(sg_shader shd)`
+fn C.sg_wgpu_query_shader_info(shd Shader) WgpuShaderInfo
+
+// wgpu_query_shader_info //s WebGPU: get internal shader resource objects
+pub fn wgpu_query_shader_info(shd Shader) WgpuShaderInfo {
+	return C.sg_wgpu_query_shader_info(shd)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_wgpu_pipeline_info sg_wgpu_query_pipeline_info(sg_pipeline pip)`
+fn C.sg_wgpu_query_pipeline_info(pip Pipeline) WgpuPipelineInfo
+
+// wgpu_query_pipeline_info //s WebGPU: get internal pipeline resource objects
+pub fn wgpu_query_pipeline_info(pip Pipeline) WgpuPipelineInfo {
+	return C.sg_wgpu_query_pipeline_info(pip)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_wgpu_attachments_info sg_wgpu_query_attachments_info(sg_attachments atts)`
+fn C.sg_wgpu_query_attachments_info(atts Attachments) WgpuAttachmentsInfo
+
+// wgpu_query_attachments_info //s WebGPU: get internal pass resource objects
+pub fn wgpu_query_attachments_info(atts Attachments) WgpuAttachmentsInfo {
+	return C.sg_wgpu_query_attachments_info(atts)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_gl_buffer_info sg_gl_query_buffer_info(sg_buffer buf)`
+fn C.sg_gl_query_buffer_info(buf Buffer) GlBufferInfo
+
+// gl_query_buffer_info //s GL: get internal buffer resource objects
+pub fn gl_query_buffer_info(buf Buffer) GlBufferInfo {
+	return C.sg_gl_query_buffer_info(buf)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_gl_image_info sg_gl_query_image_info(sg_image img)`
+fn C.sg_gl_query_image_info(img Image) GlImageInfo
+
+// gl_query_image_info //s GL: get internal image resource objects
+pub fn gl_query_image_info(img Image) GlImageInfo {
+	return C.sg_gl_query_image_info(img)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_gl_sampler_info sg_gl_query_sampler_info(sg_sampler smp)`
+fn C.sg_gl_query_sampler_info(smp Sampler) GlSamplerInfo
+
+// gl_query_sampler_info //s GL: get internal sampler resource objects
+pub fn gl_query_sampler_info(smp Sampler) GlSamplerInfo {
+	return C.sg_gl_query_sampler_info(smp)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_gl_shader_info sg_gl_query_shader_info(sg_shader shd)`
+fn C.sg_gl_query_shader_info(shd Shader) GlShaderInfo
+
+// gl_query_shader_info //s GL: get internal shader resource objects
+pub fn gl_query_shader_info(shd Shader) GlShaderInfo {
+	return C.sg_gl_query_shader_info(shd)
+}
+
+// C: `SOKOL_GFX_API_DECL sg_gl_attachments_info sg_gl_query_attachments_info(sg_attachments atts)`
+fn C.sg_gl_query_attachments_info(atts Attachments) GlAttachmentsInfo
+
+// gl_query_attachments_info //s GL: get internal pass resource objects
+pub fn gl_query_attachments_info(atts Attachments) GlAttachmentsInfo {
+	return C.sg_gl_query_attachments_info(atts)
 }
