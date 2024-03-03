@@ -204,16 +204,22 @@ pub fn metal_get_device() voidptr {
 	return voidptr(C.sapp_metal_get_device())
 }
 
-// Metal: get ARC-bridged pointer to this frame's renderpass descriptor
-@[inline]
-pub fn metal_get_renderpass_descriptor() voidptr {
-	return voidptr(C.sapp_metal_get_renderpass_descriptor())
-}
-
 // Metal: get ARC-bridged pointer to current drawable
 @[inline]
-pub fn metal_get_drawable() voidptr {
-	return voidptr(C.sapp_metal_get_drawable())
+pub fn metal_get_current_drawable() voidptr {
+	return voidptr(C.sapp_metal_get_current_drawable())
+}
+
+// Metal: get bridged pointer to MTKView's depth-stencil texture of type MTLTexture
+@[inline]
+pub fn metal_get_depth_stencil_texture() voidptr {
+	return C.sapp_metal_get_depth_stencil_texture()
+}
+
+// Metal: get bridged pointer to MTKView's msaa-color-texture of type MTLTexture (may be null)
+@[inline]
+pub fn metal_get_msaa_color_texture() voidptr {
+	return C.sapp_metal_get_msaa_color_texture()
 }
 
 // macOS: get ARC-bridged pointer to macOS NSWindow
@@ -242,8 +248,14 @@ pub fn d3d11_get_device_context() voidptr {
 
 // D3D11: get pointer to ID3D11RenderTargetView object
 @[inline]
-pub fn d3d11_get_render_target_view() voidptr {
-	return voidptr(C.sapp_d3d11_get_render_target_view())
+pub fn d3d11_get_render_view() voidptr {
+	return voidptr(C.sapp_d3d11_get_render_view())
+}
+
+// D3D11: get pointer ID3D11RenderTargetView object for msaa-resolve (may return null)
+@[inline]
+pub fn d3d11_get_resolve_view() voidptr {
+	return C.sapp_d3d11_get_resolve_view()
 }
 
 // D3D11: get pointer to ID3D11DepthStencilView

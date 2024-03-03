@@ -33,7 +33,6 @@ pub struct Context {
 	id u32
 mut:
 	// sokol_* contexts
-	gfx  gfx.Context
 	font &FontContext = unsafe { nil }
 	// Used by the Easy/Quick sub-system
 	display   Display
@@ -42,26 +41,27 @@ mut:
 
 struct Offscreen {
 mut:
-	width       int
-	height      int
-	pass        gfx.Pass
-	pass_desc   gfx.PassDesc
-	pass_action gfx.PassAction
-	img         gfx.Image
-	sampler     gfx.Sampler
-	gl_ctx      gl.Context
+	width            int
+	height           int
+	attachments      gfx.Attachments
+	attachments_desc gfx.AttachmentsDesc
+	pass_action      gfx.PassAction
+	img              gfx.Image
+	sampler          gfx.Sampler
+	gl_ctx           gl.Context
 }
 
 fn (o Offscreen) destroy() {
 	gfx.destroy_image(o.img)
 	gfx.destroy_sampler(o.sampler)
-	gfx.destroy_pass(o.pass)
+	gfx.destroy_attachments(o.attachments)
 	gl.destroy_context(o.gl_ctx)
 }
 
 struct Display {
 mut:
 	pass_action gfx.PassAction
+	swapchain   gfx.Swapchain
 	gl_pip      gl.Pipeline
 }
 
@@ -93,15 +93,22 @@ pub fn (mut g GFX) init() ! {
 		// user_data: s
 	}
 
+	env := gfx.Environment{
+		defaults: gfx.EnvironmentDefaults{
+			color_format: .rgba8
+			depth_format: .@none
+			sample_count: s.config.render.msaa
+		}
+	}
+
 	mut gfx_desc := gfx.Desc{
+		environment: env
 		// image_pool_size
 		// sampler_pool_size
 		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		context_pool_size: 4 * 512 // default 4, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 4 * 1024 // default 64, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		logger: logger
 	}
-	gfx_desc.context.sample_count = s.config.render.msaa
 	gfx.setup(&gfx_desc)
 
 	assert gfx.isvalid()
@@ -144,21 +151,15 @@ pub fn (g &GFX) get_context(cid u32) &Context {
 }
 
 pub fn (mut g GFX) activate_context(cid u32) {
-	ctx := g.get_context(cid)
-	gfx.activate_context(ctx.gfx)
 	g.active_context = cid
 }
 
 pub fn (mut g GFX) make_context() !u32 {
 	context_id := u32(g.contexts.len)
 
-	sokol_gfx_context := gfx.setup_context()
-	gfx.activate_context(sokol_gfx_context)
-
 	mut context := &Context{
 		shy: g.shy
 		id: context_id
-		gfx: sokol_gfx_context
 	}
 
 	context.init()!
@@ -230,8 +231,20 @@ fn (mut c Context) sokol_gl_init() ! {
 		}
 	}
 
+	swapchain := gfx.Swapchain{
+		width: w
+		height: h
+		sample_count: sample_count
+		color_format: .rgba8
+		depth_format: .@none
+		gl: gfx.GlSwapchain{
+			framebuffer: 0
+		}
+	}
+
 	display := Display{
 		pass_action: make_clear_pass(0.5, 0.7, 1.0, 1.0)
+		swapchain: swapchain
 		gl_pip: gl.context_make_pipeline(gl.default_context, &gl_pip_desc)
 	}
 
@@ -263,15 +276,15 @@ fn (mut c Context) sokol_gl_init() ! {
 	}
 	mut off_sampler := gfx.make_sampler(&smp_desc)
 
-	mut off_pass_desc := gfx.PassDesc{}
-	off_pass_desc.color_attachments[0].image = off_img
+	mut off_attach_desc := gfx.AttachmentsDesc{}
+	off_attach_desc.colors[0].image = off_img
 
 	offscreen := Offscreen{
 		width: w
 		height: h
-		pass: gfx.make_pass(&off_pass_desc)
+		attachments: gfx.make_attachments(&off_attach_desc)
 		pass_action: make_clear_pass(0.0, 0.0, 0.0, 1.0)
-		pass_desc: off_pass_desc
+		attachments_desc: off_attach_desc
 		gl_ctx: gl.make_context(gl_ctx_desc)
 		img: off_img
 		sampler: off_sampler
@@ -284,8 +297,8 @@ fn (mut c Context) sokol_gl_init() ! {
 fn (mut c Context) offscreen_reinit(width int, height int) ! {
 	offscreen_sample_count := 1
 
-	gfx.destroy_pass(c.offscreen.pass)
-	gfx.destroy_image(c.offscreen.pass_desc.color_attachments[0].image)
+	gfx.destroy_attachments(c.offscreen.attachments)
+	gfx.destroy_image(c.offscreen.attachments_desc.colors[0].image)
 	gfx.destroy_sampler(c.offscreen.sampler)
 	// recreate an offscreen render target texture, pass, and pass_action
 	mut img_desc := gfx.ImageDesc{
@@ -305,13 +318,13 @@ fn (mut c Context) offscreen_reinit(width int, height int) ! {
 	}
 	mut off_sampler := gfx.make_sampler(&smp_desc)
 
-	mut off_pass_desc := gfx.PassDesc{}
-	off_pass_desc.color_attachments[0].image = off_img
+	mut off_attach_desc := gfx.AttachmentsDesc{}
+	off_attach_desc.colors[0].image = off_img
 
 	c.offscreen.width = width
 	c.offscreen.height = height
-	c.offscreen.pass = gfx.make_pass(&off_pass_desc)
-	c.offscreen.pass_desc = off_pass_desc
+	c.offscreen.attachments = gfx.make_attachments(&off_attach_desc)
+	c.offscreen.attachments_desc = off_attach_desc
 	c.offscreen.img = off_img
 	c.offscreen.sampler = off_sampler
 }
@@ -342,8 +355,6 @@ pub fn (mut c Context) shutdown() ! {
 	c.display.destroy()
 
 	gl.shutdown()
-
-	gfx.discard_context(c.gfx)
 }
 
 pub fn (g GFX) commit() {
@@ -414,10 +425,18 @@ pub fn (mut g GFX) end_easy_frame(options EndOptions) {
 	// do the actual offscreen and display rendering in sokol-gfx passes
 	match options.how {
 		.clear {
-			gfx.begin_pass(off.pass, &off.pass_action)
+			pass := gfx.Pass{
+				action: off.pass_action
+				attachments: off.attachments
+			}
+			gfx.begin_pass(&pass)
 		}
 		.passthru {
-			gfx.begin_pass(off.pass, &lib.dontcare_pass)
+			pass := gfx.Pass{
+				action: lib.dontcare_pass
+				attachments: off.attachments
+			}
+			gfx.begin_pass(&pass)
 		}
 	}
 
@@ -426,14 +445,11 @@ pub fn (mut g GFX) end_easy_frame(options EndOptions) {
 	gl.draw()
 	gfx.end_pass()
 
-	match options.how {
-		.clear {
-			gfx.begin_default_pass(&dis.pass_action, int(dw), int(dh))
-		}
-		.passthru {
-			gfx.begin_default_pass(&lib.dontcare_pass, int(dw), int(dh))
-		}
+	pass := gfx.Pass{
+		action: dis.pass_action
+		swapchain: dis.swapchain
 	}
+	gfx.begin_pass(&pass)
 
 	// Alternative: gl.context_draw(gl.default_context)
 	gl.set_context(gl.default_context)
