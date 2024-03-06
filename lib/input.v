@@ -9,7 +9,7 @@ pub struct Input {
 mut:
 	mice      map[u8]&Mouse
 	keyboards map[u8]&Keyboard
-	pads      []&Gamepad
+	gamepads  []&Gamepad
 }
 
 pub fn (ip Input) mouse(n u8) ?&Mouse {
@@ -22,6 +22,15 @@ pub fn (ip Input) mouse(n u8) ?&Mouse {
 pub fn (ip Input) keyboard(n u8) ?&Keyboard {
 	if keyboard := ip.keyboards[n] {
 		return keyboard
+	}
+	return none
+}
+
+pub fn (ip Input) gamepad(n i32) ?&Gamepad {
+	for gamepad in ip.gamepads {
+		if gamepad.id == n && !isnil(gamepad) {
+			return unsafe { gamepad }
+		}
 	}
 	return none
 }

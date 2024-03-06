@@ -8,6 +8,14 @@ pub type Event = DropBeginEvent
 	| DropEndEvent
 	| DropFileEvent
 	| DropTextEvent
+	| GamepadAddedEvent
+	| GamepadAxisMotionEvent
+	| GamepadButtonEvent
+	| GamepadRemappedEvent
+	| GamepadRemovedEvent
+	| GamepadSensorUpdateEvent
+	| GamepadTouchpadButtonEvent
+	| GamepadTouchpadMotionEvent
 	| KeyEvent
 	| MouseButtonEvent
 	| MouseMotionEvent
@@ -27,9 +35,11 @@ pub type Event = DropBeginEvent
 
 fn (e Event) serialize_as_playback_string() string {
 	return match e {
-		DropBeginEvent, DropEndEvent, DropTextEvent, DropFileEvent, KeyEvent, MouseButtonEvent,
-		MouseMotionEvent, MouseWheelEvent, QuitEvent, RecordEvent, UnkownEvent, WindowEvent,
-		WindowMinimizedEvent, WindowMaximizedEvent, WindowFocusEvent, WindowMoveEvent,
+		DropBeginEvent, DropEndEvent, DropTextEvent, GamepadAddedEvent, GamepadAxisMotionEvent,
+		GamepadButtonEvent, GamepadRemappedEvent, GamepadRemovedEvent, GamepadSensorUpdateEvent,
+		GamepadTouchpadButtonEvent, GamepadTouchpadMotionEvent, DropFileEvent, KeyEvent,
+		MouseButtonEvent, MouseMotionEvent, MouseWheelEvent, QuitEvent, RecordEvent, UnkownEvent,
+		WindowEvent, WindowMinimizedEvent, WindowMaximizedEvent, WindowFocusEvent, WindowMoveEvent,
 		WindowCloseEvent, WindowResizeEvent, WindowShownEvent, WindowHiddenEvent {
 			e.serialize_as_playback_string()
 		}
@@ -399,6 +409,108 @@ pub:
 
 fn (e MouseWheelEvent) serialize_as_playback_string() string {
 	return '${e.which},${e.x},${e.y},${e.scroll_x},${e.scroll_y},${e.direction}'
+}
+
+pub const gamepad_axis_motion_min = -32768
+pub const gamepad_axis_motion_max = 32767
+
+pub struct GamepadAxisMotionEvent {
+	ShyEvent
+pub:
+	which i32 // id of Gamepad instance
+	axis  GamepadAxis
+	value int
+}
+
+fn (e GamepadAxisMotionEvent) serialize_as_playback_string() string {
+	return '${e.which},${e.axis},${e.value}'
+}
+
+pub struct GamepadButtonEvent {
+	ShyEvent
+pub:
+	which  i32 // id of Gamepad instance
+	button GamepadButton
+	state  ButtonState
+}
+
+fn (e GamepadButtonEvent) serialize_as_playback_string() string {
+	return '${e.which},${e.button},${e.state}'
+}
+
+pub struct GamepadAddedEvent {
+	ShyEvent
+pub:
+	which i32 // id of Gamepad instance
+}
+
+fn (e GamepadAddedEvent) serialize_as_playback_string() string {
+	return '${e.which}'
+}
+
+pub struct GamepadRemovedEvent {
+	ShyEvent
+pub:
+	which i32 // id of Gamepad instance
+}
+
+fn (e GamepadRemovedEvent) serialize_as_playback_string() string {
+	return '${e.which}'
+}
+
+pub struct GamepadRemappedEvent {
+	ShyEvent
+pub:
+	which i32 // id of Gamepad instance
+}
+
+fn (e GamepadRemappedEvent) serialize_as_playback_string() string {
+	return '${e.which}'
+}
+
+pub struct GamepadTouchpadButtonEvent {
+	ShyEvent
+pub:
+	which    i32 // id of Gamepad instance
+	touchpad int
+	finger   int
+	x        f32
+	y        f32
+	pressure f32
+	state    ButtonState
+}
+
+fn (e GamepadTouchpadButtonEvent) serialize_as_playback_string() string {
+	return '${e.which},${e.touchpad},${e.finger},${e.x},${e.y},${e.pressure},${e.state}'
+}
+
+pub struct GamepadTouchpadMotionEvent {
+	ShyEvent
+pub:
+	which    i32 // id of Gamepad instance
+	touchpad int
+	finger   int
+	x        f32
+	y        f32
+	pressure f32
+}
+
+fn (e GamepadTouchpadMotionEvent) serialize_as_playback_string() string {
+	return '${e.which},${e.touchpad},${e.finger},${e.x},${e.y},${e.pressure}'
+}
+
+pub struct GamepadSensorUpdateEvent {
+	ShyEvent
+pub:
+	which        i32 // id of Gamepad instance
+	sensor       GamepadSensorType
+	finger       int
+	data         [3]f32
+	timestamp_us u64
+}
+
+fn (e GamepadSensorUpdateEvent) serialize_as_playback_string() string {
+	return '${e.which},${e.sensor},${e.finger},${e.data[0]},${e.data[1]},${e.data[2]},${e.timestamp_us}'
 }
 
 pub struct DropBeginEvent {

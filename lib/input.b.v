@@ -7,61 +7,6 @@ import sdl
 // import manymouse as mm
 
 // TODO move
-pub struct Gamepad {
-	ShyStruct
-	id u8
-mut:
-	name      string
-	handle    &sdl.GameController
-	is_haptic bool
-}
-
-pub fn (mut gp Gamepad) init() ! {
-	gp.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	s := gp.shy
-	// Open the device
-	haptic := sdl.haptic_open_from_joystick(sdl.game_controller_get_joystick(gp.handle))
-	if haptic == sdl.null {
-		// error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-		s.log.gdebug('${@STRUCT}.${@FN}', 'controller ${gp.id} (${gp.name}) does not seem to have haptic features')
-	} else {
-		// See if it can do sine waves
-		if (sdl.haptic_query(haptic) & u32(sdl.haptic_sine)) == 0 {
-			s.log.gdebug('${@STRUCT}.${@FN}', 'controller ${gp.id} (${gp.name}) does not seem to support haptic SINE effects')
-		} else {
-			gp.is_haptic = true
-			/*
-			// Create the effect
-			mut effect := sdl.HapticEffect{}
-			unsafe {
-				vmemset( &effect, 0, int(sizeof(effect)) ) // 0 is safe default
-			}
-
-			effect.@type = u16(sdl.haptic_sine)
-			effect.periodic.direction.@type = u8(sdl.haptic_polar) // Polar coordinates
-			effect.periodic.direction.dir[0] = 18000 // Force comes from south
-			effect.periodic.period = 1000 // 1000 ms
-			effect.periodic.magnitude = 20000 // 20000/32767 strength
-			effect.periodic.length = 5000 // 5 seconds long
-			effect.periodic.attack_length = 1000 // Takes 1 second to get max strength
-			effect.periodic.fade_length = 1000 // Takes 1 second to fade away
-
-			// Upload the effect
-			effect_id := sdl.haptic_new_effect( haptic, &effect )
-
-			// Test the effect
-			sdl.haptic_run_effect( haptic, effect_id, 1 )
-			sdl.delay( 5000) // Wait for the effect to finish
-
-			// We destroy the effect, although closing the device also does this
-			sdl.haptic_destroy_effect( haptic, effect_id )
-			*/
-		}
-	}
-	// Close the device
-	sdl.haptic_close(haptic)
-}
-
 // scan scans for new input devices.
 pub fn (mut ip Input) scan() ! {
 	// TODO
@@ -159,7 +104,7 @@ fn (mut ip Input) init_input() ! {
 					handle: controller
 				}
 				pad.init()!
-				ip.pads << pad
+				ip.gamepads << pad
 				// s.api.controllers[i] = controller
 			} else {
 				// sdl.joystick_close(i)
@@ -414,6 +359,105 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				timestamp: timestamp
 				window_id: shy_window_id
 				text: text
+			}
+		}
+		.controlleraxismotion {
+			shy_event = GamepadAxisMotionEvent{
+				timestamp: timestamp
+				window_id: no_window
+				//
+				which: sdl_event.caxis.which
+				axis: GamepadAxis.from_sdl_controller_axis(unsafe { sdl.GameControllerAxis(sdl_event.caxis.axis) })
+				value: sdl_event.caxis.value
+			}
+		}
+		.controllerbuttondown {
+			shy_event = GamepadButtonEvent{
+				timestamp: timestamp
+				window_id: no_window
+				//
+				button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
+				which: sdl_event.cbutton.which
+				state: .down
+			}
+		}
+		.controllerbuttonup {
+			shy_event = GamepadButtonEvent{
+				timestamp: timestamp
+				window_id: no_window
+				//
+				button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
+				which: sdl_event.cbutton.which
+				state: .up
+			}
+		}
+		.controllerdeviceadded {
+			shy_event = GamepadAddedEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: i32(sdl_event.cdevice.which)
+			}
+		}
+		.controllerdeviceremoved {
+			shy_event = GamepadRemovedEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: i32(sdl_event.cdevice.which)
+			}
+		}
+		.controllerdeviceremapped {
+			shy_event = GamepadRemappedEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: i32(sdl_event.cdevice.which)
+			}
+		}
+		.controllertouchpaddown {
+			shy_event = GamepadTouchpadButtonEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: sdl_event.ctouchpad.which
+				touchpad: sdl_event.ctouchpad.touchpad
+				finger: sdl_event.ctouchpad.finger
+				x: sdl_event.ctouchpad.x
+				y: sdl_event.ctouchpad.y
+				pressure: sdl_event.ctouchpad.pressure
+				state: .down
+			}
+		}
+		.controllertouchpadup {
+			shy_event = GamepadTouchpadButtonEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: sdl_event.ctouchpad.which
+				touchpad: sdl_event.ctouchpad.touchpad
+				finger: sdl_event.ctouchpad.finger
+				x: sdl_event.ctouchpad.x
+				y: sdl_event.ctouchpad.y
+				pressure: sdl_event.ctouchpad.pressure
+				state: .up
+			}
+		}
+		.controllertouchpadmotion {
+			shy_event = GamepadTouchpadMotionEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: sdl_event.ctouchpad.which
+				touchpad: sdl_event.ctouchpad.touchpad
+				finger: sdl_event.ctouchpad.finger
+				x: sdl_event.ctouchpad.x
+				y: sdl_event.ctouchpad.y
+				pressure: sdl_event.ctouchpad.pressure
+			}
+		}
+		.controllersensorupdate {
+			shy_event = GamepadSensorUpdateEvent{
+				timestamp: timestamp
+				window_id: no_window
+				which: sdl_event.csensor.which
+				sensor: GamepadSensorType.from_sdl_sensor_type(unsafe { sdl.SensorType(sdl_event.csensor.sensor) })
+				data: sdl_event.csensor.data
+				timestamp_us: sdl_event.csensor.timestamp_us
 			}
 		}
 		else {
