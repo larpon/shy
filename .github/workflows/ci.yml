@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.14
+      SDL2_VERSION: 2.26.0
     steps:
     - name: Install dependencies
       run: |
@@ -134,7 +134,7 @@ jobs:
     timeout-minutes: 10
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.14
+      SDL2_VERSION: 2.26.0
     steps:
     - name: Install dependencies
       run: |
@@ -198,7 +198,7 @@ jobs:
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.14
+      SDL2_VERSION: 2.26.0
     steps:
     - name: Install dependencies
       run: |
@@ -261,7 +261,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
+        # sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
+        sdl-version: [2.26.0, 2.28.0, 2.30.0] # Gameped support
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
