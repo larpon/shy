@@ -83,10 +83,9 @@ pub fn GamepadButton.from_sdl_controller_button(button sdl.GameControllerButton)
 		.dpad_right {
 			GamepadButton.dpad_right
 		}
-		// TODO this does not work with SDL 2.0.8
-		//.misc1 {
-		//	GamepadButton.misc_1
-		//}
+		.misc1 {
+			GamepadButton.misc_1
+		}
 		.paddle1 {
 			GamepadButton.paddle_1
 		}

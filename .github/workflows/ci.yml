@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.8
+      SDL2_VERSION: 2.0.14
     steps:
     - name: Install dependencies
       run: |
@@ -134,7 +134,7 @@ jobs:
     timeout-minutes: 10
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.8
+      SDL2_VERSION: 2.0.14
     steps:
     - name: Install dependencies
       run: |
@@ -198,7 +198,7 @@ jobs:
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.10
+      SDL2_VERSION: 2.0.14
     steps:
     - name: Install dependencies
       run: |
