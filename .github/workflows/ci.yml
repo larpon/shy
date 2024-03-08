@@ -90,8 +90,17 @@ jobs:
     - name: Build local v
       run: make -j4 && sudo ./v symlink
 
-    - name: Install sdl module
-      run: v install sdl
+    - name: Install vlang/sdl @ ${{ env.SDL2_VERSION }}
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.SDL2_VERSION }}
+        repository: vlang/sdl
+        path: sdl
+
+    - name: Simulate "v install sdl"
+      run: |
+        mkdir -p ~/.vmodules
+        mv sdl ~/.vmodules
 
     - name: Checkout shy
       uses: actions/checkout@v4
@@ -160,8 +169,17 @@ jobs:
     - name: Build local v
       run: make && sudo ./v symlink
 
-    - name: Install sdl module
-      run: v install sdl
+    - name: Install vlang/sdl @ ${{ env.SDL2_VERSION }}
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.SDL2_VERSION }}
+        repository: vlang/sdl
+        path: sdl
+
+    - name: Simulate "v install sdl"
+      run: |
+        mkdir -p ~/.vmodules
+        mv sdl ~/.vmodules
 
     - name: Checkout shy
       uses: actions/checkout@v4
@@ -224,8 +242,17 @@ jobs:
     - name: Build local v
       run: make && sudo ./v symlink
 
-    - name: Install sdl module
-      run: v install sdl
+    - name: Install vlang/sdl @ ${{ env.SDL2_VERSION }}
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.SDL2_VERSION }}
+        repository: vlang/sdl
+        path: sdl
+
+    - name: Simulate "v install sdl"
+      run: |
+        mkdir -p ~/.vmodules
+        mv sdl ~/.vmodules
 
     - name: Checkout shy
       uses: actions/checkout@v4
