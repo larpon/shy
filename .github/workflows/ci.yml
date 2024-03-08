@@ -68,19 +68,17 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install --quiet -y libsdl2-dev libsdl2-ttf-dev
-        sudo apt-get install --quiet -y libsdl2-mixer-dev libsdl2-image-dev
+        sudo apt-get install --quiet libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
     - name: Build SDL
       run: |
         cd SDL2-${SDL2_VERSION}
-        mkdir build
-        cd build
-        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        mkdir build && cd build
+        ../configure --disable-wayland-shared
         make
-        make install
+        sudo make install
 
     - name: Checkout V
       uses: actions/checkout@v4
@@ -134,9 +132,7 @@ jobs:
 
     - name: Build shy example
       run: |
-        export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
-        export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
-        v -d sdl_no_compile_flags ~/.vmodules/shy/examples/hello_world
+        v ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-shy-can-live-anywhere:
     runs-on: ubuntu-20.04 # use 20.04 for now
@@ -155,11 +151,10 @@ jobs:
     - name: Build SDL
       run: |
         cd SDL2-${SDL2_VERSION}
-        mkdir build
-        cd build
-        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        mkdir build && cd build
+        ../configure --disable-wayland-shared
         make
-        make install
+        sudo make install
 
     - name: Checkout V
       uses: actions/checkout@v4
@@ -207,9 +202,7 @@ jobs:
 
     - name: Build shy example
       run: |
-        export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
-        export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
-        v -d sdl_no_compile_flags ~/.vmodules/shy/examples/hello_world
+        v ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-build:
     runs-on: ubuntu-latest # use 20.04 for now (SDL2 compile issue)
@@ -228,11 +221,10 @@ jobs:
     - name: Build SDL
       run: |
         cd SDL2-${SDL2_VERSION}
-        mkdir build
-        cd build
-        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        mkdir build && cd build
+        ../configure --disable-wayland-shared
         make
-        make install
+        sudo make install
 
     - name: Checkout V
       uses: actions/checkout@v4
@@ -276,12 +268,9 @@ jobs:
 
     - name: Build shy examples
       run: |
-        export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags)"
-        export LDFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --libs)"
-
-        v -d sdl_no_compile_flags -skip-unused should-compile-all ~/.vmodules/shy/examples
-        v -d sdl_no_compile_flags -d shy_analyse should-compile-all ~/.vmodules/shy/examples
-        v -d sdl_no_compile_flags -d shy_vet should-compile-all ~/.vmodules/shy/examples
+        v -skip-unused should-compile-all ~/.vmodules/shy/examples
+        v -d shy_analyse should-compile-all ~/.vmodules/shy/examples
+        v -d shy_vet should-compile-all ~/.vmodules/shy/examples
 
   sdl-branch-versions:
     runs-on: ${{ matrix.os }}
