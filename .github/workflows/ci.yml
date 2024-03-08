@@ -68,8 +68,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install --quiet -y libsdl2-dev libsdl2-ttf-dev
-        sudo apt-get install --quiet -y libsdl2-mixer-dev libsdl2-image-dev
+        sudo apt-get install --quiet -y libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
@@ -78,7 +77,10 @@ jobs:
         cd SDL2-${SDL2_VERSION}
         mkdir build
         cd build
-        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        # --disable-wayland-shared fixes a troublesome wayland build
+        # affecting 2.0.14, 2.0.16 and 2.0.18 on Ubuntu 22.04+.
+        # See https://github.com/libsdl-org/SDL/issues/5088 for more info
+        ../configure --disable-wayland-shared --prefix /tmp/sdl2-${SDL2_VERSION}
         make
         make install
 
@@ -148,7 +150,10 @@ jobs:
         cd SDL2-${SDL2_VERSION}
         mkdir build
         cd build
-        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        # --disable-wayland-shared fixes a troublesome wayland build
+        # affecting 2.0.14, 2.0.16 and 2.0.18 on Ubuntu 22.04+.
+        # See https://github.com/libsdl-org/SDL/issues/5088 for more info
+        ../configure --disable-wayland-shared --prefix /tmp/sdl2-${SDL2_VERSION}
         make
         make install
 
@@ -212,7 +217,10 @@ jobs:
         cd SDL2-${SDL2_VERSION}
         mkdir build
         cd build
-        ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+        # --disable-wayland-shared fixes a troublesome wayland build
+        # affecting 2.0.14, 2.0.16 and 2.0.18 on Ubuntu 22.04+.
+        # See https://github.com/libsdl-org/SDL/issues/5088 for more info
+        ../configure --disable-wayland-shared --prefix /tmp/sdl2-${SDL2_VERSION}
         make
         make install
 
@@ -261,7 +269,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
+        #sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
+        sdl-version: [2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
@@ -278,7 +287,10 @@ jobs:
         cd SDL2-${{ matrix.sdl-version }}
         mkdir build
         cd build
-        ../configure
+        # --disable-wayland-shared fixes a troublesome wayland build
+        # affecting 2.0.14, 2.0.16 and 2.0.18 on Ubuntu 22.04+.
+        # See https://github.com/libsdl-org/SDL/issues/5088 for more info
+        ../configure --disable-wayland-shared
         make
         sudo make install
 
