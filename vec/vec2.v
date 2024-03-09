@@ -428,3 +428,13 @@ pub fn (v Vec2[T]) normalize() Vec2[T] {
 pub fn (v Vec2[T]) sum() T {
 	return v.x + v.y
 }
+
+// move_toward moves `v` towards `to` by `delta`
+// pub fn (v Vec2[T]) move_toward[U](to Vec2[T], delta U) Vec2[T] {
+// 	vdiff := to.sub(v)
+// 	len := vdiff.magnitude()
+// 	if len <= delta || len < vec.vec_epsilon {
+// 		return to
+// 	}
+// 	return v.add(vdiff).div_scalar(len * delta)
+// }
