@@ -303,10 +303,11 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	mut u1 := f32(1.0)
 	mut v1 := f32(1.0)
 
-	u0 = utils.remap(used_dst.x, 0, w, 0, 1)
-	v0 = utils.remap(used_dst.y, 0, h, 0, 1)
-	u1 = utils.remap(used_dst.x + used_dst.width, 0, w, 0, 1)
-	v1 = utils.remap(used_dst.y + used_dst.height, 0, h, 0, 1)
+	u0 = mth.clamp(utils.remap(used_dst.x, 0, w, 0, 1),0,1)
+	v0 = mth.clamp(utils.remap(used_dst.y, 0, h, 0, 1),0,1)
+	u1 = mth.clamp(utils.remap(used_dst.x + used_dst.width, 0, w, 0, 1),0,1)
+	v1 = mth.clamp(utils.remap(used_dst.y + used_dst.height, 0, h, 0, 1),0,1)
+
 	// eprintln('dst: ${dst.x},${dst.y},${dst.width},${dst.height} u0: $u0, v0: $v0, u1: $u1, v1: $v1')
 
 	mut x0 := f32(src.x) //- 0.5
