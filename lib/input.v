@@ -35,6 +35,15 @@ pub fn (ip Input) gamepad(n i32) ?&Gamepad {
 	return none
 }
 
+pub fn (ip Input) has_gamepad(n i32) bool {
+	for gamepad in ip.gamepads {
+		if gamepad.id == n {
+			return true
+		}
+	}
+	return false
+}
+
 pub const default_keyboard_id = u8(0)
 
 @[heap]

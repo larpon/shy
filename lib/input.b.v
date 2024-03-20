@@ -88,29 +88,52 @@ fn (mut ip Input) init_input() ! {
 				continue
 			}*/
 			if sdl.is_game_controller(i) {
-				controller := sdl.game_controller_open(i)
-				if controller == sdl.null {
-					error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-					s.log.gerror('${@STRUCT}.${@FN}', 'unable to open controller ${i}:\n${error_msg}')
-					continue
-				}
-				controller_name := unsafe { cstring_to_vstring(sdl.game_controller_name_for_index(i)) }
-				s.log.gdebug('${@STRUCT}.${@FN}', 'detected controller ${i} as "${controller_name}"')
-
-				mut pad := &Gamepad{
-					id: i
-					shy: s
-					name: controller_name
-					handle: controller
-				}
-				pad.init()!
-				ip.gamepads << pad
-				// s.api.controllers[i] = controller
+				ip.add_gamepad(i)
 			} else {
 				// sdl.joystick_close(i)
 				// eprintln('Warning: Not adding controller $i - not a game controller' )
 				continue
 			}
+		}
+	}
+}
+
+pub fn (mut ip Input) add_gamepad(n i32) bool {
+	id := n
+	if sdl.is_game_controller(id) {
+		controller := sdl.game_controller_open(id)
+		if controller == sdl.null {
+			error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+			ip.shy.log.gerror('${@STRUCT}.${@FN}', 'unable to open controller ${id}:\n${error_msg}')
+			return false
+		}
+		controller_name := unsafe { cstring_to_vstring(sdl.game_controller_name_for_index(id)) }
+		ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'detected controller ${id} as "${controller_name}"')
+
+		ip.remove_gamepad(id)
+		mut pad := &Gamepad{
+			id: id
+			shy: ip.shy
+			name: controller_name
+			handle: controller
+		}
+		pad.init() or { return false }
+		ip.gamepads << pad
+		return true
+	} else {
+		ip.shy.log.gwarn('${@STRUCT}.${@FN}', 'controller ${id} was not detected as a game controller')
+	}
+	return false
+}
+
+pub fn (mut ip Input) remove_gamepad(n i32) {
+	for index, gamepad in ip.gamepads {
+		if gamepad.id == n {
+			sdl.game_controller_close(gamepad.handle)
+			ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'removing controller ${gamepad.id}')
+			ip.gamepads.delete(index)
+			unsafe { free(gamepad) }
+			return
 		}
 	}
 }
@@ -495,6 +518,24 @@ fn (mut ip Input) poll_event() ?Event {
 		return none
 	}
 
+	imut_shy_event := shy_event
+
+	// Sniff for Gamepad connected / disconnected events and auto- add/remove
+	match imut_shy_event {
+		GamepadAddedEvent {
+			id := imut_shy_event.which
+			if sdl.is_game_controller(id) {
+				ip.add_gamepad(id)
+			}
+		}
+		GamepadRemovedEvent {
+			id := imut_shy_event.which
+			if sdl.is_game_controller(id) {
+				ip.remove_gamepad(id)
+			}
+		}
+		else {}
+	}
 	// TODO find out what coordinate positions that ManyMouse actually uses?
 	/*
 	if is_multi_mice {
