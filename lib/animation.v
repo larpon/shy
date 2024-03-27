@@ -95,7 +95,8 @@ pub fn (mut a Anims) update(dt f64) {
 	analyse.max('${@MOD}.${@STRUCT}.max_in_use', a.active.len)
 	for i := 0; i < a.active.len; i++ {
 		animator := a.active[i]
-		// TODO(lmp) workaround weird crash/behavior with `-d shy_analyse` here?!?
+		// NOTE(lmp) workaround weird crash/behavior with `-d shy_analyse` here?!?
+		// Turns out the culprit was actually the garbage collector and SDL2, leave check for now
 		if isnil(animator) {
 			a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.active.len}')
 			return
