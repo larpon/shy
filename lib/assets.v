@@ -19,6 +19,7 @@ mut:
 
 	image_cache map[string]Image
 	sound_cache map[string]Sound
+	blob_cache  map[string]Blob
 	sb          strings.Builder
 }
 
@@ -50,6 +51,12 @@ pub fn (mut a Assets) shutdown() ! {
 
 	// Sounds are handled by the AudioEngine
 	a.sound_cache.clear()
+
+	// Blobs
+	for _, mut blob in a.blob_cache {
+		blob.shutdown()!
+	}
+	a.blob_cache.clear()
 
 	unsafe { a.sb.free() }
 }
@@ -126,6 +133,10 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 	if mut asset := a.ass[source_cache_key] {
 		a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when deallocating in hot code paths. It is, in general, better to unload data on shutdown. Unloading "${source.str()}"')
 
+		if mut blob := a.blob_cache[source_cache_key] {
+			blob.shutdown()!
+			a.blob_cache.delete(source_cache_key)
+		}
 		if mut image := a.image_cache[source_cache_key] {
 			image.shutdown()!
 			a.image_cache.delete(source_cache_key)
@@ -169,7 +180,11 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
 	mut sb := a.sb // TODO(lmp) workaround V compile error
-	$if T is Image {
+	$if T is Blob {
+		if blob := a.blob_cache[source.cache_key(mut sb)] {
+			return blob
+		}
+	} $else $if T is Image {
 		if image := a.image_cache[source.cache_key(mut sb)] {
 			return image
 		}
@@ -252,7 +267,7 @@ pub fn (a AssetSource) str() string {
 	}
 }
 
-pub type AssetOptions = ImageOptions | SoundOptions
+pub type AssetOptions = BlobOptions | ImageOptions | SoundOptions
 
 pub struct AssetLoadOptions {
 pub:
@@ -295,7 +310,17 @@ pub fn (mut a Asset) shutdown() ! {
 
 // to converts `Asset`'s `.data` into T and return it.
 pub fn (mut a Asset) to[T](ao AssetOptions) !T {
-	$if T is Image {
+	$if T is Blob {
+		match ao {
+			BlobOptions {
+				return a.to_blob(ao)!
+			}
+			else {
+				t := T{}
+				return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.source}" to ${typeof(t).name}')
+			}
+		}
+	} $else $if T is Image {
 		match ao {
 			ImageOptions {
 				return a.to_image(ao)!
@@ -321,6 +346,36 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 	// This should never be reached
 	t := T{}
 	return error('${@STRUCT}.${@FN}: could not convert ${typeof(ao).name} "${ao.source}" to ${typeof(t).name}')
+}
+
+// to_blob converts the asset data into a binary Blob
+fn (mut a Asset) to_blob(opt BlobOptions) !Blob {
+	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
+	assert !isnil(a.shy), 'Asset struct is not initialized'
+
+	if opt.cache {
+		if blob := a.shy.assets().get[Blob](a.lo.source) {
+			return blob
+		}
+	}
+	assert a.status == .loaded, '${@STRUCT}.${@FN} Asset is not loaded'
+	assert a.data.len > 0, '${@STRUCT}.${@FN} Asset.data appears empty'
+
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.source}" to binary blob')
+
+	mut blob := Blob{
+		asset: a
+		opt: opt
+	}
+
+	if opt.cache {
+		unsafe {
+			mut assets := a.shy.assets()
+			// assets.cache[blob](blob)! // TODO
+			assets.blob_cache[a.lo.source.cache_key(mut assets.sb)] = blob
+		}
+	}
+	return blob
 }
 
 // to_image converts the asset data into an Image
@@ -536,6 +591,38 @@ pub fn (ifm ImageFillMode) prev() ImageFillMode {
 			.tile_horizontally
 		}
 	}
+}
+
+@[heap; noinit]
+pub struct Blob {
+	opt BlobOptions
+pub:
+	asset &Asset = null // TODO removing this results in compiler warnings a few places
+}
+
+@[params]
+pub struct BlobOptions {
+	AssetLoadOptions
+}
+
+pub fn (b &Blob) as_string() string {
+	if b.asset.status != .loaded {
+		return ''
+	}
+	return b.asset.data.bytestr()
+}
+
+pub fn (b &Blob) data() []u8 {
+	if b.asset.status != .loaded {
+		return []u8{}
+	}
+	return b.asset.data
+}
+
+pub fn (mut b Blob) shutdown() ! {}
+
+pub fn (b &Blob) source() AssetSource {
+	return b.asset.lo.source
 }
 
 @[heap; noinit]

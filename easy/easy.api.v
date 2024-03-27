@@ -739,6 +739,10 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 	assets := q.easy.shy.assets()
 	mut asset := q.easy.load(ao.AssetLoadOptions)!
 	match ao {
+		shy.BlobOptions {
+			_ := asset.to[shy.Blob](ao)!
+			return
+		}
 		shy.ImageOptions {
 			// TODO e.shy.assets.is_cached(...) ???
 			if _ := assets.get[shy.Image](ao.source) {
