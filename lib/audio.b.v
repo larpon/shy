@@ -92,6 +92,10 @@ mut:
 	decoders map[u16]&ma.Decoder // sound decoders for sounds loaded from memory
 }
 
+pub fn (ae AudioEngine) str() string {
+	return 'AudioEngine{}' // TODO to allow compiling with `$dbg`
+}
+
 pub fn (mut e AudioEngine) shutdown() ! {
 	for _, sound in e.sounds {
 		if !isnil(sound) {

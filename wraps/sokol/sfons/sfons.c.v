@@ -1,7 +1,6 @@
 module sfons
 
 import shy.wraps.fontstash
-import shy.wraps.sokol.f
 import shy.wraps.sokol.memory
 
 @[markused]
@@ -49,9 +48,6 @@ fn C.sfons_create(const_desc &Desc) &fontstash.Context
 fn C.sfons_destroy(ctx &fontstash.Context)
 fn C.sfons_rgba(r u8, g u8, b u8, a u8) u32
 fn C.sfons_flush(ctx &fontstash.Context)
-
-// keep v from warning about unused imports
-const used_import = f.used_import + fontstash.used_import + 1
 
 @[inline]
 pub fn create(const_desc &Desc) &fontstash.Context {

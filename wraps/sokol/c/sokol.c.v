@@ -1,8 +1,6 @@
 // Copyright(C) 2022 Lars Pontoppidan. All rights reserved.
 module c
 
-pub const used_import = 1 // TODO
-
 #flag -I @VMODROOT/thirdparty/sokol
 #flag -I @VMODROOT/thirdparty/sokol/util
 

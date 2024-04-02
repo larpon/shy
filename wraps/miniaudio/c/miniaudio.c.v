@@ -4,8 +4,6 @@
 // is licensed under the unlicense and, are thus, in the public domain.
 module c
 
-pub const used_import = 1
-
 #flag -I @VMODROOT/miniaudio
 $if linux {
 	#flag -lpthread -lm -ldl

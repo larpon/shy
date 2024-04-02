@@ -12,8 +12,6 @@ $if !no_sokol_app ? {
 	#include "sokol_app.h"
 }
 
-pub const used_import = gfx.used_import
-
 pub fn create_desc() gfx.Desc {
 	metal_desc := gfx.MetalContextDesc{
 		device: metal_get_device()

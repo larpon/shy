@@ -24,6 +24,10 @@ mut:
 	fn_ptr  ?wren.ForeignMethodFn
 }
 
+pub fn (wc WrenClass) str() string {
+	return 'WrenClass{}' // TODO to allow compiling with `$dbg`
+}
+
 fn (w WrenVM) on_frame(dt f64) {
 	for wren_class in w.classes {
 		if frame_fn_handle := wren_class.methods['frame'] {
