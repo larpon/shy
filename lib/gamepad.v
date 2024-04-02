@@ -34,76 +34,80 @@ pub enum GamepadButton {
 }
 
 pub fn GamepadButton.from_sdl_controller_button(button sdl.GameControllerButton) GamepadButton {
-	return match button {
-		.invalid {
-			GamepadButton.invalid
+	$if shy_gamepad ? {
+		return match button {
+			.invalid {
+				GamepadButton.invalid
+			}
+			.a {
+				GamepadButton.a
+			}
+			.b {
+				GamepadButton.b
+			}
+			.x {
+				GamepadButton.x
+			}
+			.y {
+				GamepadButton.y
+			}
+			.back {
+				GamepadButton.back
+			}
+			.guide {
+				GamepadButton.guide
+			}
+			.start {
+				GamepadButton.start
+			}
+			.leftstick {
+				GamepadButton.left_stick
+			}
+			.rightstick {
+				GamepadButton.right_stick
+			}
+			.leftshoulder {
+				GamepadButton.left_shoulder
+			}
+			.rightshoulder {
+				GamepadButton.right_shoulder
+			}
+			.dpad_up {
+				GamepadButton.dpad_up
+			}
+			.dpad_down {
+				GamepadButton.dpad_down
+			}
+			.dpad_left {
+				GamepadButton.dpad_left
+			}
+			.dpad_right {
+				GamepadButton.dpad_right
+			}
+			.misc1 {
+				GamepadButton.misc_1
+			}
+			.paddle1 {
+				GamepadButton.paddle_1
+			}
+			.paddle2 {
+				GamepadButton.paddle_2
+			}
+			.paddle3 {
+				GamepadButton.paddle_3
+			}
+			.paddle4 {
+				GamepadButton.paddle_4
+			}
+			.touchpad {
+				GamepadButton.touchpad
+			}
+			.max {
+				GamepadButton.invalid
+			}
 		}
-		.a {
-			GamepadButton.a
-		}
-		.b {
-			GamepadButton.b
-		}
-		.x {
-			GamepadButton.x
-		}
-		.y {
-			GamepadButton.y
-		}
-		.back {
-			GamepadButton.back
-		}
-		.guide {
-			GamepadButton.guide
-		}
-		.start {
-			GamepadButton.start
-		}
-		.leftstick {
-			GamepadButton.left_stick
-		}
-		.rightstick {
-			GamepadButton.right_stick
-		}
-		.leftshoulder {
-			GamepadButton.left_shoulder
-		}
-		.rightshoulder {
-			GamepadButton.right_shoulder
-		}
-		.dpad_up {
-			GamepadButton.dpad_up
-		}
-		.dpad_down {
-			GamepadButton.dpad_down
-		}
-		.dpad_left {
-			GamepadButton.dpad_left
-		}
-		.dpad_right {
-			GamepadButton.dpad_right
-		}
-		.misc1 {
-			GamepadButton.misc_1
-		}
-		.paddle1 {
-			GamepadButton.paddle_1
-		}
-		.paddle2 {
-			GamepadButton.paddle_2
-		}
-		.paddle3 {
-			GamepadButton.paddle_3
-		}
-		.paddle4 {
-			GamepadButton.paddle_4
-		}
-		.touchpad {
-			GamepadButton.touchpad
-		}
-		.max {
-			GamepadButton.invalid
-		}
+	} $else {
+		return GamepadButton.invalid
 	}
 }
 
@@ -118,31 +122,35 @@ pub enum GamepadAxis {
 }
 
 pub fn GamepadAxis.from_sdl_controller_axis(axis sdl.GameControllerAxis) GamepadAxis {
-	return match axis {
-		.invalid {
-			GamepadAxis.invalid
+	$if shy_gamepad ? {
+		return match axis {
+			.invalid {
+				GamepadAxis.invalid
+			}
+			.leftx {
+				GamepadAxis.left_x
+			}
+			.lefty {
+				GamepadAxis.left_y
+			}
+			.rightx {
+				GamepadAxis.right_x
+			}
+			.righty {
+				GamepadAxis.right_y
+			}
+			.triggerleft {
+				GamepadAxis.trigger_left
+			}
+			.triggerright {
+				GamepadAxis.trigger_right
+			}
+			.max {
+				GamepadAxis.invalid
+			}
 		}
-		.leftx {
-			GamepadAxis.left_x
-		}
-		.lefty {
-			GamepadAxis.left_y
-		}
-		.rightx {
-			GamepadAxis.right_x
-		}
-		.righty {
-			GamepadAxis.right_y
-		}
-		.triggerleft {
-			GamepadAxis.trigger_left
-		}
-		.triggerright {
-			GamepadAxis.trigger_right
-		}
-		.max {
-			GamepadAxis.invalid
-		}
+	} $else {
+		return GamepadAxis.invalid
 	}
 }
 
@@ -158,31 +166,35 @@ pub enum GamepadSensorType {
 }
 
 pub fn GamepadSensorType.from_sdl_sensor_type(sensor_type sdl.SensorType) GamepadSensorType {
-	return match sensor_type {
-		.invalid {
-			GamepadSensorType.invalid
+	$if shy_gamepad ? {
+		return match sensor_type {
+			.invalid {
+				GamepadSensorType.invalid
+			}
+			.unknown {
+				GamepadSensorType.unknown
+			}
+			.accel {
+				GamepadSensorType.accelerometer
+			}
+			.gyro {
+				GamepadSensorType.gyroscope
+			}
+			.sensor_accel_l {
+				GamepadSensorType.sensor_accelerometer_left
+			}
+			.sensor_gyro_l {
+				GamepadSensorType.sensor_gyroscope_left
+			}
+			.sensor_accel_r {
+				GamepadSensorType.sensor_accelerometer_right
+			}
+			.sensor_gyro_r {
+				GamepadSensorType.sensor_gyroscope_right
+			}
 		}
-		.unknown {
-			GamepadSensorType.unknown
-		}
-		.accel {
-			GamepadSensorType.accelerometer
-		}
-		.gyro {
-			GamepadSensorType.gyroscope
-		}
-		.sensor_accel_l {
-			GamepadSensorType.sensor_accelerometer_left
-		}
-		.sensor_gyro_l {
-			GamepadSensorType.sensor_gyroscope_left
-		}
-		.sensor_accel_r {
-			GamepadSensorType.sensor_accelerometer_right
-		}
-		.sensor_gyro_r {
-			GamepadSensorType.sensor_gyroscope_right
-		}
+	} $else {
+		return GamepadSensorType.invalid
 	}
 }
 
