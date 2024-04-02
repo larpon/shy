@@ -59,11 +59,11 @@ jobs:
     #    shy test-cleancode ~/.vmodules/shy
 
   ubuntu-latest-bootstrap:
-    runs-on: ubuntu-20.04 # use 20.04 for now (SDL2 compile issue)
+    runs-on: ubuntu-20.04
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.8
+      SDL2_VERSION: 2.0.9
     steps:
     - name: Install dependencies
       run: |
@@ -139,7 +139,7 @@ jobs:
     timeout-minutes: 10
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.8
+      SDL2_VERSION: 2.0.9
     steps:
     - name: Install dependencies
       run: |
@@ -205,11 +205,11 @@ jobs:
         v ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-build:
-    runs-on: ubuntu-latest # use 20.04 for now (SDL2 compile issue)
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.8
+      SDL2_VERSION: 2.0.9
     steps:
     - name: Install dependencies
       run: |
@@ -277,8 +277,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        # sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
-        sdl-version: [2.26.0, 2.28.0, 2.30.0] # Gameped support
+        sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
