@@ -117,3 +117,9 @@ sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
 ## Shell tab completion (optional)
 You can install tab completions for your shell by [following the instructions
 here](https://github.com/Larpon/shy/blob/fb26741/cmd/complete.v#L11-L38).
+
+# Gamepad / Controller support
+
+To enable game controller support shy needs to be built with
+SDL2 version >= 2.26.0 in addition to the compile flag `-d shy_gamepad`.
+

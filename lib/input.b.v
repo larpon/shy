@@ -110,6 +110,10 @@ pub fn (mut ip Input) add_gamepad(n i32) bool {
 		controller_name := unsafe { cstring_to_vstring(sdl.game_controller_name_for_index(id)) }
 		ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'detected controller ${id} as "${controller_name}"')
 
+		$if !shy_gamepad ? {
+			ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'for full controller support please use SDL2 version >= 2.26.0 and compile with `-d shy_gamepad`')
+		}
+
 		ip.remove_gamepad(id)
 		mut pad := &Gamepad{
 			id: id
@@ -151,6 +155,115 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		timestamp: timestamp
 		window_id: no_window
 	})
+
+	$if shy_gamepad ? {
+		match sdl_event.@type {
+			.controlleraxismotion {
+				shy_event = GamepadAxisMotionEvent{
+					timestamp: timestamp
+					window_id: no_window
+					//
+					which: sdl_event.caxis.which
+					axis: GamepadAxis.from_sdl_controller_axis(unsafe { sdl.GameControllerAxis(sdl_event.caxis.axis) })
+					value: sdl_event.caxis.value
+				}
+			}
+			.controllerbuttondown {
+				shy_event = GamepadButtonEvent{
+					timestamp: timestamp
+					window_id: no_window
+					//
+					button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
+					which: sdl_event.cbutton.which
+					state: .down
+				}
+			}
+			.controllerbuttonup {
+				shy_event = GamepadButtonEvent{
+					timestamp: timestamp
+					window_id: no_window
+					//
+					button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
+					which: sdl_event.cbutton.which
+					state: .up
+				}
+			}
+			.controllerdeviceadded {
+				shy_event = GamepadAddedEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: i32(sdl_event.cdevice.which)
+				}
+			}
+			.controllerdeviceremoved {
+				shy_event = GamepadRemovedEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: i32(sdl_event.cdevice.which)
+				}
+			}
+			.controllerdeviceremapped {
+				shy_event = GamepadRemappedEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: i32(sdl_event.cdevice.which)
+				}
+			}
+			.controllertouchpaddown {
+				shy_event = GamepadTouchpadButtonEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: sdl_event.ctouchpad.which
+					touchpad: sdl_event.ctouchpad.touchpad
+					finger: sdl_event.ctouchpad.finger
+					x: sdl_event.ctouchpad.x
+					y: sdl_event.ctouchpad.y
+					pressure: sdl_event.ctouchpad.pressure
+					state: .down
+				}
+			}
+			.controllertouchpadup {
+				shy_event = GamepadTouchpadButtonEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: sdl_event.ctouchpad.which
+					touchpad: sdl_event.ctouchpad.touchpad
+					finger: sdl_event.ctouchpad.finger
+					x: sdl_event.ctouchpad.x
+					y: sdl_event.ctouchpad.y
+					pressure: sdl_event.ctouchpad.pressure
+					state: .up
+				}
+			}
+			.controllertouchpadmotion {
+				shy_event = GamepadTouchpadMotionEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: sdl_event.ctouchpad.which
+					touchpad: sdl_event.ctouchpad.touchpad
+					finger: sdl_event.ctouchpad.finger
+					x: sdl_event.ctouchpad.x
+					y: sdl_event.ctouchpad.y
+					pressure: sdl_event.ctouchpad.pressure
+				}
+			}
+			.controllersensorupdate {
+				shy_event = GamepadSensorUpdateEvent{
+					timestamp: timestamp
+					window_id: no_window
+					which: sdl_event.csensor.which
+					sensor: GamepadSensorType.from_sdl_sensor_type(unsafe { sdl.SensorType(sdl_event.csensor.sensor) })
+					data: sdl_event.csensor.data
+					timestamp_us: sdl_event.csensor.timestamp_us
+				}
+			}
+			else {}
+		}
+
+		if shy_event !is UnkownEvent {
+			return shy_event
+		}
+	}
 
 	match sdl_event.@type {
 		.windowevent {
@@ -382,105 +495,6 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				timestamp: timestamp
 				window_id: shy_window_id
 				text: text
-			}
-		}
-		.controlleraxismotion {
-			shy_event = GamepadAxisMotionEvent{
-				timestamp: timestamp
-				window_id: no_window
-				//
-				which: sdl_event.caxis.which
-				axis: GamepadAxis.from_sdl_controller_axis(unsafe { sdl.GameControllerAxis(sdl_event.caxis.axis) })
-				value: sdl_event.caxis.value
-			}
-		}
-		.controllerbuttondown {
-			shy_event = GamepadButtonEvent{
-				timestamp: timestamp
-				window_id: no_window
-				//
-				button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
-				which: sdl_event.cbutton.which
-				state: .down
-			}
-		}
-		.controllerbuttonup {
-			shy_event = GamepadButtonEvent{
-				timestamp: timestamp
-				window_id: no_window
-				//
-				button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
-				which: sdl_event.cbutton.which
-				state: .up
-			}
-		}
-		.controllerdeviceadded {
-			shy_event = GamepadAddedEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: i32(sdl_event.cdevice.which)
-			}
-		}
-		.controllerdeviceremoved {
-			shy_event = GamepadRemovedEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: i32(sdl_event.cdevice.which)
-			}
-		}
-		.controllerdeviceremapped {
-			shy_event = GamepadRemappedEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: i32(sdl_event.cdevice.which)
-			}
-		}
-		.controllertouchpaddown {
-			shy_event = GamepadTouchpadButtonEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: sdl_event.ctouchpad.which
-				touchpad: sdl_event.ctouchpad.touchpad
-				finger: sdl_event.ctouchpad.finger
-				x: sdl_event.ctouchpad.x
-				y: sdl_event.ctouchpad.y
-				pressure: sdl_event.ctouchpad.pressure
-				state: .down
-			}
-		}
-		.controllertouchpadup {
-			shy_event = GamepadTouchpadButtonEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: sdl_event.ctouchpad.which
-				touchpad: sdl_event.ctouchpad.touchpad
-				finger: sdl_event.ctouchpad.finger
-				x: sdl_event.ctouchpad.x
-				y: sdl_event.ctouchpad.y
-				pressure: sdl_event.ctouchpad.pressure
-				state: .up
-			}
-		}
-		.controllertouchpadmotion {
-			shy_event = GamepadTouchpadMotionEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: sdl_event.ctouchpad.which
-				touchpad: sdl_event.ctouchpad.touchpad
-				finger: sdl_event.ctouchpad.finger
-				x: sdl_event.ctouchpad.x
-				y: sdl_event.ctouchpad.y
-				pressure: sdl_event.ctouchpad.pressure
-			}
-		}
-		.controllersensorupdate {
-			shy_event = GamepadSensorUpdateEvent{
-				timestamp: timestamp
-				window_id: no_window
-				which: sdl_event.csensor.which
-				sensor: GamepadSensorType.from_sdl_sensor_type(unsafe { sdl.SensorType(sdl_event.csensor.sensor) })
-				data: sdl_event.csensor.data
-				timestamp_us: sdl_event.csensor.timestamp_us
 			}
 		}
 		else {

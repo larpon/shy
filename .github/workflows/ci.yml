@@ -59,11 +59,11 @@ jobs:
     #    shy test-cleancode ~/.vmodules/shy
 
   ubuntu-latest-bootstrap:
-    runs-on: ubuntu-20.04 # use 20.04 for now (SDL2 compile issue)
+    runs-on: ubuntu-20.04
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.26.0
+      SDL2_VERSION: 2.0.9
     steps:
     - name: Install dependencies
       run: |
@@ -139,7 +139,7 @@ jobs:
     timeout-minutes: 10
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.26.0
+      SDL2_VERSION: 2.0.9
     steps:
     - name: Install dependencies
       run: |
@@ -205,11 +205,11 @@ jobs:
         v ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-build:
-    runs-on: ubuntu-latest # use 20.04 for now (SDL2 compile issue)
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.26.0
+      SDL2_VERSION: 2.0.9
     steps:
     - name: Install dependencies
       run: |
@@ -277,11 +277,82 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        # sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
-        sdl-version: [2.26.0, 2.28.0, 2.30.0] # Gameped support
+        sdl-version: [2.0.9, 2.0.10, 2.0.12, 2.0.14, 2.0.16, 2.0.18, 2.0.20, 2.0.22, 2.24.0, 2.26.0, 2.28.0, 2.30.0]
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --quiet -y mesa-common-dev
+        curl -L https://www.libsdl.org/release/SDL2-${{ matrix.sdl-version }}.tar.gz -o SDL2.tar.gz
+        tar -zxvf SDL2.tar.gz
+
+    - name: Build SDL
+      run: |
+        cd SDL2-${{ matrix.sdl-version }}
+        mkdir build
+        cd build
+        ../configure
+        make
+        sudo make install
+
+    - name: Checkout V
+      uses: actions/checkout@v4
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make && sudo ./v symlink
+
+    - name: Checkout SDL ${{ matrix.sdl-version }}
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ matrix.sdl-version }}
+        repository: vlang/sdl
+        path: sdl
+
+    - name: Simulate "v install sdl"
+      run: |
+        mkdir -p ~/.vmodules
+        mv sdl ~/.vmodules
+
+    - name: Checkout shy
+      uses: actions/checkout@v4
+      with:
+        path: shy
+
+    - name: Simulate "v install shy"
+      run: mv shy ~/.vmodules
+
+    - name: Build shy
+      run: v -g ~/.vmodules/shy
+
+    - name: Symlink shy
+      run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
+
+    - name: Run 'shy --help'
+      run: shy --help
+
+    - name: Run 'shy doctor'
+      run: shy doctor
+
+    - name: Build shy examples
+      run: |
+        v -d sdl_no_compile_flags -skip-unused should-compile-all ~/.vmodules/shy/examples
+        v -d sdl_no_compile_flags -d shy_analyse should-compile-all ~/.vmodules/shy/examples
+        v -d sdl_no_compile_flags -d shy_vet should-compile-all ~/.vmodules/shy/examples
+
+  sdl-d-gamepad-branch-versions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        sdl-version: [2.26.0, 2.28.0, 2.30.0] # Gamepad support requires SDL2 >= 2.26.0
+    timeout-minutes: 20
+    env:
+      VFLAGS: -cc tcc -no-retry-compilation -d shy_gamepad
     steps:
     - name: Install dependencies
       run: |
