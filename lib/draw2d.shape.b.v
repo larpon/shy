@@ -1010,6 +1010,7 @@ fn (up &DrawShape2DUniformPolygon) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x
 
 @[params]
 struct DrawAnchorConfig {
+pub:
 	width   f32     = 1.0
 	connect Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
 	cap     Cap     = .butt

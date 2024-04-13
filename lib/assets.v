@@ -215,6 +215,7 @@ pub enum AssetStatus {
 }
 
 pub struct TaggedSource {
+pub:
 	source AssetSource
 	tag    string
 }

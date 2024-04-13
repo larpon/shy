@@ -50,6 +50,7 @@ pub fn (c Connect) next() Connect {
 }
 
 pub struct Stroke {
+pub:
 	width   f32     = 1.0
 	connect Connect = .bevel // Beav(el)is and Butt(head) - uuuh - huh huh
 	cap     Cap     = .butt

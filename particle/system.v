@@ -12,6 +12,7 @@ type Component = Affector | Emitter
 // System
 pub struct SystemConfig {
 	shy.Rect
+pub:
 	pool u32
 }
 

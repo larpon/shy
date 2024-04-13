@@ -578,6 +578,7 @@ pub fn (q &Quick) play(opt SoundPlayOptions) {
 // }
 
 pub struct ImageConfigRect {
+pub:
 	x      f32
 	y      f32
 	width  f32 = -1
