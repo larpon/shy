@@ -650,7 +650,7 @@ pub type ResizeValue = Size | f32 | f64
 @[params]
 pub struct ImageOptions {
 	AssetLoadOptions
-mut:
+pub:
 	resize  ResizeValue = f32(1.0)
 	width   int
 	height  int
@@ -682,6 +682,7 @@ pub const no_sound = Sound{}
 pub struct SoundOptions {
 	AssetLoadOptions
 	engine_id   u8   // Load sound into this engine
+pub:
 	loop        bool //
 	max_repeats u8
 }

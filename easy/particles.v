@@ -100,7 +100,10 @@ pub fn (mut ps ParticleSystem) replace_default_painter(painter particle.Painter)
 
 pub fn (mut e Easy) image_particle_painter(config ImageParticlePainterConfig) ImageParticlePainter {
 	return ImageParticlePainter{
-		...config
+		groups: config.groups
+		color: config.color
+		color_variation: config.color_variation
+		source: config.source
 		easy: e
 	}
 }
@@ -118,7 +121,7 @@ fn default_particle_painter(mut e Easy) ImageParticlePainter {
 
 @[params]
 pub struct ImageParticlePainterConfig {
-mut:
+pub:
 	groups          []string  = ['default']
 	color           shy.Color = shy.colors.shy.white
 	color_variation shy.ColorVariation

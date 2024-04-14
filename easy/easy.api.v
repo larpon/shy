@@ -532,6 +532,7 @@ pub fn (q &Quick) uniform_poly(eupc UniformPolyConfig) {
 
 @[params]
 pub struct SoundPlayOptions {
+pub:
 	source shy.AssetSource @[required]
 	loops  u16
 	pitch  f32
