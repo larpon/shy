@@ -681,7 +681,7 @@ pub const no_sound = Sound{}
 @[params]
 pub struct SoundOptions {
 	AssetLoadOptions
-	engine_id   u8   // Load sound into this engine
+	engine_id u8 // Load sound into this engine
 pub:
 	loop        bool //
 	max_repeats u8
