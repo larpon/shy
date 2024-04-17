@@ -6,8 +6,17 @@ module lib
 import shy.utils
 import shy.mth
 import rand
+import math // TODO
 
 pub const colors = BaseColors{}
+
+pub struct ColorHSV {
+pub mut:
+	h u16 // 0 - 360 // degrees
+	s f32 // 0.0 - 1.0
+	v f32 // 0.0 - 1.0
+	a f32
+}
 
 pub struct Colorf32 {
 pub mut:
@@ -148,10 +157,66 @@ pub fn (c &Color) blend_with(color Color, blend f32) Color {
 
 pub fn (c &Color) as_f32() Colorf32 {
 	return Colorf32{
-		r: utils.remap_u8_to_f32(c.r, 0, 255, 0.0, 1.0)
-		g: utils.remap_u8_to_f32(c.g, 0, 255, 0.0, 1.0)
-		b: utils.remap_u8_to_f32(c.b, 0, 255, 0.0, 1.0)
-		a: utils.remap_u8_to_f32(c.a, 0, 255, 0.0, 1.0)
+		r: f32(c.r) / 255.0 // utils.remap_u8_to_f32(c.r, 0, 255, 0.0, 1.0)
+		g: f32(c.g) / 255.0 // utils.remap_u8_to_f32(c.g, 0, 255, 0.0, 1.0)
+		b: f32(c.b) / 255.0 // utils.remap_u8_to_f32(c.b, 0, 255, 0.0, 1.0)
+		a: f32(c.a) / 255.0 // utils.remap_u8_to_f32(c.a, 0, 255, 0.0, 1.0)
+	}
+}
+
+pub fn (c &Color) as_hsv() ColorHSV {
+	// R, G, B values are divided by 255
+	// to change the range from 0..255 to 0..1
+	r := f64(c.r) / 255.0
+	g := f64(c.g) / 255.0
+	b := f64(c.b) / 255.0
+	a := f32(c.a) / 255.0
+
+	// h, s, v = hue, saturation, value
+	cmax := mth.max(r, mth.max(g, b)) // maximum of r, g, b
+	cmin := mth.min(r, mth.min(g, b)) // minimum of r, g, b
+	diff := cmax - cmin // diff of cmax and cmin.
+	mut h := f64(-1)
+	mut s := f64(-1)
+	mut v := cmax
+
+	// if cmax and cmax are equal then h = 0
+	if cmax == cmin {
+		h = 0
+	}
+	// if cmax equal r then compute h
+	else if cmax == r {
+		h = math.fmod(60 * ((g - b) / diff) + 360, 360)
+	}
+	// if cmax equal g then compute h
+	else if cmax == g {
+		h = math.fmod(60 * ((b - r) / diff) + 120, 360)
+	}
+	// if cmax equal b then compute h
+	else if cmax == b {
+		h = math.fmod(60 * ((r - g) / diff) + 240, 360)
+	}
+
+	// if cmax equal zero
+	if cmax == 0 {
+		s = 0
+	} else {
+		// s = (diff / cmax) // * 100
+		s = (diff / cmax)
+	}
+
+	// compute v
+	v = cmax // * 100
+
+	// println('HSV: ${h},${s},${v}')
+
+	return ColorHSV{
+		h: u16(h)
+		// s: u16(mth.clamp(utils.remap(s,0,1,0,255),0,255)) // remaps to 0 - 255
+		// v: u16(mth.clamp(utils.remap(v,0,1,0,255),0,255)) // remaps to 0 - 255
+		s: f32(s)
+		v: f32(v)
+		a: a
 	}
 }
 
@@ -181,6 +246,13 @@ pub fn (c &Color) a_as[T]() T {
 		return utils.remap_u8_to_f32(c.a, 0, 255, 0.0, 1.0)
 	}
 	panic('A shy TODO :)')
+}
+
+// TODO does not work as expected in regards to values generated from hex codes via 0xXXXXXX
+pub fn (c &Color) to[T]() T {
+	u32_res := ((u32(c.r) & 0xff) << 24) + ((u32(c.g) & 0xff) << 16) + ((u32(c.b) & 0xff) << 8) +
+		(u32(c.a) & 0xff)
+	return T(u32_res)
 }
 
 pub fn (mut c Color) variate(cv ColorVariation) {
@@ -238,5 +310,67 @@ pub fn rgba_f32(r f32, g f32, b f32, a f32) Color {
 		g: utils.remap_f32_to_u8(g, 0.0, 1.0, 0, 255)
 		b: utils.remap_f32_to_u8(b, 0.0, 1.0, 0, 255)
 		a: utils.remap_f32_to_u8(a, 0.0, 1.0, 0, 255)
+	}
+}
+
+pub fn (c &ColorHSV) as_rgb() Color {
+	mut r := f32(0)
+	mut g := f32(0)
+	mut b := f32(0)
+	a := u8(utils.remap_f32_to_u8(c.a, 0, 1, 0, 255))
+
+	h := utils.remap(f32(c.h), 0, 360, 0, 1)
+	s := c.s
+	v := c.v
+
+	i := int(mth.floor(h * 6))
+	f := h * 6 - i
+	p := v * (1 - s)
+	q := v * (1 - f * s)
+	t := v * (1 - (1 - f) * s)
+
+	// println('c.h: ${c.h} h: ${h} i: ${i} -> ${math.fmod(i, 6)}')
+
+	match i % 6 {
+		0 {
+			r = v
+			g = t
+			b = p
+		}
+		1 {
+			r = q
+			g = v
+			b = p
+		}
+		2 {
+			r = p
+			g = v
+			b = t
+		}
+		3 {
+			r = p
+			g = q
+			b = v
+		}
+		4 {
+			r = t
+			g = p
+			b = v
+		}
+		5 {
+			r = v
+			g = p
+			b = q
+		}
+		else {}
+	}
+
+	// println('RGB: ${r} ${g} ${b} RGB*255: ${r * 255} ${g * 255} ${b * 255} ')
+
+	return Color{
+		r: u8(r * 255)
+		g: u8(g * 255)
+		b: u8(b * 255)
+		a: a
 	}
 }
