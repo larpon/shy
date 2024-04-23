@@ -118,7 +118,7 @@ fn (w Window) dump_pixels(rect Rect) &Screenshot {
 }
 
 // free - free *only* the Screenshot pixels.
-@[unsafe]
+@[manualfree; unsafe]
 pub fn (mut ss Screenshot) free() {
 	unsafe {
 		shy_free(ss.pixels)
@@ -128,7 +128,7 @@ pub fn (mut ss Screenshot) free() {
 
 // destroy - free the Screenshot pixels,
 // then free the screenshot data structure itself.
-@[unsafe]
+@[manualfree; unsafe]
 pub fn (mut ss Screenshot) destroy() {
 	unsafe { ss.free() }
 	unsafe { shy_free(ss) }

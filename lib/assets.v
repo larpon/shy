@@ -40,7 +40,7 @@ pub fn (mut a Assets) shutdown() ! {
 			continue
 		}
 		asset.shutdown()!
-		unsafe { free(&asset) }
+		unsafe { free(&asset) } // <- commenting this will prevent the crash
 	}
 	a.ass.clear()
 	for _, mut image in a.image_cache {
@@ -298,6 +298,7 @@ pub mut:
 	status AssetStatus // TODO(lmp) should be pub read-only to the outside world if V ever gets that access modifier
 }
 
+@[manualfree]
 pub fn (mut a Asset) shutdown() ! {
 	if isnil(a) {
 		println('${@LOCATION}: Crashing at hard-to-fix V memory BUG...\nTry using `v -d sdl_memory_no_gc ...`')
