@@ -44,7 +44,7 @@ pub mut:
 pub struct ParticleSystem {
 	shy.ShyStruct
 mut:
-	system             &particle.System
+	system             &particle.System = unsafe { nil }
 	default_painter_id int
 pub mut:
 	rotation f32
