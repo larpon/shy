@@ -14,8 +14,7 @@ pub mut:
 	enabled bool = true
 
 	position vec.Vec2[f32] // Center position of the emitter
-	// Size of the emitter. when shape == .point the size has no effect
-	size shy.Size = shy.Size{100, 100}
+	size shy.Size = shy.Size{100, 100} // Size of the emitter. when shape == .point the size has no effect
 
 	velocity     StochasticDirection
 	acceleration StochasticDirection
@@ -33,11 +32,10 @@ pub mut:
 	group string // Logical group the emitted particles belong to
 
 	shape Shape = .point
-	/*
-	Provide an additional starting velocity to the emitted particles based on the emitter's movement.
-	The added velocity vector will have the same angle as the emitter's movement,
-	with a magnitude that is the magnitude of the emitters movement multiplied by the  movement_velocity.
-	*/
+
+	// Provide an additional starting velocity to the emitted particles based on the emitter's movement.
+	// The added velocity vector will have the same angle as the emitter's movement,
+	// with a magnitude that is the magnitude of the emitters movement multiplied by the  movement_velocity.
 	movement_velocity      f32
 	movement_velocity_flip bool
 mut:
@@ -52,10 +50,13 @@ mut:
 	pulse_duration int
 }
 
-/*
-pub fn (mut e Emitter) move_to(v vec.Vec2[f32]) {
-	e.position.from(v)
-}*/
+// pub fn (mut e Emitter) set_position_last_frame(v vec.Vec2[f32]) {
+// 	e.position_last_frame = v
+// }
+
+// pub fn (mut e Emitter) move_to(v vec.Vec2[f32]) {
+// 	e.position.from(v)
+// }
 
 pub fn (mut e Emitter) burst(amount int) {
 	// e.burst_position.from(e.position)
@@ -192,6 +193,7 @@ fn (mut e Emitter) emit() {
 				}
 			}
 		}
+
 		p.set_init()
 		// Send the particle into the system
 		s.pool << p
