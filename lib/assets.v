@@ -374,7 +374,7 @@ pub enum AssetIOHints {
 pub struct AssetLoadOptions {
 pub:
 	source AssetSource
-	io AssetIOHints = .cache
+	io     AssetIOHints = .cache
 }
 
 @[param]
