@@ -74,7 +74,7 @@ pub fn (mut g GFX) init() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
-	// TODO(lmp) do a better / non-inline logger fn
+	// TODO(lmp): do a better / non-inline logger fn
 	mut logger := gfx.Logger{
 		func: fn (const_tag &char, log_level u32, log_item_id u32, message_or_null &char, line_nr u32, filename_or_null &char, user_data voidptr) {
 			mut output := ''
@@ -251,8 +251,8 @@ fn (mut c Context) sokol_gl_init() ! {
 	// create a sokol-gl context compatible with the offscreen render pass
 	// (specific color pixel format, no depth-stencil-surface, no MSAA)
 	gl_ctx_desc := gl.ContextDesc{
-		max_vertices: 1_000_000 // TODO(lmp) make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
-		max_commands: 100_000 // TODO(lmp) make configurable default 16k
+		max_vertices: 1_000_000 // TODO(lmp): make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
+		max_commands: 100_000 // TODO(lmp): make configurable default 16k
 		color_format: .rgba8
 		depth_format: .@none
 		sample_count: offscreen_sample_count

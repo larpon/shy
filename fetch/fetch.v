@@ -164,6 +164,7 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 		url := job.config.url
 		// println('Loader #${thread_id} worker took ${url}')
 		mut bytes := []u8{}
+		// TODO enable network fetching etc.
 		source := url.all_after('://')
 		if url.starts_with('file://') {
 			if !os.is_file(source) {

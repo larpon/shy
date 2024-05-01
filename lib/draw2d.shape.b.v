@@ -407,7 +407,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 	scale_factor := r.factor
 	mut radius := r.radius * scale_factor
 
-	assert radius > 0, '${@LOCATION}, rectangle radius should be > 0' // TODO(lmp) decide if undefined behaviour is ok here, if it should be checked in higher level API layers? hmm...
+	assert radius > 0, '${@LOCATION}, rectangle radius should be > 0' // TODO(lmp): decide if undefined behaviour is ok here, if it should be checked in higher level API layers? hmm...
 
 	if w >= h && radius > h / 2 {
 		radius = h / 2
@@ -439,7 +439,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 		color := r.color
 		gl.c4b(color.r, color.g, color.b, color.a)
 
-		// TODO(lmp) the 0 .. X range should change on small radii
+		// TODO(lmp): the 0 .. X range should change on small radii
 
 		// left top quarter
 		gl.begin_triangle_strip()

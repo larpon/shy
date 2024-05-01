@@ -79,7 +79,7 @@ fn workaround_match_bug(image &Image, origin Origin, dis_x f32, dis_y f32, i_x f
 	mut o_dis_y := dis_y
 	match origin {
 		Anchor {
-			// TODO(lmp) this offset circus should be able to use *less* branching
+			// TODO(lmp): this offset circus should be able to use *less* branching
 			if origin in [.top_left, .top_center, .top_right, .bottom_left, .bottom_center,
 				.bottom_right] {
 				if image.width > image.height {

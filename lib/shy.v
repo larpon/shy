@@ -30,6 +30,12 @@ pub mut: // TODO error: field `App.shy` is not public - make this just "pub" to 
 	shy &Shy = lib.null
 }
 
+pub fn (s ShyStruct) str() string {
+	return 'ShyStruct {
+	shy: ${ptr_str(s.shy)}
+}'
+}
+
 fn (s ShyStruct) init() ! {
 	assert !isnil(s.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 }

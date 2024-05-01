@@ -52,12 +52,12 @@ pub struct Keyboard {
 pub:
 	id u8 // NOTE SDL doesn't really support multiple keyboard events, but who knows what the future holds?
 mut:
-	keys map[int]bool // key states, TODO(lmp) should be i32
+	keys map[int]bool // key states, TODO(lmp): should be i32
 }
 
 @[inline]
 pub fn (k &Keyboard) is_key_down(keycode KeyCode) bool {
-	// TODO(lmp) workaround memory leak in code below. See https://github.com/vlang/v/issues/19454
+	// TODO(lmp): workaround memory leak in code below. See https://github.com/vlang/v/issues/19454
 	key_state := k.keys[int(keycode)]
 	return key_state
 	// if key_state := k.keys[int(keycode)] {

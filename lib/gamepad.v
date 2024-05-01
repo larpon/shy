@@ -205,7 +205,7 @@ mut:
 	name          string
 	handle        &sdl.GameController
 	is_haptic     bool
-	button_states map[int]bool // key states, TODO(lmp) should be i32
+	button_states map[int]bool // key states, TODO(lmp): should be i32
 }
 
 pub fn (mut gp Gamepad) init() ! {
@@ -256,7 +256,7 @@ pub fn (mut gp Gamepad) init() ! {
 
 @[inline]
 pub fn (gp &Gamepad) is_button_down(button GamepadButton) bool {
-	// TODO(lmp) workaround memory leak in code below. See https://github.com/vlang/v/issues/19454
+	// TODO(lmp): workaround memory leak in code below. See https://github.com/vlang/v/issues/19454
 	key_state := gp.button_states[int(button)]
 	return key_state
 	// if key_state := k.keys[int(keycode)] {
