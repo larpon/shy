@@ -9,6 +9,7 @@ import shy.wraps.sokol.gfx
 import shy.wraps.stbi
 import v.embed_file
 import shy.analyse
+import shy.fetch
 
 // Assets is a manager of `Asset` instances.
 @[heap]
@@ -21,14 +22,22 @@ mut:
 	sound_cache map[string]Sound
 	blob_cache  map[string]Blob
 	sb          strings.Builder
+	// Async loading
+	async_load_queue []AssetLoadOptions
+	in_progress      map[u32]AssetSource
+	loader           fetch.Loader
 }
 
 pub fn (mut a Assets) init() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	a.sb.ensure_cap(1024) // NOTE TODO(lmp) this needs attention if no GC is used
+	a.sb.ensure_cap(1024) // NOTE TODO(lmp): this needs attention if no GC is used
+	a.loader.init()!
 }
 
 pub fn (mut a Assets) shutdown() ! {
+	a.async_load_queue.clear()
+	a.loader.shutdown()!
+
 	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload that may, or may not, be the function that causes it
 	// keys := a.ass.keys()
 	// values := a.ass.values()
@@ -72,17 +81,18 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	}
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
 
-	// TODO enable network fetching etc.
-	if alo.async {
-		return error('${@STRUCT}.${@FN}: "${source}" asynchronously loading not implemented yet')
-		// asset := &Asset{
-		//	shy: a.shy
-		//	lo: alo
-		//	status: .loading
-		//}
-		// a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${source}"')
-		// a.ass[source.str()] = asset
-		// return asset
+	if alo.io.has(.async) {
+		asset := &Asset{
+			shy: a.shy
+			lo: alo
+			status: .loading
+		}
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${source}"')
+		a.ass[source.str()] = asset
+
+		a.async_load_queue << alo
+
+		return asset
 	}
 
 	mut bytes := []u8{}
@@ -179,7 +189,7 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 */
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
-	mut sb := a.sb // TODO(lmp) workaround V compile error
+	mut sb := a.sb // TODO(lmp): workaround V compile error
 	$if T is Blob {
 		if blob := a.blob_cache[source.cache_key(mut sb)] {
 			return blob
@@ -193,7 +203,9 @@ pub fn (a &Assets) get[T](source AssetSource) !T {
 			return sound
 		}
 	} $else $if T is &Asset {
-		return a.ass[source.str()]
+		if asset := a.ass[source.str()] {
+			return asset
+		}
 	} $else {
 		// t := T{}
 		// tof := typeof(t).name
@@ -202,6 +214,88 @@ pub fn (a &Assets) get[T](source AssetSource) !T {
 	}
 	return error('${@STRUCT}.${@FN}: "${source}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
 }
+
+pub fn (mut a Assets) update() {
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
+
+	if a.loader.is_working() {
+		// mut loops := 0
+		for {
+			// println('for')
+			if job := a.loader.update() {
+				// println('Job #${job.id} progress ${job.progress * 100}% status ${job.status}')
+				if job.status == .running || job.status == .done {
+					source := a.in_progress[u32(job.id)] or { panic('Asset not in progress') }
+					mut asset := a.get[&Asset](source) or { panic('Asset not on cache') }
+					if job.data.size > 0 {
+						chunk := job.data.chunk
+						size := job.data.size
+						for i := 0; i < size; i++ {
+							asset.data << chunk[i]
+						}
+					}
+					asset.progress = job.progress
+					if job.status == .done {
+						asset.status = .loaded
+					}
+				}
+			} else {
+				// println('for break no job')
+				break
+			}
+			// if loops > a.loader.workers() * 100 {
+			// 	println('for break loop limit')
+			// 	break
+			// }
+			// loops++
+			// println('for end')
+		}
+	}
+
+	if a.async_load_queue.len > 0 {
+		alo := a.async_load_queue.pop()
+		source := alo.source
+		path := match source {
+			string {
+				'file://${source}'
+			}
+			else {
+				''
+			}
+		}
+		if path != '' {
+			// println('loading ${path}')
+			handle := a.loader.load(
+				url: path
+				flags: .async
+			)
+			id := u32(handle.id)
+			// println('loading sent off ${id}')
+			a.in_progress[id] = source
+		}
+
+		/*
+		for i, asset_load_option in a.async_load_queue {
+			source := asset_load_option.source
+			if asset := a.ass[source.str()] {
+				if asset.status != .loading {
+					a.async_load_queue.delete(i)
+					continue
+				}
+				a.async_load_tick(asset)
+			}
+		}*/
+	}
+}
+
+/*
+fn (mut a Assets) async_load_tick(asset &Asset) {
+	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
+	assert asset.status == .loading
+
+
+	// println('asset ${asset}')
+}*/
 
 // Asset
 
@@ -245,7 +339,7 @@ fn (a AssetSource) cache_key(mut sb strings.Builder) string {
 			a.path
 		}
 		TaggedSource {
-			// TODO memory leaks '${a.source.str()}#${a.tag}'
+			// TODO: V memory leaks '${a.source.str()}#${a.tag}', hence the `sb` :(
 			sb.write_string(a.source.str())
 			sb.write_string('#')
 			sb.write_string(a.tag)
@@ -270,12 +364,17 @@ pub fn (a AssetSource) str() string {
 
 pub type AssetOptions = BlobOptions | ImageOptions | SoundOptions
 
+@[flag]
+pub enum AssetIOHints {
+	async
+	stream
+	cache
+}
+
 pub struct AssetLoadOptions {
 pub:
 	source AssetSource
-	async  bool
-	stream bool
-	cache  bool = true
+	io AssetIOHints = .cache
 }
 
 @[param]
@@ -291,11 +390,13 @@ pub:
 @[heap]
 pub struct Asset {
 	ShyStruct
-	data []u8
+mut:
+	data     []u8
+	progress f32
 pub:
 	lo AssetLoadOptions
 pub mut:
-	status AssetStatus // TODO(lmp) should be pub read-only to the outside world if V ever gets that access modifier
+	status AssetStatus // TODO(lmp): should be pub read-only to the outside world if V ever gets that access modifier
 }
 
 @[manualfree]
@@ -355,7 +456,7 @@ fn (mut a Asset) to_blob(opt BlobOptions) !Blob {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 
-	if opt.cache {
+	if opt.io.has(.cache) {
 		if blob := a.shy.assets().get[Blob](a.lo.source) {
 			return blob
 		}
@@ -370,7 +471,7 @@ fn (mut a Asset) to_blob(opt BlobOptions) !Blob {
 		opt: opt
 	}
 
-	if opt.cache {
+	if opt.io.has(.cache) {
 		unsafe {
 			mut assets := a.shy.assets()
 			// assets.cache[blob](blob)! // TODO
@@ -385,7 +486,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 
-	if opt.cache {
+	if opt.io.has(.cache) {
 		if image := a.shy.assets().get[Image](a.lo.source) {
 			return image
 		}
@@ -466,7 +567,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 
 	stb_img.free()
 
-	if opt.cache {
+	if opt.io.has(.cache) {
 		unsafe {
 			mut assets := a.shy.assets()
 			// assets.cache[Image](image)! // TODO
@@ -479,7 +580,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
-	if opt.cache {
+	if opt.io.has(.cache) {
 		if sound := a.shy.assets().get[Sound](a.lo.source) {
 			return sound
 		}
@@ -500,7 +601,7 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 		id_end: id_end
 		loop: opt.loop
 	}
-	if opt.cache {
+	if opt.io.has(.cache) {
 		unsafe {
 			mut assets := a.shy.assets()
 			assets.sound_cache[a.lo.source.cache_key(mut assets.sb)] = sound
@@ -756,6 +857,7 @@ pub fn (s &Sound) play() {
 		}
 		// Create an alarm to watch for changes to the sound's state
 		// TODO this could probably be made smarter
+		// TODO ... Also it is not good for predictability
 		aid := s.asset.shy.make_alarm(
 			check: sound_alarm_check
 			user_data: voidptr(s)

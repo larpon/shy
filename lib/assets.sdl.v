@@ -13,7 +13,7 @@ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 
 	// TODO
-	// 	if opt.cache {
+	// 	if opt.io.has(.cache) {
 	// 		if image := a.shy.assets().get[Image](a.lo.source) {
 	// 			return image
 	// 		}
@@ -75,7 +75,7 @@ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
 		kind: .png // TODO stb_img.ext
 	}*/
 
-	// 	if opt.cache {
+	// 	if opt.io.has(.cache) {
 	// 		unsafe {
 	// 			mut assets := a.shy.assets()
 	// 			// assets.cache[Image](image)! // TODO
