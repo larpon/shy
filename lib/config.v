@@ -29,7 +29,7 @@ pub:
 	pub:
 		name  string = 'default'
 		size  f32    = 20
-		color Color  = Color{255, 255, 255, 255} // TODO BUG is really 0,0,0,0 :(
+		color Color  = Color{255, 255, 255, 255} // BUG: is really 0,0,0,0 :(
 		// align TextAlign = .baseline | .left // TODO V BUG
 	}
 

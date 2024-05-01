@@ -64,7 +64,7 @@ pub fn (mut a App) event(e shy.Event) {
 
 	ui_event := ui.shy_to_ui_event(e) or { panic('${@STRUCT}.${@FN}: ${err}') }
 	if handled_by_node := a.ui.event(ui_event) {
-		// TODO BUG printing the whole node will make things crash at runtime...
+		// BUG: printing the whole node will make things crash at runtime...
 		println('Event was handled by ui.Node.id(${handled_by_node.id})')
 	}
 }

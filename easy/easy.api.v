@@ -61,7 +61,7 @@ pub mut:
 	origin   shy.Origin    = shy.Anchor.top_left
 	align    shy.TextAlign = .baseline | .left
 	offset   vec.Vec2[f32]
-	color    shy.Color = shy.rgba(255, 255, 255, 255) // BUG shy.defaults.font.color
+	color    shy.Color = shy.rgba(255, 255, 255, 255) // BUG: shy.defaults.font.color
 	blur     f32
 }
 

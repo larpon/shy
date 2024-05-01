@@ -38,7 +38,7 @@ pub fn (mut a Assets) shutdown() ! {
 	a.async_load_queue.clear()
 	a.loader.shutdown()!
 
-	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload that may, or may not, be the function that causes it
+	// BUG: there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload that may, or may not, be the function that causes it
 	// keys := a.ass.keys()
 	// values := a.ass.values()
 	// println('Keys ${keys} ${keys.len} vs ${values.len}')
@@ -139,7 +139,7 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	source := auo.source
 	source_cache_key := source.cache_key(mut a.sb)
-	// TODO BUG there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Asset.shutdown / Assets.shutdown
+	// BUG: there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Asset.shutdown / Assets.shutdown
 	if mut asset := a.ass[source_cache_key] {
 		a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when deallocating in hot code paths. It is, in general, better to unload data on shutdown. Unloading "${source.str()}"')
 

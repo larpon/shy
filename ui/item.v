@@ -60,7 +60,7 @@ pub fn (mut i Item) update() {
 // parent returns this `Item`'s parent.
 pub fn (i &Item) parent() &Node {
 	//assert i != unsafe { nil }
-	// TODO BUG returning ?&Node is not possible currently: if isnil(i.parent) { return none }
+	// BUG: returning ?&Node is not possible currently: if isnil(i.parent) { return none }
 	return i.parent
 }
 */
@@ -250,7 +250,7 @@ pub fn (mut pea PointerEventArea) event(e Event) ?&Node {
 				y: ey
 			}
 
-			// TODO BUG pea pointer address is not the same in userspace callbacks?!
+			// BUG: pea pointer address is not the same in userspace callbacks?!
 			/*
 			eprintln('${@STRUCT}.${@FN} ea: ${ptr_str(pea.EventArea)}')
 			eprintln('${@STRUCT}.${@FN} ea.this: ${ptr_str(pea.EventArea.this)}')

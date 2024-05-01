@@ -150,7 +150,7 @@ fn (mut a Anims) p_new_animator[T](config AnimatorConfig) &Animator[T] {
 	}
 	mut animator := &Animator[T]{
 		shy: a.shy
-		// TODO BUG ...config <- doesn't work for generics
+		// BUG: ...config <- doesn't work for generics
 	}
 	animator.config_update(config)
 	return animator
@@ -164,7 +164,7 @@ fn (mut a Anims) p_new_follow_animator[T](config FollowAnimatorConfig) &FollowAn
 	}
 	mut animator := &FollowAnimator[T]{
 		shy: a.shy
-		// TODO BUG ...config <- doesn't work for generics
+		// BUG: ...config <- doesn't work for generics
 	}
 	// animator.reset()
 	animator.config_update(config)
@@ -305,7 +305,7 @@ pub fn (a &Animator[T]) t() f64 {
 }
 
 pub fn (ima Animator[T]) reset() {
-	mut a := unsafe { ima } // TODO BUG workaround mutable generic interfaces
+	mut a := unsafe { ima } // BUG: workaround mutable generic interfaces
 	a.running = false
 	a.elapsed = 0
 	a.value = a.from
@@ -353,7 +353,7 @@ fn (mut a Animator[T]) ended() {
 fn (a &Animator[T]) touch() {}
 
 fn (ima &Animator[T]) step(dt f64) {
-	mut a := unsafe { ima } // TODO BUG workaround mutable generic interfaces
+	mut a := unsafe { ima } // BUG: workaround mutable generic interfaces
 	a.elapsed += dt * 1000
 	if a.elapsed >= a.duration {
 		a.ended()
@@ -401,7 +401,7 @@ mut:
 }
 
 fn (fa FollowAnimator[T]) touch() {
-	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
+	mut a := unsafe { fa } // BUG: workaround mutable generic interfaces
 	should_run := mth.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
 	if should_run {
 		a.running = should_run
@@ -416,7 +416,7 @@ fn (fa FollowAnimator[T]) restart() {
 }
 
 fn (fa FollowAnimator[T]) reset() {
-	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
+	mut a := unsafe { fa } // BUG: workaround mutable generic interfaces
 	a.value = a.target
 }
 
@@ -445,7 +445,7 @@ pub fn (a &FollowAnimator[T]) value() T {
 }
 
 fn (fa &FollowAnimator[T]) step(dt f64) {
-	mut a := unsafe { fa } // TODO BUG workaround mutable generic interfaces
+	mut a := unsafe { fa } // BUG: workaround mutable generic interfaces
 
 	value := a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.multiply)
 	// value := utils.remap(a.t, 0, 1.0, a.from, a.to)
