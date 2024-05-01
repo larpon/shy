@@ -728,11 +728,28 @@ pub fn (q &Quick) image(eic ImageConfig) {
 
 // Assets
 
-// load returns a reference `shy.Asset`. Note that the asset may not be fully loaded
-// depending on the load options passed.
+// load returns a reference to a `shy.Asset`.
+// NOTE The asset may not be fully loaded depending on the load options passed.
 pub fn (e &Easy) load(alo shy.AssetLoadOptions) !&shy.Asset {
 	mut assets := e.shy.assets()
 	return assets.load(alo)!
+}
+
+// get returns a reference to a `shy.Asset`.
+// NOTE The asset may not be fully loaded depending on the load options passed.
+@[inline]
+pub fn (e &Easy) get(source shy.AssetSource) !&shy.Asset {
+	mut assets := e.shy.assets()
+	return assets.get[&shy.Asset](source)!
+}
+
+// get returns a reference to a `shy.Asset`.
+// NOTE The asset may not be fully loaded depending on the load options passed.
+@[inline]
+pub fn (q &Quick) get(source shy.AssetSource) !&shy.Asset {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	assets := q.easy.shy.assets()
+	return assets.get[&shy.Asset](source)!
 }
 
 @[inline]
