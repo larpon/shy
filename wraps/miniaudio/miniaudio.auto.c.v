@@ -7,36 +7,42 @@ import miniaudio.c as _
 // miniaudio.h
 //
 
+@[typedef]
+pub struct C.pthread_mutex_t {}
+
+@[typedef]
+pub struct C.pthread_cond_t {}
+
 // C typedef aliases used
 // ma_bool8 -> ma_uint8 -> u8
-type C.ma_bool8 = u8 // C.ma_uint8
+pub type C.ma_bool8 = u8 // C.ma_uint8
 
 // ma_bool32 -> ma_uint32 -> u32
-type C.ma_bool32 = u32 // C.ma_uint32
+pub type C.ma_bool32 = u32 // C.ma_uint32
 
 // ma_handle -> void* -> voidptr
-type C.ma_handle = voidptr
+pub type C.ma_handle = voidptr
 
 // ma_ptr -> void* -> voidptr
 // wchar_t -> ma_uint16 -> u16
 // ma_channel -> ma_uint8 -> u8
-type C.ma_channel = u8
+pub type C.ma_channel = u8
 pub type Channel = u8
 
 // ma_spinlock -> ma_uint32 -> u32
 // ma_thread -> ma_pthread_t -> C.ma_pthread_t
-type C.ma_thread = voidptr // C.ma_pthread_t -> C.ma_handle
+pub type C.ma_thread = voidptr // C.ma_pthread_t -> C.ma_handle
 
 // ma_mutex -> ma_pthread_mutex_t -> C.ma_pthread_mutex_t
-type C.ma_mutex = C.pthread_mutex_t
+pub type C.ma_mutex = C.pthread_mutex_t
 
-struct C.pthread_mutex_t {}
+pub struct C.pthread_mutex_t {}
 
-type C.ma_pthread_mutex_t = C.pthread_mutex_t
+pub type C.ma_pthread_mutex_t = C.pthread_mutex_t
 
-struct C.pthread_cond_t {}
+pub struct C.pthread_cond_t {}
 
-type C.ma_pthread_cond_t = C.pthread_cond_t
+pub type C.ma_pthread_cond_t = C.pthread_cond_t
 
 // ma_event -> ma_handle -> C.ma_handle
 // ma_semaphore -> ma_handle -> C.ma_handle
