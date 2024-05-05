@@ -16,6 +16,7 @@ pub type Event = DropBeginEvent
 	| GamepadSensorUpdateEvent
 	| GamepadTouchpadButtonEvent
 	| GamepadTouchpadMotionEvent
+	| IntEvent
 	| KeyEvent
 	| MouseButtonEvent
 	| MouseMotionEvent
@@ -37,7 +38,7 @@ fn (e Event) serialize_as_playback_string() string {
 	return match e {
 		DropBeginEvent, DropEndEvent, DropTextEvent, GamepadAddedEvent, GamepadAxisMotionEvent,
 		GamepadButtonEvent, GamepadRemappedEvent, GamepadRemovedEvent, GamepadSensorUpdateEvent,
-		GamepadTouchpadButtonEvent, GamepadTouchpadMotionEvent, DropFileEvent, KeyEvent,
+		GamepadTouchpadButtonEvent, GamepadTouchpadMotionEvent, DropFileEvent, IntEvent, KeyEvent,
 		MouseButtonEvent, MouseMotionEvent, MouseWheelEvent, QuitEvent, RecordEvent, UnkownEvent,
 		WindowEvent, WindowMinimizedEvent, WindowMaximizedEvent, WindowFocusEvent, WindowMoveEvent,
 		WindowCloseEvent, WindowResizeEvent, WindowShownEvent, WindowHiddenEvent {
@@ -131,6 +132,14 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 				timestamp: timestamp
 				window_id: window_id
 				path: split[offset]
+			}
+		}
+		'IntEvent' {
+			IntEvent{
+				timestamp: timestamp
+				window_id: window_id
+				id: split[offset].int()
+				value: split[offset + 1].int()
 			}
 		}
 		'KeyEvent' {
@@ -247,6 +256,17 @@ pub struct UnkownEvent {
 
 fn (e UnkownEvent) serialize_as_playback_string() string {
 	return ''
+}
+
+pub struct IntEvent {
+	ShyEvent
+pub:
+	id    int
+	value int
+}
+
+fn (e IntEvent) serialize_as_playback_string() string {
+	return '${e.id},${e.value}'
 }
 
 pub struct KeyEvent {

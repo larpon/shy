@@ -227,6 +227,16 @@ fn (mut e Events) send_record_event() {
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
 
+// send_int_event sends an IntEvent
+pub fn (mut e Events) send_int_event(id int, value int) {
+	e.send(IntEvent{
+		timestamp: e.shy.ticks()
+		window_id: e.shy.wm().active_window_id()
+		id: id
+		value: value
+	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
+}
+
 // import sdl
 // import manymouse as mm
 
