@@ -226,7 +226,7 @@ pub fn (mut a Assets) update() {
 				// println('Job #${job.id} progress ${job.progress * 100}% status ${job.status}')
 				if job.status == .running || job.status == .done {
 					source := a.in_progress[u32(job.id)] or { panic('Asset not in progress') }
-					mut asset := a.get[&Asset](source) or { panic('Asset not on cache') }
+					mut asset := a.get[&Asset](source) or { panic('Asset not in cache') }
 					if job.data.size > 0 {
 						chunk := job.data.chunk
 						size := job.data.size
