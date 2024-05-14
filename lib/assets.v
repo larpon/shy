@@ -257,7 +257,20 @@ pub fn (mut a Assets) update() {
 		source := alo.source
 		path := match source {
 			string {
-				'file://${source}'
+				if os.is_file(source) {
+					'file://${source}'
+				} else {
+					eprintln('${@STRUCT}.${@FN}: error converting "${source}" to `fetch` compatible source"')
+					''
+				}
+			}
+			TaggedSource {
+				if os.is_file(source.str()) {
+					'file://${source.str()}'
+				} else {
+					eprintln('${@STRUCT}.${@FN}: error converting "${source.str()}" to `fetch` compatible source')
+					''
+				}
 			}
 			else {
 				''
