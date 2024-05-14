@@ -136,7 +136,7 @@ pub fn (mut ip Input) remove_gamepad(n i32) {
 			sdl.game_controller_close(gamepad.handle)
 			ip.shy.log.gdebug('${@STRUCT}.${@FN}', 'removing controller ${gamepad.id}')
 			ip.gamepads.delete(index)
-			unsafe { free(gamepad) }
+			unsafe { shy_free(gamepad) }
 			return
 		}
 	}
