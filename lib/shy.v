@@ -49,14 +49,14 @@ struct ShyFrame {
 	ShyStruct
 }
 
-@[if !prod]
+@[if !prod; inline]
 fn (mut sf ShyFrame) begin() {
 	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 	assert sf.shy.state.rendering, '${@STRUCT}.${@FN}' +
 		' can only be called inside a .frame() call'
 }
 
-@[if !prod]
+@[if !prod; inline]
 fn (mut sf ShyFrame) end() {
 	assert !isnil(sf.shy), '${@STRUCT}.${@FN}' + 'shy is null'
 	assert sf.shy.state.rendering, '${@STRUCT}.${@FN}' +
@@ -114,6 +114,7 @@ pub fn (mut s Shy) init() ! {
 	s.timer.start()
 }
 
+@[inline]
 pub fn (mut s Shy) reset() ! {
 	s.alarms.reset()!
 	s.api.reset()!

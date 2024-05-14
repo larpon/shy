@@ -35,10 +35,11 @@ pub fn (mut e Easy) init() ! {
 	// e.particle_systems TODO init a limited amount of systems
 }
 
+@[manualfree]
 pub fn (mut e Easy) shutdown() ! {
 	for mut ps in e.particle_systems {
 		ps.free()
-		// free(ps)
+		unsafe { shy.shy_free(ps) }
 	}
 	e.particle_systems.clear()
 }
@@ -624,6 +625,7 @@ pub:
 	meta ImageMetaData
 }
 
+@[inline]
 pub fn (ei &Image) draw() {
 	if image := ei.shy.assets().get[shy.Image](ei.source) {
 		draw := ei.shy.draw()
@@ -735,6 +737,12 @@ pub fn (e &Easy) load(alo shy.AssetLoadOptions) !&shy.Asset {
 	return assets.load(alo)!
 }
 
+// unload unloads a `shy.Asset`.
+pub fn (e &Easy) unload(auo shy.AssetUnloadOptions) ! {
+	mut assets := e.shy.assets()
+	assets.unload(auo)!
+}
+
 // get returns a reference to a `shy.Asset`.
 // NOTE The asset may not be fully loaded depending on the load options passed.
 @[inline]
@@ -779,12 +787,6 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 		}
 	}
 	return error('${@STRUCT}.${@FN}: TODO ${ao} type not implemented yet')
-}
-
-// unload unloads a `shy.Asset`.
-pub fn (e &Easy) unload(auo shy.AssetUnloadOptions) ! {
-	mut assets := e.shy.assets()
-	assets.unload(auo)!
 }
 
 @[inline]
