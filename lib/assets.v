@@ -121,7 +121,7 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		}
 	}
 	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@bytes', u64(bytes.len))
-	// TODO preallocated asset pool??
+	// PERFORMANCE: TODO preallocated asset pool??
 	asset := &Asset{
 		shy: a.shy
 		data: bytes
