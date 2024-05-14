@@ -625,6 +625,8 @@ pub fn (s &Size) area() f32 {
 	return s.width * s.height
 }
 
+// mul_scalar returns a new `Size` where `width` and `height` fields are both multiplied by `scalar`.
+// See also: half/0
 pub fn (s Size) mul_scalar(scalar f32) Size {
 	return Size{
 		width: s.width * scalar
