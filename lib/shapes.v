@@ -603,6 +603,7 @@ pub fn (s1 Size) - (s2 Size) Size {
 }
 
 // to_rect converts `Size` to `Rect` with `x` and `y` fields sat to 0.
+@[inline]
 pub fn (s &Size) to_rect() Rect {
 	return Rect{
 		x: 0
@@ -621,12 +622,14 @@ pub fn (s &Size) to_vec2() Vec2[f32] {
 }
 
 // area returns the area of the `Size`, which is calculated as `width * height`
+@[inline]
 pub fn (s &Size) area() f32 {
 	return s.width * s.height
 }
 
 // mul_scalar returns a new `Size` where `width` and `height` fields are both multiplied by `scalar`.
 // See also: half/0
+@[inline]
 pub fn (s Size) mul_scalar(scalar f32) Size {
 	return Size{
 		width: s.width * scalar
@@ -636,6 +639,7 @@ pub fn (s Size) mul_scalar(scalar f32) Size {
 
 // half returns a new `Size` that is half of `Size`.
 // See also: mul_scalar/1
+@[inline]
 pub fn (s &Size) half() Size {
 	return Size{
 		width: s.width * 0.5
