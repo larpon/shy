@@ -329,7 +329,15 @@ pub fn (v Vec2[T]) is_approx_zero(tolerance T) bool {
 	return false
 }
 
+// cast_via returns a version of `v` where all compontents have been cast to `U` and then back to `T`.
+@[inline]
+pub fn (v Vec2[T]) cast_via[U]() Vec2[T] {
+	return Vec2[T]{U(v.x), U(v.y)}
+}
+
 // cast_back returns a version of `v` where all compontents have been cast to `U` and then back to `T`.
+@[deprecated: 'Use cast_via instead']
+@[deprecated_after: '2024-05-11']
 @[inline]
 pub fn (v Vec2[T]) cast_back[U]() Vec2[T] {
 	return Vec2[T]{U(v.x), U(v.y)}
