@@ -4,6 +4,8 @@
 !*.*
 # Unignore all dirs
 !*/
+# Unignore LICENSE files
+!LICENSE
 # Ignore ~ file endings
 *.*~
 # Ignore known binaries for programs and plugins
