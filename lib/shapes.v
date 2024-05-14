@@ -634,6 +634,25 @@ pub fn (s Size) mul_scalar(scalar f32) Size {
 	}
 }
 
+// half returns a new `Size` that is half of `Size`.
+// See also: mul_scalar/1
+pub fn (s &Size) half() Size {
+	return Size{
+		width: s.width * 0.5
+		height: s.height * 0.5
+	}
+}
+
+// cast_via returns a new `Size` where all fields have been cast through `U` and then back to `f32`.
+// Example: assert Size{1.5,1.6}.cast_via[int]() == Size{1,1}
+@[inline]
+pub fn (s &Size) cast_via[U]() Size {
+	return Size{
+		width: U(s.width)
+		height: U(s.height)
+	}
+}
+
 pub enum Anchor {
 	top_left
 	top_center
