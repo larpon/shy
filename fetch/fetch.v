@@ -100,7 +100,7 @@ pub fn (mut l Loader) shutdown() ! {
 
 pub fn (mut l Loader) update() ?JobUpdate {
 	// Send off workload to one of the worker threads
-	for l.job_count < l.threads.len && l.job_queue.len > 1 {
+	for l.job_count < l.threads.len && l.job_queue.len > 0 {
 		load_job := l.job_queue.pop()
 		l.job_count++
 		l.ch_in <- load_job
