@@ -30,6 +30,11 @@ mut:
 
 pub fn (mut a Assets) init() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	$if shy_debug_assets ? {
+		$if !debug {
+			eprintln('Pass `-cg -d shy_debug_assets` to enable asset debug output')
+		}
+	}
 	a.sb.ensure_cap(1024) // NOTE TODO(lmp): this needs attention if no GC is used
 	a.loader.init()!
 }
@@ -49,7 +54,10 @@ pub fn (mut a Assets) shutdown() ! {
 			continue
 		}
 		asset.shutdown()!
-		unsafe { free(&asset) } // <- commenting this will prevent the crash
+	}
+	// BUG: the `free(asset)` can not be done in the function above
+	for _, asset in a.ass {
+		unsafe { free(asset) }
 	}
 	a.ass.clear()
 	for _, mut image in a.image_cache {
@@ -87,7 +95,9 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 			lo: alo
 			status: .loading
 		}
-		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading asynchronously "${source}"')
+		$if shy_debug_assets ? {
+			a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading (asynchronously) "${source}"...')
+		}
 		a.ass[source.str()] = asset
 
 		a.async_load_queue << alo
@@ -95,6 +105,9 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		return asset
 	}
 
+	$if shy_debug_assets ? {
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${source}"...')
+	}
 	mut bytes := []u8{}
 	match source {
 		string {
@@ -128,7 +141,9 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		lo: alo
 		status: .loaded
 	}
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${source}"')
+	$if shy_debug_assets ? {
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${source}"')
+	}
 	// a.cache[&Asset](asset)! // TODO
 	a.ass[source.str()] = asset
 	return asset
@@ -139,6 +154,9 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	source := auo.source
 	source_cache_key := source.cache_key(mut a.sb)
+	$if shy_debug_assets ? {
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'unloading "${source_cache_key}"...')
+	}
 	// BUG: there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Asset.shutdown / Assets.shutdown
 	if mut asset := a.ass[source_cache_key] {
 		a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when deallocating in hot code paths. It is, in general, better to unload data on shutdown. Unloading "${source.str()}"')
@@ -160,6 +178,9 @@ pub fn (mut a Assets) unload(auo AssetUnloadOptions) ! {
 
 		// a.ass[source.str()] = null
 		a.ass.delete(source.str())
+		$if shy_debug_assets ? {
+			a.shy.log.gdebug('${@STRUCT}.${@FN}', 'unloaded "${source_cache_key}"')
+		}
 		return
 	}
 	return error('Asset ${source.str()} not loaded, nothing to unload')
@@ -236,6 +257,9 @@ pub fn (mut a Assets) update() {
 					}
 					asset.progress = job.progress
 					if job.status == .done {
+						$if shy_debug_assets ? {
+							a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded (asynchronously) "${source}"')
+						}
 						asset.status = .loaded
 					}
 				}
@@ -283,8 +307,11 @@ pub fn (mut a Assets) update() {
 				flags: .async
 			)
 			id := u32(handle.id)
-			// println('loading sent off ${id}')
 			a.in_progress[id] = source
+
+			$if shy_debug_assets ? {
+				a.shy.log.gdebug('${@STRUCT}.${@FN}', 'sent off "${path}" to async loading via `shy.fetch`')
+			}
 		}
 
 		/*
@@ -491,6 +518,11 @@ fn (mut a Asset) to_blob(opt BlobOptions) !Blob {
 			assets.blob_cache[a.lo.source.cache_key(mut assets.sb)] = blob
 		}
 	}
+
+	$if shy_debug_assets ? {
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converted Asset ("${a.lo.source}") to Blob')
+	}
+
 	return blob
 }
 
@@ -572,7 +604,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	// println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
 	img_desc.data.subimage[0][0] = gfx.Range{
 		ptr: stb_img.data
-		size: usize(4 * image.width * image.height) // NOTE 4 is not always equal to image.channels count, but sokol_gl contexts expect it
+		size: usize(4 * image.width * image.height) // NOTE: 4 is not always equal to image.channels count, but sokol_gl contexts expect it
 	}
 
 	image.gfx_image = gfx.make_image(&img_desc)
@@ -587,6 +619,11 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 			assets.image_cache[a.lo.source.cache_key(mut assets.sb)] = image
 		}
 	}
+
+	$if shy_debug_assets ? {
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converted Asset ("${a.lo.source}") to Image')
+	}
+
 	return image
 }
 
@@ -620,6 +657,10 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 			assets.sound_cache[a.lo.source.cache_key(mut assets.sb)] = sound
 			// assets.cache[Sound](sound)!
 		}
+	}
+
+	$if shy_debug_assets ? {
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converted Asset ("${a.lo.source}") to Sound ${sound.id}')
 	}
 
 	return sound
@@ -845,6 +886,12 @@ fn (s &Sound) engine() &AudioEngine {
 // play plays the sound.
 pub fn (s &Sound) play() {
 	assert !isnil(s.asset), 'Sound is not initialized'
+	if s.asset.status != .loaded { // TODO: .streaming???
+		$if shy_debug_assets ? {
+			s.asset.shy.log.gdebug('${@STRUCT}.${@FN}', 'Sound ${s.id} Asset is not loaded. Sound.asset.status: ${s.asset.status}')
+		}
+		return
+	}
 	engine := s.engine()
 	engine.set_looping(s.id, s.loop)
 	s.set_volume(s.volume)
@@ -869,8 +916,8 @@ pub fn (s &Sound) play() {
 			})
 		}
 		// Create an alarm to watch for changes to the sound's state
-		// TODO this could probably be made smarter
-		// TODO ... Also it is not good for predictability
+		// TODO: this could probably be made smarter
+		// TODO: ... Also it is not good for predictability
 		aid := s.asset.shy.make_alarm(
 			check: sound_alarm_check
 			user_data: voidptr(s)
@@ -897,12 +944,24 @@ pub fn (s &Sound) set_pitch(pitch f32) {
 
 // is_paused returns true if the sound is paused.
 pub fn (s &Sound) is_paused() bool {
+	if s.asset.status != .loaded {
+		$if shy_debug_assets ? {
+			s.asset.shy.log.gdebug('${@STRUCT}.${@FN}', 'Sound ${s.id} Asset is not loaded. Sound.asset.status: ${s.asset.status}')
+		}
+		return false
+	}
 	return s.paused
 }
 
 // pause pauses the sound.
 pub fn (s &Sound) pause(pause bool) {
 	assert !isnil(s.asset), 'Sound is not initialized'
+	if s.asset.status != .loaded {
+		$if shy_debug_assets ? {
+			s.asset.shy.log.gdebug('${@STRUCT}.${@FN}', 'Sound ${s.id} Asset is not loaded. Sound.asset.status: ${s.asset.status}')
+		}
+		return
+	}
 	engine := s.engine()
 
 	// TODO doesn't work as expected currently
@@ -931,6 +990,12 @@ pub fn (s &Sound) pause(pause bool) {
 // is_looping returns `true` if the sound is looping, `false` otherwise.
 pub fn (s &Sound) is_looping() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
+	if s.asset.status != .loaded {
+		$if shy_debug_assets ? {
+			s.asset.shy.log.gdebug('${@STRUCT}.${@FN}', 'Sound ${s.id} Asset is not loaded. Sound.asset.status: ${s.asset.status}')
+		}
+		return false
+	}
 	engine := s.engine()
 	id := s.id
 	if s.id_end > 0 {
@@ -946,6 +1011,12 @@ pub fn (s &Sound) is_looping() bool {
 // is_playing returns `true` if the sound is playing, `false` otherwise.
 pub fn (s &Sound) is_playing() bool {
 	assert !isnil(s.asset), 'Sound is not initialized'
+	if s.asset.status != .loaded {
+		$if shy_debug_assets ? {
+			s.asset.shy.log.gdebug('${@STRUCT}.${@FN}', 'Sound ${s.id} Asset is not loaded. Sound.asset.status: ${s.asset.status}')
+		}
+		return false
+	}
 	engine := s.engine()
 	assert !isnil(engine), 'Sound engine is not initialized'
 	id := s.id
@@ -962,6 +1033,12 @@ pub fn (s &Sound) is_playing() bool {
 // stop stops the sound, if it is playing.
 pub fn (s &Sound) stop() {
 	assert !isnil(s.asset), 'Sound is not initialized'
+	if s.asset.status != .loaded {
+		$if shy_debug_assets ? {
+			s.asset.shy.log.gdebug('${@STRUCT}.${@FN}', 'Sound ${s.id} Asset is not loaded. Sound.asset.status: ${s.asset.status}')
+		}
+		return
+	}
 	engine := s.engine()
 	engine.stop(s.id)
 	engine.seek_to_pcm_frame(s.id, 0)
