@@ -231,9 +231,9 @@ pub fn (a &Assets) get[T](source AssetSource) !T {
 		// t := T{}
 		// tof := typeof(t).name
 		tof := 'TODO'
-		return error('${@STRUCT}.${@FN}' + ': "${source}" of type ${tof} is not supported')
+		return error('${@STRUCT}.${@FN}: "${source}" of type ${tof} is not supported')
 	}
-	return error('${@STRUCT}.${@FN}: "${source}" is not available. Assets can be loaded with ${@STRUCT}.load(...)')
+	return error('${@STRUCT}.${@FN}: "${source}" is not available in cached data. Assets can be loaded and cached with ${@STRUCT}.load(...)')
 }
 
 pub fn (mut a Assets) update() {
