@@ -665,7 +665,6 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 
 	if image := e.shy.assets().get[shy.Image](eic.source) {
-		// if img := e.shy.assets().get_cached_image(eic.source) {
 		mut r := shy.Rect{
 			x: eic.x
 			y: eic.y
@@ -718,6 +717,7 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 			}
 		}
 	}
+
 	// TODO decide if we should have a strict mode of some sort??
 	// panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
 }
