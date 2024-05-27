@@ -210,17 +210,20 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 */
 
 pub fn (a &Assets) get[T](source AssetSource) !T {
+	// TODO:  PERFORMANCE: getting anything from a map each frame is currently leaking AF in V
+	// This function should do better somehow when compiled with `-gc none` ... :(
 	mut sb := a.sb // TODO(lmp): workaround V compile error
+	source_cache_key := source.cache_key(mut sb)
 	$if T is Blob {
-		if blob := a.blob_cache[source.cache_key(mut sb)] {
+		if blob := a.blob_cache[source_cache_key] {
 			return blob
 		}
 	} $else $if T is Image {
-		if image := a.image_cache[source.cache_key(mut sb)] {
+		if image := a.image_cache[source_cache_key] {
 			return image
 		}
 	} $else $if T is Sound {
-		if sound := a.sound_cache[source.cache_key(mut sb)] {
+		if sound := a.sound_cache[source_cache_key] {
 			return sound
 		}
 	} $else $if T is &Asset {
