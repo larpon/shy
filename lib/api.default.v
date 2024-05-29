@@ -49,14 +49,10 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 	}
 	a.system.init()!
 
-	a.assets = &Assets{
-		shy: s
-	}
-	a.assets.init()!
-
 	a.gfx = &GFX{
 		shy: s
 	}
+
 	/*
 	$if !wasm32_emscripten {
 		// NOTE When targeting WASM/emscripten graphics needs to be initialized
@@ -77,6 +73,11 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 		shy: s
 	}
 	a.audio.init()!
+
+	a.assets = &Assets{
+		shy: s
+	}
+	a.assets.init()!
 
 	a.scripts = &Scripts{
 		shy: s
