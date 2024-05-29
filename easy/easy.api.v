@@ -545,11 +545,7 @@ pub fn (q &Quick) play(opt SoundPlayOptions) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 
 	// TODO
-	mut sound := unsafe {
-		q.easy.shy.assets().get[shy.Sound](opt.source) or {
-			panic('${@STRUCT}.${@FN}: TODO ${err}')
-		}
-	}
+	mut sound, _ := q.easy.shy.assets().get[shy.Sound](opt.source)
 
 	sound.pitch = opt.pitch
 	sound.volume = opt.volume
@@ -627,44 +623,48 @@ pub:
 
 @[inline]
 pub fn (ei &Image) draw() {
-	if image := ei.shy.assets().get[shy.Image](ei.source) {
-		draw := ei.shy.draw()
-		mut d := draw.image()
-		d.begin()
-		mut i2d := d.image_2d(image)
-		i2d.x = ei.x
-		i2d.y = ei.y
-		i2d.width = ei.width
-		i2d.height = ei.height
-		i2d.color = ei.color
-		i2d.rotation = ei.rotation
-		i2d.scale = ei.scale
-		i2d.offset = ei.offset
-		i2d.origin = ei.origin
-		i2d.fill_mode = ei.fill_mode
+	image, _ := ei.shy.assets().get[shy.Image](ei.source)
+	draw := ei.shy.draw()
+	mut d := draw.image()
+	d.begin()
+	mut i2d := d.image_2d(image)
+	i2d.x = ei.x
+	i2d.y = ei.y
+	i2d.width = ei.width
+	i2d.height = ei.height
+	i2d.color = ei.color
+	i2d.rotation = ei.rotation
+	i2d.scale = ei.scale
+	i2d.offset = ei.offset
+	i2d.origin = ei.origin
+	i2d.fill_mode = ei.fill_mode
 
-		if ei.region.width >= 0 || ei.region.height >= 0 {
-			src := shy.Rect{
-				x: 0
-				y: 0
-				width: ei.width
-				height: ei.height
-			}
-			dst := ei.region
-			// println('$ei.source:\nsrc: $src dst: $dst')
-			i2d.draw_region(src, dst)
-		} else {
-			i2d.draw()
+	if ei.region.width >= 0 || ei.region.height >= 0 {
+		src := shy.Rect{
+			x: 0
+			y: 0
+			width: ei.width
+			height: ei.height
 		}
-		d.end()
+		dst := ei.region
+		// println('$ei.source:\nsrc: $src dst: $dst')
+		i2d.draw_region(src, dst)
+	} else {
+		i2d.draw()
 	}
+	d.end()
 }
 
 @[inline]
 pub fn (e &Easy) image(eic ImageConfig) Image {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 
-	if image := e.shy.assets().get[shy.Image](eic.source) {
+	// image, status := e.shy.assets().get[shy.Image](eic.source)
+
+	assets := e.shy.assets()
+	image := assets.get_image_no_matter_what(eic.source)
+	status := shy.AssetGetStatus.ok
+	if status == .ok {
 		mut r := shy.Rect{
 			x: eic.x
 			y: eic.y
@@ -747,8 +747,11 @@ pub fn (e &Easy) unload(auo shy.AssetUnloadOptions) ! {
 // NOTE The asset may not be fully loaded depending on the load options passed.
 @[inline]
 pub fn (e &Easy) get(source shy.AssetSource) !&shy.Asset {
-	mut assets := e.shy.assets()
-	return assets.get[&shy.Asset](source)!
+	asset, status := e.shy.assets().get[shy.AssetRef](source)
+	if status == .error {
+		return error('Easy.get: Asset not found')
+	}
+	return asset.asset
 }
 
 // get returns a reference to a `shy.Asset`.
@@ -756,8 +759,7 @@ pub fn (e &Easy) get(source shy.AssetSource) !&shy.Asset {
 @[inline]
 pub fn (q &Quick) get(source shy.AssetSource) !&shy.Asset {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
-	assets := q.easy.shy.assets()
-	return assets.get[&shy.Asset](source)!
+	return q.easy.get(source)!
 }
 
 @[inline]
@@ -772,13 +774,11 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 		}
 		shy.ImageOptions {
 			// TODO e.shy.assets.is_cached(...) ???
-			if _ := assets.get[shy.Image](ao.source) {
-				// if _ := assets.get_cached_image(ao.source) {
-				// assets.get[&shy.Asset](ao.source)
+			_, status := assets.get[shy.Image](ao.source)
+			if status == .ok {
 				return
 			}
 			_ := asset.to[shy.Image](ao)!
-			// return image
 			return
 		}
 		shy.SoundOptions {

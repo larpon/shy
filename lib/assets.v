@@ -26,6 +26,11 @@ mut:
 	async_load_queue []AssetLoadOptions
 	in_progress      map[u32]AssetSource
 	loader           fetch.Loader
+	//
+	error_asset Asset
+	error_sound Sound
+	error_image Image
+	error_blob  Blob
 }
 
 pub fn (mut a Assets) init() ! {
@@ -37,6 +42,7 @@ pub fn (mut a Assets) init() ! {
 	}
 	a.sb.ensure_cap(1024) // NOTE TODO(lmp): this needs attention if no GC is used
 	a.loader.init()!
+	a.load_error_assets()!
 }
 
 pub fn (mut a Assets) shutdown() ! {
@@ -78,6 +84,35 @@ pub fn (mut a Assets) shutdown() ! {
 	unsafe { a.sb.free() }
 }
 
+fn (mut a Assets) load_error_assets() ! {
+	a.error_asset = Asset{
+		shy: a.shy
+		data: [u8(0xD), 0xE, 0xA, 0xD]
+		lo: AssetLoadOptions{}
+		status: .error
+	}
+	ass_image := a.load(
+		source: lib.c_embedded_asset_error_image
+	)!
+	a.error_image = ass_image.to[Image](ImageOptions{
+		source: lib.c_embedded_asset_error_image
+	})!
+
+	ass_blob := a.load(
+		source: lib.c_embedded_asset_error_blob
+	)!
+	a.error_blob = ass_blob.to[Blob](BlobOptions{
+		source: lib.c_embedded_asset_error_blob
+	})!
+
+	ass_sound := a.load(
+		source: lib.c_embedded_asset_error_sound
+	)!
+	a.error_sound = ass_sound.to[Sound](SoundOptions{
+		source: lib.c_embedded_asset_error_sound
+	})!
+}
+
 // load loads a binary blob from a variety of sources and return
 // a reference to an `Asset`.
 // See also: unload
@@ -90,10 +125,12 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
 
 	if alo.io.has(.async) {
+		file_size := int(os.file_size(source.str()))
 		asset := &Asset{
 			shy: a.shy
 			lo: alo
 			status: .loading
+			data: []u8{cap: file_size}
 		}
 		$if shy_debug_assets ? {
 			a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading (asynchronously) "${source}"...')
@@ -118,10 +155,16 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 			bytes = os.read_bytes(source) or {
 				return error('${@STRUCT}.${@FN}: "${source}" could not be loaded')
 			}
+			$if shy_debug_assets ? {
+				a.shy.log.gdebug('${@STRUCT}.${@FN}', 'read successfully from string')
+			}
 		}
 		embed_file.EmbedFileData {
 			analyse.count('${@MOD}.${@STRUCT}.${@FN}(embedded)', 1)
 			bytes = source.to_bytes()
+			$if shy_debug_assets ? {
+				a.shy.log.gdebug('${@STRUCT}.${@FN}', 'read successfully from embedded data')
+			}
 		}
 		TaggedSource {
 			if !os.is_file(source.str()) {
@@ -130,6 +173,9 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 			analyse.count('${@MOD}.${@STRUCT}.${@FN}(filesystem)', 1)
 			bytes = os.read_bytes(source.str()) or {
 				return error('${@STRUCT}.${@FN}: "${source.str()}" could not be loaded')
+			}
+			$if shy_debug_assets ? {
+				a.shy.log.gdebug('${@STRUCT}.${@FN}', 'read successfully from tagged string')
 			}
 		}
 	}
@@ -142,7 +188,7 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		status: .loaded
 	}
 	$if shy_debug_assets ? {
-		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded "${source}"')
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded ~${u64(bytes.len / 1024)} kB from "${source}"')
 	}
 	// a.cache[&Asset](asset)! // TODO
 	a.ass[source.str()] = asset
@@ -209,34 +255,79 @@ pub fn (mut a Assets) cache[T](asset T) ! {
 }
 */
 
-pub fn (a &Assets) get[T](source AssetSource) !T {
+const c_embedded_asset_error_blob = $embed_file('../assets/blobs/dead')
+const c_embedded_asset_error_image = $embed_file('../assets/images/error.png')
+const c_embedded_asset_error_sound = $embed_file('../assets/sfx/error.flac')
+
+pub enum AssetGetStatus {
+	error
+	ok
+}
+
+pub struct AssetRef {
+pub:
+	asset &Asset
+}
+
+pub fn (a &Assets) get_image_no_matter_what(source AssetSource) Image {
+	mut sb := unsafe { a.sb }
+	source_cache_key := source.cache_key(mut sb)
+	if image := a.image_cache[source_cache_key] {
+		return image
+	}
+	return a.error_image
+}
+
+pub fn (a &Assets) get[T](source AssetSource) (T, AssetGetStatus) {
 	// TODO:  PERFORMANCE: getting anything from a map each frame is currently leaking AF in V
 	// This function should do better somehow when compiled with `-gc none` ... :(
-	mut sb := a.sb // TODO(lmp): workaround V compile error
+	// There's multiple things that suck currently in this whole setup
+	// string interpolation in error('${leak}') leaks and `if value := amap[key] {..}` leaks...
+
+	mut sb := unsafe { a.sb }
 	source_cache_key := source.cache_key(mut sb)
 	$if T is Blob {
 		if blob := a.blob_cache[source_cache_key] {
-			return blob
+			return blob, AssetGetStatus.ok
 		}
+		return a.error_blob, AssetGetStatus.error
 	} $else $if T is Image {
 		if image := a.image_cache[source_cache_key] {
-			return image
+			return image, AssetGetStatus.ok
 		}
+		return a.error_image, AssetGetStatus.error
 	} $else $if T is Sound {
 		if sound := a.sound_cache[source_cache_key] {
-			return sound
+			return sound, AssetGetStatus.ok
 		}
-	} $else $if T is &Asset {
+		return a.error_sound, AssetGetStatus.error
+	} $else $if T is AssetRef {
 		if asset := a.ass[source.str()] {
-			return asset
+			return AssetRef{
+				asset: asset
+			}, AssetGetStatus.ok
 		}
-	} $else {
-		// t := T{}
-		// tof := typeof(t).name
-		tof := 'TODO'
-		return error('${@STRUCT}.${@FN}: "${source}" of type ${tof} is not supported')
+		return AssetRef{
+			asset: &a.error_asset
+		}, AssetGetStatus.error
 	}
-	return error('${@STRUCT}.${@FN}: "${source}" is not available in cached data. Assets can be loaded and cached with ${@STRUCT}.load(...)')
+	// BUG:
+	// V BUG galore https://github.com/vlang/v/issues/21594
+	// $else $if T is &Asset {
+	// 	if asset := a.ass[source.str()] {
+	// 		return asset, AssetGetStatus.ok
+	// 	}
+	// 	return &a.error_asset, AssetGetStatus.error
+	// }
+	$else {
+		$compile_error('Asset.get[T]: only retreival of Blob, Image, Sound and &Asset is currently supported')
+	}
+	// Should not could be reached:
+
+	// NOTE: Do not use string interpolation in these error returns, they leak with `-gc none`
+	// return error('${@STRUCT}.${@FN}: "${source}" is not available in cached data. assets can be loaded and cached with ${@struct}.load(...)') <- no go
+
+	return T{}, AssetGetStatus.error
 }
 
 pub fn (mut a Assets) update() {
@@ -250,7 +341,11 @@ pub fn (mut a Assets) update() {
 				// println('Job #${job.id} progress ${job.progress * 100}% status ${job.status}')
 				if job.status == .running || job.status == .done {
 					source := a.in_progress[u32(job.id)] or { panic('Asset not in progress') }
-					mut asset := a.get[&Asset](source) or { panic('Asset not in cache') }
+					assref, status := a.get[AssetRef](source)
+					if status == .error {
+						panic('Asset not in cache')
+					}
+					mut asset := assref.asset
 					if job.data.size > 0 {
 						chunk := job.data.chunk
 						size := job.data.size
@@ -416,7 +511,7 @@ pub enum AssetIOHints {
 
 pub struct AssetLoadOptions {
 pub:
-	source AssetSource
+	source AssetSource // BUG: @[required]
 	io     AssetIOHints = .cache
 }
 
@@ -455,11 +550,12 @@ pub fn (mut a Asset) shutdown() ! {
 }
 
 // to converts `Asset`'s `.data` into T and return it.
-pub fn (mut a Asset) to[T](ao AssetOptions) !T {
+pub fn (a &Asset) to[T](ao AssetOptions) !T {
+	mut muta := unsafe { a }
 	$if T is Blob {
 		match ao {
 			BlobOptions {
-				return a.to_blob(ao)!
+				return muta.to_blob(ao)!
 			}
 			else {
 				t := T{}
@@ -469,7 +565,7 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 	} $else $if T is Image {
 		match ao {
 			ImageOptions {
-				return a.to_image(ao)!
+				return muta.to_image(ao)!
 			}
 			else {
 				t := T{}
@@ -479,7 +575,7 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 	} $else $if T is Sound {
 		match ao {
 			SoundOptions {
-				return a.to_sound(ao)!
+				return muta.to_sound(ao)!
 			}
 			else {
 				t := T{}
@@ -487,7 +583,7 @@ pub fn (mut a Asset) to[T](ao AssetOptions) !T {
 			}
 		}
 	} $else {
-		$compile_error('Asset.to[T]: only convertion to Image and Sound is currently supported')
+		$compile_error('Asset.to[T]: only convertion to Image, Sound and Blob is currently supported')
 	}
 	// This should never be reached
 	t := T{}
@@ -500,7 +596,8 @@ fn (mut a Asset) to_blob(opt BlobOptions) !Blob {
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 
 	if opt.io.has(.cache) {
-		if blob := a.shy.assets().get[Blob](a.lo.source) {
+		blob, status := a.shy.assets().get[Blob](a.lo.source)
+		if status == .ok {
 			return blob
 		}
 	}
@@ -535,7 +632,8 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 
 	if opt.io.has(.cache) {
-		if image := a.shy.assets().get[Image](a.lo.source) {
+		image, status := a.shy.assets().get[Image](a.lo.source)
+		if status == .ok {
 			return image
 		}
 	}
@@ -634,7 +732,8 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 	if opt.io.has(.cache) {
-		if sound := a.shy.assets().get[Sound](a.lo.source) {
+		sound, status := a.shy.assets().get[Sound](a.lo.source)
+		if status == .ok {
 			return sound
 		}
 	}
