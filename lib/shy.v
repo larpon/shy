@@ -222,6 +222,18 @@ pub enum VetArea {
 	hot_code
 }
 
+fn version() string {
+	mut v := '0.0.0'
+	vmod_file := @VMOD_FILE
+	if vmod_file.len > 0 {
+		if vmod_file.contains('version:') {
+			v = vmod_file.all_after('version:').all_before('\n').replace("'", '').replace('"',
+				'').trim_space()
+		}
+	}
+	return v
+}
+
 @[if shy_vet ?]
 pub fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string) {
 	mut prefix := caller + ' '
