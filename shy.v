@@ -5,7 +5,10 @@ module main
 
 import os
 import flag
+import term
 import shy.cli
+
+const c_embedded_shy_sixel_logo = $embed_file('assets/images/shy.six')
 
 fn main() {
 	// Run any sub-commands on the spot if found in args
@@ -31,6 +34,9 @@ fn main() {
 	}
 
 	if opt.dump_usage {
+		if term.supports_sixel() {
+			println(c_embedded_shy_sixel_logo.to_bytes().bytestr())
+		}
 		println(fp.usage())
 		exit(0)
 	}
