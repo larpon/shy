@@ -271,7 +271,9 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.window.windowID)
 			win := s.window(shy_window_id) or {
 				s.log.gerror('${@STRUCT}.${@FN}', 'unable to locate SDL/Shy window ${sdl_event.window.windowID}/${shy_window_id}: ${err}')
-				panic('${@STRUCT}.${@FN} unable locate SDL/Shy window ${sdl_event.window.windowID}/${shy_window_id}: ${err}')
+				s.log.gwarn('${@STRUCT}.${@FN}', 'dropping handling of window event ${sdl_event.window.windowID}/${shy_window_id}, returning unknown...')
+				// panic('${@STRUCT}.${@FN} unable locate SDL/Shy window ${sdl_event.window.windowID}/${shy_window_id}: ${err}')
+				return shy_event
 			}
 
 			match wevid {
