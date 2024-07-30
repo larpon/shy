@@ -154,6 +154,7 @@ pub fn (mut a EasyApp) event(e shy.Event) {
 
 @[params]
 pub struct AssetLoadOption {
+pub:
 	tag ?string
 }
 
