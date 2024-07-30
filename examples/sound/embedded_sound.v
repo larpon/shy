@@ -4,7 +4,6 @@
 module main
 
 import shy.lib as shy
-import shy.easy
 import shy.embed
 
 const embedded_music_file = $embed_file('../../assets/music/shy_chords_loop.flac')

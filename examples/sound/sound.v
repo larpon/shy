@@ -4,7 +4,6 @@
 module main
 
 import shy.lib as shy
-import shy.easy
 import shy.embed
 
 fn main() {
