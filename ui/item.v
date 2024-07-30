@@ -24,11 +24,11 @@ mut:
 	// ... which was quickly fixed but one of them couldn't be made as an MRE (minimal reproducible example) - so it's
 	// a target of regression: https://github.com/vlang/v/commit/2119a24 <- this commit has the fix.
 	parent   &Node = unsafe { nil }
-	body     []&Node
 	on_event []OnEventFn
 	// nice to have state
 	hovered_by_pointer_device bool
 pub mut:
+	body []&Node
 	// Transformations
 	rotation f32
 	scale    f32 = 1.0

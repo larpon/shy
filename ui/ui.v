@@ -22,6 +22,7 @@ pub fn new(config UIConfig) !&UI {
 
 @[params]
 pub struct UIConfig {
+pub:
 	shy   &shy.Shy
 	easy  &easy.Easy
 	root  &Node
