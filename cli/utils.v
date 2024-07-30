@@ -44,14 +44,16 @@ fn version() string {
 }
 
 // run_subcommand runs any sub-command detected in `args`.
-pub fn run_subcommand(args []string) ! {
-	nocache := args.contains('--nocache')
-	for subcmd in subcmds {
-		if subcmd in args {
-			// First encountered known sub-command is executed on the spot.
-			launch_cmd(args[args.index(subcmd)..], nocache)!
+pub fn run_subcommand(args []string, opts Options) ! {
+	if args.len > 1 && !args[1].starts_with('-') && args[1] in subcmds {
+		sub_command := args[1]
+		if sub_command == 'doctor' {
+			doctor(opts)
 			exit(0)
 		}
+		// First encountered known sub-command is executed on the spot.
+		launch_cmd(args[args.index(sub_command)..], opts.nocache)!
+		exit(0)
 	}
 }
 

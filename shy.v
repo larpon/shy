@@ -3,7 +3,6 @@
 // that can be found in the LICENSE file.
 module main
 
-import os
 import flag
 import term
 import shy.cli
@@ -11,15 +10,11 @@ import shy.cli
 const c_embedded_shy_sixel_logo = $embed_file('assets/images/shy.six')
 
 fn main() {
-	// Run any sub-commands on the spot if found in args
-	cli.run_subcommand(os.args) or {
-		eprintln(err)
-		exit(1)
-	}
+	args := arguments()
+
 	// Collect user flags in an extended manner.
 	// Start with defaults -> merge over SHY_FLAGS -> merge over cmdline flags -> merge .shy entries.
 	mut opt := cli.Options{}
-	mut fp := &flag.FlagParser(unsafe { nil })
 
 	opt = cli.options_from_env(opt) or {
 		eprintln('Error while parsing `SHY_FLAGS`: ${err}')
@@ -27,8 +22,8 @@ fn main() {
 		exit(1)
 	}
 
-	opt, fp = cli.args_to_options(os.args, opt) or {
-		eprintln('Error while parsing `os.args`: ${err}')
+	opt = cli.args_to_options(args, opt) or {
+		eprintln('Error while parsing arguments: ${err}')
 		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
 		exit(1)
 	}
@@ -37,35 +32,29 @@ fn main() {
 		if term.supports_sixel() {
 			println(c_embedded_shy_sixel_logo.to_bytes().bytestr())
 		}
-		println(fp.usage())
+		println(flag.to_doc[cli.Options](
+			name: cli.exe_short_name
+			version: '${cli.exe_version} (${cli.exe_git_hash})'
+			description: cli.exe_description
+			options: flag.DocOptions{
+				compact: true
+			}
+		)!)
 		exit(0)
 	}
 
 	// All flags after this requires an input argument
-	if fp.args.len == 0 {
+	if args.len == 1 {
 		eprintln('No arguments given')
 		eprintln('Use `shy -h` to see all flags')
 		exit(1)
 	}
 
-	// TODO
-	if opt.additional_args.len > 1 {
-		if opt.additional_args[0] == 'xxx' {
-			// xxx_arg := opt.additional_args[1]
-			exit(1)
-		}
+	// Run any sub-commands if found on the spot if found in args
+	cli.run_subcommand(args, opt) or {
+		eprintln(err)
+		exit(1)
 	}
-
-	// Call the doctor at this point
-	if opt.additional_args.len > 0 {
-		if opt.additional_args[0] == 'doctor' {
-			cli.doctor(opt)
-			exit(0)
-		}
-	}
-
-	input := fp.args.last()
-	opt.input = input
 
 	cli.validate_input(opt.input)!
 

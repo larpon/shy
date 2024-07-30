@@ -190,7 +190,7 @@ pub fn (opt &Options) to_export_options() export.Options {
 		verbosity: opt.verbosity
 		work_dir: opt.work_dir
 		parallel: opt.parallel
-		cache: opt.cache
+		cache: !opt.nocache
 		gl_version: gl_version
 		format: format
 		input: opt.input

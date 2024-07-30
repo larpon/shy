@@ -7,25 +7,24 @@ import flag
 pub struct Options {
 pub:
 	// These fields would make little sense to change during a run
-	verbosity int
-	work_dir  string = work_directory
+	verbosity int    @[only: v; repeats; xdoc: 'Verbosity level 1-3']
+	work_dir  string = work_directory @[xdoc: 'Directory to use for temporary work files']
 	//
-	run        bool
-	parallel   bool = true // Run, what can be run, in parallel
-	cache      bool // defaults to false in os.args/flag parsing phase
-	gl_version string = '3'
+	nocache bool @[xdoc: 'Do not use caching']
 	// Detected environment
-	dump_usage bool
+	run        bool @[ignore]
+	dump_usage bool @[long: help; short: h; xdoc: 'Show this help message and exit']
 pub mut:
 	// I/O
-	input           string
-	output          string
-	additional_args []string // additional_args passed via os.args
-	is_prod         bool
-	c_flags         []string // flags passed to the C compiler(s)
-	v_flags         []string // flags passed to the V compiler
-	assets_extra    []string // list of (extra) paths to assets dirs to include
-	libs_extra      []string
+	input  string @[tail]
+	output string @[short: o; xdoc: 'Path to output (dir/file)']
+	// additional_args []string // additional_args passed via os.args
+	is_prod      bool
+	c_flags      []string @[long: cflag; short: c; xdoc: 'Additional flags for the C compiler']
+	v_flags      []string @[long: flag; short: f; xdoc: 'Additional flags for the V compiler']
+	assets_extra []string @[long: asset; short: a; xdoc: 'Asset dir(s) to include in build']
+	libs_extra   []string @[long: libs; short: l; xdoc: 'Lib dir(s) to include in build']
+	version      bool     @[xdoc: 'Output version information and exit']
 }
 
 // options_from_env returns an `Option` struct filled with flags set via
@@ -35,7 +34,7 @@ pub fn options_from_env(defaults Options) !Options {
 	if env_flags != '' {
 		mut flags := [os.args[0]]
 		flags << string_to_args(env_flags)!
-		opts, _ := args_to_options(flags, defaults)!
+		opts := args_to_options(flags, defaults)!
 		return opts
 	}
 	return defaults
@@ -85,13 +84,12 @@ pub fn (opt &Options) uses_gc() bool {
 
 // args_to_options returns an `Option` merged from (CLI/Shell) `arguments` using `defaults` as
 // values where no value can be obtained from `arguments`.
-pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.FlagParser) {
+pub fn args_to_options(arguments []string, defaults Options) !Options {
 	mut args := arguments.clone()
 
+	// Indentify special flags in args before passing them on
 	mut v_flags := []string{}
 	mut cmd_flags := []string{}
-	// Indentify special flags in args before FlagParser ruin them.
-	// E.g. the -autofree flag will result in dump_usage being called for some weird reason???
 	for special_flag in rip_vflags {
 		if special_flag in args {
 			if special_flag == '-gc' {
@@ -107,41 +105,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 		}
 	}
 
-	mut fp := flag.new_flag_parser(args)
-	fp.application(exe_short_name)
-	fp.version(version_full())
-	fp.description(exe_description)
-	fp.arguments_description(exe_args_description)
-
-	fp.skip_executable()
-
-	mut verbosity := fp.int_opt('verbosity', `v`, 'Verbosity level 1-3') or { defaults.verbosity }
-	if ('-v' in args || 'verbosity' in args) && verbosity == 0 {
-		verbosity = 1
-	}
-
-	mut opt := Options{
-		assets_extra: fp.string_multi('assets', `a`, 'Asset dir(s) to include in build')
-		libs_extra: fp.string_multi('libs', `l`, 'Lib dir(s) to include in build')
-		v_flags: fp.string_multi('flag', `f`, 'Additional flags for the V compiler')
-		c_flags: fp.string_multi('cflag', `c`, 'Additional flags for the C compiler')
-		gl_version: fp.string('gl', 0, defaults.gl_version, 'GL(ES) version to use from any of 2,3,es2,es3')
-		//
-		run: 'run' in cmd_flags
-		dump_usage: fp.bool('help', `h`, defaults.dump_usage, 'Show this help message and exit')
-		cache: !fp.bool('nocache', 0, defaults.cache, 'Do not use build cache')
-		//
-		output: fp.string('output', `o`, defaults.output, 'Path to output (dir/file)')
-		//
-		verbosity: verbosity
-		parallel: !fp.bool('no-parallel', 0, false, 'Do not run tasks in parallel.')
-		//
-		work_dir: defaults.work_dir
-	}
-
-	opt.additional_args = fp.finalize() or {
-		return error('${@FN}: flag parser failed finalizing: ${err}')
-	}
+	mut opt, _ := flag.using(defaults, args)!
 
 	mut c_flags := []string{}
 	c_flags << opt.c_flags
@@ -160,7 +124,7 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 	}
 	opt.v_flags = v_flags
 
-	return opt, fp
+	return opt
 }
 
 // shy_v builds `opt.input` as `v` would have done normally, except
@@ -172,7 +136,7 @@ pub fn (opt &Options) shy_v() ! {
 	mut v_cmd := [
 		v_exe,
 	]
-	if !opt.cache {
+	if opt.nocache {
 		v_cmd << '-nocache'
 	}
 	if opt.is_prod {
@@ -200,7 +164,7 @@ pub fn (opt &Options) shy_v() ! {
 		if opt.run {
 			v_compile_opt := VCompileOptions{
 				verbosity: opt.verbosity
-				cache: opt.cache
+				cache: !opt.nocache
 				flags: opt.v_flags
 				work_dir: os.join_path(opt.work_dir, 'v')
 				input: opt.input

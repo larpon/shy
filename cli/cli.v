@@ -10,16 +10,16 @@ pub const exe_version = version()
 pub const exe_name = os.file_name(os.executable())
 pub const exe_short_name = os.file_name(os.executable()).replace('.exe', '')
 pub const exe_dir = os.dir(os.real_path(os.executable()))
-pub const exe_args_description = 'input
-or:    shy <sub-command> [options] input'
+pub const exe_description = 'Usage: shy [options] input
+or:    shy <sub-command> [options] input
 
-pub const exe_description = 'shy is a module and tool made with love.
+Description: shy is a module and tool made with love.
 It is primarily aimed at V developers roaming the creative corners of coding.
 
 shy can compile, package and deploy V apps for a wide range of platforms like:
 Linux, macOS, Windows, Android and HTML5 (WASM).
 
-The following does the same as if they were passed to the "v" compiler:
+The following does the same as if they were passed to the `v` command:
 
 Flags:
   -autofree, -gc <type>, -g, -cg, -prod, -showcc
@@ -27,13 +27,13 @@ Flags:
 Sub-commands:
   run                       Run the V code
   export                    Export shy based project
-  doctor                    Display useful info about your system for bug reports'
+  doctor                    Display useful info about the system'
 
 pub const exe_git_hash = shy_commit_hash()
 pub const work_directory = shy_tmp_work_dir()
 pub const cache_directory = shy_cache_dir()
 pub const rip_vflags = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', '-showcc']
-pub const subcmds = ['complete', 'test-cleancode', 'export']
+pub const subcmds = ['complete', 'doctor', 'export', 'test-cleancode']
 pub const accepted_input_files = ['.v']
 
 pub const shy_env_vars = [
