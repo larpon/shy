@@ -112,7 +112,7 @@ pub type Color = C.sg_color
 
 // Backend is C.sg_backend
 pub enum Backend {
-	glcore33        = C.SG_BACKEND_GLCORE
+	glcore          = C.SG_BACKEND_GLCORE
 	gles3           = C.SG_BACKEND_GLES3
 	d3d11           = C.SG_BACKEND_D3D11
 	metal_ios       = C.SG_BACKEND_METAL_IOS
