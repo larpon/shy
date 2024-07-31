@@ -112,7 +112,7 @@ pub type Color = C.sg_color
 
 // Backend is C.sg_backend
 pub enum Backend {
-	glcore33        = C.SG_BACKEND_GLCORE33
+	glcore33        = C.SG_BACKEND_GLCORE
 	gles3           = C.SG_BACKEND_GLES3
 	d3d11           = C.SG_BACKEND_D3D11
 	metal_ios       = C.SG_BACKEND_METAL_IOS
@@ -192,8 +192,10 @@ pub enum PixelFormat {
 	etc2_rgb8a1     = C.SG_PIXELFORMAT_ETC2_RGB8A1
 	etc2_rgba8      = C.SG_PIXELFORMAT_ETC2_RGBA8
 	etc2_srgb8a8    = C.SG_PIXELFORMAT_ETC2_SRGB8A8
-	etc2_rg11       = C.SG_PIXELFORMAT_ETC2_RG11
-	etc2_rg11sn     = C.SG_PIXELFORMAT_ETC2_RG11SN
+	eac_r11         = C.SG_PIXELFORMAT_EAC_R11
+	eac_r11sn       = C.SG_PIXELFORMAT_EAC_R11SN
+	eac_rg11        = C.SG_PIXELFORMAT_EAC_RG11
+	eac_rg11sn      = C.SG_PIXELFORMAT_EAC_RG11SN
 	astc_4x4_rgba   = C.SG_PIXELFORMAT_ASTC_4x4_RGBA
 	astc_4x4_srgba  = C.SG_PIXELFORMAT_ASTC_4x4_SRGBA
 	num             = C._SG_PIXELFORMAT_NUM
@@ -215,6 +217,7 @@ pub mut:
 	image_clamp_to_border       bool // border color and clamp-to-border UV-wrap mode is supported
 	mrt_independent_blend_state bool // multiple-render-target rendering can use per-render-target blend state
 	mrt_independent_write_mask  bool // multiple-render-target rendering can use per-render-target color write masks
+	storage_buffer              bool // storage buffers are supported
 }
 
 pub type Features = C.sg_features
@@ -256,11 +259,12 @@ pub enum Usage as u32 {
 
 // BufferType is C.sg_buffer_type
 pub enum BufferType as u32 {
-	_default     = C._SG_BUFFERTYPE_DEFAULT // value 0 reserved for default-init
-	vertexbuffer = C.SG_BUFFERTYPE_VERTEXBUFFER
-	indexbuffer  = C.SG_BUFFERTYPE_INDEXBUFFER
-	_num         = C._SG_BUFFERTYPE_NUM
-	_force_u32   = C._SG_BUFFERTYPE_FORCE_U32 // 0x7FFFFFFF,
+	_default      = C._SG_BUFFERTYPE_DEFAULT // value 0 reserved for default-init
+	vertexbuffer  = C.SG_BUFFERTYPE_VERTEXBUFFER
+	indexbuffer   = C.SG_BUFFERTYPE_INDEXBUFFER
+	storagebuffer = C.SG_BUFFERTYPE_STORAGEBUFFER
+	_num          = C._SG_BUFFERTYPE_NUM
+	_force_u32    = C._SG_BUFFERTYPE_FORCE_U32 // 0x7FFFFFFF,
 }
 
 // IndexType is C.sg_index_type
@@ -803,6 +807,15 @@ pub mut:
 pub type ShaderImageDesc = C.sg_shader_image_desc
 
 @[typedef]
+pub struct C.sg_shader_storage_buffer_desc {
+pub mut:
+	used     bool
+	readonly bool
+}
+
+pub type ShaderStorageBufferDesc = C.sg_shader_storage_buffer_desc
+
+@[typedef]
 pub struct C.sg_shader_sampler_desc {
 pub mut:
 	used         bool
@@ -830,6 +843,7 @@ pub mut:
 	entry        &char = unsafe { nil }
 	d3d11_target &char = unsafe { nil }
 	// TODO 	uniform_blocks [SG_MAX_SHADERSTAGE_UBS]ShaderUniformBlockDesc
+	// TODO 	storage_buffers[SG_MAX_SHADERSTAGE_STORAGEBUFFERS]ShaderStorageBufferDesc;
 	// TODO 	images [SG_MAX_SHADERSTAGE_IMAGES]ShaderImageDesc
 	// TODO 	samplers [SG_MAX_SHADERSTAGE_SAMPLERS]ShaderSamplerDesc
 	// TODO 	image_sampler_pairs [SG_MAX_SHADERSTAGE_IMAGESAMPLERPAIRS]ShaderImageSamplerPairDesc
@@ -1239,6 +1253,7 @@ pub mut:
 	num_set_vertex_buffer          u32
 	num_set_vertex_texture         u32
 	num_set_vertex_sampler_state   u32
+	num_set_fragment_buffer        u32
 	num_set_fragment_texture       u32
 	num_set_fragment_sampler_state u32
 }
