@@ -53,7 +53,7 @@ fn (lf Flag) clean_str() string {
 // Log makes it possible to categorize and color log entries
 pub struct Log {
 mut:
-	flags  Flag = log.default_flags
+	flags  Flag            = log.default_flags
 	buffer strings.Builder = strings.new_builder(4096)
 }
 

@@ -34,7 +34,7 @@ pub struct Anims {
 mut:
 	// running bool
 	paused  bool
-	active  []&IAnimator     = []&IAnimator{cap: 1000} // Should match prealloc
+	active  []&IAnimator     = []&IAnimator{cap: 1000}     // Should match prealloc
 	f32pool []&Animator[f32] = []&Animator[f32]{cap: 1000} // Should match prealloc
 	// f64_pool    []&Animator<f64>
 }

@@ -124,52 +124,52 @@ pub enum Backend {
 
 // PixelFormat is C.sg_pixel_format
 pub enum PixelFormat {
-	default         = C._SG_PIXELFORMAT_DEFAULT // value 0 reserved for default-init
-	@none           = C.SG_PIXELFORMAT_NONE
-	r8              = C.SG_PIXELFORMAT_R8
-	r8sn            = C.SG_PIXELFORMAT_R8SN
-	r8ui            = C.SG_PIXELFORMAT_R8UI
-	r8si            = C.SG_PIXELFORMAT_R8SI
-	r16             = C.SG_PIXELFORMAT_R16
-	r16sn           = C.SG_PIXELFORMAT_R16SN
-	r16ui           = C.SG_PIXELFORMAT_R16UI
-	r16si           = C.SG_PIXELFORMAT_R16SI
-	r16f            = C.SG_PIXELFORMAT_R16F
-	rg8             = C.SG_PIXELFORMAT_RG8
-	rg8sn           = C.SG_PIXELFORMAT_RG8SN
-	rg8ui           = C.SG_PIXELFORMAT_RG8UI
-	rg8si           = C.SG_PIXELFORMAT_RG8SI
-	r32ui           = C.SG_PIXELFORMAT_R32UI
-	r32si           = C.SG_PIXELFORMAT_R32SI
-	r32f            = C.SG_PIXELFORMAT_R32F
-	rg16            = C.SG_PIXELFORMAT_RG16
-	rg16sn          = C.SG_PIXELFORMAT_RG16SN
-	rg16ui          = C.SG_PIXELFORMAT_RG16UI
-	rg16si          = C.SG_PIXELFORMAT_RG16SI
-	rg16f           = C.SG_PIXELFORMAT_RG16F
-	rgba8           = C.SG_PIXELFORMAT_RGBA8
-	srgb8a8         = C.SG_PIXELFORMAT_SRGB8A8
-	rgba8sn         = C.SG_PIXELFORMAT_RGBA8SN
-	rgba8ui         = C.SG_PIXELFORMAT_RGBA8UI
-	rgba8si         = C.SG_PIXELFORMAT_RGBA8SI
-	bgra8           = C.SG_PIXELFORMAT_BGRA8
-	rgb10a2         = C.SG_PIXELFORMAT_RGB10A2
-	rg11b10f        = C.SG_PIXELFORMAT_RG11B10F
-	rgb9e5          = C.SG_PIXELFORMAT_RGB9E5
-	rg32ui          = C.SG_PIXELFORMAT_RG32UI
-	rg32si          = C.SG_PIXELFORMAT_RG32SI
-	rg32f           = C.SG_PIXELFORMAT_RG32F
-	rgba16          = C.SG_PIXELFORMAT_RGBA16
-	rgba16sn        = C.SG_PIXELFORMAT_RGBA16SN
-	rgba16ui        = C.SG_PIXELFORMAT_RGBA16UI
-	rgba16si        = C.SG_PIXELFORMAT_RGBA16SI
-	rgba16f         = C.SG_PIXELFORMAT_RGBA16F
-	rgba32ui        = C.SG_PIXELFORMAT_RGBA32UI
-	rgba32si        = C.SG_PIXELFORMAT_RGBA32SI
-	rgba32f         = C.SG_PIXELFORMAT_RGBA32F
+	default  = C._SG_PIXELFORMAT_DEFAULT // value 0 reserved for default-init
+	@none    = C.SG_PIXELFORMAT_NONE
+	r8       = C.SG_PIXELFORMAT_R8
+	r8sn     = C.SG_PIXELFORMAT_R8SN
+	r8ui     = C.SG_PIXELFORMAT_R8UI
+	r8si     = C.SG_PIXELFORMAT_R8SI
+	r16      = C.SG_PIXELFORMAT_R16
+	r16sn    = C.SG_PIXELFORMAT_R16SN
+	r16ui    = C.SG_PIXELFORMAT_R16UI
+	r16si    = C.SG_PIXELFORMAT_R16SI
+	r16f     = C.SG_PIXELFORMAT_R16F
+	rg8      = C.SG_PIXELFORMAT_RG8
+	rg8sn    = C.SG_PIXELFORMAT_RG8SN
+	rg8ui    = C.SG_PIXELFORMAT_RG8UI
+	rg8si    = C.SG_PIXELFORMAT_RG8SI
+	r32ui    = C.SG_PIXELFORMAT_R32UI
+	r32si    = C.SG_PIXELFORMAT_R32SI
+	r32f     = C.SG_PIXELFORMAT_R32F
+	rg16     = C.SG_PIXELFORMAT_RG16
+	rg16sn   = C.SG_PIXELFORMAT_RG16SN
+	rg16ui   = C.SG_PIXELFORMAT_RG16UI
+	rg16si   = C.SG_PIXELFORMAT_RG16SI
+	rg16f    = C.SG_PIXELFORMAT_RG16F
+	rgba8    = C.SG_PIXELFORMAT_RGBA8
+	srgb8a8  = C.SG_PIXELFORMAT_SRGB8A8
+	rgba8sn  = C.SG_PIXELFORMAT_RGBA8SN
+	rgba8ui  = C.SG_PIXELFORMAT_RGBA8UI
+	rgba8si  = C.SG_PIXELFORMAT_RGBA8SI
+	bgra8    = C.SG_PIXELFORMAT_BGRA8
+	rgb10a2  = C.SG_PIXELFORMAT_RGB10A2
+	rg11b10f = C.SG_PIXELFORMAT_RG11B10F
+	rgb9e5   = C.SG_PIXELFORMAT_RGB9E5
+	rg32ui   = C.SG_PIXELFORMAT_RG32UI
+	rg32si   = C.SG_PIXELFORMAT_RG32SI
+	rg32f    = C.SG_PIXELFORMAT_RG32F
+	rgba16   = C.SG_PIXELFORMAT_RGBA16
+	rgba16sn = C.SG_PIXELFORMAT_RGBA16SN
+	rgba16ui = C.SG_PIXELFORMAT_RGBA16UI
+	rgba16si = C.SG_PIXELFORMAT_RGBA16SI
+	rgba16f  = C.SG_PIXELFORMAT_RGBA16F
+	rgba32ui = C.SG_PIXELFORMAT_RGBA32UI
+	rgba32si = C.SG_PIXELFORMAT_RGBA32SI
+	rgba32f  = C.SG_PIXELFORMAT_RGBA32F
 	// NOTE: when adding/removing pixel formats before DEPTH, also update sokol_app.h/_SAPP_PIXELFORMAT_*
-	depth           = C.SG_PIXELFORMAT_DEPTH
-	depth_stencil   = C.SG_PIXELFORMAT_DEPTH_STENCIL
+	depth         = C.SG_PIXELFORMAT_DEPTH
+	depth_stencil = C.SG_PIXELFORMAT_DEPTH_STENCIL
 	// NOTE: don't put any new compressed format in front of here
 	bc1_rgba        = C.SG_PIXELFORMAT_BC1_RGBA
 	bc2_rgba        = C.SG_PIXELFORMAT_BC2_RGBA
@@ -183,8 +183,8 @@ pub enum PixelFormat {
 	bc6h_rgbuf      = C.SG_PIXELFORMAT_BC6H_RGBUF
 	bc7_rgba        = C.SG_PIXELFORMAT_BC7_RGBA
 	bc7_srgba       = C.SG_PIXELFORMAT_BC7_SRGBA
-	pvrtc_rgb_2bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_2BPP // FIXME: deprecated
-	pvrtc_rgb_4bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_4BPP // FIXME: deprecated
+	pvrtc_rgb_2bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_2BPP  // FIXME: deprecated
+	pvrtc_rgb_4bpp  = C.SG_PIXELFORMAT_PVRTC_RGB_4BPP  // FIXME: deprecated
 	pvrtc_rgba_2bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_2BPP // FIXME: deprecated
 	pvrtc_rgba_4bpp = C.SG_PIXELFORMAT_PVRTC_RGBA_4BPP // FIXME: deprecated
 	etc2_rgb8       = C.SG_PIXELFORMAT_ETC2_RGB8
@@ -344,7 +344,7 @@ pub enum PrimitiveType as u32 {
 // Filter is C.sg_filter
 pub enum Filter as u32 {
 	_default   = C._SG_FILTER_DEFAULT // value 0 reserved for default-init
-	@none      = C.SG_FILTER_NONE // FIXME: deprecated
+	@none      = C.SG_FILTER_NONE     // FIXME: deprecated
 	nearest    = C.SG_FILTER_NEAREST
 	linear     = C.SG_FILTER_LINEAR
 	_num       = C._SG_FILTER_NUM
@@ -424,8 +424,8 @@ pub enum UniformType as u32 {
 // UniformLayout is C.sg_uniform_layout
 pub enum UniformLayout as u32 {
 	_default   = C._SG_UNIFORMLAYOUT_DEFAULT // value 0 reserved for default-init
-	native     = C.SG_UNIFORMLAYOUT_NATIVE // default: layout depends on currently active backend
-	std140     = C.SG_UNIFORMLAYOUT_STD140 // std140: memory layout according to std140
+	native     = C.SG_UNIFORMLAYOUT_NATIVE   // default: layout depends on currently active backend
+	std140     = C.SG_UNIFORMLAYOUT_STD140   // std140: memory layout according to std140
 	_num       = C._SG_UNIFORMLAYOUT_NUM
 	_force_u32 = C._SG_UNIFORMLAYOUT_FORCE_U32 // 0x7FFFFFFF,
 }
@@ -513,23 +513,23 @@ pub enum BlendOp as u32 {
 
 // ColorMask is C.sg_color_mask
 pub enum ColorMask as u32 {
-	_default   = C._SG_COLORMASK_DEFAULT // 0, value 0 reserved for default-init
-	@none      = C.SG_COLORMASK_NONE // 0x10, special value for 'all channels disabled
-	r          = C.SG_COLORMASK_R // 0x1,
-	g          = C.SG_COLORMASK_G // 0x2,
-	rg         = C.SG_COLORMASK_RG // 0x3,
-	b          = C.SG_COLORMASK_B // 0x4,
-	rb         = C.SG_COLORMASK_RB // 0x5,
-	gb         = C.SG_COLORMASK_GB // 0x6,
-	rgb        = C.SG_COLORMASK_RGB // 0x7,
-	a          = C.SG_COLORMASK_A // 0x8,
-	ra         = C.SG_COLORMASK_RA // 0x9,
-	ga         = C.SG_COLORMASK_GA // 0xA,
-	rga        = C.SG_COLORMASK_RGA // 0xB,
-	ba         = C.SG_COLORMASK_BA // 0xC,
-	rba        = C.SG_COLORMASK_RBA // 0xD,
-	gba        = C.SG_COLORMASK_GBA // 0xE,
-	rgba       = C.SG_COLORMASK_RGBA // 0xF,
+	_default   = C._SG_COLORMASK_DEFAULT   // 0, value 0 reserved for default-init
+	@none      = C.SG_COLORMASK_NONE       // 0x10, special value for 'all channels disabled
+	r          = C.SG_COLORMASK_R          // 0x1,
+	g          = C.SG_COLORMASK_G          // 0x2,
+	rg         = C.SG_COLORMASK_RG         // 0x3,
+	b          = C.SG_COLORMASK_B          // 0x4,
+	rb         = C.SG_COLORMASK_RB         // 0x5,
+	gb         = C.SG_COLORMASK_GB         // 0x6,
+	rgb        = C.SG_COLORMASK_RGB        // 0x7,
+	a          = C.SG_COLORMASK_A          // 0x8,
+	ra         = C.SG_COLORMASK_RA         // 0x9,
+	ga         = C.SG_COLORMASK_GA         // 0xA,
+	rga        = C.SG_COLORMASK_RGA        // 0xB,
+	ba         = C.SG_COLORMASK_BA         // 0xC,
+	rba        = C.SG_COLORMASK_RBA        // 0xD,
+	gba        = C.SG_COLORMASK_GBA        // 0xE,
+	rgba       = C.SG_COLORMASK_RGBA       // 0xF,
 	_force_u32 = C._SG_COLORMASK_FORCE_U32 // 0x7FFFFFFF,
 }
 
@@ -565,7 +565,7 @@ pub struct C.sg_depth_attachment_action {
 pub mut:
 	load_action  LoadAction  // default: SG_LOADACTION_CLEAR
 	store_action StoreAction // default: SG_STOREACTION_DONTCARE
-	clear_value  f32 // default: 1.0
+	clear_value  f32         // default: 1.0
 }
 
 pub type DepthAttachmentAction = C.sg_depth_attachment_action
@@ -575,7 +575,7 @@ pub struct C.sg_stencil_attachment_action {
 pub mut:
 	load_action  LoadAction  // default: SG_LOADACTION_CLEAR
 	store_action StoreAction // default: SG_STOREACTION_DONTCARE
-	clear_value  u8 // default: 0
+	clear_value  u8          // default: 0
 }
 
 pub type StencilAttachmentAction = C.sg_stencil_attachment_action
@@ -706,7 +706,7 @@ pub const sg_max_mipmaps = 16
 @[typedef]
 pub struct C.sg_image_data {
 pub mut:
-	subimage [sg_cubeface_num][sg_max_mipmaps]Range
+	subimage [gfx.sg_cubeface_num][gfx.sg_max_mipmaps]Range
 }
 
 pub type ImageData = C.sg_image_data
@@ -1012,36 +1012,36 @@ pub mut:
 	make_shader         fn (const_desc &ShaderDesc, result Shader, user_data voidptr)           // sg_shader_desc*
 	make_pipeline       fn (const_desc &PipelineDesc, result Pipeline, user_data voidptr)       // sg_pipeline_desc*
 	make_attachments    fn (const_desc &AttachmentsDesc, result Attachments, user_data voidptr) // sg_attachments_desc*
-	destroy_buffer      fn (buf Buffer, user_data voidptr)       // buf,
-	destroy_image       fn (img Image, user_data voidptr)        // img,
-	destroy_sampler     fn (smp Sampler, user_data voidptr)      // smp,
-	destroy_shader      fn (shd Shader, user_data voidptr)       // shd,
-	destroy_pipeline    fn (pip Pipeline, user_data voidptr)     // pip,
-	destroy_attachments fn (atts Attachments, user_data voidptr) // atts,
-	update_buffer       fn (buf Buffer, const_data &Range, user_data voidptr)    // buf,
-	update_image        fn (img Image, const_data &ImageData, user_data voidptr) // img,
+	destroy_buffer      fn (buf Buffer, user_data voidptr)                                // buf,
+	destroy_image       fn (img Image, user_data voidptr)                                 // img,
+	destroy_sampler     fn (smp Sampler, user_data voidptr)                               // smp,
+	destroy_shader      fn (shd Shader, user_data voidptr)                                // shd,
+	destroy_pipeline    fn (pip Pipeline, user_data voidptr)                              // pip,
+	destroy_attachments fn (atts Attachments, user_data voidptr)                          // atts,
+	update_buffer       fn (buf Buffer, const_data &Range, user_data voidptr)             // buf,
+	update_image        fn (img Image, const_data &ImageData, user_data voidptr)          // img,
 	append_buffer       fn (buf Buffer, const_data &Range, result int, user_data voidptr) // buf,
 	begin_pass          fn (const_pass &Pass, user_data voidptr) // sg_pass*
 	apply_viewport      fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
 	apply_scissor_rect  fn (x int, y int, width int, height int, origin_top_left bool, user_data voidptr) // x,
-	apply_pipeline      fn (pip Pipeline, user_data voidptr) // pip,
+	apply_pipeline      fn (pip Pipeline, user_data voidptr)             // pip,
 	apply_bindings      fn (const_bindings &Bindings, user_data voidptr) // sg_bindings*
 	apply_uniforms      fn (stage ShaderStage, ub_index int, const_data &Range, user_data voidptr)    // stage,
 	draw                fn (base_element int, num_elements int, num_instances int, user_data voidptr) // base_element,
-	end_pass            fn (user_data voidptr) // user_data)
-	commit              fn (user_data voidptr) // user_data)
-	alloc_buffer        fn (result Buffer, user_data voidptr)       // result,
-	alloc_image         fn (result Image, user_data voidptr)        // result,
-	alloc_sampler       fn (result Sampler, user_data voidptr)      // result,
-	alloc_shader        fn (result Shader, user_data voidptr)       // result,
-	alloc_pipeline      fn (result Pipeline, user_data voidptr)     // result,
-	alloc_attachments   fn (result Attachments, user_data voidptr)  // result,
-	dealloc_buffer      fn (buf_id Buffer, user_data voidptr)       // buf_id,
-	dealloc_image       fn (img_id Image, user_data voidptr)        // img_id,
-	dealloc_sampler     fn (smp_id Sampler, user_data voidptr)      // smp_id,
-	dealloc_shader      fn (shd_id Shader, user_data voidptr)       // shd_id,
-	dealloc_pipeline    fn (pip_id Pipeline, user_data voidptr)     // pip_id,
-	dealloc_attachments fn (atts_id Attachments, user_data voidptr) // atts_id,
+	end_pass            fn (user_data voidptr)                                                   // user_data)
+	commit              fn (user_data voidptr)                                                   // user_data)
+	alloc_buffer        fn (result Buffer, user_data voidptr)                                    // result,
+	alloc_image         fn (result Image, user_data voidptr)                                     // result,
+	alloc_sampler       fn (result Sampler, user_data voidptr)                                   // result,
+	alloc_shader        fn (result Shader, user_data voidptr)                                    // result,
+	alloc_pipeline      fn (result Pipeline, user_data voidptr)                                  // result,
+	alloc_attachments   fn (result Attachments, user_data voidptr)                               // result,
+	dealloc_buffer      fn (buf_id Buffer, user_data voidptr)                                    // buf_id,
+	dealloc_image       fn (img_id Image, user_data voidptr)                                     // img_id,
+	dealloc_sampler     fn (smp_id Sampler, user_data voidptr)                                   // smp_id,
+	dealloc_shader      fn (shd_id Shader, user_data voidptr)                                    // shd_id,
+	dealloc_pipeline    fn (pip_id Pipeline, user_data voidptr)                                  // pip_id,
+	dealloc_attachments fn (atts_id Attachments, user_data voidptr)                              // atts_id,
 	init_buffer         fn (buf_id Buffer, const_desc &BufferDesc, user_data voidptr)            // buf_id,
 	init_image          fn (img_id Image, const_desc &ImageDesc, user_data voidptr)              // img_id,
 	init_sampler        fn (smp_id Sampler, const_desc &SamplerDesc, user_data voidptr)          // smp_id,
@@ -1061,7 +1061,7 @@ pub mut:
 	fail_pipeline       fn (pip_id Pipeline, user_data voidptr)     // pip_id,
 	fail_attachments    fn (atts_id Attachments, user_data voidptr) // atts_id,
 	push_debug_group    fn (const_name &char, user_data voidptr)    // char*
-	pop_debug_group     fn (user_data voidptr) // user_data)
+	pop_debug_group     fn (user_data voidptr)                      // user_data)
 }
 
 pub type TraceHooks = C.sg_trace_hooks
@@ -1070,7 +1070,7 @@ pub type TraceHooks = C.sg_trace_hooks
 pub struct C.sg_slot_info {
 pub mut:
 	state  ResourceState // the current state of this resource slot
-	res_id u32 // type-neutral resource if (e.g. sg_buffer.id)
+	res_id u32           // type-neutral resource if (e.g. sg_buffer.id)
 }
 
 pub type SlotInfo = C.sg_slot_info

@@ -389,12 +389,12 @@ fn (e WindowMaximizedEvent) serialize_as_playback_string() string {
 pub struct MouseMotionEvent {
 	ShyEvent
 pub:
-	which   u16 // The mouse id
+	which   u16          // The mouse id
 	buttons MouseButtons // The current button state
-	x       int // X coordinate, relative to window
-	y       int // Y coordinate, relative to window
-	rel_x   int // The relative motion in the X direction
-	rel_y   int // The relative motion in the Y direction
+	x       int          // X coordinate, relative to window
+	y       int          // Y coordinate, relative to window
+	rel_x   int          // The relative motion in the X direction
+	rel_y   int          // The relative motion in the Y direction
 }
 
 fn (e MouseMotionEvent) serialize_as_playback_string() string {
@@ -404,7 +404,7 @@ fn (e MouseMotionEvent) serialize_as_playback_string() string {
 pub struct MouseButtonEvent {
 	ShyEvent
 pub:
-	which  u16 // The mouse id
+	which  u16         // The mouse id
 	button MouseButton // The mouse button index
 	state  ButtonState
 	clicks u8  // 1 for single-click, 2 for double-click, etc.
@@ -419,11 +419,11 @@ fn (e MouseButtonEvent) serialize_as_playback_string() string {
 pub struct MouseWheelEvent {
 	ShyEvent
 pub:
-	which     u16 // The mouse id
-	x         int // X coordinate, relative to window
-	y         int // Y coordinate, relative to window
-	scroll_x  int // The amount scrolled horizontally, positive to the right and negative to the left
-	scroll_y  int // The amount scrolled vertically, positive away from the user and negative toward the user
+	which     u16                 // The mouse id
+	x         int                 // X coordinate, relative to window
+	y         int                 // Y coordinate, relative to window
+	scroll_x  int                 // The amount scrolled horizontally, positive to the right and negative to the left
+	scroll_y  int                 // The amount scrolled vertically, positive away from the user and negative toward the user
 	direction MouseWheelDirection // When .flipped the values in .x and .y will be opposite. Multiply by -1 to change them back
 }
 

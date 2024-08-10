@@ -47,7 +47,7 @@ pub:
 	pub:
 		title      string = 'Shy Window'
 		fullscreen bool   = os.getenv('SHY_CI_VISUAL_TEST').len > 0 // default: false. Window open in fullscreen, can be toggled at run time. NOTE the specialcase for Shy's visual tests
-		resizable  bool   = true // Window is resizable and can be toggled at run time
+		resizable  bool   = true            // Window is resizable and can be toggled at run time
 		color      Color  = Color{0, 0, 0, 255} // Default background color of the root window
 	}
 	/*

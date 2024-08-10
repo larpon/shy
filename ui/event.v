@@ -84,10 +84,10 @@ pub struct MouseMotionEvent {
 	UIEvent
 pub:
 	buttons MouseButtons // The current button state
-	x       int // X coordinate, relative to window
-	y       int // Y coordinate, relative to window
-	rel_x   int // The relative motion in the X direction
-	rel_y   int // The relative motion in the Y direction
+	x       int          // X coordinate, relative to window
+	y       int          // Y coordinate, relative to window
+	rel_x   int          // The relative motion in the X direction
+	rel_y   int          // The relative motion in the Y direction
 }
 
 pub struct MouseButtonEvent {
@@ -103,10 +103,10 @@ pub:
 pub struct MouseWheelEvent {
 	UIEvent
 pub:
-	x         int // X coordinate, relative to window
-	y         int // Y coordinate, relative to window
-	scroll_x  int // The amount scrolled horizontally, positive to the right and negative to the left
-	scroll_y  int // The amount scrolled vertically, positive away from the user and negative toward the user
+	x         int                 // X coordinate, relative to window
+	y         int                 // Y coordinate, relative to window
+	scroll_x  int                 // The amount scrolled horizontally, positive to the right and negative to the left
+	scroll_y  int                 // The amount scrolled vertically, positive away from the user and negative toward the user
 	direction MouseWheelDirection // When .flipped the values in .x and .y will be opposite. Multiply by -1 to change them back
 }
 

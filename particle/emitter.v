@@ -41,7 +41,7 @@ mut:
 	position_last_frame vec.Vec2[f32]
 
 	system  &System = unsafe { nil }
-	dt      f64    // current delta time this frame
+	dt      f64 // current delta time this frame
 	elapsed f32 // Elapsed time accumulator
 
 	burst_position vec.Vec2[f32] // Center position of the burst

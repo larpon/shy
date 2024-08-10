@@ -29,12 +29,12 @@ pub enum Variant {
 }
 
 pub enum Format {
-	zip // .zip
-	directory // /path/to/output
+	zip          // .zip
+	directory    // /path/to/output
 	appimage_dir // .AppDir
-	appimage // .AppImage
-	android_apk // .apk
-	android_aab // .aab
+	appimage     // .AppImage
+	android_apk  // .apk
+	android_aab  // .aab
 }
 
 pub fn (f Format) ext() string {

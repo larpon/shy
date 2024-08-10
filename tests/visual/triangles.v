@@ -17,7 +17,7 @@ struct App {
 	embed.ExampleApp
 mut:
 	a_r    &shy.Animator[f32] = shy.null
-	origin shy.Anchor = .center
+	origin shy.Anchor         = .center
 }
 
 @[markused]

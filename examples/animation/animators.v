@@ -23,7 +23,7 @@ mut:
 	a_s   &shy.Animator[f32]       = shy.null
 	fa_x  &shy.FollowAnimator[f32] = shy.null
 	fa_y  &shy.FollowAnimator[f32] = shy.null
-	timer time.StopWatch = time.new_stopwatch()
+	timer time.StopWatch           = time.new_stopwatch()
 }
 
 @[markused]

@@ -109,9 +109,9 @@ pub type WriteFn = fn (vm &VM, const_text &char)
 // WrenErrorType is C.WrenErrorType
 pub enum ErrorType {
 	// A syntax or resolution error detected at compile time.
-	compile     = C.WREN_ERROR_COMPILE
+	compile = C.WREN_ERROR_COMPILE
 	// The error message for a runtime error.
-	runtime     = C.WREN_ERROR_RUNTIME
+	runtime = C.WREN_ERROR_RUNTIME
 	// One entry of a runtime error's stack trace.
 	stack_trace = C.WREN_ERROR_STACK_TRACE
 }
