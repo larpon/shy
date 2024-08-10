@@ -699,6 +699,8 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	mut smp_desc := gfx.SamplerDesc{
 		wrap_u: opt.wrap_u // .clamp_to_edge
 		wrap_v: opt.wrap_v // .clamp_to_edge
+		min_filter: opt.min_filter // .linear
+		mag_filter: opt.mag_filter // .linear
 	}
 
 	// println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
@@ -903,18 +905,22 @@ mut:
 
 pub type ImageWrap = gfx.Wrap
 
+pub type ImageFilter = gfx.Filter
+
 pub type ResizeValue = Size | f32 | f64
 
 @[params]
 pub struct ImageOptions {
 	AssetLoadOptions
 pub:
-	resize  ResizeValue = f32(1.0)
-	width   int
-	height  int
-	mipmaps int
-	wrap_u  ImageWrap = .clamp_to_edge
-	wrap_v  ImageWrap = .clamp_to_edge
+	resize     ResizeValue = f32(1.0)
+	width      int
+	height     int
+	mipmaps    int
+	wrap_u     ImageWrap   = .clamp_to_edge
+	wrap_v     ImageWrap   = .clamp_to_edge
+	min_filter ImageFilter = .linear
+	mag_filter ImageFilter = .linear
 }
 
 //@[params]
