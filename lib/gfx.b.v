@@ -271,8 +271,8 @@ fn (mut c Context) sokol_gl_init() ! {
 	mut smp_desc := gfx.SamplerDesc{
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
-		min_filter: .nearest
-		mag_filter: .nearest
+		min_filter: .linear
+		mag_filter: .linear
 	}
 	mut off_sampler := gfx.make_sampler(&smp_desc)
 
