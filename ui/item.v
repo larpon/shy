@@ -94,23 +94,23 @@ pub fn (i &Item) visual_state() VisualState {
 
 		// scale := p_vs.scale * i.scale
 		return VisualState{
-			x: p_vs.x + i.Rect.x
-			y: p_vs.y + i.Rect.y
-			width: i.Rect.width
-			height: i.Rect.height
+			x:        p_vs.x + i.Rect.x
+			y:        p_vs.y + i.Rect.y
+			width:    i.Rect.width
+			height:   i.Rect.height
 			rotation: i.rotation
-			scale: i.scale
-			offset: i.offset
-			origin: i.origin
+			scale:    i.scale
+			offset:   i.offset
+			origin:   i.origin
 		}
 	}
 	// No parent, return as-is
 	return VisualState{
-		Rect: i.Rect
+		Rect:     i.Rect
 		rotation: i.rotation
-		scale: i.scale
-		offset: i.offset
-		origin: i.origin
+		scale:    i.scale
+		offset:   i.offset
+		origin:   i.origin
 	}
 }
 
@@ -246,8 +246,8 @@ pub fn (mut pea PointerEventArea) event(e Event) ?&Node {
 			assert !isnil(on_pointer_event)
 			mut pe := PointerEvent{
 				event: e
-				x: ex
-				y: ey
+				x:     ex
+				y:     ey
 			}
 
 			// BUG: pea pointer address is not the same in userspace callbacks?!

@@ -118,8 +118,8 @@ pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
 
 	s.new_timer(
-		loop: .loop
-		loops: loops
+		loop:     .loop
+		loops:    loops
 		duration: delay
 		callback: callback
 	).run()

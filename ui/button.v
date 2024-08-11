@@ -59,7 +59,7 @@ pub fn (mut b Button) draw() {
 		// width: vs.width
 		// height: vs.height
 		origin: shy.Anchor.center
-		text: b.label
+		text:   b.label
 	)
 	// Draw text
 	et.draw()

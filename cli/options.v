@@ -164,10 +164,10 @@ pub fn (opt &Options) shy_v() ! {
 		if opt.run {
 			v_compile_opt := VCompileOptions{
 				verbosity: opt.verbosity
-				cache: !opt.nocache
-				flags: opt.v_flags
-				work_dir: os.join_path(opt.work_dir, 'v')
-				input: opt.input
+				cache:     !opt.nocache
+				flags:     opt.v_flags
+				work_dir:  os.join_path(opt.work_dir, 'v')
+				input:     opt.input
 			}
 
 			v_meta_dump := v_dump_meta(v_compile_opt)!

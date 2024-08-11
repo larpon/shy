@@ -70,7 +70,7 @@ pub fn (mut w WrenVM) init() ! {
 	w.vm.get_variable('shy', 'Shy', 0)
 
 	mut wren_class := WrenClass{
-		vm: w.vm
+		vm:    w.vm
 		class: w.vm.get_slot_handle(0)
 	}
 	wren_class.methods['frame'] = w.vm.make_call_handle('frame(_)')
@@ -159,8 +159,8 @@ pub fn (mut w WrenVM) register_class[T](fn_name string, fn_ptr wren.ForeignMetho
 	w.vm.get_variable(class_name, class_name, 0)
 
 	mut wren_class := WrenClass{
-		vm: w.vm
-		name: class_name
+		vm:    w.vm
+		name:  class_name
 		class: w.vm.get_slot_handle(0)
 	}
 

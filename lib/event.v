@@ -124,53 +124,53 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 			DropTextEvent{
 				timestamp: timestamp
 				window_id: window_id
-				text: split[offset]
+				text:      split[offset]
 			}
 		}
 		'DropFileEvent' {
 			DropFileEvent{
 				timestamp: timestamp
 				window_id: window_id
-				path: split[offset]
+				path:      split[offset]
 			}
 		}
 		'IntEvent' {
 			IntEvent{
 				timestamp: timestamp
 				window_id: window_id
-				id: split[offset].int()
-				value: split[offset + 1].int()
+				id:        split[offset].int()
+				value:     split[offset + 1].int()
 			}
 		}
 		'KeyEvent' {
 			KeyEvent{
 				timestamp: timestamp
 				window_id: window_id
-				which: split[offset].u8()
-				state: ButtonState.from_string(split[offset + 1]) or { ButtonState.up }
-				key_code: keycode_from_string(split[offset + 2])
+				which:     split[offset].u8()
+				state:     ButtonState.from_string(split[offset + 1]) or { ButtonState.up }
+				key_code:  keycode_from_string(split[offset + 2])
 			}
 		}
 		'MouseButtonEvent' {
 			MouseButtonEvent{
 				timestamp: timestamp
 				window_id: window_id
-				which: split[offset].u8()
-				button: MouseButton.from_string(split[offset + 3]) or { MouseButton.unknown }
-				state: ButtonState.from_string(split[offset + 4]) or { ButtonState.up }
-				clicks: split[offset + 5].u8()
-				x: split[offset + 1].int()
-				y: split[offset + 2].int()
+				which:     split[offset].u8()
+				button:    MouseButton.from_string(split[offset + 3]) or { MouseButton.unknown }
+				state:     ButtonState.from_string(split[offset + 4]) or { ButtonState.up }
+				clicks:    split[offset + 5].u8()
+				x:         split[offset + 1].int()
+				y:         split[offset + 2].int()
 			}
 		}
 		'MouseMotionEvent' {
 			MouseMotionEvent{
 				timestamp: timestamp
 				window_id: window_id
-				which: split[offset].u8()
+				which:     split[offset].u8()
 				// buttons: MouseButtons.from_string(split[offset+3]) or { MouseButtons.unknown } // TODO
-				x: split[offset + 1].int()
-				y: split[offset + 2].int()
+				x:     split[offset + 1].int()
+				y:     split[offset + 2].int()
 				rel_x: split[offset + 3].int()
 				rel_y: split[offset + 4].int()
 			}
@@ -179,11 +179,11 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 			MouseWheelEvent{
 				timestamp: timestamp
 				window_id: window_id
-				which: split[offset].u8()
-				x: split[offset + 1].int()
-				y: split[offset + 2].int()
-				scroll_x: split[offset + 3].int()
-				scroll_y: split[offset + 4].int()
+				which:     split[offset].u8()
+				x:         split[offset + 1].int()
+				y:         split[offset + 2].int()
+				scroll_x:  split[offset + 3].int()
+				scroll_y:  split[offset + 4].int()
 				direction: MouseWheelDirection.from_string(split[offset + 5]) or {
 					MouseWheelDirection.normal
 				}
@@ -193,7 +193,7 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 			QuitEvent{
 				timestamp: timestamp
 				window_id: window_id
-				request: split[offset].bool()
+				request:   split[offset].bool()
 			}
 		}
 		'RecordEvent' {

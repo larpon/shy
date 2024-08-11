@@ -33,16 +33,16 @@ pub fn (mut a App) frame(dt f64) {
 	margin := f32(10)
 
 	a.quick.image(
-		x: cx
-		y: cy
+		x:      cx
+		y:      cy
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.bottom_right
 		offset: shy.vec2(-margin, -margin)
 		region: shy.Rect{0, 0, 256, 256}
 	)
 	a.quick.image(
-		x: cx
-		y: cy
+		x:      cx
+		y:      cy
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.bottom_left
 		offset: shy.vec2(margin, -margin)
@@ -50,8 +50,8 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.image(
-		x: cx
-		y: cy
+		x:      cx
+		y:      cy
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.top_left
 		offset: shy.vec2(margin, margin)
@@ -59,8 +59,8 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.image(
-		x: cx
-		y: cy
+		x:      cx
+		y:      cy
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.top_right
 		offset: shy.vec2(-margin, margin)

@@ -72,7 +72,7 @@ pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawSha
 	segments := if config.segments <= 2 { u32(3) } else { config.segments }
 	return DrawShape2DUniformPolygon{
 		...config
-		factor: d2d.factor
+		factor:   d2d.factor
 		segments: segments
 	}
 }

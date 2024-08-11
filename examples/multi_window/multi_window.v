@@ -32,16 +32,16 @@ pub fn (mut a App) frame(dt f64) {
 		color = shy.colors.shy.blue
 	}
 	a.quick.rect(
-		x: (shy.half * win_size.width) - 50
-		y: (shy.half * win_size.height) - 50
-		width: 100
+		x:      (shy.half * win_size.width) - 50
+		y:      (shy.half * win_size.height) - 50
+		width:  100
 		height: 100
-		color: color
+		color:  color
 	)
 
 	a.quick.text(
-		x: win_size.width / 10
-		y: win_size.height / 10
+		x:    win_size.width / 10
+		y:    win_size.height / 10
 		text: 'Window ${win.id}\n(press W to open a new child window)\nMouse: ${mouse.x},${mouse.y}'
 	)
 }
@@ -58,8 +58,8 @@ pub fn (mut a App) event(e shy.Event) {
 			match key {
 				.w {
 					a.window.new_window(
-						title: 'New Shy Window'
-						width: 400
+						title:  'New Shy Window'
+						width:  400
 						height: 300
 					) or { panic(err) }
 				}

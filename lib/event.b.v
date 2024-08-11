@@ -215,7 +215,7 @@ fn (mut e Events) send_quit_event(force_quit bool) {
 	e.send(QuitEvent{
 		timestamp: e.shy.ticks()
 		window_id: e.shy.wm().active_window_id()
-		request: !force_quit
+		request:   !force_quit
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
 
@@ -232,8 +232,8 @@ pub fn (mut e Events) send_int_event(id int, value int) {
 	e.send(IntEvent{
 		timestamp: e.shy.ticks()
 		window_id: e.shy.wm().active_window_id()
-		id: id
-		value: value
+		id:        id
+		value:     value
 	}) or { panic('${@STRUCT}.${@FN}: send failed: ${err}') }
 }
 

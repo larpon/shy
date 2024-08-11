@@ -60,7 +60,7 @@ pub:
 pub fn (d &Draw) shape_2d() DrawShape2D {
 	mut s := d.shy
 	mut d2d := DrawShape2D{
-		shy: s
+		shy:    s
 		factor: d.canvas.factor
 	}
 	d2d.init() or {
@@ -74,7 +74,7 @@ pub fn (d &Draw) shape_2d() DrawShape2D {
 pub fn (d &Draw) text() DrawText {
 	mut s := d.shy
 	mut dt := DrawText{
-		shy: s
+		shy:    s
 		factor: d.canvas.factor
 	}
 	dt.init() or {
@@ -88,9 +88,9 @@ pub fn (d &Draw) text() DrawText {
 pub fn (d &Draw) image() DrawImage {
 	mut s := d.shy
 	mut di := DrawImage{
-		shy: s
+		shy:    s
 		factor: d.canvas.factor
-		draw: unsafe { d }
+		draw:   unsafe { d }
 	}
 	di.init() or {
 		msg := 'initializing DrawImage failed'

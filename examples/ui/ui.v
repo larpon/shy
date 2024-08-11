@@ -26,21 +26,21 @@ pub fn (mut a App) init() ! {
 	a.window.mode = .ui
 
 	root := &ui.Rectangle{
-		width: a.window.width
+		width:  a.window.width
 		height: a.window.height
-		fills: .body
-		body: [
+		fills:  .body
+		body:   [
 			&ui.Button{
-				x: 50
-				y: 50
-				width: 50
+				x:      50
+				y:      50
+				width:  50
 				height: 50
-				label: 'Hello World'
+				label:  'Hello World'
 			},
 		]
 	}
 	a.ui = ui.new(
-		shy: a.shy
+		shy:  a.shy
 		easy: a.easy
 		root: root
 	)!

@@ -42,48 +42,48 @@ pub fn (mut a App) live_frame(dt f64) {
 	rs := f32(0.6) // f32(0.5) //256/512
 
 	a.quick.image(
-		x: cx
-		y: cy
-		width: rw
+		x:      cx
+		y:      cy
+		width:  rw
 		height: rh
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.bottom_right
-		scale: rs
+		scale:  rs
 		offset: shy.vec2(-margin, -margin)
 		region: shy.Rect{0, 0, 256, 256}
 	)
 	a.quick.image(
-		x: cx
-		y: cy
-		width: rw
+		x:      cx
+		y:      cy
+		width:  rw
 		height: rh
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.bottom_left
-		scale: rs
+		scale:  rs
 		offset: shy.vec2(margin, -margin)
 		region: shy.Rect{256, 0, 256, 256}
 	)
 
 	a.quick.image(
-		x: cx
-		y: cy
-		width: rw
+		x:      cx
+		y:      cy
+		width:  rw
 		height: rh
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.top_left
-		scale: rs
+		scale:  rs
 		offset: shy.vec2(margin, margin)
 		region: shy.Rect{256, 256, 256, 256}
 	)
 
 	a.quick.image(
-		x: cx
-		y: cy
-		width: rw
+		x:      cx
+		y:      cy
+		width:  rw
 		height: rh
 		source: a.asset('images/shy.png')
 		origin: shy.Anchor.top_right
-		scale: rs
+		scale:  rs
 		offset: shy.vec2(-margin, margin)
 		region: shy.Rect{0, 256, 256, 256}
 	)

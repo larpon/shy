@@ -29,14 +29,14 @@ pub fn (mut d Draw) init() ! {
 	alpha_pipdesc.label = c'alpha-pipeline'
 
 	alpha_pipdesc.depth = gfx.DepthState{
-		pixel_format: .@none // .depth // .rgba8 //.@none // rgba8
+		pixel_format:  .@none // .depth // .rgba8 //.@none // rgba8
 		write_enabled: true
 		// compare: .less_equal
 	}
 
 	alpha_pipdesc.colors[0] = gfx.ColorTargetState{
 		blend: gfx.BlendState{
-			enabled: true
+			enabled:        true
 			src_factor_rgb: .src_alpha
 			dst_factor_rgb: .one_minus_src_alpha
 		}

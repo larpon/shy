@@ -32,10 +32,10 @@ pub fn (mut di DrawImage) end() {
 pub fn (di DrawImage) image_2d(image &Image) Draw2DImage {
 	return Draw2DImage{
 		factor: di.factor
-		width: image.width
+		width:  image.width
 		height: image.height
-		image: image
-		draw: di.draw
+		image:  image
+		draw:   di.draw
 	}
 	/*
 	// TODO return small default image?
@@ -167,9 +167,9 @@ pub fn (i Draw2DImage) draw() {
 			o_dis_y += i_y - y1y
 			scissor_rect = i.draw.scissor_rect
 			mut scissor := Rect{
-				x: x
-				y: y
-				width: w * i.scale
+				x:      x
+				y:      y
+				width:  w * i.scale
 				height: h * i.scale
 			}
 			scissor = scissor.displaced_from(i.origin)
@@ -192,9 +192,9 @@ pub fn (i Draw2DImage) draw() {
 			if x1 > w {
 				scissor_rect = i.draw.scissor_rect
 				mut scissor := Rect{
-					x: x
-					y: y
-					width: w * i.scale
+					x:      x
+					y:      y
+					width:  w * i.scale
 					height: h * i.scale
 				}
 				scissor = scissor.displaced_from(i.origin)
@@ -210,9 +210,9 @@ pub fn (i Draw2DImage) draw() {
 			if y1 > h {
 				scissor_rect = i.draw.scissor_rect
 				mut scissor := Rect{
-					x: x
-					y: y
-					width: w * i.scale
+					x:      x
+					y:      y
+					width:  w * i.scale
 					height: h * i.scale
 				}
 				scissor = scissor.displaced_from(i.origin)
@@ -225,9 +225,9 @@ pub fn (i Draw2DImage) draw() {
 			if x1 > w || y1 > h {
 				scissor_rect = i.draw.scissor_rect
 				mut scissor := Rect{
-					x: x
-					y: y
-					width: w * i.scale
+					x:      x
+					y:      y
+					width:  w * i.scale
 					height: h * i.scale
 				}
 				scissor = scissor.displaced_from(i.origin)
@@ -292,9 +292,9 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	h := i.image.height
 
 	used_dst := Rect{
-		x: dst.x * i.factor
-		y: dst.y * i.factor
-		width: dst.width * i.factor
+		x:      dst.x * i.factor
+		y:      dst.y * i.factor
+		width:  dst.width * i.factor
 		height: dst.height * i.factor
 	}
 

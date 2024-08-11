@@ -38,19 +38,19 @@ pub fn (mut a App) init() ! {
 @[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
-		x: shy.half * a.window.width
-		y: shy.half * a.window.height
+		x:        shy.half * a.window.width
+		y:        shy.half * a.window.height
 		rotation: a.a_r.value() * shy.deg2rad
-		origin: shy.Anchor.center
+		origin:   shy.Anchor.center
 	)
 
 	win := a.window
 	text_manual_render := if a.window.mode == .ui { 'Press "r" to render frame.' } else { '' }
 	a.quick.text(
-		x: a.window.width * 0.01
-		y: a.window.height * (1.0 - 0.01)
+		x:      a.window.width * 0.01
+		y:      a.window.height * (1.0 - 0.01)
 		origin: shy.Anchor.bottom_left
-		text: '${text_manual_render}
+		text:   '${text_manual_render}
 Press "m" to toggle window mode.
 Press "a" to set new animator.
 Mode: ${win.mode}
@@ -102,7 +102,7 @@ pub fn (mut a App) event(e shy.Event) {
 								mode: .in_out
 							}
 							loops: shy.infinite
-							loop: .pingpong
+							loop:  .pingpong
 						)
 					} else {
 						a.a_r = a.shy.new_animator[f32](

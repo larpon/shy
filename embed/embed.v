@@ -172,7 +172,7 @@ pub fn (ea ExampleApp) asset(path string, option AssetLoadOption) shy.AssetSourc
 	if tag := option.tag {
 		return shy.TaggedSource{
 			source: source
-			tag: tag
+			tag:    tag
 		}
 	}
 	return source
@@ -281,6 +281,6 @@ pub fn (ta TestApp) asset(path string, option AssetLoadOption) shy.AssetSource {
 	}
 	return shy.TaggedSource{
 		source: test_asset_path
-		tag: option.tag or { '' }
+		tag:    option.tag or { '' }
 	}
 }

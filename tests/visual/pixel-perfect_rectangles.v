@@ -24,9 +24,9 @@ pub fn (mut a App) frame(dt f64) {
 	canvas := a.window.canvas()
 
 	a.quick.rect(
-		x: canvas.width / 2
-		y: canvas.height / 2
-		width: canvas.width
+		x:      canvas.width / 2
+		y:      canvas.height / 2
+		width:  canvas.width
 		height: canvas.height
 		origin: shy.Anchor.center
 		stroke: shy.Stroke{
@@ -35,9 +35,9 @@ pub fn (mut a App) frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: canvas.width / 2
-		y: canvas.height / 2
-		width: canvas.width / 2
+		x:      canvas.width / 2
+		y:      canvas.height / 2
+		width:  canvas.width / 2
 		height: canvas.height / 2
 		origin: shy.Anchor.center
 		stroke: shy.Stroke{

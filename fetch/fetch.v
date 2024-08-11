@@ -117,10 +117,10 @@ pub fn (mut l Loader) update() ?JobUpdate {
 			l.job_count--
 		}
 		return JobUpdate{
-			id: job_status.id
+			id:       job_status.id
 			progress: job_status.progress
-			status: job_status.status
-			data: job_status.data
+			status:   job_status.status
+			data:     job_status.data
 		}
 	}
 	return none
@@ -129,7 +129,7 @@ pub fn (mut l Loader) update() ?JobUpdate {
 pub fn (mut l Loader) load(config LoadConfig) Handle {
 	l.ids++
 	l.job_queue << LoadJob{
-		id: l.ids
+		id:     l.ids
 		config: config
 	}
 	return Handle{
@@ -169,9 +169,9 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 		if url.starts_with('file://') {
 			if !os.is_file(source) {
 				ch_out <- JobStatus{
-					id: job.id
+					id:       job.id
 					progress: 0
-					status: .error
+					status:   .error
 				}
 				println('ERROR Loader #${thread_id} ${url} is not as file')
 				break
@@ -179,9 +179,9 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 			}
 			bytes = os.read_bytes(source) or {
 				ch_out <- JobStatus{
-					id: job.id
+					id:       job.id
 					progress: 0
-					status: .error
+					status:   .error
 				}
 				println('ERROR Loader #${thread_id} ${url} error reading file')
 				break
@@ -208,12 +208,12 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 				if bytes_sent == bytes_total {
 					// println('Loader #${thread_id} sending DONE data ${url}')
 					ch_out <- JobStatus{
-						id: job.id
+						id:       job.id
 						progress: 1
-						status: .done
-						data: Data{
+						status:   .done
+						data:     Data{
 							chunk: chunk
-							size: size
+							size:  size
 						}
 					}
 					unsafe { bytes.free() } // TODO -autofree ??
@@ -221,21 +221,21 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 				}
 				// println('Loader #${thread_id} sending data ${url}')
 				ch_out <- JobStatus{
-					id: job.id
+					id:       job.id
 					progress: f32(bytes_sent) / f32(bytes_total)
-					status: .running
-					data: Data{
+					status:   .running
+					data:     Data{
 						chunk: chunk
-						size: size
+						size:  size
 					}
 				}
 			}
 		} else {
 			println('ERROR Loader #${thread_id} ${url} error something')
 			ch_out <- JobStatus{
-				id: job.id
+				id:       job.id
 				progress: 0
-				status: .error
+				status:   .error
 			}
 		}
 

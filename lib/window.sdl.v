@@ -144,11 +144,11 @@ fn new_shy_frame_record_config() &FrameRecordConfig {
 		dir := os.getenv_opt('SHY_RECORD_DIR') or { os.join_path(os.temp_dir(), 'shy') }
 		prefix := os.join_path_single(dir, os.file_name(os.executable()).all_before('.') + '_')
 		return &FrameRecordConfig{
-			windows: window_ids
+			windows:       window_ids
 			exit_on_frame: exit_on_frame
-			frames: frames
-			save_path: dir
-			save_prefix: prefix
+			frames:        frames
+			save_path:     dir
+			save_prefix:   prefix
 		}
 	} $else {
 		return &FrameRecordConfig{}
@@ -832,7 +832,7 @@ pub fn (w &Window) size() Size {
 	mut width, mut height := 0, 0
 	sdl.get_window_size(w.handle, &width, &height)
 	return Size{
-		width: width
+		width:  width
 		height: height
 	}
 }
@@ -872,9 +872,9 @@ pub fn (w &Window) canvas() Canvas {
 		factor_y = f32(dh) / wh
 	}
 	return Canvas{
-		width: width
-		height: height
-		factor: mth.min(f32(dw) / ww, f32(dh) / wh)
+		width:    width
+		height:   height
+		factor:   mth.min(f32(dw) / ww, f32(dh) / wh)
 		factor_x: factor_x
 		factor_y: factor_y
 	}

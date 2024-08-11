@@ -14,21 +14,21 @@ $if !no_sokol_app ? {
 
 pub fn create_desc() gfx.Desc {
 	metal_desc := gfx.MetalContextDesc{
-		device: metal_get_device()
+		device:                   metal_get_device()
 		renderpass_descriptor_cb: metal_get_renderpass_descriptor
-		drawable_cb: metal_get_drawable
+		drawable_cb:              metal_get_drawable
 	}
 	d3d11_desc := gfx.D3d11ContextDesc{
-		device: d3d11_get_device()
-		device_context: d3d11_get_device_context()
+		device:                d3d11_get_device()
+		device_context:        d3d11_get_device_context()
 		render_target_view_cb: d3d11_get_render_target_view
 		depth_stencil_view_cb: d3d11_get_depth_stencil_view
 	}
 
 	return gfx.Desc{
 		context: gfx.ContextDesc{
-			metal: metal_desc
-			d3d11: d3d11_desc
+			metal:        metal_desc
+			d3d11:        d3d11_desc
 			color_format: .bgra8
 		}
 		image_pool_size: 1000

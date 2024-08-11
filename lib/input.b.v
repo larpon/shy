@@ -49,7 +49,7 @@ pub fn (mut ip Input) init() ! {
 	// } else {
 	mut mouse := &Mouse{
 		shy: s
-		id: default_mouse_id
+		id:  default_mouse_id
 	}
 	mouse.init()!
 	ip.mice[default_mouse_id] = mouse // TODO NOTE see process_events also
@@ -116,9 +116,9 @@ pub fn (mut ip Input) add_gamepad(n i32) bool {
 
 		ip.remove_gamepad(id)
 		mut pad := &Gamepad{
-			id: id
-			shy: ip.shy
-			name: controller_name
+			id:     id
+			shy:    ip.shy
+			name:   controller_name
 			handle: controller
 		}
 		pad.init() or { return false }
@@ -164,7 +164,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					window_id: no_window
 					//
 					which: sdl_event.caxis.which
-					axis: GamepadAxis.from_sdl_controller_axis(unsafe { sdl.GameControllerAxis(sdl_event.caxis.axis) })
+					axis:  GamepadAxis.from_sdl_controller_axis(unsafe { sdl.GameControllerAxis(sdl_event.caxis.axis) })
 					value: sdl_event.caxis.value
 				}
 			}
@@ -174,8 +174,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					window_id: no_window
 					//
 					button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
-					which: sdl_event.cbutton.which
-					state: .down
+					which:  sdl_event.cbutton.which
+					state:  .down
 				}
 			}
 			.controllerbuttonup {
@@ -184,76 +184,76 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					window_id: no_window
 					//
 					button: GamepadButton.from_sdl_controller_button(unsafe { sdl.GameControllerButton(sdl_event.cbutton.button) })
-					which: sdl_event.cbutton.which
-					state: .up
+					which:  sdl_event.cbutton.which
+					state:  .up
 				}
 			}
 			.controllerdeviceadded {
 				shy_event = GamepadAddedEvent{
 					timestamp: timestamp
 					window_id: no_window
-					which: i32(sdl_event.cdevice.which)
+					which:     i32(sdl_event.cdevice.which)
 				}
 			}
 			.controllerdeviceremoved {
 				shy_event = GamepadRemovedEvent{
 					timestamp: timestamp
 					window_id: no_window
-					which: i32(sdl_event.cdevice.which)
+					which:     i32(sdl_event.cdevice.which)
 				}
 			}
 			.controllerdeviceremapped {
 				shy_event = GamepadRemappedEvent{
 					timestamp: timestamp
 					window_id: no_window
-					which: i32(sdl_event.cdevice.which)
+					which:     i32(sdl_event.cdevice.which)
 				}
 			}
 			.controllertouchpaddown {
 				shy_event = GamepadTouchpadButtonEvent{
 					timestamp: timestamp
 					window_id: no_window
-					which: sdl_event.ctouchpad.which
-					touchpad: sdl_event.ctouchpad.touchpad
-					finger: sdl_event.ctouchpad.finger
-					x: sdl_event.ctouchpad.x
-					y: sdl_event.ctouchpad.y
-					pressure: sdl_event.ctouchpad.pressure
-					state: .down
+					which:     sdl_event.ctouchpad.which
+					touchpad:  sdl_event.ctouchpad.touchpad
+					finger:    sdl_event.ctouchpad.finger
+					x:         sdl_event.ctouchpad.x
+					y:         sdl_event.ctouchpad.y
+					pressure:  sdl_event.ctouchpad.pressure
+					state:     .down
 				}
 			}
 			.controllertouchpadup {
 				shy_event = GamepadTouchpadButtonEvent{
 					timestamp: timestamp
 					window_id: no_window
-					which: sdl_event.ctouchpad.which
-					touchpad: sdl_event.ctouchpad.touchpad
-					finger: sdl_event.ctouchpad.finger
-					x: sdl_event.ctouchpad.x
-					y: sdl_event.ctouchpad.y
-					pressure: sdl_event.ctouchpad.pressure
-					state: .up
+					which:     sdl_event.ctouchpad.which
+					touchpad:  sdl_event.ctouchpad.touchpad
+					finger:    sdl_event.ctouchpad.finger
+					x:         sdl_event.ctouchpad.x
+					y:         sdl_event.ctouchpad.y
+					pressure:  sdl_event.ctouchpad.pressure
+					state:     .up
 				}
 			}
 			.controllertouchpadmotion {
 				shy_event = GamepadTouchpadMotionEvent{
 					timestamp: timestamp
 					window_id: no_window
-					which: sdl_event.ctouchpad.which
-					touchpad: sdl_event.ctouchpad.touchpad
-					finger: sdl_event.ctouchpad.finger
-					x: sdl_event.ctouchpad.x
-					y: sdl_event.ctouchpad.y
-					pressure: sdl_event.ctouchpad.pressure
+					which:     sdl_event.ctouchpad.which
+					touchpad:  sdl_event.ctouchpad.touchpad
+					finger:    sdl_event.ctouchpad.finger
+					x:         sdl_event.ctouchpad.x
+					y:         sdl_event.ctouchpad.y
+					pressure:  sdl_event.ctouchpad.pressure
 				}
 			}
 			.controllersensorupdate {
 				shy_event = GamepadSensorUpdateEvent{
-					timestamp: timestamp
-					window_id: no_window
-					which: sdl_event.csensor.which
-					sensor: GamepadSensorType.from_sdl_sensor_type(unsafe { sdl.SensorType(sdl_event.csensor.sensor) })
-					data: sdl_event.csensor.data
+					timestamp:    timestamp
+					window_id:    no_window
+					which:        sdl_event.csensor.which
+					sensor:       GamepadSensorType.from_sdl_sensor_type(unsafe { sdl.SensorType(sdl_event.csensor.sensor) })
+					data:         sdl_event.csensor.data
 					timestamp_us: sdl_event.csensor.timestamp_us
 				}
 			}
@@ -281,8 +281,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					shy_event = WindowResizeEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						width: win.width()
-						height: win.height()
+						width:     win.width()
+						height:    win.height()
 					}
 				}
 				.moved {
@@ -290,8 +290,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					shy_event = WindowMoveEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						x: x
-						y: y
+						x:         x
+						y:         y
 					}
 				}
 				.shown {
@@ -304,40 +304,40 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						target: .keyboard
-						kind: .gained
+						target:    .keyboard
+						kind:      .gained
 					}
 				}
 				.focus_lost {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						target: .keyboard
-						kind: .lost
+						target:    .keyboard
+						kind:      .lost
 					}
 				}
 				.enter {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						target: .mouse
-						kind: .gained
+						target:    .mouse
+						kind:      .gained
 					}
 				}
 				.leave {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						target: .mouse
-						kind: .lost
+						target:    .mouse
+						kind:      .lost
 					}
 				}
 				.take_focus {
 					shy_event = WindowFocusEvent{
 						timestamp: timestamp
 						window_id: shy_window_id
-						target: .keyboard
-						kind: .offered
+						target:    .keyboard
+						kind:      .offered
 					}
 				}
 				.minimized {
@@ -376,8 +376,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
 				timestamp: timestamp
 				window_id: shy_window_id
-				state: .up
-				key_code: shy_key_code
+				state:     .up
+				key_code:  shy_key_code
 			}
 		}
 		.keydown {
@@ -387,8 +387,8 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
 				timestamp: timestamp
 				window_id: shy_window_id
-				state: .down
-				key_code: unsafe { KeyCode(int(shy_key_code)) }
+				state:     .down
+				key_code:  unsafe { KeyCode(int(shy_key_code)) }
 			}
 		}
 		.mousemotion {
@@ -404,12 +404,12 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = MouseMotionEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				which: which // sdl_event.motion.which // TODO use own ID system??
-				buttons: buttons
-				x: sdl_event.motion.x
-				y: sdl_event.motion.y
-				rel_x: sdl_event.motion.xrel
-				rel_y: sdl_event.motion.yrel
+				which:     which // sdl_event.motion.which // TODO use own ID system??
+				buttons:   buttons
+				x:         sdl_event.motion.x
+				y:         sdl_event.motion.y
+				rel_x:     sdl_event.motion.xrel
+				rel_y:     sdl_event.motion.yrel
 			}
 			// }
 		}
@@ -422,12 +422,12 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = MouseButtonEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				which: default_mouse_id // sdl_event.button.which // TODO use own ID system??
-				button: button
-				state: state
-				clicks: sdl_event.button.clicks
-				x: sdl_event.button.x
-				y: sdl_event.button.y
+				which:     default_mouse_id // sdl_event.button.which // TODO use own ID system??
+				button:    button
+				state:     state
+				clicks:    sdl_event.button.clicks
+				x:         sdl_event.button.x
+				y:         sdl_event.button.y
 			}
 			// }
 		}
@@ -444,11 +444,11 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = MouseWheelEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				which: default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
-				x: mouse.x
-				y: mouse.y
-				scroll_x: sdl_event.wheel.x
-				scroll_y: sdl_event.wheel.y
+				which:     default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
+				x:         mouse.x
+				y:         mouse.y
+				scroll_x:  sdl_event.wheel.x
+				scroll_y:  sdl_event.wheel.y
 				direction: dir
 			}
 			// }
@@ -479,7 +479,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = DropFileEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				path: path
+				path:      path
 			}
 		}
 		.droptext {
@@ -496,7 +496,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = DropTextEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				text: text
+				text:      text
 			}
 		}
 		else {

@@ -33,8 +33,8 @@ pub fn (mut a Audio) init() ! {
 	}
 	a.engines[0] = &AudioEngine{
 		shy: a.shy
-		id: 0
-		e: mini_audio_engine
+		id:  0
+		e:   mini_audio_engine
 	}
 }
 
@@ -57,8 +57,8 @@ pub fn (mut a Audio) new_engine() !&AudioEngine {
 	a.engine_id++
 	engine := &AudioEngine{
 		shy: a.shy
-		id: a.engine_id
-		e: mini_audio_engine
+		id:  a.engine_id
+		e:   mini_audio_engine
 	}
 	a.engines[a.engine_id] = engine
 	return engine

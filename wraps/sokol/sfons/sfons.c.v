@@ -5,8 +5,8 @@ import shy.wraps.sokol.memory
 
 @[markused]
 const default_allocator = Allocator{
-	alloc_fn: memory.salloc
-	free_fn: memory.sfree
+	alloc_fn:  memory.salloc
+	free_fn:   memory.sfree
 	user_data: voidptr(0x100005f0)
 }
 

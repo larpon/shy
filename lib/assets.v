@@ -86,9 +86,9 @@ pub fn (mut a Assets) shutdown() ! {
 
 fn (mut a Assets) load_error_assets() ! {
 	a.error_asset = Asset{
-		shy: a.shy
-		data: [u8(0xD), 0xE, 0xA, 0xD]
-		lo: AssetLoadOptions{}
+		shy:    a.shy
+		data:   [u8(0xD), 0xE, 0xA, 0xD]
+		lo:     AssetLoadOptions{}
 		status: .error
 	}
 	ass_image := a.load(
@@ -127,10 +127,10 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	if alo.io.has(.async) {
 		file_size := int(os.file_size(source.str()))
 		asset := &Asset{
-			shy: a.shy
-			lo: alo
+			shy:    a.shy
+			lo:     alo
 			status: .loading
-			data: []u8{cap: file_size}
+			data:   []u8{cap: file_size}
 		}
 		$if shy_debug_assets ? {
 			a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading (asynchronously) "${source}"...')
@@ -182,9 +182,9 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@bytes', u64(bytes.len))
 	// PERFORMANCE: TODO preallocated asset pool??
 	asset := &Asset{
-		shy: a.shy
-		data: bytes
-		lo: alo
+		shy:    a.shy
+		data:   bytes
+		lo:     alo
 		status: .loaded
 	}
 	$if shy_debug_assets ? {
@@ -401,7 +401,7 @@ pub fn (mut a Assets) update() {
 		if path != '' {
 			// println('loading ${path}')
 			handle := a.loader.load(
-				url: path
+				url:   path
 				flags: .async
 			)
 			id := u32(handle.id)
@@ -608,7 +608,7 @@ fn (mut a Asset) to_blob(opt BlobOptions) !Blob {
 
 	mut blob := Blob{
 		asset: a
-		opt: opt
+		opt:   opt
 	}
 
 	if opt.io.has(.cache) {
@@ -676,29 +676,29 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	}
 
 	mut image := Image{
-		asset: a
-		opt: opt
-		width: stb_img.width
-		height: stb_img.height
+		asset:    a
+		opt:      opt
+		width:    stb_img.width
+		height:   stb_img.height
 		channels: stb_img.use_channels
-		mipmaps: opt.mipmaps
-		ready: stb_img.ok
-		kind: .png // TODO stb_img.ext
+		mipmaps:  opt.mipmaps
+		ready:    stb_img.ok
+		kind:     .png // TODO stb_img.ext
 	}
 
 	// Sokol image
 	// eprintln('\n init sokol image ${img.path} ok=${img.sg_image_ok}')
 	mut img_desc := gfx.ImageDesc{
-		width: image.width
-		height: image.height
+		width:       image.width
+		height:      image.height
 		num_mipmaps: 0 // TODO image.mipmaps
 		// label: &u8(0)
 		pixel_format: .rgba8
 	}
 
 	mut smp_desc := gfx.SamplerDesc{
-		wrap_u: opt.wrap_u // .clamp_to_edge
-		wrap_v: opt.wrap_v // .clamp_to_edge
+		wrap_u:     opt.wrap_u // .clamp_to_edge
+		wrap_v:     opt.wrap_v // .clamp_to_edge
 		min_filter: opt.min_filter // .linear
 		mag_filter: opt.mag_filter // .linear
 	}
@@ -706,7 +706,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	// println('${image.width} x ${image.height} x ${image.channels} --- ${a.data.len}')
 	// println('${usize(4 * image.width * image.height)} vs ${a.data.len}')
 	img_desc.data.subimage[0][0] = gfx.Range{
-		ptr: stb_img.data
+		ptr:  stb_img.data
 		size: usize(4 * image.width * image.height) // NOTE: 4 is not always equal to image.channels count, but sokol_gl contexts expect it
 	}
 
@@ -750,10 +750,10 @@ fn (mut a Asset) to_sound(opt SoundOptions) !Sound {
 		id = engine.load(a.lo.source)!
 	}
 	sound := Sound{
-		asset: a
-		id: id
+		asset:  a
+		id:     id
 		id_end: id_end
-		loop: opt.loop
+		loop:   opt.loop
 	}
 	if opt.io.has(.cache) {
 		unsafe {
@@ -1027,7 +1027,7 @@ pub fn (s &Sound) play() {
 		// TODO: this could probably be made smarter
 		// TODO: ... Also it is not good for predictability
 		aid := s.asset.shy.make_alarm(
-			check: sound_alarm_check
+			check:     sound_alarm_check
 			user_data: voidptr(s)
 		)
 		unsafe {

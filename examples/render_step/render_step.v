@@ -29,8 +29,8 @@ pub fn (mut a App) init() ! {
 			mode: .in_out
 		}
 		recycle: true
-		loops: shy.infinite
-		loop: .pingpong
+		loops:   shy.infinite
+		loop:    .pingpong
 	)
 	a.a_s = a.shy.new_animator[f32](
 		ease: ease.Ease{
@@ -38,8 +38,8 @@ pub fn (mut a App) init() ! {
 			mode: .in_out
 		}
 		recycle: true
-		loops: shy.infinite
-		loop: .pingpong
+		loops:   shy.infinite
+		loop:    .pingpong
 	)
 	a.window.step(1, 60)
 }
@@ -56,19 +56,19 @@ pub fn (mut a App) frame(dt f64) {
 	}
 
 	a.quick.rect(
-		x: shy.half * a.window.width
-		y: shy.half * a.window.height
+		x:        shy.half * a.window.width
+		y:        shy.half * a.window.height
 		rotation: a.a_r.value() * shy.deg2rad
-		scale: a.a_s.value()
-		origin: shy.Anchor.center
+		scale:    a.a_s.value()
+		origin:   shy.Anchor.center
 	)
 
 	win := a.window
 	a.quick.text(
-		x: a.window.width * 0.01
-		y: a.window.height * (1.0 - 0.01)
+		x:      a.window.width * 0.01
+		y:      a.window.height * (1.0 - 0.01)
 		origin: shy.Anchor.bottom_left
-		text: 'Press "s" to step 135 frames, hold "s+shift" to go out of step mode.
+		text:   'Press "s" to step 135 frames, hold "s+shift" to go out of step mode.
 Mode: ${win.mode}
 Frame: ${win.state.frame}
 Update rate ${win.state.update_rate}@hz

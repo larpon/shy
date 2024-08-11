@@ -11,9 +11,9 @@ pub type ID = int | string | u64
 // new returns a new UI instance located on the heap.
 pub fn new(config UIConfig) !&UI {
 	mut u := &UI{
-		shy: config.shy
-		easy: config.easy
-		root: config.root
+		shy:   config.shy
+		easy:  config.easy
+		root:  config.root
 		theme: config.theme
 	}
 	u.init()!

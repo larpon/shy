@@ -127,17 +127,17 @@ pub fn config_from_toml_text(toml_text string) !Config {
 	//
 	toml_rend_c := toml_doc.value('shy.render')
 	rend_c := RenderConfig{
-		update_rate: toml_rend_c.value('update_rate').default_to(lib.defaults.render.update_rate).f64()
+		update_rate:         toml_rend_c.value('update_rate').default_to(lib.defaults.render.update_rate).f64()
 		update_multiplicity: u8(toml_rend_c.value('update_multiplicity').default_to(int(lib.defaults.render.update_multiplicity)).int())
-		lock_framerate: toml_rend_c.value('lock_framerate').default_to(lib.defaults.render.lock_framerate).bool()
-		time_history_count: u8(toml_rend_c.value('time_history_count').default_to(int(lib.defaults.render.time_history_count)).int())
-		vsync: vsynctype_from_string(toml_rend_c.value('vsync').default_to('on').string())
-		msaa: toml_rend_c.value('msaa').default_to(lib.defaults.render.msaa).int()
+		lock_framerate:      toml_rend_c.value('lock_framerate').default_to(lib.defaults.render.lock_framerate).bool()
+		time_history_count:  u8(toml_rend_c.value('time_history_count').default_to(int(lib.defaults.render.time_history_count)).int())
+		vsync:               vsynctype_from_string(toml_rend_c.value('vsync').default_to('on').string())
+		msaa:                toml_rend_c.value('msaa').default_to(lib.defaults.render.msaa).int()
 	}
 	wc := WindowConfig{
-		title: toml_wc.value('title').default_to(lib.defaults.window.title).string()
+		title:     toml_wc.value('title').default_to(lib.defaults.window.title).string()
 		resizable: toml_wc.value('resizable').default_to(lib.defaults.window.resizable).bool()
-		render: rend_c
+		render:    rend_c
 	}
 	//
 	toml_input_c := toml_doc.value('shy.input')
@@ -146,7 +146,7 @@ pub fn config_from_toml_text(toml_text string) !Config {
 	}
 
 	return Config{
-		input: input_c
+		input:  input_c
 		render: rend_c
 		window: wc
 	}

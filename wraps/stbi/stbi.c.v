@@ -136,8 +136,8 @@ pub struct LoadParams {
 pub fn load(path string, params LoadParams) !Image {
 	ext := path.all_after_last('.')
 	mut res := Image{
-		ok: true
-		ext: ext
+		ok:   true
+		ext:  ext
 		data: 0
 	}
 	res.data = C.stbi_load(&char(path.str), &res.width, &res.height, &res.channels, params.desired_channels)
@@ -152,7 +152,7 @@ pub fn load(path string, params LoadParams) !Image {
 // load_from_memory load an image from a memory buffer
 pub fn load_from_memory(buf &u8, bufsize int, params LoadParams) !Image {
 	mut res := Image{
-		ok: true
+		ok:   true
 		data: 0
 	}
 	res.data = C.stbi_load_from_memory(buf, bufsize, &res.width, &res.height, &res.channels,
@@ -174,12 +174,12 @@ fn C.stbir_resize_uint8(input_pixels &u8, input_w int, input_h int, input_stride
 // resize_uint8 resizes `img` to dimensions of `output_w` and `output_h`
 pub fn resize_uint8(img &Image, output_w int, output_h int) !Image {
 	mut res := Image{
-		ok: true
-		ext: img.ext
-		data: 0
-		width: output_w
-		height: output_h
-		channels: img.channels
+		ok:           true
+		ext:          img.ext
+		data:         0
+		width:        output_w
+		height:       output_h
+		channels:     img.channels
 		use_channels: img.use_channels
 	}
 

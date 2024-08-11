@@ -15,7 +15,7 @@ fn main() {
 	mut app := &App{}
 	shy.run[App](mut app,
 		window: shy.WindowConfig{
-			width: 600
+			width:  600
 			height: 400
 		}
 	)!
@@ -38,25 +38,25 @@ pub fn (mut a App) init() ! {
 	size := a.window.size()
 
 	a.once_text = a.easy.new_text(
-		x: shy.half * size.width
-		y: shy.half * size.height
-		size: 50
+		x:      shy.half * size.width
+		y:      shy.half * size.height
+		size:   50
 		origin: shy.Anchor.center
-		align: .center
+		align:  .center
 	)
 
 	a.info_text = a.easy.new_text(
-		x: shy.half * size.width
-		y: 10
+		x:      shy.half * size.width
+		y:      10
 		origin: shy.Anchor.top_center
-		align: .center
-		text: info
+		align:  .center
+		text:   info
 	)
 
 	a.clock_text = a.easy.new_text(
-		y: size.height
+		y:      size.height
 		origin: shy.Anchor.bottom_left
-		text: 'Local time: ${time.now().format_ss()}'
+		text:   'Local time: ${time.now().format_ss()}'
 	)
 
 	a.shy.every(fn [mut a] () {

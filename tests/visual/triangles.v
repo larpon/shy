@@ -32,7 +32,7 @@ pub fn (mut a App) init() ! {
 		}
 		// recycle: true
 		loops: shy.infinite
-		loop: .pingpong
+		loop:  .pingpong
 	}
 
 	a.a_r = a.shy.new_animator[f32](a_config)
@@ -60,39 +60,39 @@ pub fn (mut a App) frame(dt f64) {
 	rotation := f32(a.a_r.value()) * shy.deg2rad
 
 	mut tri_q1 := a.easy.triangle(
-		a: center
-		b: center + shy.vec2(f32(-100), -10)
-		c: center + shy.vec2(f32(-50), -150) // TODO origin bug
-		origin: origin
+		a:        center
+		b:        center + shy.vec2(f32(-100), -10)
+		c:        center + shy.vec2(f32(-50), -150) // TODO origin bug
+		origin:   origin
 		rotation: rotation
-		color: shy.rgba(0, 127, 0, 127)
+		color:    shy.rgba(0, 127, 0, 127)
 		// scale: 0.4
 	)
 	tri_q1.draw()
 	a.quick.rect(
-		Rect: tri_q1.bbox()
+		Rect:  tri_q1.bbox()
 		fills: .stroke
 	)
 
 	mut tri_q2 := a.easy.triangle(
-		a: center
-		b: center + shy.vec2(f32(100), -10)
-		c: center + shy.vec2(f32(50), -150) // TODO origin bug
-		origin: origin
+		a:        center
+		b:        center + shy.vec2(f32(100), -10)
+		c:        center + shy.vec2(f32(50), -150) // TODO origin bug
+		origin:   origin
 		rotation: rotation
-		color: shy.rgba(0, 0, 127, 127)
+		color:    shy.rgba(0, 0, 127, 127)
 	)
 	tri_q2.draw()
 	a.quick.rect(
-		Rect: tri_q2.bbox()
+		Rect:  tri_q2.bbox()
 		fills: .stroke
 	)
 
 	mut tri_q3 := a.easy.triangle(
-		a: center
-		b: center + shy.vec2(f32(100), 10)
-		c: center + shy.vec2(f32(50), 150) // TODO origin bug
-		color: shy.rgba(127, 0, 0, 127)
+		a:        center
+		b:        center + shy.vec2(f32(100), 10)
+		c:        center + shy.vec2(f32(50), 150) // TODO origin bug
+		color:    shy.rgba(127, 0, 0, 127)
 		rotation: rotation
 		// scale: 0.4
 		origin: origin
@@ -101,38 +101,38 @@ pub fn (mut a App) frame(dt f64) {
 	tri_q3.draw()
 
 	a.quick.rect(
-		Rect: tri_q3.bbox()
+		Rect:  tri_q3.bbox()
 		fills: .stroke
 	)
 
 	mut tri_q4 := a.easy.triangle(
-		c: center
-		a: center + shy.vec2(f32(-100), 10)
-		b: center + shy.vec2(f32(-50), 150) // TODO origin bug
-		origin: origin
+		c:        center
+		a:        center + shy.vec2(f32(-100), 10)
+		b:        center + shy.vec2(f32(-50), 150) // TODO origin bug
+		origin:   origin
 		rotation: rotation
-		color: shy.rgba(127, 0, 127, 127)
+		color:    shy.rgba(127, 0, 127, 127)
 	)
 	tri_q4.draw()
 	a.quick.rect(
-		Rect: tri_q4.bbox()
+		Rect:  tri_q4.bbox()
 		fills: .stroke
 	)
 
 	a.quick.rect(
-		x: center.x
-		y: center.y
-		width: 2
+		x:      center.x
+		y:      center.y
+		width:  2
 		height: 2
-		fills: .body
-		color: shy.rgb(0, 255, 0)
+		fills:  .body
+		color:  shy.rgb(0, 255, 0)
 	)
 
 	a.quick.text(
-		x: a.canvas().width * 0.01
-		y: a.canvas().height * (1.0 - 0.01)
+		x:      a.canvas().width * 0.01
+		y:      a.canvas().height * (1.0 - 0.01)
 		origin: shy.Anchor.bottom_left
-		text: 'Click mouse left/right to change transform origin
+		text:   'Click mouse left/right to change transform origin
 Origin: ${a.origin}'
 	)
 }

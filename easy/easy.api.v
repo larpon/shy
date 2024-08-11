@@ -264,9 +264,9 @@ pub fn (et &Triangle) bbox() shy.Rect {
 	bb := t.bbox()
 	mut p_x, mut p_y := et.origin.pos_wh(bb.width, bb.height)
 	return shy.Rect{
-		x: bb.x - p_x
-		y: bb.y - p_y
-		width: bb.width
+		x:      bb.x - p_x
+		y:      bb.y - p_y
+		width:  bb.width
 		height: bb.height
 	}
 }
@@ -641,9 +641,9 @@ pub fn (ei &Image) draw() {
 
 	if ei.region.width >= 0 || ei.region.height >= 0 {
 		src := shy.Rect{
-			x: 0
-			y: 0
-			width: ei.width
+			x:      0
+			y:      0
+			width:  ei.width
 			height: ei.height
 		}
 		dst := ei.region
@@ -675,19 +675,19 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 		// TODO WORKAROUND "...eic" spread does not work
 		// with the ImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
 		return Image{
-			shy: e.shy
-			Rect: r
-			source: eic.source
-			color: eic.color
-			rotation: eic.rotation
-			scale: eic.scale
-			offset: eic.offset
-			origin: eic.origin
-			region: eic.region
+			shy:       e.shy
+			Rect:      r
+			source:    eic.source
+			color:     eic.color
+			rotation:  eic.rotation
+			scale:     eic.scale
+			offset:    eic.offset
+			origin:    eic.origin
+			region:    eic.region
 			fill_mode: eic.fill_mode
-			meta: ImageMetaData{
+			meta:      ImageMetaData{
 				size_raw: shy.Size{
-					width: image.width
+					width:  image.width
 					height: image.height
 				}
 			}
@@ -695,24 +695,24 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 	}
 
 	return Image{
-		shy: e.shy
+		shy:  e.shy
 		Rect: shy.Rect{
-			x: 0
-			y: 0
-			width: 0
+			x:      0
+			y:      0
+			width:  0
 			height: 0
 		}
-		source: eic.source
-		color: eic.color
-		rotation: eic.rotation
-		scale: eic.scale
-		offset: eic.offset
-		origin: eic.origin
-		region: eic.region
+		source:    eic.source
+		color:     eic.color
+		rotation:  eic.rotation
+		scale:     eic.scale
+		offset:    eic.offset
+		origin:    eic.origin
+		region:    eic.region
 		fill_mode: eic.fill_mode
-		meta: ImageMetaData{
+		meta:      ImageMetaData{
 			size_raw: shy.Size{
-				width: 0
+				width:  0
 				height: 0
 			}
 		}

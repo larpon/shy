@@ -33,10 +33,10 @@ fn main() {
 			println(c_embedded_shy_sixel_logo.to_bytes().bytestr())
 		}
 		println(flag.to_doc[cli.Options](
-			name: cli.exe_short_name
-			version: '${cli.exe_version} (${cli.exe_git_hash})'
+			name:        cli.exe_short_name
+			version:     '${cli.exe_version} (${cli.exe_git_hash})'
 			description: cli.exe_description
-			options: flag.DocOptions{
+			options:     flag.DocOptions{
 				compact: true
 			}
 		)!)

@@ -107,7 +107,7 @@ pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	// TODO configurable size:
 
 	fons_desc := sfons.Desc{
-		width: 4 * 1024 // NOTE 256 is definitely too small
+		width:  4 * 1024 // NOTE 256 is definitely too small
 		height: 4 * 1024
 	}
 	fons_context := sfons.create(&fons_desc)

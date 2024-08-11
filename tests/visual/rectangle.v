@@ -52,12 +52,12 @@ pub fn (mut a App) live_frame(dt f64) {
 	min_y, max_y := mth.max(max_height * 0.1, 20), mth.max(max_height * 0.9, 220)
 
 	a.quick.rect(
-		x: min_x
-		y: min_y
-		width: a.dimension
+		x:      min_x
+		y:      min_y
+		width:  a.dimension
 		height: a.dimension
 		origin: shy.Anchor.center
-		color: shy.rgba(255, 0, 0, 127)
+		color:  shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
 			width: a.dimension // test that exact rendering works
@@ -65,12 +65,12 @@ pub fn (mut a App) live_frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: a.dimension
+		x:      cx
+		y:      cy
+		width:  a.dimension
 		height: a.dimension
 		origin: shy.Anchor.center
-		color: shy.rgba(0, 0, 255, 127)
+		color:  shy.rgba(0, 0, 255, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
 			width: a.dimension * 2 // test that rendering does not overflow
@@ -78,12 +78,12 @@ pub fn (mut a App) live_frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: min_x
-		y: max_y
-		width: a.dimension
+		x:      min_x
+		y:      max_y
+		width:  a.dimension
 		height: a.dimension
 		origin: shy.Anchor.bottom_left
-		color: shy.rgba(0, 0, 255, 127)
+		color:  shy.rgba(0, 0, 255, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
 			width: a.dimension / 4
@@ -91,12 +91,12 @@ pub fn (mut a App) live_frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: max_x
-		y: max_y
-		width: a.dimension
+		x:      max_x
+		y:      max_y
+		width:  a.dimension
 		height: a.dimension
 		origin: shy.Anchor.bottom_right
-		color: shy.rgba(255, 0, 0, 127)
+		color:  shy.rgba(255, 0, 0, 127)
 		stroke: shy.Stroke{
 			color: shy.rgba(255, 255, 255, 127)
 			width: 1
@@ -104,19 +104,19 @@ pub fn (mut a App) live_frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: max_x
-		y: min_y
-		width: a.dimension
+		x:      max_x
+		y:      min_y
+		width:  a.dimension
 		height: a.dimension
 		origin: shy.Anchor.top_right
-		color: shy.rgba(255, 0, 0, 127)
-		fills: .body
+		color:  shy.rgba(255, 0, 0, 127)
+		fills:  .body
 	)
 
 	a.quick.text(
-		y: a.canvas().height
+		y:      a.canvas().height
 		origin: shy.Anchor.bottom_left
-		text: 'Press "D" to change dimensions
+		text:   'Press "D" to change dimensions
 Origin (up/down): ${a.origin}
 Dimensions ${a.dimension}x${a.dimension}'
 	)

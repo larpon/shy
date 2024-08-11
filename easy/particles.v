@@ -21,12 +21,12 @@ pub fn (mut e Easy) new_particle_system(psc ParticleSystemConfig) &ParticleSyste
 	default_painter_id := system.add_painter(default_painter)
 	e.particle_systems << system
 	return &ParticleSystem{
-		shy: e.shy
-		system: system
+		shy:                e.shy
+		system:             system
 		default_painter_id: default_painter_id
-		rotation: psc.rotation
-		scale: psc.scale
-		offset: psc.offset
+		rotation:           psc.rotation
+		scale:              psc.scale
+		offset:             psc.offset
 	}
 }
 
@@ -100,11 +100,11 @@ pub fn (mut ps ParticleSystem) replace_default_painter(painter particle.Painter)
 
 pub fn (mut e Easy) image_particle_painter(config ImageParticlePainterConfig) ImageParticlePainter {
 	return ImageParticlePainter{
-		groups: config.groups
-		color: config.color
+		groups:          config.groups
+		color:           config.color
 		color_variation: config.color_variation
-		source: config.source
-		easy: e
+		source:          config.source
+		easy:            e
 	}
 }
 
@@ -114,7 +114,7 @@ fn default_particle_painter(mut e Easy) ImageParticlePainter {
 	}) or { panic(err) }
 
 	return e.image_particle_painter(
-		source: easy.default_particle_image
+		source:          easy.default_particle_image
 		color_variation: shy.ColorVariation{0, 0, 0, 0.3}
 	)
 }
@@ -151,15 +151,15 @@ fn (ip &ImageParticlePainter) draw(p &particle.Particle, frame_dt f64) {
 	color.a = u8(p.init.color.a * utils.remap(p.life_time, p.init.life_time, p.end.life_time,
 		1, 0))
 	i := ip.easy.image(
-		x: p.position.x
-		y: p.position.y
-		width: p.size.x
-		height: p.size.y
-		source: ip.source
-		color: color
+		x:        p.position.x
+		y:        p.position.y
+		width:    p.size.x
+		height:   p.size.y
+		source:   ip.source
+		color:    color
 		rotation: p.rotation
-		scale: p.scale
-		origin: shy.Anchor.center
+		scale:    p.scale
+		origin:   shy.Anchor.center
 	)
 	i.draw()
 }

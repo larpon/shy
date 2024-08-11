@@ -96,48 +96,48 @@ pub fn (mut a App) live_frame(dt f64) {
 	cy := shy.half * a.canvas().height
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: test_width
+		x:      cx
+		y:      cy
+		width:  test_width
 		height: test_height
 		origin: shy.Anchor.center
-		fills: .stroke
+		fills:  .stroke
 		stroke: shy.Stroke{
 			width: 9
 		}
 	)
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: shy.half * test_width
+		x:      cx
+		y:      cy
+		width:  shy.half * test_width
 		height: test_height
 		origin: shy.Anchor.center
-		fills: .stroke
+		fills:  .stroke
 		stroke: shy.Stroke{
 			width: 9
 		}
 	)
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: test_width
+		x:      cx
+		y:      cy
+		width:  test_width
 		height: shy.half * test_height
 		origin: shy.Anchor.center
-		fills: .stroke
+		fills:  .stroke
 		stroke: shy.Stroke{
 			width: 9
 		}
 	)
 
 	a.quick.image(
-		x: cx
-		y: cy
-		width: test_width
-		height: test_height
-		source: a.asset_fill_mode(images[a.image], a.fill_mode)
-		origin: a.origin
+		x:         cx
+		y:         cy
+		width:     test_width
+		height:    test_height
+		source:    a.asset_fill_mode(images[a.image], a.fill_mode)
+		origin:    a.origin
 		fill_mode: a.fill_mode
 		// scale: rs
 		// offset: shy.vec2(-margin, -margin)
@@ -145,12 +145,12 @@ pub fn (mut a App) live_frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: test_width
+		x:      cx
+		y:      cy
+		width:  test_width
 		height: test_height
 		origin: a.origin
-		fills: .stroke
+		fills:  .stroke
 		stroke: shy.Stroke{
 			color: shy.colors.red
 			width: 1
@@ -158,13 +158,13 @@ pub fn (mut a App) live_frame(dt f64) {
 	)
 
 	a.quick.rect(
-		x: cx
-		y: cy
-		width: 3
+		x:      cx
+		y:      cy
+		width:  3
 		height: 3
 		origin: shy.Anchor.center
-		fills: .body
-		color: shy.colors.blue
+		fills:  .body
+		color:  shy.colors.blue
 	)
 
 	a.quick.text(
@@ -173,7 +173,7 @@ pub fn (mut a App) live_frame(dt f64) {
 		// width: rw
 		// height: rh
 		origin: shy.Anchor.bottom_left
-		text: 'Image (n/m): ${images[a.image]}
+		text:   'Image (n/m): ${images[a.image]}
 Origin (up/down): ${a.origin}
 FillMode (left/right): ${a.fill_mode}'
 	)

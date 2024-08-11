@@ -158,9 +158,9 @@ pub fn (mut wm WM) init_root_window() !&Window {
 
 	window_config := WindowConfig{
 		...s.config.window
-		x: win_x
-		y: win_y
-		width: win_w
+		x:      win_x
+		y:      win_y
+		width:  win_w
 		height: win_h
 	}
 	win := wm.new_window(window_config)!
@@ -207,9 +207,9 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	// X > 1 child windows of the root window
 	wm.w_id++
 	mut win := &Window{
-		shy: s
+		shy:    s
 		config: config
-		id: wm.w_id
+		id:     wm.w_id
 		handle: window
 	}
 	win.init()!

@@ -27,16 +27,16 @@ pub fn (c Canvas) wh() (int, int) {
 
 pub fn (c Canvas) size() Size {
 	return Size{
-		width: c.width
+		width:  c.width
 		height: c.height
 	}
 }
 
 pub fn (c Canvas) rect() Rect {
 	return Rect{
-		x: 0
-		y: 0
-		width: c.width
+		x:      0
+		y:      0
+		width:  c.width
 		height: c.height
 	}
 }

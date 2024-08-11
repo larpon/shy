@@ -20,9 +20,9 @@ struct App {
 pub fn (mut a App) frame(dt f64) {
 	// Draws a square at the center of the window
 	a.quick.rect(
-		x: (shy.half * a.window.width)
-		y: (shy.half * a.window.height)
-		width: 100
+		x:      (shy.half * a.window.width)
+		y:      (shy.half * a.window.height)
+		width:  100
 		height: 100
 		origin: shy.Anchor.center
 	)

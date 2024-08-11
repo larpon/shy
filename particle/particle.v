@@ -18,43 +18,43 @@ pub fn (mut s System) new_particle() &Particle {
 		// init: particle.null
 		// end: particle.null
 		// system: s
-		position: vec.Vec2[f32]{0, 0}
-		velocity: vec.Vec2[f32]{0, 0}
+		position:     vec.Vec2[f32]{0, 0}
+		velocity:     vec.Vec2[f32]{0, 0}
 		acceleration: vec.Vec2[f32]{0, 0}
-		size: particle.default_size
-		rotation: 0
-		scale: 1
-		color: particle.default_color
-		life_time: particle.default_life_time
+		size:         particle.default_size
+		rotation:     0
+		scale:        1
+		color:        particle.default_color
+		life_time:    particle.default_life_time
 	}
 
 	ep := ParticleState{
 		// init: particle.null
 		// end: particle.null
 		// system: s
-		position: ip.position
-		velocity: ip.velocity
+		position:     ip.position
+		velocity:     ip.velocity
 		acceleration: ip.acceleration
-		size: ip.size
-		rotation: ip.rotation
-		scale: ip.scale
-		color: ip.color
-		life_time: 0.0
+		size:         ip.size
+		rotation:     ip.rotation
+		scale:        ip.scale
+		color:        ip.color
+		life_time:    0.0
 	}
 
 	p := &Particle{
 		system: s
-		init: ip
-		end: ep
+		init:   ip
+		end:    ep
 		//
-		position: ip.position
-		velocity: ip.velocity
+		position:     ip.position
+		velocity:     ip.velocity
 		acceleration: ip.acceleration
-		size: ip.size
-		rotation: ip.rotation
-		scale: ip.scale
-		color: ip.color
-		life_time: ip.life_time
+		size:         ip.size
+		rotation:     ip.rotation
+		scale:        ip.scale
+		color:        ip.color
+		life_time:    ip.life_time
 	}
 	return p
 }

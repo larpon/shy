@@ -32,7 +32,7 @@ pub fn (mut a App) init() ! {
 		}
 		// recycle: true
 		loops: shy.infinite
-		loop: .pingpong
+		loop:  .pingpong
 	}
 
 	a.a_r = a.shy.new_animator[f32](a_config)
@@ -51,28 +51,28 @@ pub fn (mut a App) frame(dt f64) {
 	rotation := f32(a.a_r.value()) * shy.deg2rad
 
 	a.quick.triangle(
-		a: center
-		b: center + shy.vec2(f32(100), 30)
-		c: center + shy.vec2(f32(50), 135)
+		a:        center
+		b:        center + shy.vec2(f32(100), 30)
+		c:        center + shy.vec2(f32(50), 135)
 		rotation: rotation
-		origin: origin
+		origin:   origin
 	)
 
 	// Mark center of window
 	a.quick.rect(
-		x: center.x
-		y: center.y
-		width: 2
+		x:      center.x
+		y:      center.y
+		width:  2
 		height: 2
-		fills: .body
-		color: shy.rgb(0, 0, 255)
+		fills:  .body
+		color:  shy.rgb(0, 0, 255)
 	)
 
 	a.quick.text(
-		x: a.window.width * 0.01
-		y: a.window.height * (1.0 - 0.01)
+		x:      a.window.width * 0.01
+		y:      a.window.height * (1.0 - 0.01)
 		origin: shy.Anchor.bottom_left
-		text: 'Click mouse left/right to change transform origin
+		text:   'Click mouse left/right to change transform origin
 Origin: ${a.origin}
 Rotation: ${rotation * shy.rad2deg:.1f}°'
 	)

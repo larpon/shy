@@ -37,8 +37,8 @@ pub fn (mut a App) init() ! {
 			// custom_fn: custom_ease
 		}
 		recycle: true
-		loops: shy.infinite
-		loop: .pingpong
+		loops:   shy.infinite
+		loop:    .pingpong
 	}
 
 	a.a_x = a.shy.new_animator[f32](a_config)
@@ -85,20 +85,20 @@ pub fn (mut a App) frame(dt f64) {
 	}
 
 	a.quick.rect(
-		x: shy.half * a.window.width
-		y: shy.half * a.window.height
+		x:        shy.half * a.window.width
+		y:        shy.half * a.window.height
 		rotation: a.a_r.value() * shy.deg2rad
-		scale: a.a_s.value()
-		origin: shy.Anchor.center
+		scale:    a.a_s.value()
+		origin:   shy.Anchor.center
 	)
 
 	win := a.window
 	es := a.timer.elapsed().seconds()
 	a.quick.text(
-		x: a.window.width * 0.01
-		y: a.window.height * (1.0 - 0.01)
+		x:      a.window.width * 0.01
+		y:      a.window.height * (1.0 - 0.01)
 		origin: shy.Anchor.bottom_left
-		text: 'Animation running for ${es:.1f} seconds
+		text:   'Animation running for ${es:.1f} seconds
 Frame: ${win.state.frame}
 follow at ${a.fa_x.value():.1f},${a.fa_y.value():.1f} running: ${a.fa_x.running}
 text at ${text.x:.1f},${text.y:.1f} x.t ${a.a_x.t():.4f} ${win.state.update_rate} @hz

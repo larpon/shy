@@ -141,8 +141,8 @@ pub fn shy_to_ui_event(shy_event shy.Event) !Event {
 			ui_event = MouseMotionEvent{
 				timestamp: shy_event.timestamp
 				// buttons: buttons TODO
-				x: shy_event.x
-				y: shy_event.y
+				x:     shy_event.x
+				y:     shy_event.y
 				rel_x: shy_event.rel_x
 				rel_y: shy_event.rel_y
 			}
@@ -157,8 +157,8 @@ pub fn shy_to_ui_event(shy_event shy.Event) !Event {
 				// button: button
 				// state: state
 				clicks: shy_event.clicks
-				x: shy_event.x
-				y: shy_event.y
+				x:      shy_event.x
+				y:      shy_event.y
 			}
 			// }
 		}
@@ -173,10 +173,10 @@ pub fn shy_to_ui_event(shy_event shy.Event) !Event {
 			// 			}
 			ui_event = MouseWheelEvent{
 				timestamp: shy_event.timestamp
-				x: shy_event.x
-				y: shy_event.y
-				scroll_x: shy_event.scroll_x
-				scroll_y: shy_event.scroll_y
+				x:         shy_event.x
+				y:         shy_event.y
+				scroll_x:  shy_event.scroll_x
+				scroll_y:  shy_event.scroll_y
 				// direction: dir
 			}
 			// }

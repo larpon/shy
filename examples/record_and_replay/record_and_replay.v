@@ -46,7 +46,7 @@ pub fn (mut a App) init() ! {
 		}*/
 		// recycle: true
 		loops: shy.infinite
-		loop: .pingpong
+		loop:  .pingpong
 	}
 
 	a.a_r = a.shy.new_animator[f32](a_config)
@@ -71,17 +71,17 @@ rect.x ${a.fa_x.value}
 rect.y ${a.fa_y.value}'
 
 	a.quick.rect(
-		x: a.fa_x.value
-		y: a.fa_y.value
+		x:        a.fa_x.value
+		y:        a.fa_y.value
 		rotation: rotation
-		origin: shy.Anchor.center
+		origin:   shy.Anchor.center
 	)
 
 	a.quick.text(
-		x: a.window.width * 0.01
-		y: a.window.height * 0.01
+		x:      a.window.width * 0.01
+		y:      a.window.height * 0.01
 		origin: shy.Anchor.top_left
-		text: text
+		text:   text
 	)
 }
 

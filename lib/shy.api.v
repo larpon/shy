@@ -133,9 +133,9 @@ pub fn vec4[T](x T, y T, z T, w T) vec.Vec4[T] {
 @[inline]
 pub fn rect(x f32, y f32, w f32, h f32) Rect {
 	return Rect{
-		x: x
-		y: y
-		width: w
+		x:      x
+		y:      y
+		width:  w
 		height: h
 	}
 }
@@ -143,7 +143,7 @@ pub fn rect(x f32, y f32, w f32, h f32) Rect {
 @[inline]
 pub fn size(w f32, h f32) Size {
 	return Size{
-		width: w
+		width:  w
 		height: h
 	}
 }

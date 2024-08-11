@@ -105,9 +105,9 @@ pub fn (mut g GFX) init() ! {
 		environment: env
 		// image_pool_size
 		// sampler_pool_size
-		shader_pool_size: 4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		shader_pool_size:   4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 4 * 1024 // default 64, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		logger: logger
+		logger:             logger
 	}
 	gfx.setup(&gfx_desc)
 
@@ -159,7 +159,7 @@ pub fn (mut g GFX) make_context() !u32 {
 
 	mut context := &Context{
 		shy: g.shy
-		id: context_id
+		id:  context_id
 	}
 
 	context.init()!
@@ -196,7 +196,7 @@ pub fn (mut c Context) init() ! {
 		shy: c.shy
 		// prealloc_contexts: 8
 		preload: preload_fonts
-		render: c.shy.config.render
+		render:  c.shy.config.render
 	})! // fonts.b.v
 	s.log.gdebug('${@STRUCT}.${@FN}', 'adding font context for GFX context ${c.id} ${ptr_str(font_context.fsc)}...')
 	c.font = font_context
@@ -216,36 +216,36 @@ fn (mut c Context) sokol_gl_init() ! {
 	gl_desc := &gl.Desc{
 		// max_vertices: 1_000_000
 		// max_commands: 100_000
-		context_pool_size: 2 * 512 // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
+		context_pool_size:  2 * 512 // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 2 * 1024 // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
-		sample_count: sample_count
+		sample_count:       sample_count
 	}
 	gl.setup(gl_desc)
 
 	// pass action and pipeline for the default render pass
 	mut gl_pip_desc := gfx.PipelineDesc{
 		cull_mode: .back
-		depth: gfx.DepthState{
+		depth:     gfx.DepthState{
 			write_enabled: true
-			compare: .less_equal
+			compare:       .less_equal
 		}
 	}
 
 	swapchain := gfx.Swapchain{
-		width: w
-		height: h
+		width:        w
+		height:       h
 		sample_count: sample_count
 		color_format: .rgba8
 		depth_format: .@none
-		gl: gfx.GlSwapchain{
+		gl:           gfx.GlSwapchain{
 			framebuffer: 0
 		}
 	}
 
 	display := Display{
 		pass_action: make_clear_pass(0.5, 0.7, 1.0, 1.0)
-		swapchain: swapchain
-		gl_pip: gl.context_make_pipeline(gl.default_context, &gl_pip_desc)
+		swapchain:   swapchain
+		gl_pip:      gl.context_make_pipeline(gl.default_context, &gl_pip_desc)
 	}
 
 	// create a sokol-gl context compatible with the offscreen render pass
@@ -261,16 +261,16 @@ fn (mut c Context) sokol_gl_init() ! {
 	// create an offscreen render target texture, pass, and pass_action
 	mut img_desc := gfx.ImageDesc{
 		render_target: true
-		width: w
-		height: h
-		pixel_format: .rgba8
-		sample_count: offscreen_sample_count
+		width:         w
+		height:        h
+		pixel_format:  .rgba8
+		sample_count:  offscreen_sample_count
 	}
 	off_img := gfx.make_image(&img_desc)
 
 	mut smp_desc := gfx.SamplerDesc{
-		wrap_u: .clamp_to_edge
-		wrap_v: .clamp_to_edge
+		wrap_u:     .clamp_to_edge
+		wrap_v:     .clamp_to_edge
 		min_filter: .linear
 		mag_filter: .linear
 	}
@@ -280,14 +280,14 @@ fn (mut c Context) sokol_gl_init() ! {
 	off_attach_desc.colors[0].image = off_img
 
 	offscreen := Offscreen{
-		width: w
-		height: h
-		attachments: gfx.make_attachments(&off_attach_desc)
-		pass_action: make_clear_pass(0.0, 0.0, 0.0, 1.0)
+		width:            w
+		height:           h
+		attachments:      gfx.make_attachments(&off_attach_desc)
+		pass_action:      make_clear_pass(0.0, 0.0, 0.0, 1.0)
 		attachments_desc: off_attach_desc
-		gl_ctx: gl.make_context(gl_ctx_desc)
-		img: off_img
-		sampler: off_sampler
+		gl_ctx:           gl.make_context(gl_ctx_desc)
+		img:              off_img
+		sampler:          off_sampler
 	}
 
 	c.display = display
@@ -303,16 +303,16 @@ fn (mut c Context) offscreen_reinit(width int, height int) ! {
 	// recreate an offscreen render target texture, pass, and pass_action
 	mut img_desc := gfx.ImageDesc{
 		render_target: true
-		width: width
-		height: height
-		pixel_format: .rgba8
-		sample_count: offscreen_sample_count
+		width:         width
+		height:        height
+		pixel_format:  .rgba8
+		sample_count:  offscreen_sample_count
 	}
 	off_img := gfx.make_image(&img_desc)
 
 	mut smp_desc := gfx.SamplerDesc{
-		wrap_u: .clamp_to_edge
-		wrap_v: .clamp_to_edge
+		wrap_u:     .clamp_to_edge
+		wrap_v:     .clamp_to_edge
 		min_filter: .linear
 		mag_filter: .linear
 	}
@@ -426,14 +426,14 @@ pub fn (mut g GFX) end_easy_frame(options EndOptions) {
 	match options.how {
 		.clear {
 			pass := gfx.Pass{
-				action: off.pass_action
+				action:      off.pass_action
 				attachments: off.attachments
 			}
 			gfx.begin_pass(&pass)
 		}
 		.passthru {
 			pass := gfx.Pass{
-				action: lib.dontcare_pass
+				action:      lib.dontcare_pass
 				attachments: off.attachments
 			}
 			gfx.begin_pass(&pass)
@@ -446,7 +446,7 @@ pub fn (mut g GFX) end_easy_frame(options EndOptions) {
 	gfx.end_pass()
 
 	pass := gfx.Pass{
-		action: dis.pass_action
+		action:    dis.pass_action
 		swapchain: dis.swapchain
 	}
 	gfx.begin_pass(&pass)

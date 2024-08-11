@@ -25,23 +25,23 @@ pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
 	a.eps = a.easy.new_particle_system(
-		width: a.window.width
+		width:  a.window.width
 		height: a.window.height
-		pool: 300
+		pool:   300
 	)
 
 	scale := f32(6.0)
 	a.eps.add(particle.Emitter{
-		rate: 50
+		rate:     50
 		position: shy.vec2[f32](shy.half * a.window.width, shy.half * a.window.height)
 		velocity: particle.PointDirection{
-			point: shy.vec2[f32](0.0, -0.5 * scale * 0.5)
+			point:           shy.vec2[f32](0.0, -0.5 * scale * 0.5)
 			point_variation: shy.vec2[f32](0.2, 0.5)
 		}
-		size_variation: shy.vec2[f32](10.0 * scale, 10 * scale)
-		life_time: 2000
+		size_variation:      shy.vec2[f32](10.0 * scale, 10 * scale)
+		life_time:           2000
 		life_time_variation: 1000
-		movement_velocity: 40
+		movement_velocity:   40
 	})
 
 	// For demo purposes, replace the default particle painter

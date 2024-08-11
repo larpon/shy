@@ -177,9 +177,9 @@ pub fn (t &Triangle) bbox() Rect {
 	min_y := mth.min(a_y, mth.min(b_y, c_y))
 	max_y := mth.max(a_y, mth.max(b_y, c_y))
 	return Rect{
-		x: min_x
-		y: min_y
-		width: max_x - min_x
+		x:      min_x
+		y:      min_y
+		width:  max_x - min_x
 		height: max_y - min_y
 	}
 }
@@ -301,17 +301,17 @@ pub fn (r &Rect) displaced_from(origin Origin) Rect {
 		Anchor {
 			rx, ry := origin.displace_rect(r)
 			Rect{
-				x: rx
-				y: ry
-				width: r.width
+				x:      rx
+				y:      ry
+				width:  r.width
 				height: r.height
 			}
 		}
 		Vec2[f32] {
 			Rect{
-				x: r.x - origin.x
-				y: r.y - origin.y
-				width: r.width
+				x:      r.x - origin.x
+				y:      r.y - origin.y
+				width:  r.width
 				height: r.height
 			}
 		}
@@ -326,9 +326,9 @@ pub fn (r Rect) point_at(anchor Anchor) (f32, f32) {
 
 pub fn (r &Rect) mul_scalar(scalar f32) Rect {
 	return Rect{
-		x: r.x * scalar
-		y: r.y * scalar
-		width: r.width * scalar
+		x:      r.x * scalar
+		y:      r.y * scalar
+		width:  r.width * scalar
 		height: r.height * scalar
 	}
 }
@@ -337,9 +337,9 @@ pub fn (r &Rect) mul_scalar(scalar f32) Rect {
 @[inline]
 pub fn (r &Rect) scale_at(origin_x f32, origin_y f32, factor_x f32, factor_y f32) Rect {
 	return Rect{
-		x: origin_x + (r.x - origin_x) * factor_x
-		y: origin_y + (r.y - origin_y) * factor_y
-		width: r.width * factor_x
+		x:      origin_x + (r.x - origin_x) * factor_x
+		y:      origin_y + (r.y - origin_y) * factor_y
+		width:  r.width * factor_x
 		height: r.height * factor_y
 	}
 }
@@ -421,7 +421,7 @@ pub fn (mut l Line) grow_b(length f32) {
 pub fn (l &Line) to_ray() Ray {
 	return Ray{
 		origin: l.a
-		angle: l.slope_angle()
+		angle:  l.slope_angle()
 	}
 }
 
@@ -577,9 +577,9 @@ pub mut:
 @[inline]
 pub fn (c &Circle) bbox() Rect {
 	return Rect{
-		x: c.x - (c.radius * 0.5)
-		y: c.y - (c.radius * 0.5)
-		width: c.radius * 2
+		x:      c.x - (c.radius * 0.5)
+		y:      c.y - (c.radius * 0.5)
+		width:  c.radius * 2
 		height: c.radius * 2
 	}
 }
@@ -606,9 +606,9 @@ pub fn (s1 Size) - (s2 Size) Size {
 @[inline]
 pub fn (s &Size) to_rect() Rect {
 	return Rect{
-		x: 0
-		y: 0
-		width: s.width
+		x:      0
+		y:      0
+		width:  s.width
 		height: s.height
 	}
 }
@@ -632,7 +632,7 @@ pub fn (s &Size) area() f32 {
 @[inline]
 pub fn (s Size) mul_scalar(scalar f32) Size {
 	return Size{
-		width: s.width * scalar
+		width:  s.width * scalar
 		height: s.height * scalar
 	}
 }
@@ -642,7 +642,7 @@ pub fn (s Size) mul_scalar(scalar f32) Size {
 @[inline]
 pub fn (s &Size) half() Size {
 	return Size{
-		width: s.width * 0.5
+		width:  s.width * 0.5
 		height: s.height * 0.5
 	}
 }
@@ -652,7 +652,7 @@ pub fn (s &Size) half() Size {
 @[inline]
 pub fn (s &Size) cast_via[U]() Size {
 	return Size{
-		width: U(s.width)
+		width:  U(s.width)
 		height: U(s.height)
 	}
 }

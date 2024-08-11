@@ -28,7 +28,7 @@ pub fn (mut a App) init() ! {
 			mode: .in_out
 		}
 		loops: shy.infinite
-		loop: .pingpong
+		loop:  .pingpong
 	)
 	if !a.a_r.running {
 		a.a_r.init(10, 500, 2500)
@@ -39,8 +39,8 @@ pub fn (mut a App) init() ! {
 @[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.circle(
-		x: (shy.half * a.window.width)
-		y: (shy.half * a.window.height)
+		x:      (shy.half * a.window.width)
+		y:      (shy.half * a.window.height)
 		radius: a.a_r.value()
 		stroke: shy.Stroke{
 			width: 10

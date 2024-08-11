@@ -18,9 +18,9 @@ fn C.shy_gl_read_rgba_pixels(x int, y int, width int, height int, pixels charptr
 // Supported formats are: `.png`, `.ppm`.
 pub fn (w Window) screenshot(path string) ! {
 	area := Rect{
-		x: 0
-		y: 0
-		width: w.width()
+		x:      0
+		y:      0
+		width:  w.width()
 		height: w.height()
 	}
 	return w.areashot(area, path)
@@ -110,9 +110,9 @@ fn (w Window) dump_pixels(rect Rect) &Screenshot {
 	img_pixels := unsafe { &u8(malloc(img_size)) }
 	C.shy_gl_read_rgba_pixels(rect.x, rect.y, img_width, img_height, img_pixels)
 	return &Screenshot{
-		width: img_width
+		width:  img_width
 		height: img_height
-		size: img_size
+		size:   img_size
 		pixels: img_pixels
 	}
 }

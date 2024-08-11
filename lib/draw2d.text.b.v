@@ -60,7 +60,7 @@ pub fn (mut dt DrawText) text_2d() Draw2DText {
 	assert !isnil(dt.font_context), 'DrawText.font_context is null'
 	return Draw2DText{
 		factor: dt.factor
-		fc: dt.font_context
+		fc:     dt.font_context
 	}
 }
 
@@ -311,9 +311,9 @@ pub fn (t Draw2DText) draw() {
 		$if shy_debug_draw ? {
 			if i == 0 {
 				t.dbg_draw_rect(Rect{
-					x: r.x - align_off_x / 2
-					y: r.y
-					width: max_w
+					x:      r.x - align_off_x / 2
+					y:      r.y
+					width:  max_w
 					height: max_h
 				})
 			}
@@ -391,9 +391,9 @@ pub fn (t Draw2DText) bounds(s string) Rect {
 	mut buf := [4]f32{}
 	font_context.text_bounds(0, 0, s, &buf[0])
 	return Rect{
-		x: buf[0]
-		y: buf[1]
-		width: buf[2] - buf[0]
+		x:      buf[0]
+		y:      buf[1]
+		width:  buf[2] - buf[0]
 		height: buf[3] - buf[1]
 	}
 }
@@ -417,8 +417,8 @@ pub fn (t Draw2DText) metrics() FontMetrics {
 	mut asc, mut desc, line_h := f32(0), f32(0), f32(0)
 	t.fc.fsc.vert_metrics(&asc, &desc, &line_h)
 	return FontMetrics{
-		ascender: asc
-		descender: desc
+		ascender:    asc
+		descender:   desc
 		line_height: line_h
 	}
 }

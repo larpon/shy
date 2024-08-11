@@ -20,19 +20,19 @@ pub mut:
 pub fn (mut r Rectangle) draw() {
 	vs := r.visual_state()
 	er := r.ui.easy.rect(
-		x: vs.x
-		y: vs.y
-		width: vs.width
-		height: vs.height
+		x:        vs.x
+		y:        vs.y
+		width:    vs.width
+		height:   vs.height
 		rotation: vs.rotation
-		scale: vs.scale
-		offset: vs.offset
-		origin: vs.origin
+		scale:    vs.scale
+		offset:   vs.offset
+		origin:   vs.origin
 		// easy rect config
 		stroke: r.stroke
 		radius: r.radius
-		color: r.color
-		fills: r.fills
+		color:  r.color
+		fills:  r.fills
 	)
 	er.draw()
 	// Draw rest of tree (children) on top

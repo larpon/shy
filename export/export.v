@@ -128,7 +128,7 @@ pub fn export(opt &Options) ! {
 
 	resolved_options := Options{
 		...opt
-		input: input
+		input:  input
 		output: output
 		format: format
 	}
@@ -379,10 +379,10 @@ exec "${EXEC}" "$@"'
 	]
 
 	rd_config := ResolveDependenciesConfig{
-		verbosity: opt.verbosity
-		format: opt.format
-		exe: v_app
-		excludes: so_excludes
+		verbosity:    opt.verbosity
+		format:       opt.format
+		exe:          v_app
+		excludes:     so_excludes
 		skip_resolve: skip_resolve
 	}
 	dependencies := resolve_dependencies(rd_config)!
@@ -750,7 +750,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 
 		conf := ResolveDependenciesConfig{
 			...config
-			exe: path
+			exe:    path
 			indent: indent + 1
 		}
 		resolve_dependencies_recursively(mut deps, conf)!

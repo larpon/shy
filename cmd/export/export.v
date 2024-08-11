@@ -135,20 +135,20 @@ pub fn args_to_options(arguments []string, defaults Options) !(Options, &flag.Fl
 
 	mut opt := Options{
 		assets_extra: fp.string_multi('assets', `a`, 'Asset dir(s) to include in build')
-		libs_extra: fp.string_multi('libs', `a`, 'Lib dir(s) to include in build')
-		v_flags: fp.string_multi('flag', `f`, 'Additional flags for the V compiler')
-		c_flags: fp.string_multi('cflag', `c`, 'Additional flags for the C compiler')
-		gl_version: fp.string('gl', 0, defaults.gl_version, 'GL(ES) version to use from any of 2,3,es2,es3')
+		libs_extra:   fp.string_multi('libs', `a`, 'Lib dir(s) to include in build')
+		v_flags:      fp.string_multi('flag', `f`, 'Additional flags for the V compiler')
+		c_flags:      fp.string_multi('cflag', `c`, 'Additional flags for the C compiler')
+		gl_version:   fp.string('gl', 0, defaults.gl_version, 'GL(ES) version to use from any of 2,3,es2,es3')
 		//
-		run: 'run' in cmd_flags
-		format: fp.string('format', 0, 'zip', 'Format of output (default is a .zip)')
+		run:        'run' in cmd_flags
+		format:     fp.string('format', 0, 'zip', 'Format of output (default is a .zip)')
 		dump_usage: fp.bool('help', `h`, defaults.dump_usage, 'Show this help message and exit')
-		cache: !fp.bool('nocache', 0, defaults.cache, 'Do not use build cache')
+		cache:      !fp.bool('nocache', 0, defaults.cache, 'Do not use build cache')
 		//
 		output: fp.string('output', `o`, defaults.output, 'Path to output (dir/file)')
 		//
 		verbosity: verbosity
-		parallel: !fp.bool('no-parallel', 0, false, 'Do not run tasks in parallel.')
+		parallel:  !fp.bool('no-parallel', 0, false, 'Do not run tasks in parallel.')
 		//
 		work_dir: defaults.work_dir
 	}
@@ -187,18 +187,18 @@ pub fn (opt &Options) to_export_options() export.Options {
 	mut gl_version := opt.gl_version
 
 	opts := export.Options{
-		verbosity: opt.verbosity
-		work_dir: opt.work_dir
-		parallel: opt.parallel
-		cache: !opt.nocache
+		verbosity:  opt.verbosity
+		work_dir:   opt.work_dir
+		parallel:   opt.parallel
+		cache:      !opt.nocache
 		gl_version: gl_version
-		format: format
-		input: opt.input
-		output: opt.output
-		is_prod: opt.is_prod
-		c_flags: opt.c_flags
-		v_flags: opt.v_flags
-		assets: opt.assets_extra
+		format:     format
+		input:      opt.input
+		output:     opt.output
+		is_prod:    opt.is_prod
+		c_flags:    opt.c_flags
+		v_flags:    opt.v_flags
+		assets:     opt.assets_extra
 	}
 	return opts
 }
