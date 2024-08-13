@@ -105,7 +105,7 @@ pub fn (mut g GFX) init() ! {
 		environment: env
 		// image_pool_size
 		// sampler_pool_size
-		shader_pool_size:   4 * 512 // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		shader_pool_size:   4 * 512  // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 4 * 1024 // default 64, NOTE this number affects the prealloc_contexts in fonts.b.v...
 		logger:             logger
 	}
@@ -216,7 +216,7 @@ fn (mut c Context) sokol_gl_init() ! {
 	gl_desc := &gl.Desc{
 		// max_vertices: 1_000_000
 		// max_commands: 100_000
-		context_pool_size:  2 * 512 // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
+		context_pool_size:  2 * 512  // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 2 * 1024 // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
 		sample_count:       sample_count
 	}
@@ -252,7 +252,7 @@ fn (mut c Context) sokol_gl_init() ! {
 	// (specific color pixel format, no depth-stencil-surface, no MSAA)
 	gl_ctx_desc := gl.ContextDesc{
 		max_vertices: 1_000_000 // TODO(lmp): make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
-		max_commands: 100_000 // TODO(lmp): make configurable default 16k
+		max_commands: 100_000   // TODO(lmp): make configurable default 16k
 		color_format: .rgba8
 		depth_format: .@none
 		sample_count: offscreen_sample_count

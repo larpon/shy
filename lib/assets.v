@@ -697,8 +697,8 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	}
 
 	mut smp_desc := gfx.SamplerDesc{
-		wrap_u:     opt.wrap_u // .clamp_to_edge
-		wrap_v:     opt.wrap_v // .clamp_to_edge
+		wrap_u:     opt.wrap_u     // .clamp_to_edge
+		wrap_v:     opt.wrap_v     // .clamp_to_edge
 		min_filter: opt.min_filter // .linear
 		mag_filter: opt.mag_filter // .linear
 	}
