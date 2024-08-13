@@ -116,10 +116,10 @@ pub fn launch_cmd(args []string, no_use_cache bool) ! {
 	if os.is_executable(tool_exe) {
 		os.setenv('SHY_EXE', os.join_path(cli.exe_dir, cli.exe_name), true)
 		$if windows {
-			exit(os.system('${os.quoted_path(tool_exe)} ${tool_args}'))
+			exit(os.system('${os.quoted_path(tool_exe)} ${args}'))
 		} $else $if js {
 			// no way to implement os.execvp in JS backend
-			exit(os.system('${tool_exe} ${tool_args}'))
+			exit(os.system('${tool_exe} ${args}'))
 		} $else {
 			os.execvp(tool_exe, args) or { return err }
 		}

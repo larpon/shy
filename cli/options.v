@@ -11,9 +11,11 @@ pub:
 	work_dir  string = work_directory @[xdoc: 'Directory to use for temporary work files']
 	//
 	nocache bool @[xdoc: 'Do not use caching']
-	// Detected environment
-	run        bool @[ignore]
-	dump_usage bool @[long: help; short: h; xdoc: 'Show this help message and exit']
+	//
+	run bool @[ignore]
+	// print info and exit
+	dump_usage   bool @[long: help; short: h; xdoc: 'Show this help message and exit']
+	show_version bool @[long: version; xdoc: 'Output version information and exit']
 pub mut:
 	// I/O
 	input  string @[tail]
@@ -24,7 +26,6 @@ pub mut:
 	v_flags      []string @[long: flag; short: f; xdoc: 'Additional flags for the V compiler']
 	assets_extra []string @[long: asset; short: a; xdoc: 'Asset dir(s) to include in build']
 	libs_extra   []string @[long: libs; short: l; xdoc: 'Lib dir(s) to include in build']
-	version      bool     @[xdoc: 'Output version information and exit']
 }
 
 // options_from_env returns an `Option` struct filled with flags set via

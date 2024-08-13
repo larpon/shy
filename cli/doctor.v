@@ -5,7 +5,7 @@ import shy.vxt
 
 // doctor prints various useful information to the shell to aid
 // diagnosticing the work environment.
-pub fn doctor(opt Options) {
+pub fn doctor() {
 	env_vars := os.environ()
 
 	// shy section
@@ -24,17 +24,11 @@ pub fn doctor(opt Options) {
 		print_var_if_set(env_vars, env_var)
 	}
 
-	// Product section
-	println('Product
-	Output "${opt.output}"')
-
 	// V section
 	println('V
 	Version ${vxt.version()} ${vxt.version_commit_hash()}
 	Path "${vxt.home()}"')
-	if opt.v_flags.len > 0 {
-		println('\tFlags ${opt.v_flags}')
-	}
+
 	// Print output of `v doctor` if v is found
 	if vxt.found() {
 		println('')

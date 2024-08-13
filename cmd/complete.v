@@ -77,6 +77,7 @@ SUBCMD:
 const auto_complete_commands = [
 	// tools in one .v file
 	'complete',
+	'export',
 	'test-cleancode',
 	// commands
 	'run',
@@ -112,6 +113,10 @@ const auto_complete_flags = [
 	'-o',
 ]
 const auto_complete_flags_complete = [
+	'--help',
+	'-h',
+]
+const auto_complete_flags_export = [
 	'--help',
 	'-h',
 ]
@@ -249,6 +254,9 @@ fn auto_complete_request(args []string) []string {
 			match parent_command {
 				'complete' { // 'shy complete -<tab>'
 					list = get_flags(auto_complete_flags_complete, part)
+				}
+				'export' { // 'shy export -<tab>'
+					list = get_flags(auto_complete_flags_export, part)
 				}
 				else {
 					for flag in auto_complete_flags {

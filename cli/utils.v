@@ -44,15 +44,15 @@ fn version() string {
 }
 
 // run_subcommand runs any sub-command detected in `args`.
-pub fn run_subcommand(args []string, opts Options) ! {
+pub fn run_subcommand(args []string, no_use_cache bool) ! {
 	if args.len > 1 && !args[1].starts_with('-') && args[1] in subcmds {
 		sub_command := args[1]
 		if sub_command == 'doctor' {
-			doctor(opts)
+			doctor()
 			exit(0)
 		}
 		// First encountered known sub-command is executed on the spot.
-		launch_cmd(args[args.index(sub_command)..], opts.nocache)!
+		launch_cmd(args[args.index(sub_command)..], no_use_cache)!
 		exit(0)
 	}
 }

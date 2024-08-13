@@ -16,6 +16,20 @@ fn main() {
 	// Start with defaults -> merge over SHY_FLAGS -> merge over cmdline flags -> merge .shy entries.
 	mut opt := cli.Options{}
 
+	// Run any sub-commands if found on the spot if found in args
+	cli.run_subcommand(args, '-nocache' in args) or {
+		eprintln(err)
+		exit(1)
+	}
+
+	/* TODO: (lmp) .shy should be first, then env then flags, right?
+	opt.extend_from_dot_shy() or {
+		eprintln('Error while parsing `.shy`: ${err}')
+		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
+		exit(1)
+	}
+	*/
+
 	opt = cli.options_from_env(opt) or {
 		eprintln('Error while parsing `SHY_FLAGS`: ${err}')
 		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
@@ -26,6 +40,11 @@ fn main() {
 		eprintln('Error while parsing arguments: ${err}')
 		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
 		exit(1)
+	}
+
+	if opt.show_version {
+		println('${cli.exe_short_name} ${cli.exe_version}')
+		exit(0)
 	}
 
 	if opt.dump_usage {
@@ -50,19 +69,7 @@ fn main() {
 		exit(1)
 	}
 
-	// Run any sub-commands if found on the spot if found in args
-	cli.run_subcommand(args, opt) or {
-		eprintln(err)
-		exit(1)
-	}
-
 	cli.validate_input(opt.input)!
-
-	opt.extend_from_dot_shy() or {
-		eprintln('Error while parsing `.shy`: ${err}')
-		eprintln('Use `${cli.exe_short_name} -h` to see all flags')
-		exit(1)
-	}
 
 	// Validate environment after options and input has been resolved
 	opt.validate_env() or { panic(err) }
