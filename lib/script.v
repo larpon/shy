@@ -17,6 +17,7 @@ mut:
 }
 
 pub fn (sc Scripts) new_wren_vm() !&WrenVM {
+	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	mut wvm := &WrenVM{
 		shy: sc.shy
 	}
@@ -27,6 +28,9 @@ pub fn (sc Scripts) new_wren_vm() !&WrenVM {
 pub fn (mut sc Scripts) init() ! {
 	sc.shy.assert_api_init()
 	sc.shy.log.gdebug('${@STRUCT}.${@FN}', '')
+	$if shy_use_wren ? {
+		sc.wren_vms << sc.new_wren_vm()!
+	}
 }
 
 fn (sc Scripts) on_frame(dt f64) {
