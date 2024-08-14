@@ -615,7 +615,8 @@ pub fn (mut w Window) init() ! {
 		sdl.gl_set_attribute(.context_minor_version, 0)
 	} $else $if android {
 		sdl.gl_set_attribute(.context_profile_mask, int(sdl.GLprofile.es))
-		sdl.gl_set_attribute(.context_major_version, 2)
+		// sdl.gl_set_attribute(.context_major_version, 2)
+		sdl.gl_set_attribute(.context_major_version, 3)
 	} $else {
 		sdl.gl_set_attribute(.context_flags, int(sdl.GLcontextFlag.forward_compatible_flag))
 		sdl.gl_set_attribute(.context_profile_mask, int(sdl.GLprofile.core))
