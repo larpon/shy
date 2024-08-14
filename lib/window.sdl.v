@@ -620,8 +620,8 @@ pub fn (mut w Window) init() ! {
 	} $else {
 		sdl.gl_set_attribute(.context_flags, int(sdl.GLcontextFlag.forward_compatible_flag))
 		sdl.gl_set_attribute(.context_profile_mask, int(sdl.GLprofile.core))
-		sdl.gl_set_attribute(.context_major_version, 3)
-		sdl.gl_set_attribute(.context_minor_version, 3)
+		sdl.gl_set_attribute(.context_major_version, 4)
+		sdl.gl_set_attribute(.context_minor_version, 1)
 	}
 	sdl.gl_set_attribute(.doublebuffer, 1)
 	sdl.gl_set_attribute(.depth_size, 24)
