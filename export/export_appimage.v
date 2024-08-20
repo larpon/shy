@@ -150,9 +150,7 @@ Name=${app_name}
 Exec=${app_name}
 Icon=${app_name}
 Type=Application
-Categories=Game;'
-
-	// TODO for term apps Terminal=true
+Categories=Game;' // TODO for term apps Terminal=true
 
 	os.write_file(desktop_path, desktop_contents)!
 

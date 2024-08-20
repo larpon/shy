@@ -16,7 +16,8 @@ import shy.particle
 // Quick is an internal struct for fire-and-forget/instant calling of Easy methods.
 //[noinit]
 pub struct Quick {
-pub mut: // TODO error: field ... is not public - make this just "pub" to callers - and mut to internal system
+pub mut:
+	// TODO error: field ... is not public - make this just "pub" to callers - and mut to internal system
 	easy &Easy = shy.null
 }
 

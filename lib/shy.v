@@ -26,7 +26,8 @@ mut:
 // ShyStruct is meant to be used as an embed for all types that need to have access to
 // all sub-systems of the Shy struct.
 struct ShyStruct {
-pub mut: // TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
+pub mut:
+	// TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
 	shy &Shy = lib.null
 }
 
