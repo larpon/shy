@@ -145,15 +145,23 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	$if shy_debug_assets ? {
 		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loading "${source}"...')
 	}
-	mut bytes := []u8{}
+	mut bytes := []u8{len: 0}
 	match source {
 		string {
-			if !os.is_file(source) {
-				return error('${@STRUCT}.${@FN}: "${source}" does not exist on the file system')
-			}
 			analyse.count('${@MOD}.${@STRUCT}.${@FN}(filesystem)', 1)
-			bytes = os.read_bytes(source) or {
-				return error('${@STRUCT}.${@FN}: "${source}" could not be loaded')
+			$if android && !termux {
+				if !source.starts_with('/') {
+					bytes = sdl_read_bytes_from_apk(source)!
+				} else {
+					return error('${@STRUCT}.${@FN}:${@LINE}: paths should be *relative* when loaded from an Android APK/AAB, "${source}" is not')
+				}
+			} $else {
+				if !os.is_file(source) {
+					return error('${@STRUCT}.${@FN}:${@LINE}: "${source}" does not exist on the file system')
+				}
+				bytes = os.read_bytes(source) or {
+					return error('${@STRUCT}.${@FN}: "${source}" could not be loaded')
+				}
 			}
 			$if shy_debug_assets ? {
 				a.shy.log.gdebug('${@STRUCT}.${@FN}', 'read successfully from string')
@@ -167,12 +175,20 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 			}
 		}
 		TaggedSource {
-			if !os.is_file(source.str()) {
-				return error('${@STRUCT}.${@FN}: "${source.str()}" does not exist on the file system')
-			}
 			analyse.count('${@MOD}.${@STRUCT}.${@FN}(filesystem)', 1)
-			bytes = os.read_bytes(source.str()) or {
-				return error('${@STRUCT}.${@FN}: "${source.str()}" could not be loaded')
+			$if android && !termux {
+				if !source.str().starts_with('/') {
+					bytes = sdl_read_bytes_from_apk(source.str())!
+				} else {
+					return error('${@STRUCT}.${@FN}:${@LINE}: paths should be *relative* when loaded from an Android APK/AAB, "${source.str()}" is not')
+				}
+			} $else {
+				if !os.is_file(source.str()) {
+					return error('${@STRUCT}.${@FN}:${@LINE}: "${source.str()}" does not exist on the file system')
+				}
+				bytes = os.read_bytes(source.str()) or {
+					return error('${@STRUCT}.${@FN}: "${source.str()}" could not be loaded')
+				}
 			}
 			$if shy_debug_assets ? {
 				a.shy.log.gdebug('${@STRUCT}.${@FN}', 'read successfully from tagged string')
@@ -180,6 +196,11 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		}
 	}
 	analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@bytes', u64(bytes.len))
+
+	if bytes.len <= 0 {
+		return error('${@STRUCT}.${@FN}:${@LINE}: error loaded <= 0 bytes from "${source.str()}"')
+	}
+
 	// PERFORMANCE: TODO preallocated asset pool??
 	asset := &Asset{
 		shy:    a.shy
@@ -487,7 +508,7 @@ fn (a AssetSource) cache_key(mut sb strings.Builder) string {
 }
 
 pub fn (a AssetSource) str() string {
-	return match a {
+	s := match a {
 		string {
 			a
 		}
@@ -498,6 +519,7 @@ pub fn (a AssetSource) str() string {
 			a.source.str()
 		}
 	}
+	return s
 }
 
 pub type AssetOptions = BlobOptions | ImageOptions | SoundOptions
@@ -645,6 +667,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		return error('${@STRUCT}.${@FN}' +
 			': stbi failed loading asset "${a.lo.source}". Error: ${err}')
 	}
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded asset "${a.lo.source}" via stbi')
 
 	mut new_width := int(stb_img.width)
 	mut new_height := int(stb_img.height)

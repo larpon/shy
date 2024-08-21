@@ -165,7 +165,7 @@ struct ExampleApp {
 
 // asset unifies locating example project assets
 pub fn (ea ExampleApp) asset(path string, option AssetLoadOption) shy.AssetSource {
-	$if wasm32_emscripten {
+	$if wasm32_emscripten || android {
 		return path
 	}
 	source := os.join_path(@VMODROOT, 'assets', path)
@@ -264,7 +264,7 @@ struct TestApp {
 
 // asset unifies locating project assets for visually tested apps
 pub fn (ta TestApp) asset(path string, option AssetLoadOption) shy.AssetSource {
-	$if wasm32_emscripten {
+	$if wasm32_emscripten || android {
 		return path
 	}
 

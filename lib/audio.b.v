@@ -134,10 +134,19 @@ pub fn (mut ae AudioEngine) load(source AssetSource) !u16 {
 	return ae.sound_id
 }
 
-fn (ae &AudioEngine) load_file(path string) !&ma.Sound {
+fn (mut ae AudioEngine) load_file(path string) !&ma.Sound {
 	sound := &ma.Sound{}
-	if ma.sound_init_from_file(ae.e, path.str, 0, ma.null, ma.null, sound) != .success {
-		return error('${@STRUCT}.${@FN}: failed to load "${path}"')
+	$if android && !termux {
+		if !path.starts_with('/') {
+			bytes := sdl_read_bytes_from_apk(path)!
+			return ae.load_bytes(bytes)!
+		} else {
+			return error('${@STRUCT}.${@FN}:${@LINE}: paths should be *relative* when loaded from an Android APK/AAB, "${path}" is not')
+		}
+	} $else {
+		if ma.sound_init_from_file(ae.e, path.str, 0, ma.null, ma.null, sound) != .success {
+			return error('${@STRUCT}.${@FN}:${@LINE}: failed to load "${path}"')
+		}
 	}
 	return sound
 }

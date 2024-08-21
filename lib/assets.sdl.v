@@ -84,3 +84,39 @@ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
 	// 	}
 	return surf
 }
+
+fn sdl_read_bytes_from_apk(source string) ![]u8 {
+	$if android && !termux {
+		// TODO: FIXME, this is a little messy
+		rw := sdl.rw_from_file(source.str, 'rb'.str)
+		if rw == sdl.null {
+			error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+			return error('${@FN}:${@LINE}: "${source}" could not be opened via sdl.rw_from_file. SDL2 says: ${error_msg}')
+		}
+		len := rw.size()
+		if len < 0 {
+			error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+			return error('${@FN}:${@LINE}: size of "${source}" could not be read via rw.size(). SDL2 says: ${error_msg}')
+		}
+		mut bytes := []u8{len: int(len)}
+		// just read everything it in one go for now
+		chunks_per_read := len
+		max_chunks_to_be_read := 1
+		mut total_chunks_read := 0
+		for {
+			chunks_read := rw.read(bytes.data, usize(chunks_per_read), usize(max_chunks_to_be_read))
+			total_chunks_read += int(chunks_read)
+			if chunks_read <= 0 {
+				break
+			}
+		}
+		// NOTE: the rw.read function return 0 both on error and EOF...
+		if total_chunks_read == 0 {
+			error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
+			return error('${@FN}:${@LINE}: "${source}" failed reading via rw.read. SDL2 says: ${error_msg}')
+		}
+		rw.close()
+		return bytes
+	}
+	return error('${@FN}:${@LINE}: "${source}" failed reading. ${@FN} only works on Android, with sdl and only with apk/aab packages.')
+}
