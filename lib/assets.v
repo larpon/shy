@@ -699,14 +699,15 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	}
 
 	mut image := Image{
-		asset:    a
-		opt:      opt
-		width:    stb_img.width
-		height:   stb_img.height
+		asset:   a
+		opt:     opt
+		width:   stb_img.width
+		height:  stb_img.height
+		mipmaps: opt.mipmaps
+		ready:   stb_img.ok
+		kind:    .png // TODO stb_img.ext
+		//
 		channels: stb_img.use_channels
-		mipmaps:  opt.mipmaps
-		ready:    stb_img.ok
-		kind:     .png // TODO stb_img.ext
 	}
 
 	// Sokol image
