@@ -8,4 +8,4 @@ See the examples folder for usage.
 
 # Install
 
-`git clone https://github.com/Larpon/wren.git ~/.vmodules/wren`
+`git clone https://github.com/larpon/wren.git ~/.vmodules/wren`

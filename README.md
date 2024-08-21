@@ -10,7 +10,7 @@ The `shy` project works both as a V module and a standalone CLI tool.
 
 # Games made with Shy
 
-[Puzzle Vibes](https://blackgrain.itch.io/puzzle-vibes) ([Source](https://github.com/Larpon/puzzle_vibes))
+[Puzzle Vibes](https://blackgrain.itch.io/puzzle-vibes) ([Source](https://github.com/larpon/puzzle_vibes))
 
 # Targets
 
@@ -31,7 +31,7 @@ Windows, macOS, Linux, Raspberry PI, Android, Web (WASM/emscripten) and likely m
 * 2D shape collision detection.
 * 3D capable (via `sokol_gfx.h`)
 * Multiple, runtime switchable, render modes (immediate, UI, step).
-* [Visually tested](https://github.com/Larpon/shy/blob/master/.github/workflows/ci_visual_tests.yml) for graphic regressions.
+* [Visually tested](https://github.com/larpon/shy/blob/master/.github/workflows/ci_visual_tests.yml) for graphic regressions.
 * Fairly sub-system agnostic. Bring your own ECS, physics engine etc.
 * [WIP] Assets system for easy loading (and freeing) of all kinds of assets: binary blobs, images,
 music, sounds etc.
@@ -116,7 +116,7 @@ sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
 
 ## Shell tab completion (optional)
 You can install tab completions for your shell by [following the instructions
-here](https://github.com/Larpon/shy/blob/fb26741/cmd/complete.v#L11-L38).
+here](https://github.com/larpon/shy/blob/fb26741/cmd/complete.v#L11-L38).
 
 # Gamepad / Controller support
 

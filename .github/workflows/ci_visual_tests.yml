@@ -53,7 +53,7 @@ jobs:
         chmod +x ./imgur.sh
 
         # Get reference images to test against
-        git clone https://github.com/Larpon/shy-visual-tests
+        git clone https://github.com/larpon/shy-visual-tests
 
     - name: Build SDL
       run: |
