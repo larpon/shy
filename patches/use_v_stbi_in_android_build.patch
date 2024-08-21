@@ -1,0 +1,48 @@
+diff --git a/lib/assets.sdl.v b/lib/assets.sdl.v
+index 3809b74..ec07389 100644
+--- a/lib/assets.sdl.v
++++ b/lib/assets.sdl.v
+@@ -5,7 +5,7 @@ module lib
+ 
+ // import os
+ import sdl
+-import shy.wraps.stbi
++import stbi
+ import shy.analyse
+ 
+ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
+diff --git a/lib/assets.v b/lib/assets.v
+index 82aae78..d4bd370 100644
+--- a/lib/assets.v
++++ b/lib/assets.v
+@@ -6,7 +6,7 @@ module lib
+ import os
+ import strings
+ import shy.wraps.sokol.gfx
+-import shy.wraps.stbi
++import stbi
+ import v.embed_file
+ import shy.analyse
+ import shy.fetch
+@@ -707,7 +707,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
+ 		ready:   stb_img.ok
+ 		kind:    .png // TODO stb_img.ext
+ 		//
+-		channels: stb_img.use_channels
++		channels: stb_img.nr_channels
+ 	}
+ 
+ 	// Sokol image
+diff --git a/lib/window.sdl.c.v b/lib/window.sdl.c.v
+index 11b3a11..7b66655 100644
+--- a/lib/window.sdl.c.v
++++ b/lib/window.sdl.c.v
+@@ -4,7 +4,7 @@
+ module lib
+ 
+ import os
+-import shy.wraps.stbi
++import stbi
+ 
+ #include "@VMODROOT/lib/shy_gl_read_pixels.h"
+ 
