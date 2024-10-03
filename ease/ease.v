@@ -433,20 +433,20 @@ pub fn elastic(t f64, mode Mode) f64 {
 
 @[inline]
 pub fn in_elastic(t f64) f64 {
-	return -math.pow(2, 10 * t) * math.sin((t * 10 - 10.75) * ease.c4)
+	return -math.pow(2, 10 * t) * math.sin((t * 10 - 10.75) * c4)
 }
 
 @[inline]
 pub fn out_elastic(t f64) f64 {
-	return math.pow(2, -10 * t) * math.sin((t * 10 - 0.75) * ease.c4) + 1
+	return math.pow(2, -10 * t) * math.sin((t * 10 - 0.75) * c4) + 1
 }
 
 @[inline]
 pub fn in_out_elastic(t f64) f64 {
 	return if t < 0.5 {
-		-(math.pow(2, 20 * t - 10) * math.sin((20 * t - 11.125) * ease.c5)) / 2
+		-(math.pow(2, 20 * t - 10) * math.sin((20 * t - 11.125) * c5)) / 2
 	} else {
-		(math.pow(2, -20 * t + 10) * math.sin((20 * t - 11.125) * ease.c5)) / 2 + 1
+		(math.pow(2, -20 * t + 10) * math.sin((20 * t - 11.125) * c5)) / 2 + 1
 	}
 }
 
@@ -466,20 +466,20 @@ pub fn back(t f64, mode Mode) f64 {
 
 @[inline]
 pub fn in_back(t f64) f64 {
-	return ease.c3 * t * t * t - ease.c1 * t * t
+	return c3 * t * t * t - c1 * t * t
 }
 
 @[inline]
 pub fn out_back(t f64) f64 {
-	return 1.0 + ease.c3 * math.pow(t - 1, 3) + ease.c1 * math.pow(t - 1, 2)
+	return 1.0 + c3 * math.pow(t - 1, 3) + c1 * math.pow(t - 1, 2)
 }
 
 @[inline]
 pub fn in_out_back(t f64) f64 {
 	return if t < 0.5 {
-		(math.pow(2 * t, 2) * ((ease.c2 + 1) * 2 * t - ease.c2)) / 2
+		(math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
 	} else {
-		(math.pow(2 * t - 2, 2) * ((ease.c2 + 1) * (t * 2 - 2) + ease.c2) + 2) / 2
+		(math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2
 	}
 }
 

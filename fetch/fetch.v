@@ -50,7 +50,7 @@ mut:
 	job_queue []LoadJob
 	ch_in     chan LoadJob
 	ch_out    chan JobStatus
-	threads   []thread = []thread{cap: int(fetch.c_max_threads)}
+	threads   []thread = []thread{cap: int(c_max_threads)}
 }
 
 @[params]
@@ -88,7 +88,7 @@ pub:
 
 pub fn (mut l Loader) init() ! {
 	// l.threads := []thread{cap: c_max_threads}
-	for t in 0 .. fetch.c_max_threads {
+	for t in 0 .. c_max_threads {
 		l.threads << spawn l.worker(t, l.ch_in, l.ch_out)
 	}
 }
@@ -214,10 +214,10 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 			bytes_total := bytes.len
 			mut bytes_sent := 0
 			for bytes_sent < bytes_total {
-				mut chunk := [fetch.c_chunk_size]u8{}
+				mut chunk := [c_chunk_size]u8{}
 				mut size := u16(0)
 				mut one_byte := bytes[bytes_sent]
-				for i := 0; i < fetch.c_chunk_size; i++ {
+				for i := 0; i < c_chunk_size; i++ {
 					chunk[i] = one_byte
 					size++
 					bytes_sent++

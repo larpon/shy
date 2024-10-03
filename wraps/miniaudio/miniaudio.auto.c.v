@@ -4809,7 +4809,7 @@ pub enum IosSessionCategoryOption {
 	default_to_speaker                         = C.ma_ios_session_category_option_default_to_speaker                         // 0x08, AVAudioSessionCategoryOptionDefaultToSpeaker
 	interrupt_spoken_audio_and_mix_with_others = C.ma_ios_session_category_option_interrupt_spoken_audio_and_mix_with_others // 0x11, AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers
 	allow_bluetooth_a2dp                       = C.ma_ios_session_category_option_allow_bluetooth_a2dp                       // 0x20, AVAudioSessionCategoryOptionAllowBluetoothA2DP
-	allow_air_play                             = C.ma_ios_session_category_option_allow_air_play                             // 0x40, AVAudioSessionCategoryOptionAllowAirPlay
+	allow_air_play                             = C.ma_ios_session_category_option_allow_air_play // 0x40, AVAudioSessionCategoryOptionAllowAirPlay
 }
 
 // OpenslStreamType is C.ma_opensl_stream_type

@@ -32,9 +32,9 @@ pub fn (mut a App) init() ! {
 
 	scale := f32(6.0)
 	a.eps.add(particle.Emitter{
-		rate:     50
-		position: shy.vec2[f32](shy.half * a.window.width, shy.half * a.window.height)
-		velocity: particle.PointDirection{
+		rate:                50
+		position:            shy.vec2[f32](shy.half * a.window.width, shy.half * a.window.height)
+		velocity:            particle.PointDirection{
 			point:           shy.vec2[f32](0.0, -0.5 * scale * 0.5)
 			point_variation: shy.vec2[f32](0.2, 0.5)
 		}

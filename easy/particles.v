@@ -110,11 +110,11 @@ pub fn (mut e Easy) image_particle_painter(config ImageParticlePainterConfig) Im
 
 fn default_particle_painter(mut e Easy) ImageParticlePainter {
 	e.quick.load(shy.ImageOptions{
-		source: easy.default_particle_image
+		source: default_particle_image
 	}) or { panic(err) }
 
 	return e.image_particle_painter(
-		source:          easy.default_particle_image
+		source:          default_particle_image
 		color_variation: shy.ColorVariation{0, 0, 0, 0.3}
 	)
 }
@@ -125,7 +125,7 @@ pub:
 	groups          []string  = ['default']
 	color           shy.Color = shy.colors.shy.white
 	color_variation shy.ColorVariation
-	source          shy.AssetSource = easy.default_particle_image
+	source          shy.AssetSource = default_particle_image
 }
 
 @[noinit: 'Easy.make_image_particle_painter']
@@ -135,7 +135,7 @@ mut:
 	groups          []string  = ['default']
 	color           shy.Color = shy.colors.shy.white
 	color_variation shy.ColorVariation
-	source          shy.AssetSource = easy.default_particle_image
+	source          shy.AssetSource = default_particle_image
 }
 
 fn (mut ip ImageParticlePainter) init(mut p particle.Particle) {

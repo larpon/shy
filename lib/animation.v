@@ -325,7 +325,7 @@ fn (mut a Animator[T]) ended() {
 			if a.loops > 0 {
 				a.loops--
 				a.restart()
-			} else if a.loops == lib.infinite {
+			} else if a.loops == infinite {
 				a.restart()
 			} else {
 				a.running = false
@@ -338,7 +338,7 @@ fn (mut a Animator[T]) ended() {
 				a.from, a.to = a.to, a.from
 				a.loops--
 				a.restart()
-			} else if a.loops == lib.infinite {
+			} else if a.loops == infinite {
 				a.from, a.to = a.to, a.from
 				a.restart()
 			} else {

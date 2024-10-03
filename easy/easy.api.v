@@ -696,8 +696,8 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 	}
 
 	return Image{
-		shy:  e.shy
-		Rect: shy.Rect{
+		shy:       e.shy
+		Rect:      shy.Rect{
 			x:      0
 			y:      0
 			width:  0

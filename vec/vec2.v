@@ -271,7 +271,7 @@ pub fn (v Vec2[T]) eq(u Vec2[T]) bool {
 
 // eq_epsilon returns a bool indicating if the two vectors are equal within the module `vec_epsilon` const.
 pub fn (v Vec2[T]) eq_epsilon(u Vec2[T]) bool {
-	return v.eq_approx[T, f32](u, vec.vec_epsilon)
+	return v.eq_approx[T, f32](u, vec_epsilon)
 }
 
 // x_eq_approx returns whether the `v.x` component of vector `v` is approximately equal to `x`, within `tolerance`.
@@ -441,7 +441,7 @@ pub fn (v Vec2[T]) sum() T {
 pub fn (v Vec2[T]) move_toward[U](to Vec2[T], delta U) Vec2[T] {
 	vdiff := to.sub(v)
 	len := vdiff.magnitude()
-	if len <= delta || len < vec.vec_epsilon {
+	if len <= delta || len < vec_epsilon {
 		return to
 	}
 	return v.add(vdiff.div_scalar(len * delta))

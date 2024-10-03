@@ -26,7 +26,7 @@ pub fn create_desc() gfx.Desc {
 	}
 
 	return gfx.Desc{
-		context: gfx.ContextDesc{
+		context:         gfx.ContextDesc{
 			metal:        metal_desc
 			d3d11:        d3d11_desc
 			color_format: .bgra8

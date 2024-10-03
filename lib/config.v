@@ -91,27 +91,27 @@ pub:
 pub struct WindowConfig {
 	Rect
 pub:
-	title      string = lib.defaults.window.title
-	resizable  bool   = lib.defaults.window.resizable
-	fullscreen bool   = lib.defaults.window.fullscreen
+	title      string = defaults.window.title
+	resizable  bool   = defaults.window.resizable
+	fullscreen bool   = defaults.window.fullscreen
 	visible    bool   = true
-	color      Color  = lib.defaults.window.color
+	color      Color  = defaults.window.color
 	// TODO ? flags WindowFlag
 	render RenderConfig
 }
 
 pub struct RenderConfig {
 pub:
-	update_rate         f64   = lib.defaults.render.update_rate
-	update_multiplicity u8    = lib.defaults.render.update_multiplicity
-	lock_framerate      bool  = lib.defaults.render.lock_framerate
-	time_history_count  u8    = lib.defaults.render.time_history_count
-	vsync               VSync = lib.defaults.render.vsync
-	msaa                int   = lib.defaults.render.msaa
+	update_rate         f64   = defaults.render.update_rate
+	update_multiplicity u8    = defaults.render.update_multiplicity
+	lock_framerate      bool  = defaults.render.lock_framerate
+	time_history_count  u8    = defaults.render.time_history_count
+	vsync               VSync = defaults.render.vsync
+	msaa                int   = defaults.render.msaa
 }
 
 pub struct InputConfig {
-	mice bool = lib.defaults.input.mice
+	mice bool = defaults.input.mice
 }
 
 pub fn config_from_toml_file(path string) !Config {
@@ -127,22 +127,22 @@ pub fn config_from_toml_text(toml_text string) !Config {
 	//
 	toml_rend_c := toml_doc.value('shy.render')
 	rend_c := RenderConfig{
-		update_rate:         toml_rend_c.value('update_rate').default_to(lib.defaults.render.update_rate).f64()
-		update_multiplicity: u8(toml_rend_c.value('update_multiplicity').default_to(int(lib.defaults.render.update_multiplicity)).int())
-		lock_framerate:      toml_rend_c.value('lock_framerate').default_to(lib.defaults.render.lock_framerate).bool()
-		time_history_count:  u8(toml_rend_c.value('time_history_count').default_to(int(lib.defaults.render.time_history_count)).int())
+		update_rate:         toml_rend_c.value('update_rate').default_to(defaults.render.update_rate).f64()
+		update_multiplicity: u8(toml_rend_c.value('update_multiplicity').default_to(int(defaults.render.update_multiplicity)).int())
+		lock_framerate:      toml_rend_c.value('lock_framerate').default_to(defaults.render.lock_framerate).bool()
+		time_history_count:  u8(toml_rend_c.value('time_history_count').default_to(int(defaults.render.time_history_count)).int())
 		vsync:               vsynctype_from_string(toml_rend_c.value('vsync').default_to('on').string())
-		msaa:                toml_rend_c.value('msaa').default_to(lib.defaults.render.msaa).int()
+		msaa:                toml_rend_c.value('msaa').default_to(defaults.render.msaa).int()
 	}
 	wc := WindowConfig{
-		title:     toml_wc.value('title').default_to(lib.defaults.window.title).string()
-		resizable: toml_wc.value('resizable').default_to(lib.defaults.window.resizable).bool()
+		title:     toml_wc.value('title').default_to(defaults.window.title).string()
+		resizable: toml_wc.value('resizable').default_to(defaults.window.resizable).bool()
 		render:    rend_c
 	}
 	//
 	toml_input_c := toml_doc.value('shy.input')
 	input_c := InputConfig{
-		mice: toml_input_c.value('mice').default_to(lib.defaults.input.mice).bool()
+		mice: toml_input_c.value('mice').default_to(defaults.input.mice).bool()
 	}
 
 	return Config{

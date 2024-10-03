@@ -176,7 +176,7 @@ pub fn string_to_export_format(str string) !Format {
 			.android_aab
 		}
 		else {
-			error('${@MOD}.${@FN}: unsupported format "${str}". Available: ${export.available_format_strings}')
+			error('${@MOD}.${@FN}: unsupported format "${str}". Available: ${available_format_strings}')
 		}
 	}
 }

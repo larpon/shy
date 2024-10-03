@@ -706,7 +706,7 @@ pub const sg_max_mipmaps = 16
 @[typedef]
 pub struct C.sg_image_data {
 pub mut:
-	subimage [gfx.sg_cubeface_num][gfx.sg_max_mipmaps]Range
+	subimage [sg_cubeface_num][sg_max_mipmaps]Range
 }
 
 pub type ImageData = C.sg_image_data

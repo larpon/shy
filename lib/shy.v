@@ -28,7 +28,7 @@ mut:
 struct ShyStruct {
 pub mut:
 	// TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
-	shy &Shy = lib.null
+	shy &Shy = null
 }
 
 pub fn (s ShyStruct) str() string {
@@ -43,7 +43,7 @@ fn (s ShyStruct) init() ! {
 
 fn (mut s ShyStruct) shutdown() ! {
 	assert !isnil(s.shy), '${@STRUCT}.${@FN}' + 'shy is null'
-	s.shy = lib.null
+	s.shy = null
 }
 
 struct ShyFrame {
@@ -247,11 +247,11 @@ pub fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string
 			match area {
 				.hot_code {
 					if s.state.in_hot_code {
-						s.log.gwarn('${lib.vet_tag} ' + prefix, msg)
+						s.log.gwarn('${vet_tag} ' + prefix, msg)
 					}
 				}
 				else {
-					s.log.gwarn('${lib.vet_tag} ' + prefix, msg)
+					s.log.gwarn('${vet_tag} ' + prefix, msg)
 				}
 			}
 		}

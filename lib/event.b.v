@@ -45,7 +45,7 @@ pub fn (mut e Events) init() ! {
 		e.queue.free()
 		// free(e.queue) // TODO fail when using `-gc none`
 	}
-	e.queue = []Event{len: 0, cap: 10000, init: lib.empty_event}
+	e.queue = []Event{len: 0, cap: 10000, init: empty_event}
 	unsafe { e.queue.flags.set(.noslices | .noshrink | .nogrow) }
 	analyse.max('${@MOD}.${@STRUCT}.queue.cap', e.queue.cap)
 }

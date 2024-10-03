@@ -98,7 +98,7 @@ pub:
 // record_frame acts according to the config specified in `shy.frame_record_config`.
 @[if shy_record ?]
 fn (mut w Window) record_frame() {
-	rc := lib.frame_record_config
+	rc := frame_record_config
 	frame := w.state.frame
 	valid_window := rc.windows.len == 0 || w.id in rc.windows
 	if !valid_window {

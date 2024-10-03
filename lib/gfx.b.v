@@ -433,7 +433,7 @@ pub fn (mut g GFX) end_easy_frame(options EndOptions) {
 		}
 		.passthru {
 			pass := gfx.Pass{
-				action:      lib.dontcare_pass
+				action:      dontcare_pass
 				attachments: off.attachments
 			}
 			gfx.begin_pass(&pass)

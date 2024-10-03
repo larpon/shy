@@ -23,7 +23,7 @@ mut:
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 	a.a_r = a.shy.new_animator[f32](
-		ease: ease.Ease{
+		ease:  ease.Ease{
 			kind: .sine // .back
 			mode: .in_out
 		}

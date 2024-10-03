@@ -97,7 +97,7 @@ pub fn (mut a App) event(e shy.Event) {
 					end_value := a.a_r.value()
 					if a.window.mode == .immediate {
 						a.a_r = a.shy.new_animator[f32](
-							ease: ease.Ease{
+							ease:  ease.Ease{
 								kind: .sine
 								mode: .in_out
 							}
@@ -106,7 +106,7 @@ pub fn (mut a App) event(e shy.Event) {
 						)
 					} else {
 						a.a_r = a.shy.new_animator[f32](
-							ease: ease.Ease{
+							ease:  ease.Ease{
 								kind: .sine
 								mode: .in_out
 							}
