@@ -31,7 +31,7 @@ pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
 	a_config := shy.AnimatorConfig{
-		ease: ease.Ease{
+		ease:    ease.Ease{
 			kind: .sine
 			mode: .in_out
 			// custom_fn: custom_ease

@@ -21,11 +21,11 @@ pub fn (mut s System) new_particle() &Particle {
 		position:     vec.Vec2[f32]{0, 0}
 		velocity:     vec.Vec2[f32]{0, 0}
 		acceleration: vec.Vec2[f32]{0, 0}
-		size:         particle.default_size
+		size:         default_size
 		rotation:     0
 		scale:        1
-		color:        particle.default_color
-		life_time:    particle.default_life_time
+		color:        default_color
+		life_time:    default_life_time
 	}
 
 	ep := ParticleState{
@@ -158,12 +158,12 @@ pub fn (mut p Particle) reset() {
 	p.position.zero()
 	p.acceleration.zero()
 	p.velocity.zero()
-	p.color = particle.default_color
+	p.color = default_color
 
 	p.rotation = 0
 	p.scale = 1
 
-	p.life_time = particle.default_life_time
+	p.life_time = default_life_time
 
 	p.set_init()
 }

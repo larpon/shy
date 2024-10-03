@@ -38,7 +38,7 @@ pub type Allocator = C.sfons_allocator_t
 struct C.sfons_desc_t {
 	width     int // initial width of font atlas texture (default: 512, must be power of 2)
 	height    int // initial height of font atlas texture (default: 512, must be power of 2)
-	allocator Allocator = sfons.default_allocator // optional memory allocation overrides
+	allocator Allocator = default_allocator // optional memory allocation overrides
 }
 
 pub type Desc = C.sfons_desc_t

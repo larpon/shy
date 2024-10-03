@@ -22,7 +22,7 @@ mut:
 // increase it's value by `amount`.
 @[if shy_analyse ?]
 fn tagged_count[T](tag string, key string, amount T) {
-	mut a := unsafe { analyse.hack } // TODO
+	mut a := unsafe { hack } // TODO
 	nkey := '[${tag}]${key}'
 	$if T is int {
 		a.entries[nkey] = '${a.entries[nkey].int() + amount}'
@@ -63,7 +63,7 @@ pub fn count_and_sum[T](key string, amount T) {
 
 @[if shy_analyse ?]
 pub fn max[T](key string, amount T) {
-	mut a := unsafe { analyse.hack } // TODO
+	mut a := unsafe { hack } // TODO
 	nkey := '[${@FN}]${key}'
 	$if T is int {
 		cur_amount := a.entries[nkey].int()
@@ -103,7 +103,7 @@ pub fn max[T](key string, amount T) {
 
 @[if shy_analyse ?]
 pub fn min[T](key string, amount T) {
-	mut a := unsafe { analyse.hack } // TODO
+	mut a := unsafe { hack } // TODO
 	nkey := '[${@FN}]${key}'
 	$if T is int {
 		cur_amount := a.entries[nkey].int()
@@ -144,7 +144,7 @@ pub fn min[T](key string, amount T) {
 // eprintln_report prints the report via `eprintln`.
 @[if shy_analyse ?]
 pub fn eprintln_report() {
-	a := analyse.hack
+	a := hack
 	eprintln('--- analysis report ---')
 	mut sorted_keys := a.entries.keys()
 	sorted_keys.sort_with_compare(fn (a &string, b &string) int {

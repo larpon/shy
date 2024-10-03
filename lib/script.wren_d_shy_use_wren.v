@@ -63,7 +63,7 @@ pub fn (mut w WrenVM) init() ! {
 	w.vm = vm
 
 	// TODO TEST ONLY
-	w.eval('shy', lib.shy_in_wren) or { return error('${@STRUCT}.${@FN}: ${err}') }
+	w.eval('shy', shy_in_wren) or { return error('${@STRUCT}.${@FN}: ${err}') }
 
 	// Register handle for the Shy.frame method
 	w.vm.ensure_slots(1)

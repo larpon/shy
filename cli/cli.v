@@ -78,7 +78,7 @@ pub fn launch_cmd(args []string, no_use_cache bool) ! {
 		cmd = cmd.all_after('test-')
 	}
 	v := vxt.vexe()
-	mut tool_src := os.join_path(cli.exe_dir, 'cmd', cmd)
+	mut tool_src := os.join_path(exe_dir, 'cmd', cmd)
 	tool_exe := tool_src + '.exe'
 	if !os.is_dir(tool_src) {
 		if os.is_file(tool_src + '.v') {
@@ -88,13 +88,13 @@ pub fn launch_cmd(args []string, no_use_cache bool) ! {
 		}
 	}
 	if os.is_executable(v) {
-		hash_file := os.join_path(cli.exe_dir, 'cmd', '.' + cmd + '.hash')
+		hash_file := os.join_path(exe_dir, 'cmd', '.' + cmd + '.hash')
 
 		mut hash := ''
 		if os.is_file(hash_file) {
 			hash = os.read_file(hash_file) or { '' }
 		}
-		if hash != cli.exe_git_hash || no_use_cache {
+		if hash != exe_git_hash || no_use_cache {
 			v_cmd := [
 				v,
 				'-o',
@@ -106,7 +106,7 @@ pub fn launch_cmd(args []string, no_use_cache bool) ! {
 				return error('${@MOD}.${@FN} failed compiling "${cmd}": ${res.output}')
 			}
 			if res.exit_code == 0 {
-				os.write_file(hash_file, cli.exe_git_hash) or {}
+				os.write_file(hash_file, exe_git_hash) or {}
 			} else {
 				vcmd := v_cmd.join(' ')
 				return error('${@MOD}.${@FN} "${vcmd}" failed:\n${res.output}')
@@ -114,7 +114,7 @@ pub fn launch_cmd(args []string, no_use_cache bool) ! {
 		}
 	}
 	if os.is_executable(tool_exe) {
-		os.setenv('SHY_EXE', os.join_path(cli.exe_dir, cli.exe_name), true)
+		os.setenv('SHY_EXE', os.join_path(exe_dir, exe_name), true)
 		$if windows {
 			exit(os.system('${os.quoted_path(tool_exe)} ${args}'))
 		} $else $if js {
@@ -174,7 +174,7 @@ pub fn string_to_args(input string) ![]string {
 pub fn validate_input(input string) ! {
 	input_ext := os.file_ext(input)
 
-	accepted_input_ext := input_ext in cli.accepted_input_files
+	accepted_input_ext := input_ext in accepted_input_files
 	if !(os.is_dir(input) || accepted_input_ext) {
 		return error('input should be a V file or a directory containing V sources')
 	}

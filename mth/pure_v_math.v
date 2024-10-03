@@ -188,23 +188,23 @@ pub fn round_sig(x f64, sig_digits int) f64 {
 // round_to_even(nan) = nan
 pub fn round_to_even(x f64) f64 {
 	mut bits := f64_bits(x)
-	mut e_ := (bits >> mth.shift) & mth.mask
-	if e_ >= mth.bias {
+	mut e_ := (bits >> shift) & mask
+	if e_ >= bias {
 		// round abs(x) >= 1.
 		// - Large numbers without fractional components, infinity, and nan are unchanged.
 		// - Add 0.499.. or 0.5 before truncating depending on whether the truncated
 		// number is even or odd (respectively).
-		half_minus_ulp := u64(u64(1) << (mth.shift - 1)) - 1
-		e_ -= u64(mth.bias)
-		bits += (half_minus_ulp + (bits >> (mth.shift - e_)) & 1) >> e_
-		bits &= mth.frac_mask >> e_
-		bits ^= mth.frac_mask >> e_
-	} else if e_ == mth.bias - 1 && bits & mth.frac_mask != 0 {
+		half_minus_ulp := u64(u64(1) << (shift - 1)) - 1
+		e_ -= u64(bias)
+		bits += (half_minus_ulp + (bits >> (shift - e_)) & 1) >> e_
+		bits &= frac_mask >> e_
+		bits ^= frac_mask >> e_
+	} else if e_ == bias - 1 && bits & frac_mask != 0 {
 		// round 0.5 < abs(x) < 1.
-		bits = bits & mth.sign_mask | mth.uvone // +-1
+		bits = bits & sign_mask | uvone // +-1
 	} else {
 		// round abs(x) <= 0.5 including denormals.
-		bits &= mth.sign_mask // +-0
+		bits &= sign_mask // +-0
 	}
 	return f64_from_bits(bits)
 }
@@ -225,13 +225,13 @@ const frac_mask = u64((u64(1) << u64(shift)) - u64(1))
 
 // inf returns positive infinity if sign >= 0, negative infinity if sign < 0.
 pub fn inf(sign int) f64 {
-	v := if sign >= 0 { mth.uvinf } else { mth.uvneginf }
+	v := if sign >= 0 { uvinf } else { uvneginf }
 	return f64_from_bits(v)
 }
 
 // nan returns an IEEE 754 ``not-a-number'' value.
 pub fn nan() f64 {
-	return f64_from_bits(mth.uvnan)
+	return f64_from_bits(uvnan)
 }
 
 // is_nan reports whether f is an IEEE 754 ``not-a-number'' value.
@@ -252,7 +252,7 @@ pub fn is_inf(f f64, sign int) bool {
 	// To avoid the floating-point hardware, could use:
 	// x := f64_bits(f);
 	// return sign >= 0 && x == uvinf || sign <= 0 && x == uvneginf;
-	return (sign >= 0 && f > mth.max_f64) || (sign <= 0 && f < -mth.max_f64)
+	return (sign >= 0 && f > max_f64) || (sign <= 0 && f < -max_f64)
 }
 
 pub fn is_finite(f f64) bool {
@@ -264,7 +264,7 @@ pub fn is_finite(f f64) bool {
 pub fn normalize(x f64) (f64, int) {
 	smallest_normal := 2.2250738585072014e-308 // 2**-1022
 	if abs(x) < smallest_normal {
-		return x * mth.normalize_smallest_mask, -52
+		return x * normalize_smallest_mask, -52
 	}
 	return x, 0
 }
@@ -282,11 +282,11 @@ const modf_maxpowtwo = 4.503599627370496000e+15
 pub fn modf(f f64) (f64, f64) {
 	abs_f := abs(f)
 	mut i := 0.0
-	if abs_f >= mth.modf_maxpowtwo {
+	if abs_f >= modf_maxpowtwo {
 		i = f // it must be an integer
 	} else {
-		i = abs_f + mth.modf_maxpowtwo // shift fraction off right
-		i -= mth.modf_maxpowtwo // shift back without fraction
+		i = abs_f + modf_maxpowtwo // shift fraction off right
+		i -= modf_maxpowtwo // shift back without fraction
 		for i > abs_f { // above arithmetic might round
 			i -= 1.0 // test again just to be sure
 		}

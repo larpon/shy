@@ -92,24 +92,24 @@ fn (mut a Assets) load_error_assets() ! {
 		status: .error
 	}
 	ass_image := a.load(
-		source: lib.c_embedded_asset_error_image
+		source: c_embedded_asset_error_image
 	)!
 	a.error_image = ass_image.to[Image](ImageOptions{
-		source: lib.c_embedded_asset_error_image
+		source: c_embedded_asset_error_image
 	})!
 
 	ass_blob := a.load(
-		source: lib.c_embedded_asset_error_blob
+		source: c_embedded_asset_error_blob
 	)!
 	a.error_blob = ass_blob.to[Blob](BlobOptions{
-		source: lib.c_embedded_asset_error_blob
+		source: c_embedded_asset_error_blob
 	})!
 
 	ass_sound := a.load(
-		source: lib.c_embedded_asset_error_sound
+		source: c_embedded_asset_error_sound
 	)!
 	a.error_sound = ass_sound.to[Sound](SoundOptions{
-		source: lib.c_embedded_asset_error_sound
+		source: c_embedded_asset_error_sound
 	})!
 }
 
@@ -821,15 +821,15 @@ pub enum ImageKind {
 }
 
 pub enum ImageFillMode {
-	stretch                              // image is stretched to fit all of image width and height
+	stretch // image is stretched to fit all of image width and height
 	stretch_horizontally_tile_vertically // image is stretched to fit image width and tiled along the y axis (height/vertically)
 	stretch_vertically_tile_horizontally // image is stretched to fit image height and tiled along the x axis (width/horizontally)
-	aspect_fit                           // image is scaled uniformly to fit with no cropping into image width and height
-	aspect_crop                          // image is scaled uniformly to fill image width and height and cropped if necessary
-	tile                                 // image is duplicated horizontally and vertically
-	tile_vertically                      // image is stretched horizontally and tiled vertically
-	tile_horizontally                    // image is stretched vertically and tiled horizontally
-	pad                                  // image is not transformed, leaving empty space if image width and/or height is > that loaded bitmap width/height
+	aspect_fit        // image is scaled uniformly to fit with no cropping into image width and height
+	aspect_crop       // image is scaled uniformly to fill image width and height and cropped if necessary
+	tile              // image is duplicated horizontally and vertically
+	tile_vertically   // image is stretched horizontally and tiled vertically
+	tile_horizontally // image is stretched vertically and tiled horizontally
+	pad               // image is not transformed, leaving empty space if image width and/or height is > that loaded bitmap width/height
 }
 
 pub fn (ifm ImageFillMode) next() ImageFillMode {
