@@ -1,8 +1,10 @@
-// Copyright(C) 2019 Lars Pontoppidan. All rights reserved.
+// Copyright(C) 2019-2021 Lars Pontoppidan. All rights reserved.
 // Use of this source code is governed by an MIT license file distributed with this software package
 // miniaudio https://github.com/dr-soft/miniaudio @ dbca7a3b (Version 0.10.42)
 // is licensed under the unlicense and, are thus, in the public domain.
 module c
+
+pub const used_import = 1
 
 #flag -I @VMODROOT/miniaudio
 $if linux {
