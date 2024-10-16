@@ -294,7 +294,13 @@ fn (mut c Context) sokol_gl_init() ! {
 	c.offscreen = offscreen
 }
 
-fn (mut c Context) offscreen_reinit(width int, height int) ! {
+fn (mut c Context) on_resize(width int, height int) ! {
+	mut swapchain := c.display.swapchain
+	swapchain.width = width
+	swapchain.height = height
+
+	c.display.swapchain = swapchain
+
 	offscreen_sample_count := 1
 
 	gfx.destroy_attachments(c.offscreen.attachments)
@@ -373,7 +379,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 	w, h := win.canvas().wh()
 	if off.width != w || off.height != h {
 		mut mc := unsafe { g.get_active_context() }
-		mc.offscreen_reinit(w, h) or { panic(err) }
+		mc.on_resize(w, h) or { panic(err) }
 	}
 }
 
