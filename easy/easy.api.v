@@ -45,11 +45,13 @@ pub fn (mut e Easy) shutdown() ! {
 	e.particle_systems.clear()
 }
 
-pub fn (mut e Easy) variable_update(dt f64) {
+pub fn (mut e Easy) fixed_update(dt f64) {
 	for mut ps in e.particle_systems {
 		ps.update(dt)
 	}
 }
+
+pub fn (mut e Easy) variable_update(dt f64) {}
 
 @[params]
 pub struct TextConfig {
