@@ -101,6 +101,11 @@ pub fn (mut a EasyApp) set_canvas(canvas shy.Canvas) {
 	a.draw.set_canvas(canvas)
 }
 
+pub fn (mut a EasyApp) fixed_update(dt f64) {
+	a.App.fixed_update(dt)
+	a.easy.fixed_update(dt)
+}
+
 pub fn (mut a EasyApp) variable_update(dt f64) {
 	a.App.variable_update(dt)
 	a.easy.variable_update(dt)
