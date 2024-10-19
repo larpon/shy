@@ -11,6 +11,13 @@ import shy.vec { Vec2 }
 
 // basic primitives
 
+// Axis defines an axis in 3D space; x,y or z
+pub enum Axis {
+	x
+	y
+	z
+}
+
 // Origin is a sumtype for points with origin at 0,0
 pub type Origin = Anchor | Vec2[f32]
 

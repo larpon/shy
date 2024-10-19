@@ -51,12 +51,13 @@ pub struct Draw2DImage {
 mut:
 	draw &Draw // For scissor state restoring
 pub mut:
-	color     Color = rgb(255, 255, 255)
-	origin    Origin
-	rotation  f32
-	scale     f32 = 1.0
-	offset    Vec2[f32]
-	fill_mode ImageFillMode
+	color         Color = rgb(255, 255, 255)
+	origin        Origin
+	rotation      f32
+	rotation_axis Axis = .z
+	scale         f32  = 1.0
+	offset        Vec2[f32]
+	fill_mode     ImageFillMode
 }
 
 @[inline]
@@ -250,7 +251,11 @@ pub fn (i Draw2DImage) draw() {
 
 	if i.rotation != 0 {
 		gl.translate(-o_dis_x, -o_dis_y, 0)
-		gl.rotate(i.rotation, 0, 0, 1.0)
+		match i.rotation_axis {
+			.x { gl.rotate(i.rotation, 1.0, 0, 0) }
+			.y { gl.rotate(i.rotation, 0, 1.0, 0) }
+			.z { gl.rotate(i.rotation, 0, 0, 1.0) }
+		}
 		gl.translate(o_dis_x, o_dis_y, 0)
 	}
 	if i.scale != 1 {
