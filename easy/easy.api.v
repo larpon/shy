@@ -592,14 +592,15 @@ pub struct ImageConfig {
 	// shy.Rect: shy.Rect{0,0,-1,-1}
 	ImageConfigRect
 pub:
-	source    shy.AssetSource
-	color     shy.Color = shy.rgb(255, 255, 255)
-	rotation  f32
-	scale     f32 = 1.0
-	offset    vec.Vec2[f32]
-	origin    shy.Origin
-	region    shy.Rect = shy.Rect{0, 0, -1, -1}
-	fill_mode shy.ImageFillMode
+	source        shy.AssetSource
+	color         shy.Color = shy.rgb(255, 255, 255)
+	rotation      f32
+	rotation_axis shy.Axis = .z
+	scale         f32      = 1.0
+	offset        vec.Vec2[f32]
+	origin        shy.Origin
+	region        shy.Rect = shy.Rect{0, 0, -1, -1}
+	fill_mode     shy.ImageFillMode
 }
 
 pub struct ImageMetaData {
@@ -612,14 +613,15 @@ pub struct Image {
 	shy.ShyStruct
 	shy.Rect
 pub mut:
-	source    shy.AssetSource
-	color     shy.Color = shy.rgb(255, 255, 255)
-	rotation  f32
-	scale     f32 = 1.0
-	offset    vec.Vec2[f32]
-	origin    shy.Origin
-	region    shy.Rect = shy.Rect{0, 0, -1, -1}
-	fill_mode shy.ImageFillMode
+	source        shy.AssetSource
+	color         shy.Color = shy.rgb(255, 255, 255)
+	rotation      f32
+	rotation_axis shy.Axis = .z
+	scale         f32      = 1.0
+	offset        vec.Vec2[f32]
+	origin        shy.Origin
+	region        shy.Rect = shy.Rect{0, 0, -1, -1}
+	fill_mode     shy.ImageFillMode
 pub:
 	meta ImageMetaData
 }
@@ -637,6 +639,7 @@ pub fn (ei &Image) draw() {
 	i2d.height = ei.height
 	i2d.color = ei.color
 	i2d.rotation = ei.rotation
+	i2d.rotation_axis = ei.rotation_axis
 	i2d.scale = ei.scale
 	i2d.offset = ei.offset
 	i2d.origin = ei.origin
@@ -678,17 +681,18 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 		// TODO WORKAROUND "...eic" spread does not work
 		// with the ImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
 		return Image{
-			shy:       e.shy
-			Rect:      r
-			source:    eic.source
-			color:     eic.color
-			rotation:  eic.rotation
-			scale:     eic.scale
-			offset:    eic.offset
-			origin:    eic.origin
-			region:    eic.region
-			fill_mode: eic.fill_mode
-			meta:      ImageMetaData{
+			shy:           e.shy
+			Rect:          r
+			source:        eic.source
+			color:         eic.color
+			rotation:      eic.rotation
+			rotation_axis: eic.rotation_axis
+			scale:         eic.scale
+			offset:        eic.offset
+			origin:        eic.origin
+			region:        eic.region
+			fill_mode:     eic.fill_mode
+			meta:          ImageMetaData{
 				size_raw: shy.Size{
 					width:  image.width
 					height: image.height
@@ -698,22 +702,23 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 	}
 
 	return Image{
-		shy:       e.shy
-		Rect:      shy.Rect{
+		shy:           e.shy
+		Rect:          shy.Rect{
 			x:      0
 			y:      0
 			width:  0
 			height: 0
 		}
-		source:    eic.source
-		color:     eic.color
-		rotation:  eic.rotation
-		scale:     eic.scale
-		offset:    eic.offset
-		origin:    eic.origin
-		region:    eic.region
-		fill_mode: eic.fill_mode
-		meta:      ImageMetaData{
+		source:        eic.source
+		color:         eic.color
+		rotation:      eic.rotation
+		rotation_axis: eic.rotation_axis
+		scale:         eic.scale
+		offset:        eic.offset
+		origin:        eic.origin
+		region:        eic.region
+		fill_mode:     eic.fill_mode
+		meta:          ImageMetaData{
 			size_raw: shy.Size{
 				width:  0
 				height: 0
