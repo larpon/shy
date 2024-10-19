@@ -125,6 +125,7 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation can happen when allocating in hot code paths. It is, in general, better to pre-load data. Loading "${source}"')
 
 	if alo.io.has(.async) {
+		// TODO: `os.file_size` does not work on Android
 		file_size := int(os.file_size(source.str()))
 		asset := &Asset{
 			shy:    a.shy
