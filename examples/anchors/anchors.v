@@ -13,7 +13,7 @@ fn main() {
 }
 
 @[heap]
-struct App {
+pub struct App {
 	embed.ExampleApp
 mut:
 	anchor shy.Anchor

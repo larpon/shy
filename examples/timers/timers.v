@@ -22,7 +22,7 @@ fn main() {
 }
 
 @[heap]
-struct App {
+pub struct App {
 	embed.ExampleApp
 mut:
 	info_text  &easy.Text = shy.null

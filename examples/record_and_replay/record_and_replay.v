@@ -15,7 +15,7 @@ fn main() {
 }
 
 @[heap]
-struct App {
+pub struct App {
 	embed.ExampleApp
 mut:
 	fa_x  &shy.FollowAnimator[f32] = shy.null
