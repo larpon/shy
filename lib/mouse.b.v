@@ -18,7 +18,8 @@ pub fn (mut m Mouse) init() ! {
 		m.x = mgx - w_x
 		m.y = mgy - w_y
 	}
-	m.shy.api.events.on_event(m.on_event)
+	// NOTE: pure function `on_mouse_event` used instead of closure (m.on_event) for better support on platforms that does not support closures
+	m.shy.api.events.on_event(on_mouse_event)
 }
 
 pub fn (mut m Mouse) show() {
@@ -47,6 +48,25 @@ pub fn (m Mouse) position(position_type MousePositionType) (int, int) {
 	}
 }
 
+fn on_mouse_event(s &Shy, e Event) bool {
+	if e !is MouseMotionEvent && e !is MouseButtonEvent && e !is MouseWheelEvent {
+		return false
+	}
+	mut api := unsafe { s.api() }
+	match e {
+		MouseMotionEvent, MouseButtonEvent, MouseWheelEvent {
+			if mut m := api.input.mouse(u8(e.which)) {
+				return m.on_event(e)
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
+}
+
 fn (mut m Mouse) on_event(e Event) bool {
 	if e !is MouseMotionEvent && e !is MouseButtonEvent && e !is MouseWheelEvent {
 		return false
@@ -61,7 +81,7 @@ fn (mut m Mouse) on_event(e Event) bool {
 					assert !isnil(handler)
 					// If `handler` returns true, it means
 					// a listener has accepted/handled the event
-					if handler(e) {
+					if handler(m.shy, e) {
 						return true
 					}
 				}
@@ -80,7 +100,7 @@ fn (mut m Mouse) on_event(e Event) bool {
 						assert !isnil(handler)
 						// If `handler` returns true, it means
 						// a listener has accepted/handled the event
-						if handler(e) {
+						if handler(m.shy, e) {
 							return true
 						}
 					}
@@ -92,7 +112,7 @@ fn (mut m Mouse) on_event(e Event) bool {
 						assert !isnil(handler)
 						// If `handler` returns true, it means
 						// a listener has accepted/handled the event
-						if handler(e) {
+						if handler(m.shy, e) {
 							return true
 						}
 					}
@@ -102,7 +122,7 @@ fn (mut m Mouse) on_event(e Event) bool {
 				if p_state && !state {
 					for handler in m.on_button_click {
 						assert !isnil(handler)
-						if handler(e) {
+						if handler(m.shy, e) {
 							return true
 						}
 					}

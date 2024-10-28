@@ -79,7 +79,28 @@ pub fn (mut k Keyboard) set_key_state(key_code KeyCode, button_state ButtonState
 
 pub fn (mut k Keyboard) init() ! {
 	k.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	k.shy.api.events.on_event(k.on_event)
+	// NOTE: pure function `on_keyboard_event` used instead of closure (k.on_event) for better support on platforms that does not support closures
+	k.shy.api.events.on_event(on_keyboard_event)
+}
+
+fn on_keyboard_event(s &Shy, e Event) bool {
+	// Exit as early as possible
+	if e !is KeyEvent {
+		return false
+	}
+	mut api := unsafe { s.api() }
+	match e {
+		KeyEvent {
+			if mut k := api.input.keyboard(e.which) {
+				return k.on_event(e)
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
 }
 
 fn (mut k Keyboard) on_event(e Event) bool {

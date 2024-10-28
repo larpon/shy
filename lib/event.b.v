@@ -5,7 +5,7 @@ module lib
 
 import analyse
 
-pub type OnEventFn = fn (event Event) bool
+pub type OnEventFn = fn (&Shy, Event) bool
 
 pub enum ButtonState {
 	up
@@ -122,37 +122,15 @@ pub fn (mut e Events) poll() ?Event {
 	}
 
 	if event := e.pop() {
-		$if wasm32_emscripten {
-			mut api := unsafe { e.shy.api() }
-			mut win := e.shy.wm().active_window()
-			if win.on_event(event) {
+		for on_event in e.on_events {
+			assert !isnil(on_event)
+			// If `on_event` returns true, it means
+			// a listener has accepted the event in which case we
+			// do not propagate the event to the rest of the system.
+			if on_event(e.shy, event) {
 				return none
 			}
-
-			if mut keyboard := api.input().keyboard(0) {
-				if keyboard.on_event(event) {
-					return none
-				}
-			}
-
-			if mut mouse := api.input().mouse(0) {
-				if mouse.on_event(event) {
-					return none
-				}
-			}
-		} $else {
-			for on_event in e.on_events {
-				assert !isnil(on_event)
-				// If `on_event` returns true, it means
-				// a listener has accepted the event in which case we
-				// do not propagate the event to the rest of the system.
-				if on_event(event) {
-					return none
-				}
-			}
-			eprintln('${@STRUCT}.${@FN} return event')
 		}
-
 		return event
 	}
 	return none

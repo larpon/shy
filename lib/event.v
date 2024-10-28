@@ -3,7 +3,10 @@
 // that can be found in the LICENSE file.
 module lib
 
-// TODO factor WindowEvent out?
+// TODO: factor WindowEvent out?
+// NOTE: All event types in this list must embed `ShyEvent` so event handlers can get
+// to the `Shy` struct *without* having to use closures.
+// (closures does not work on all platforms, like wasm32_emscripten)
 pub type Event = DropBeginEvent
 	| DropEndEvent
 	| DropFileEvent
@@ -243,7 +246,7 @@ fn (ip Input) deserialize_event_from_string(serialized_string string, format Eve
 pub struct ShyEvent {
 pub:
 	timestamp u64 @[required] // Value of Shy.ticks()
-	window_id u32 @[required] // The id of the window, 0 = root window, -1 = no window
+	window_id u32 @[required] // The id of the window, 1 = root window, -1 = no window
 }
 
 fn (se ShyEvent) serialize_as_playback_string() string {

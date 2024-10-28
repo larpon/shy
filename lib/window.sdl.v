@@ -684,7 +684,8 @@ pub fn (mut w Window) init() ! {
 	w.Rect.x, w.Rect.y = w.position()
 	w.Rect.width, w.Rect.height = w.wh()
 
-	w.shy.api.events.on_event(w.on_event)
+	// NOTE: pure function `on_window_event` used instead of closure (w.on_event) for better support on platforms that does not support closures
+	w.shy.api.events.on_event(on_window_event)
 
 	w.ready = true
 }
@@ -729,6 +730,25 @@ pub fn (mut w Window) shutdown() ! {
 	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)
+}
+
+fn on_window_event(s &Shy, e Event) bool {
+	if e !is WindowResizeEvent && e !is WindowMoveEvent {
+		return false
+	}
+	mut api := unsafe { s.api() }
+	match e {
+		WindowResizeEvent, WindowMoveEvent {
+			if mut w := api.wm().find_window(e.window_id) {
+				return w.on_event(e)
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
 }
 
 fn (mut w Window) on_event(e Event) bool {

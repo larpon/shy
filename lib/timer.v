@@ -7,7 +7,7 @@ import shy.analyse
 
 type TimerEventFn = fn (TimerEvent)
 
-type TimerFn = fn ()
+pub type TimerFn = fn (&Shy)
 
 pub enum TimerEvent {
 	begin
@@ -206,7 +206,7 @@ fn (t &Timer) fire_event_fn(event TimerEvent) {
 	}
 	if event == .end {
 		if callback := t.callback {
-			callback()
+			callback(t.shy)
 		}
 	}
 }
