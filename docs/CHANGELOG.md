@@ -1,3 +1,41 @@
+## Shy up
+
+(Features available with latest build from source)
+
+#### Notable changes
+
+Add support for `wasm32_emscripten` build target making it possible to target the Web via `emscripten`/`emcc`
+
+#### Breaking changes
+
+To be able to support platforms that does not natively support V closures some changes where needed to allow event
+callbacks to still be able to get to the user data (`&App` instance) without using closures.
+
+Code before:
+  `pub type OnEventFn = fn (Event) bool`
+Code after:
+  `pub type OnEventFn = fn (&Shy, Event) bool`
+
+For `shy.once(...)` / `shy.every(...)`:
+
+Code before:
+  `pub type TimerFn = fn () bool`
+Code after:
+  `pub type TimerFn = fn (t &Timer) bool` (then `t.shy.app[App]()`).
+
+Example:
+
+```v
+shy.once(fn (t &shy.Timer) {
+  mut app := t.shy.app[App]()
+  // Do something meaningful
+})
+```
+
+For complex reasons, all user space `&App` structs now need to be declared as `pub` in order for Shy to
+pass it as generic to C code callbacks. This has to do with the way generic
+functions has to be passed to C callbacks in V.
+
 ## Shy 0.2.0
 *29 May 2024*
 

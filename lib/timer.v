@@ -7,7 +7,7 @@ import shy.analyse
 
 type TimerEventFn = fn (TimerEvent)
 
-pub type TimerFn = fn (&Shy)
+pub type TimerFn = fn (&Timer)
 
 pub enum TimerEvent {
 	begin
@@ -23,6 +23,7 @@ pub enum TimerLoop {
 pub struct Timers {
 	ShyStruct
 mut:
+	ids u32
 	// running bool
 	paused bool
 	active []&Timer = []&Timer{cap: 1000} // Should match prealloc
@@ -128,8 +129,10 @@ pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
 	t.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
+	t.ids++
 	mut timer := &Timer{
 		shy: t.shy
+		id:  t.ids
 	}
 	timer.reset()
 	timer.config_update(config)
@@ -138,10 +141,12 @@ fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
 
 pub fn (mut t Timers) new_timer(config TimerConfig) &Timer {
 	mut timer := &Timer(unsafe { nil }) // unsafe { nil }
+	t.ids++
 	if t.pool.len > 0 {
 		timer = t.pool.pop()
 		timer.reset()
 		timer.config_update(config)
+		timer.id = t.ids
 	} else {
 		timer = t.p_new_timer(config)
 	}
@@ -165,6 +170,8 @@ pub mut:
 pub struct Timer {
 	ShyStruct
 pub mut:
+	id u32 // TODO: should be module mut but public read-only
+	//
 	running     bool
 	paused      bool
 	loop        TimerLoop
@@ -206,7 +213,7 @@ fn (t &Timer) fire_event_fn(event TimerEvent) {
 	}
 	if event == .end {
 		if callback := t.callback {
-			callback(t.shy)
+			callback(t)
 		}
 	}
 }
