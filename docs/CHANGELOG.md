@@ -4,7 +4,7 @@
 
 #### Notable changes
 
-Add support for `wasm32_emscripten` build target making it possible to target the Web via `emscripten`/`emcc`
+* Add support for `wasm32_emscripten` build target making it possible to target the Web via `emscripten`/`emcc`
 
 #### Breaking changes
 

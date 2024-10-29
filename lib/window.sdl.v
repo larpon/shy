@@ -577,7 +577,7 @@ pub fn (w &Window) swap() {
 }
 
 pub fn (w Window) is_root() bool {
-	return w.id == 0
+	return w.id == root_window_id
 }
 
 pub fn (mut w Window) new_window(config WindowConfig) !&Window {
@@ -723,7 +723,7 @@ pub fn (mut w Window) shutdown() ! {
 	w.shy.api.gfx.shutdown_context(w.gfx)!
 
 	// NOTE Last window shuts down the graphics module
-	if w.id == 0 {
+	if w.id == root_window_id {
 		w.shy.api.gfx.shutdown()!
 	}
 

@@ -3,7 +3,8 @@
 // that can be found in the LICENSE file.
 module lib
 
-const no_window = u32(0)
+pub const no_window = u32(0)
+const root_window_id = u32(1)
 
 pub struct Boot {
 	ShyStruct

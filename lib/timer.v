@@ -141,11 +141,11 @@ fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
 
 pub fn (mut t Timers) new_timer(config TimerConfig) &Timer {
 	mut timer := &Timer(unsafe { nil }) // unsafe { nil }
-	t.ids++
 	if t.pool.len > 0 {
 		timer = t.pool.pop()
 		timer.reset()
 		timer.config_update(config)
+		t.ids++
 		timer.id = t.ids
 	} else {
 		timer = t.p_new_timer(config)

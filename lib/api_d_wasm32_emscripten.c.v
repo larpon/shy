@@ -11,6 +11,7 @@ import shy.mth
 
 fn C.emscripten_set_main_loop_arg(fn (voidptr), voidptr, int, bool)
 fn C.emscripten_cancel_main_loop()
+fn C.emscripten_run_script_int(charptr) int
 
 type FnWithVoidptrArgument = fn (voidptr)
 
@@ -71,4 +72,14 @@ fn emscripten_main_impl[T](mut ctx T) {
 		C.emscripten_cancel_main_loop()
 		return
 	}
+}
+
+fn emscripten_get_canvas_width() int {
+	width := C.emscripten_run_script_int(c'document.querySelector("#canvas").width;')
+	return width
+}
+
+fn emscripten_get_canvas_height() int {
+	height := C.emscripten_run_script_int(c'document.querySelector("#canvas").height;')
+	return height
 }
