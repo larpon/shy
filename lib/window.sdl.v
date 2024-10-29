@@ -577,7 +577,7 @@ pub fn (w &Window) swap() {
 }
 
 pub fn (w Window) is_root() bool {
-	return w.id == 0
+	return w.id == root_window_id
 }
 
 pub fn (mut w Window) new_window(config WindowConfig) !&Window {
@@ -684,7 +684,8 @@ pub fn (mut w Window) init() ! {
 	w.Rect.x, w.Rect.y = w.position()
 	w.Rect.width, w.Rect.height = w.wh()
 
-	w.shy.api.events.on_event(w.on_event)
+	// NOTE: pure function `on_window_event` used instead of closure (w.on_event) for better support on platforms that does not support closures
+	w.shy.api.events.on_event(on_window_event)
 
 	w.ready = true
 }
@@ -722,13 +723,32 @@ pub fn (mut w Window) shutdown() ! {
 	w.shy.api.gfx.shutdown_context(w.gfx)!
 
 	// NOTE Last window shuts down the graphics module
-	if w.id == 0 {
+	if w.id == root_window_id {
 		w.shy.api.gfx.shutdown()!
 	}
 
 	sdl.gl_delete_context(w.gl_context)
 	// }
 	sdl.destroy_window(w.handle)
+}
+
+fn on_window_event(s &Shy, e Event) bool {
+	if e !is WindowResizeEvent && e !is WindowMoveEvent {
+		return false
+	}
+	mut api := unsafe { s.api() }
+	match e {
+		WindowResizeEvent, WindowMoveEvent {
+			if mut w := api.wm().find_window(e.window_id) {
+				return w.on_event(e)
+			}
+			return false
+		}
+		else {
+			return false
+		}
+	}
+	return false
 }
 
 fn (mut w Window) on_event(e Event) bool {

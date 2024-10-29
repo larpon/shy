@@ -193,6 +193,10 @@ pub fn (a &ShyAPI) scripts() &Scripts {
 // BUG: MAY NEED WORKAROUND
 // pub fn api_main<T>(mut ctx T, mut s Shy) ! {
 pub fn (mut a ShyAPI) main[T](mut ctx T, mut s Shy) ! {
+	$if wasm32_emscripten ? {
+		a.emscripten_main[T](mut ctx, mut s)!
+		return
+	}
 	s.log.gdebug('${@MOD}.${@FN}', 'entering core loop')
 
 	mut api := unsafe { s.api() }

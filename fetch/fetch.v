@@ -88,8 +88,12 @@ pub:
 
 pub fn (mut l Loader) init() ! {
 	// l.threads := []thread{cap: c_max_threads}
-	for t in 0 .. c_max_threads {
-		l.threads << spawn l.worker(t, l.ch_in, l.ch_out)
+	$if wasm32_emscripten {
+		// l.threads << spawn l.worker(0, l.ch_in, l.ch_out)
+	} $else {
+		for t in 0 .. c_max_threads {
+			l.threads << spawn l.worker(t, l.ch_in, l.ch_out)
+		}
 	}
 }
 

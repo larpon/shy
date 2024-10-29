@@ -33,9 +33,9 @@ pub enum MouseWheelDirection {
 	flipped
 }
 
-pub type OnMouseMotionFn = fn (event MouseMotionEvent) bool
+pub type OnMouseMotionFn = fn (&Shy, MouseMotionEvent) bool
 
-pub type OnMouseButtonFn = fn (event MouseButtonEvent) bool
+pub type OnMouseButtonFn = fn (&Shy, MouseButtonEvent) bool
 
 @[heap]
 pub struct Mouse {

@@ -22,7 +22,7 @@ fn main() {
 }
 
 @[heap]
-struct App {
+pub struct App {
 	embed.ExampleApp
 mut:
 	info_text  &easy.Text = shy.null
@@ -59,7 +59,8 @@ pub fn (mut a App) init() ! {
 		text:   'Local time: ${time.now().format_ss()}'
 	)
 
-	a.shy.every(fn [mut a] () {
+	a.shy.every(fn (t &shy.Timer) {
+		mut a := t.shy.app[App]()
 		a.clock_text.text = 'Local time: ${time.now().format_ss()}'
 	}, 1000, shy.infinite)
 }
@@ -92,7 +93,8 @@ pub fn (mut a App) event(e shy.Event) {
 					a.info_text.text = '${info}\nLast timer started at frame ${a.window.state.frame}\n(via "T" on the keyboard)'
 					a.once_text.text = '${wait}'
 					a.since = a.window.state.frame
-					a.shy.once(fn [mut a] () {
+					a.shy.once(fn (t &shy.Timer) {
+						mut a := t.shy.app[App]()
 						took := a.window.state.frame - a.since
 						a.once_text.text = 'Time is up, it took ${took} frames to trigger!\n(since "T" was pressed on the keyboard)'
 					}, 1000)
@@ -105,7 +107,8 @@ pub fn (mut a App) event(e shy.Event) {
 				a.info_text.text = '${info}\nLast timer started at frame ${a.window.state.frame}\n(via mouse click)'
 				a.once_text.text = '${wait}'
 				a.since = a.window.state.frame
-				a.shy.once(fn [mut a] () {
+				a.shy.once(fn (t &shy.Timer) {
+					mut a := t.shy.app[App]()
 					took := a.window.state.frame - a.since
 					a.once_text.text = 'Time is up, it took ${took} frames to trigger!\n(since the mouse was clicked)'
 				}, 1000)

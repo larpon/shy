@@ -12,7 +12,7 @@ fn main() {
 }
 
 @[heap]
-struct App {
+pub struct App {
 	embed.ExampleApp
 mut:
 	sound shy.Sound = shy.no_sound

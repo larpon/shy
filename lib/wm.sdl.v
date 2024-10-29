@@ -156,6 +156,13 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		win_y = 0
 	}
 
+	$if wasm32_emscripten ? {
+		win_w = emscripten_get_canvas_width()
+		win_h = emscripten_get_canvas_height()
+		win_x = 0
+		win_y = 0
+	}
+
 	window_config := WindowConfig{
 		...s.config.window
 		x:      win_x
@@ -187,8 +194,11 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	}
 
 	// $if opengl ? {
-	window_flags = window_flags | u32(sdl.WindowFlags.opengl) | u32(sdl.WindowFlags.allow_highdpi)
+	window_flags = window_flags | u32(sdl.WindowFlags.opengl)
 	// }
+	$if !wasm32_emscripten {
+		window_flags = window_flags | u32(sdl.WindowFlags.allow_highdpi)
+	}
 	// window_flags := u32(sdl.null)
 	// window_flags = window_flags | u32(sdl.WindowFlags.fullscreen)
 
@@ -203,9 +213,9 @@ fn (mut wm WM) new_window(config WindowConfig) !&Window {
 	// }
 	// Window ids in Shy is:
 	// 0 == "no window". E.g. events can come from no window
-	// 1 == the root window aka. the first opened window
+	// 1 == the root window aka. the first opened window (root_window_id)
 	// X > 1 child windows of the root window
-	wm.w_id++
+	wm.w_id++ // NOTE: THIS SHOULD MATCH root_window_id *on first call*!
 	mut win := &Window{
 		shy:    s
 		config: config

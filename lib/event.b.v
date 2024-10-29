@@ -5,7 +5,7 @@ module lib
 
 import analyse
 
-pub type OnEventFn = fn (event Event) bool
+pub type OnEventFn = fn (&Shy, Event) bool
 
 pub enum ButtonState {
 	up
@@ -127,7 +127,7 @@ pub fn (mut e Events) poll() ?Event {
 			// If `on_event` returns true, it means
 			// a listener has accepted the event in which case we
 			// do not propagate the event to the rest of the system.
-			if on_event(event) {
+			if on_event(e.shy, event) {
 				return none
 			}
 		}
