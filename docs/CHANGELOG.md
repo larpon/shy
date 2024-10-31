@@ -5,6 +5,9 @@
 #### Notable changes
 
 * Add support for `wasm32_emscripten` build target making it possible to target the Web via `emscripten`/`emcc`
+* **WIP** Rewrite `shy export` internals
+  - Exporting to an `AppImage` on Linux now works via `shy export appimage ...`
+  - Exporting to the Web (via `emcc`) now works via `shy export wasm ...`
 
 #### Breaking changes
 

@@ -43,8 +43,7 @@ static char __CLOSURE_GET_DATA_BYTES[] = {
 
 -gsource-map -sSTACK_SIZE=8mb
 # -sTOTAL_MEMORY=300mb -sINITIAL_MEMORY=200mb
-
+-sEMSCRIPTEN_KEEPALIVE?? test this instead of -sEXPORTED_FUNCTIONS...
 # Puzzle Vibes
  shy_root="$(pwd)"; pro="$HOME/Projects/puzzle_vibes"; v -skip-unused -gc none -d wasm32_emscripten -os wasm32_emscripten -o /tmp/shyem/vc_src.c $pro && emcc -flto -fPIC -fvisibility=hidden --preload-file $shy_root/assets@/ --preload-file $pro/assets@/ -sEXPORTED_FUNCTIONS="['_malloc', '_main']" -sSTACK_SIZE=1mb -sERROR_ON_UNDEFINED_SYMBOLS=0 -sASSERTIONS=1 -sUSE_WEBGL2=1 -sUSE_SDL=2 -sNO_EXIT_RUNTIME=1 -sALLOW_MEMORY_GROWTH=1 -O0 -g -D_DEBUG_ -D_DEBUG -D SOKOL_GLES3 -D SOKOL_NO_ENTRY -D MINIAUDIO_IMPLEMENTATION -D _REENTRANT -I "$shy_root/thirdparty/stb" -I "$shy_root/thirdparty/fontstash" -I "$shy_root/thirdparty/sokol" -I "$shy_root/thirdparty/sokol/util" -I "$shy_root/wraps/miniaudio/c/miniaudio" -I "$shy_root/shy" -Wno-enum-conversion -Wno-unused-value $shy_root/thirdparty/stb/stbi.c /tmp/shyem/vc_src.c -lm -lpthread -ldl -o /tmp/shyem/vc_src.html
-
 
