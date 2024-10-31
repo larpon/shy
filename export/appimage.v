@@ -4,10 +4,130 @@
 module export
 
 import os
+import flag
 import shy.vxt
+import shy.paths
+import shy.utils
 import net.http
 
-fn (opt Options) ensure_appimagetool() !string {
+pub const appimage_exporter_version = '0.0.1'
+pub const appimage_fn_description = 'shy export appimage
+exports both plain V applications and shy-based applications to Linux AppImages.
+'
+
+pub enum AppImageFormat {
+	app_image // .AppImage
+	app_dir   // .AppDir
+}
+
+pub fn (aif AppImageFormat) ext() string {
+	return match aif {
+		.app_image {
+			'AppImage'
+		}
+		.app_dir {
+			'AppDir'
+		}
+	}
+}
+
+pub struct AppImageOptions {
+	ExportOptions
+pub:
+	work_dir string = os.join_path(paths.tmp_work(), 'export', 'appimage') @[ignore]
+	compress bool   @[xdoc: 'Compress executable with `upx` if available']
+	strip    bool   @[xdoc: 'Strip executable symbols with `strip` if available']
+	format   AppImageFormat = .app_image
+}
+
+fn (aio AppImageOptions) help_or_docs() ?Result {
+	if aio.show_version {
+		return Result{
+			output: 'shy export appimage ${appimage_exporter_version}'
+		}
+	}
+
+	if aio.dump_usage {
+		export_doc := flag.to_doc[ExportOptions](
+			name:        'shy export appimage'
+			version:     '${appimage_exporter_version}'
+			description: appimage_fn_description
+		) or { return none }
+
+		appimage_doc := flag.to_doc[AppImageOptions](
+			options: flag.DocOptions{
+				show: .flags | .flag_type | .flag_hint | .footer
+			}
+		) or { return none }
+
+		return Result{
+			output: '${export_doc}\n${appimage_doc}'
+		}
+	}
+	return none
+}
+
+pub fn args_to_appimage_options(args []string) !AppImageOptions {
+	export_options, unmatched := flag.to_struct[ExportOptions](args, skip: 1)!
+	options, no_match := flag.to_struct[AppImageOptions](unmatched)!
+	if no_match.len > 0 {
+		return error('Unrecognized argument(s): ${no_match}')
+	}
+	return AppImageOptions{
+		...options
+		ExportOptions: export_options
+	}
+}
+
+// resolve_input returns the resolved path/file of the input.
+fn (opt AppImageOptions) resolve_input() !string {
+	mut input := opt.input.trim_right(os.path_separator)
+	// If no specific output file is given, we use the input file as a base
+	if input == '' {
+		return error('${@MOD}.${@FN}: no input given')
+	}
+	if input in ['.', '..'] || os.is_dir(input) {
+		input = os.real_path(input)
+	}
+	return input
+}
+
+// resolve_output returns output according to what `input` contains.
+fn (opt AppImageOptions) resolve_output(input string) !string {
+	// Resolve output
+	mut output_file := ''
+	// input_file_ext := os.file_ext(opt.input).trim_left('.').to_lower()
+	output_file_ext := os.file_ext(opt.output).trim_left('.').to_lower()
+	// Infer from output
+	if output_file_ext in ['appimage', 'appdir'] {
+		output_file = opt.output
+	} else { // Generate from defaults: [-o <output>] <input>
+		default_file_name := input.all_after_last(os.path_separator).replace(' ', '_').to_lower()
+		if opt.output != '' {
+			ext := os.file_ext(opt.output)
+			if ext != '' {
+				output_file = opt.output.all_before(ext)
+			} else {
+				output_file = os.join_path(opt.output.trim_right(os.path_separator), default_file_name)
+			}
+		} else {
+			output_file = default_file_name
+		}
+		if opt.format == .app_image {
+			output_file += '.AppImage'
+		} else {
+			output_file += '.AppDir'
+		}
+	}
+	return output_file
+}
+
+pub fn (opt AppImageOptions) resolve_io() !(string, string, AppImageFormat) {
+	input := opt.resolve_input()!
+	return input, opt.resolve_output(input)!, opt.format
+}
+
+fn (opt AppImageOptions) ensure_appimagetool() !string {
 	appimagetool_url := 'https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage'
 	mut appimagetool_exe := os.join_path(ensure_cache_dir()!, 'squashfs-root', 'AppRun')
 	if !os.exists(appimagetool_exe) {
@@ -50,25 +170,33 @@ fn (opt Options) ensure_appimagetool() !string {
 	return appimagetool_exe
 }
 
-fn export_appimage(opt Options) ! {
-	if opt.verbosity > 3 {
-		eprintln('--- ${@MOD}.${@FN} ---')
-		eprintln(opt)
+pub fn appimage(opt AppImageOptions) !Result {
+	if result := opt.help_or_docs() {
+		return result
+	}
+
+	if opt.input == '' {
+		return error('${@MOD}.${@FN}: no input')
+	}
+
+	if os.user_os() != 'linux' {
+		return error('${@MOD}.${@FN}: AppImage generation is only supported on Linux')
 	}
 	appimagetool_exe := opt.ensure_appimagetool()!
 
-	// Resolve and sanitize input path
-	input := os.real_path(opt.input).trim_string_right(os.path_separator)
+	// Resolve and sanitize input and output
+	input, output, format := opt.resolve_io()!
+
+	paths.ensure(opt.work_dir)!
 
 	// Build V input app for host platform
 	v_app := os.join_path(opt.work_dir, 'v_app')
-	if opt.verbosity > 0 {
-		eprintln('Building V source as "${v_app}"...')
-	}
+	opt.verbose(1, 'Building V source(s) as "${v_app}"...')
+
 	mut v_cmd := [
 		vxt.vexe(),
 	]
-	if opt.is_prod {
+	if opt.supported_v_flags.prod {
 		v_cmd << '-prod'
 	}
 	v_cmd << opt.v_flags
@@ -91,9 +219,8 @@ fn export_appimage(opt Options) ! {
 	if app_name == '' {
 		return error('${@MOD}.${@FN}: failed resolving app name from ${input}')
 	}
-	if opt.verbosity > 1 {
-		eprintln('Resolved app name to "${app_name}"')
-	}
+	opt.verbose(2, 'Resolved app name to "${app_name}"')
+
 	// Prepare AppDir directory. We do it manually because the "format",
 	// or rather, conventions - are fairly straight forward and appimage-builder is a mess.
 	// https://docs.appimage.org/packaging-guide/overview.html#manually-creating-an-appdir
@@ -101,9 +228,9 @@ fn export_appimage(opt Options) ! {
 	//
 	app_dir_path := os.join_path(opt.work_dir, '${app_name}.AppDir')
 	if os.exists(app_dir_path) {
-		os.rmdir_all(app_dir_path)!
+		os.rmdir_all(app_dir_path) or {}
 	}
-	os.mkdir_all(app_dir_path)!
+	paths.ensure(app_dir_path)!
 
 	// Create an AppDir structure, that the appimagetool can work on.
 	//
@@ -203,7 +330,6 @@ exec "${EXEC}" "$@"'
 
 	rd_config := ResolveDependenciesConfig{
 		verbosity:    opt.verbosity
-		format:       opt.format
 		exe:          v_app
 		excludes:     so_excludes
 		skip_resolve: skip_resolve
@@ -218,9 +344,7 @@ exec "${EXEC}" "$@"'
 		if os.is_link(lib_real_path) {
 			lib_real_path = os.real_path(lib_real_path)
 		}
-		if opt.verbosity > 1 {
-			eprintln('Copying "${lib_real_path}" to "${app_lib}"')
-		}
+		opt.verbose(2, 'Copying "${lib_real_path}" to "${app_lib}"')
 		os.cp(lib_real_path, app_lib) or {
 			return error('${@MOD}.${@FN}: failed to copy "${lib_real_path}" to "${app_lib}": ${err}')
 		}
@@ -256,9 +380,7 @@ exec "${EXEC}" "$@"'
 	// Look for "assets" dir in same location as input
 	assets_by_side := os.join_path(assets_by_side_path, 'assets')
 	if os.is_dir(assets_by_side) {
-		if opt.verbosity > 0 {
-			eprintln('Including assets from "${assets_by_side}"')
-		}
+		opt.verbose(1, 'Including assets from "${assets_by_side}"')
 		os.cp_all(assets_by_side, assets_path, false) or {
 			return error('${@MOD}.${@FN}: failed to copy "${assets_by_side}" to "${assets_path}": ${err}')
 		}
@@ -271,13 +393,9 @@ exec "${EXEC}" "$@"'
 		assets_above := os.real_path(os.join_path(assets_by_side_path, '..', 'assets'))
 		if os.is_dir(assets_above) {
 			if os.real_path(assets_above) in included_asset_paths {
-				if opt.verbosity > 1 {
-					eprintln('Skipping "${assets_above}" since it\'s already included')
-				}
+				opt.verbose(2, 'Skipping "${assets_above}" since it\'s already included')
 			} else {
-				if opt.verbosity > 0 {
-					eprintln('Including assets from "${assets_above}"')
-				}
+				opt.verbose(1, 'Including assets from "${assets_above}"')
 				os.cp_all(assets_above, assets_path, false) or {
 					return error('${@MOD}.${@FN}: failed to copy "${assets_above}" to "${assets_path}": ${err}')
 				}
@@ -291,13 +409,9 @@ exec "${EXEC}" "$@"'
 			os.join_path('shy', 'assets')
 		if os.is_dir(shy_example_assets) {
 			if os.real_path(shy_example_assets) in included_asset_paths {
-				if opt.verbosity > 1 {
-					eprintln('Skipping "${shy_example_assets}" since it\'s already included')
-				}
+				opt.verbose(2, 'Skipping "${shy_example_assets}" since it\'s already included')
 			} else {
-				if opt.verbosity > 0 {
-					eprintln('Including assets from "${shy_example_assets}"')
-				}
+				opt.verbose(1, 'Including assets from "${shy_example_assets}"')
 				os.cp_all(shy_example_assets, assets_path, false) or {
 					return error('${@MOD}.${@FN}: failed to copy (assets in dir) "${shy_example_assets}" to "${assets_path}": ${err}')
 				}
@@ -310,13 +424,9 @@ exec "${EXEC}" "$@"'
 	if os.is_dir(assets_in_dir) {
 		assets_in_dir_resolved := os.real_path(os.join_path(os.getwd(), assets_in_dir))
 		if assets_in_dir_resolved in included_asset_paths {
-			if opt.verbosity > 1 {
-				eprintln('Skipping "${assets_in_dir}" since it\'s already included')
-			}
+			opt.verbose(2, 'Skipping "${assets_in_dir}" since it\'s already included')
 		} else {
-			if opt.verbosity > 0 {
-				eprintln('Including assets from "${assets_in_dir}"')
-			}
+			opt.verbose(1, 'Including assets from "${assets_in_dir}"')
 			os.cp_all(assets_in_dir, assets_path, false) or {
 				return error('${@MOD}.${@FN}: failed to copy (assets in dir) "${assets_in_dir}" to "${assets_path}": ${err}')
 			}
@@ -328,13 +438,9 @@ exec "${EXEC}" "$@"'
 		if os.is_dir(user_asset) {
 			user_asset_resolved := os.real_path(user_asset)
 			if user_asset_resolved in included_asset_paths {
-				if opt.verbosity > 1 {
-					eprintln('Skipping "${user_asset}" since it\'s already included')
-				}
+				opt.verbose(2, 'Skipping "${user_asset}" since it\'s already included')
 			} else {
-				if opt.verbosity > 0 {
-					eprintln('Including assets from "${user_asset}"')
-				}
+				opt.verbose(1, 'Including assets from "${user_asset}"')
 				os.cp_all(user_asset, assets_path, false) or {
 					return error('${@MOD}.${@FN}: failed to copy "${user_asset}" to "${assets_path}": ${err}')
 				}
@@ -342,25 +448,25 @@ exec "${EXEC}" "$@"'
 			}
 		} else {
 			os.cp(user_asset, assets_path) or {
-				eprintln('Skipping invalid or non-existent asset file "${user_asset}"')
+				utils.shy_notice('Skipping invalid or non-existent asset file "${user_asset}"')
 			}
 		}
 	}
 
 	// strip exe
-	strip_exe := os.find_abs_path_of_executable('strip') or { '' }
-	if os.is_executable(strip_exe) {
-		if opt.verbosity > 0 {
-			eprintln('Running ${strip_exe} "${app_exe}"...')
-		}
-		strip_cmd := [
-			'${strip_exe}',
-			'"${app_exe}"',
-		]
-		strip_res := os.execute(strip_cmd.join(' '))
-		if strip_res.exit_code != 0 {
-			stripcmd := strip_cmd.join(' ')
-			return error('${@MOD}.${@FN}: "${stripcmd}" failed: ${strip_res.output}')
+	if opt.strip {
+		strip_exe := os.find_abs_path_of_executable('strip') or { '' }
+		if os.is_executable(strip_exe) {
+			opt.verbose(1, 'Running ${strip_exe} "${app_exe}"...')
+			strip_cmd := [
+				'${strip_exe}',
+				'"${app_exe}"',
+			]
+			strip_res := os.execute(strip_cmd.join(' '))
+			if strip_res.exit_code != 0 {
+				stripcmd := strip_cmd.join(' ')
+				return error('${@MOD}.${@FN}: "${stripcmd}" failed: ${strip_res.output}')
+			}
 		}
 	}
 
@@ -368,9 +474,7 @@ exec "${EXEC}" "$@"'
 	if opt.compress {
 		upx_exe := os.find_abs_path_of_executable('upx') or { '' }
 		if os.is_executable(upx_exe) {
-			if opt.verbosity > 0 {
-				eprintln('Compressing "${app_exe}"...')
-			}
+			opt.verbose(1, 'Compressing "${app_exe}"...')
 			upx_cmd := [
 				'${upx_exe}',
 				'-9',
@@ -402,29 +506,29 @@ exec "${EXEC}" "$@"'
 		})
 	}
 
-	if opt.format == .appimage_dir {
-		return
+	if format == .app_dir {
+		return Result{
+			output: 'Successfully generated "${app_dir_path}"'
+		}
 	}
 
 	// Write .AppDir to AppImage using `appimagetool`
-	output := opt.output
-	if opt.verbosity > 0 {
-		eprintln('Building AppImage "${output}"...')
-	}
+	opt.verbose(1, 'Building AppImage "${output}"...')
 	appimagetool_cmd := [
 		appimagetool_exe,
 		app_dir_path,
 		output,
 	]
-	if opt.verbosity > 2 {
-		eprintln('Running "${appimagetool_cmd}"...')
-	}
+	opt.verbose(3, 'Running "${appimagetool_cmd}"...')
 	ait_res := os.execute(appimagetool_cmd.join(' '))
 	if ait_res.exit_code != 0 {
 		ait_cmd := appimagetool_cmd.join(' ')
 		return error('${@MOD}.${@FN}: "${ait_cmd}" failed: ${ait_res.output}')
 	}
 	os.chmod(output, 0o775)! // make it executable
+	return Result{
+		output: 'Successfully generated "${output}"'
+	}
 }
 
 pub fn appimage_exclude_list(verbosity int) ![]string {
@@ -442,4 +546,165 @@ pub fn appimage_exclude_list(verbosity int) ![]string {
 	}
 	return os.read_lines(excludes_path) or { []string{} }.filter(it.trim_space() != ''
 		&& !it.trim_space().starts_with('#'))
+}
+
+// pub struct Dependency{
+// 	path string
+// 	// { 'so':so, 'path':path, 'realpath':realpath, 'dependants':set([executable]), 'type':'lib' }
+// }
+
+struct ResolveDependenciesConfig {
+	verbosity    int
+	indent       int
+	exe          string
+	excludes     []string
+	skip_resolve []string
+}
+
+fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDependenciesConfig) ! {
+	// Resolving shared object (.so) dependencies on Linux is not as straight forward as
+	// one could wish for. Using `objdump` alone gives us only the *names* of the
+	// shared objects, not the full path. Using only `ldd` *does* result in resolved lib paths BUT
+	// they're done recursively, in some cases by executing the exe/lib - and, on top, it's printed
+	// *in one stream* which makes it impossible to know which libs has dependencies on which,
+	// further more `ldd` has security issues and problems with cross-compiled binaries.
+	// The issues are mostly ignored in our case since we consider the input (v sources -> binary)
+	// "trusted" and we do not support V cross-compiled binaries anyway at this point
+	// (Not sure AppImages even support it?!).
+	//
+	// Digging even further and reading source code of programs like `lddtree` will reveal
+	// that it's not straight forward to know what `.so` will be loaded by `ld` upon execution
+	// due to LD_LIBRARY_PATH mess and misuse etc.
+	//
+	// So. For now we've chosen a solution using a mix of both `objdump` and `ldd` - it has pitfalls for sure -
+	// but how many and how severe - only time will tell. If we are to do this "correctly" it'll need a lot
+	// more development time and special-cases (and native V modules for reading ELF binaries etc.) than what
+	// is feasible right now; We really just want to be able to collect a bunch of shared object files that
+	// a given V executable rely on in-order for us to collect them and package them up, for example, in an AppImage.
+	//
+	// The strategy is thus the following:
+	// 1. Run `objdump` on the exe/so file (had to choose one; readelf lost:
+	// https://stackoverflow.com/questions/8979664/readelf-vs-objdump-why-are-both-needed)
+	// this gives us the immediate (1st level) dependencies of the app.
+	// 2. Run `ldd` on the same exe/so file to obtain the first encountered resolved path(s) to the 1st level exe/so dependency.
+	// 3. Do step 1 and 2 for all dependencies, recursively
+	// 4. Cross our fingers and assume that 99.99% of cases will end up having happy users.
+	// The remaining user pool will hopefully be tech savy enough to fix/extend things themselves.
+
+	verbosity := config.verbosity
+	indent := config.indent
+	mut root_indents := '  '.repeat(indent) + ' '
+	if indent == 0 {
+		root_indents = ''
+	}
+	indents := '  '.repeat(indent + 1) + ' '
+	executable := config.exe
+	excludes := config.excludes
+	skip_resolve := config.skip_resolve
+
+	if verbosity > 0 {
+		base := os.file_name(executable)
+		eprintln('${root_indents}${base} (include)')
+	}
+	objdump_cmd := [
+		'objdump',
+		'-x',
+		executable,
+	]
+	od_res := os.execute(objdump_cmd.join(' '))
+	if od_res.exit_code != 0 {
+		cmd := objdump_cmd.join(' ')
+		return error('${@MOD}.${@FN} "${cmd}" failed:\n${od_res.output}')
+	}
+	od_lines := od_res.output.split('\n').map(it.trim_space())
+	mut exe_deps := []string{}
+	for line in od_lines {
+		if !line.contains('NEEDED') {
+			continue
+		}
+		parts := line.split(' ').map(it.trim_space()).filter(it != '')
+		if parts.len != 2 {
+			continue
+		}
+		so_name := parts[1]
+		if so_name in excludes {
+			if verbosity > 1 {
+				eprintln('${indents}${so_name} (exclude)')
+			}
+			continue
+		}
+		exe_deps << so_name
+	}
+
+	mut resolved_deps := map[string]string{}
+
+	ldd_cmd := [
+		'ldd',
+		// '-r',
+		executable,
+	]
+	ldd_res := os.execute(ldd_cmd.join(' '))
+	if ldd_res.exit_code != 0 {
+		cmd := ldd_cmd.join(' ')
+		return error('${@MOD}.${@FN} "${cmd}" failed:\n${ldd_res.output}')
+	}
+	ldd_lines := ldd_res.output.split('\n').map(it.trim_space())
+	for line in ldd_lines {
+		if line.contains('statically linked') {
+			continue
+		}
+		if line.contains('not found') {
+			// TODO ?? - give error here? add an option to continue?
+			continue
+		}
+		parts := line.split(' ')
+		if parts.len == 0 || parts.len < 3 {
+			continue
+		}
+		// dump(parts)
+		so_name := parts[0]
+		path := parts[2]
+
+		if so_name in exe_deps {
+			if existing := resolved_deps[so_name] {
+				if existing != path {
+					eprintln('${indents}${so_name} Warning: resolved path is ambiguous "${existing}" vs. "${path}"')
+				}
+				continue
+			}
+			resolved_deps[so_name] = path
+		}
+
+		// if _ := deps[so_name] {
+		//  // Could add to "dependants" here for further info
+		//	continue
+		//}
+	}
+
+	for so_name, path in resolved_deps {
+		deps[so_name] = path
+
+		if so_name in skip_resolve {
+			if verbosity > 1 {
+				eprintln('${indents}${so_name} (skip resolve)')
+			}
+			continue
+		}
+
+		conf := ResolveDependenciesConfig{
+			...config
+			exe:    path
+			indent: indent + 1
+		}
+		resolve_dependencies_recursively(mut deps, conf)!
+	}
+}
+
+pub fn resolve_dependencies(config ResolveDependenciesConfig) !map[string]string {
+	mut deps := map[string]string{}
+	if config.verbosity > 0 {
+		eprintln('Resolving dependencies for executable "${config.exe}"...')
+	}
+	resolve_dependencies_recursively(mut deps, config)!
+	return deps
 }
