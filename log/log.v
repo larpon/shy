@@ -9,11 +9,12 @@ import strings
 const label_info = 'INFO'
 const label_warn = 'WARN'
 const label_error = 'ERROR'
+const label_notice = 'NOTICE'
 const label_debug = 'DEBUG'
 const label_critical = 'CRITICAL'
 const default_flags = get_default_flags_workaround()
 
-// TODO
+// TODO: WORKAROUND
 @[markused]
 fn todo_() {
 	_ := default_flags
@@ -23,7 +24,7 @@ fn get_default_flags_workaround() Flag {
 	return $if prod {
 		Flag.log | .std_err | .error | .critical | .custom
 	} $else {
-		Flag.log | .std_err | .info | .warn | .error | .critical | .custom
+		Flag.log | .std_err | .info | .notice | .warn | .error | .critical | .custom
 	}
 }
 
@@ -38,6 +39,7 @@ pub enum Flag {
 	info
 	warn
 	error
+	notice
 	debug
 	critical
 	//
@@ -246,6 +248,19 @@ pub fn (l &Log) critical(str string) {
 	}
 }
 
+@[if !shy_no_log ?]
+pub fn (l &Log) notice(str string) {
+	if l.flags.has(.notice) {
+		if l.flags.has(.buffer) {
+			unsafe {
+				l.buffer.writeln(label_notice + ' ' + str)
+			}
+		}
+		maybe_colored := l.colorize('bright_magenta', label_notice + ' ')
+		l.redirect(maybe_colored + str)
+	}
+}
+
 @[if debug && !shy_no_log ?]
 pub fn (l &Log) debug(str string) {
 	if l.flags.has(.debug) {
@@ -323,6 +338,20 @@ pub fn (l &Log) gcritical(group string, str string) {
 			}
 		}
 		maybe_colored := l.colorize('red', label_critical + ' ') + l.colorize('white', '${group} ')
+		l.redirect(maybe_colored + str)
+	}
+}
+
+@[if !shy_no_log ?]
+pub fn (l &Log) gnotice(group string, str string) {
+	if l.flags.has(.notice) {
+		if l.flags.has(.buffer) {
+			unsafe {
+				l.buffer.writeln(label_notice + ' ${group} ' + str)
+			}
+		}
+		maybe_colored := l.colorize('bright_magenta', label_notice + ' ') +
+			l.colorize('white', '${group} ')
 		l.redirect(maybe_colored + str)
 	}
 }
