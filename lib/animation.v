@@ -55,7 +55,7 @@ pub fn (mut a Anims) init() ! {
 
 pub fn (mut a Anims) reset() ! {
 	for i := 0; i < a.active.len; i++ {
-		animator := a.active[i]
+		mut animator := a.active[i]
 		animator.restart()
 	}
 }
@@ -94,8 +94,8 @@ pub fn (mut a Anims) update(dt f64) {
 	}
 	analyse.max('${@MOD}.${@STRUCT}.max_in_use', a.active.len)
 	for i := 0; i < a.active.len; i++ {
-		animator := a.active[i]
-		// NOTE(lmp) workaround weird crash/behavior with `-d shy_analyse` here?!?
+		mut animator := a.active[i]
+		// NOTE: (lmp) workaround weird crash/behavior with `-d shy_analyse` here?!?
 		// Turns out the culprit was actually the garbage collector and SDL2, leave check for now
 		if isnil(animator) {
 			a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.active.len}')
@@ -107,13 +107,13 @@ pub fn (mut a Anims) update(dt f64) {
 		}
 		// for animator in a.active {
 		if !animator.running && !animator.recycle {
-			// TODO move to inactive pool - measure if this is even all worth it.
+			// TODO: move to inactive pool - measure if this is even all worth it.
 			// Doing this has some implications when the anim is restarted:
 			// we need (maybe expensive?) logic to detect and transfer the animator back into
 			// the active pool - maybe it's just more "efficient" to simply let the
 			// animation live in the active pool. Hmm...
 			// Let's try with a recycle flag:
-			if animator is Animator[f32] {
+			if mut animator is Animator[f32] {
 				a.f32pool << animator
 				a.active.delete(i)
 			}
@@ -209,7 +209,8 @@ pub fn (mut a Anims) new_follow_animator[T](config FollowAnimatorConfig) &Follow
 
 // IAnimator is what the Anims system can control
 interface IAnimator {
-	kind    AnimatorKind
+	kind AnimatorKind
+mut:
 	running bool
 	paused  bool // run()
 	recycle bool
@@ -276,21 +277,19 @@ pub fn (mut a Animator[T]) init(from T, to T, duration_ms i64) {
 	a.prev_value = from
 }
 
-pub fn (a &Animator[T]) restart() {
+pub fn (mut a Animator[T]) restart() {
 	unsafe {
 		a.reset()
 		a.run()
 	}
 }
 
-pub fn (a &Animator[T]) run() {
-	unsafe {
-		a.running = true
-	}
+pub fn (mut a Animator[T]) run() {
+	a.running = true
 	a.fire_event_fn(.begin)
 }
 
-fn (a &Animator[T]) fire_event_fn(event AnimEvent) {
+fn (mut a Animator[T]) fire_event_fn(event AnimEvent) {
 	if on_event_fn := a.on_event_fn {
 		on_event_fn(a.user, event)
 	}
@@ -304,8 +303,7 @@ pub fn (a &Animator[T]) t() f64 {
 	return a.t
 }
 
-pub fn (ima Animator[T]) reset() {
-	mut a := unsafe { ima } // BUG: workaround mutable generic interfaces
+pub fn (mut a Animator[T]) reset() {
 	a.running = false
 	a.elapsed = 0
 	a.value = a.from
@@ -319,7 +317,6 @@ fn (mut a Animator[T]) ended() {
 		.once {
 			a.running = false
 			a.value = a.to
-			// a.reset()
 		}
 		.loop {
 			if a.loops > 0 {
@@ -330,7 +327,6 @@ fn (mut a Animator[T]) ended() {
 			} else {
 				a.running = false
 				a.value = a.to
-				// a.reset()
 			}
 		}
 		.pingpong {
@@ -344,16 +340,14 @@ fn (mut a Animator[T]) ended() {
 			} else {
 				a.running = false
 				a.value = a.to
-				// a.reset()
 			}
 		}
 	}
 }
 
-fn (a &Animator[T]) touch() {}
+fn (mut a Animator[T]) touch() {}
 
-fn (ima &Animator[T]) step(dt f64) {
-	mut a := unsafe { ima } // BUG: workaround mutable generic interfaces
+fn (mut a Animator[T]) step(dt f64) {
 	a.elapsed += dt * 1000
 	if a.elapsed >= a.duration {
 		a.ended()
@@ -400,8 +394,7 @@ mut:
 	value  T
 }
 
-fn (fa FollowAnimator[T]) touch() {
-	mut a := unsafe { fa } // BUG: workaround mutable generic interfaces
+fn (mut a FollowAnimator[T]) touch() {
 	should_run := mth.round_to_even(utils.manhattan_distance(a.value, 0, a.target, 0)) != 0
 	if should_run {
 		a.running = should_run
@@ -411,12 +404,11 @@ fn (fa FollowAnimator[T]) touch() {
 	}
 }
 
-fn (fa FollowAnimator[T]) restart() {
-	fa.reset()
+fn (mut a FollowAnimator[T]) restart() {
+	a.reset()
 }
 
-fn (fa FollowAnimator[T]) reset() {
-	mut a := unsafe { fa } // BUG: workaround mutable generic interfaces
+fn (mut a FollowAnimator[T]) reset() {
 	a.value = a.target
 }
 
@@ -434,7 +426,7 @@ fn (mut a FollowAnimator[T]) config_update(config FollowAnimatorConfig) {
 	a.on_event_fn = config.on_event_fn
 }
 
-fn (a &FollowAnimator[T]) fire_event_fn(event AnimEvent) {
+fn (mut a FollowAnimator[T]) fire_event_fn(event AnimEvent) {
 	if on_event_fn := a.on_event_fn {
 		on_event_fn(a.user, event)
 	}
@@ -444,9 +436,7 @@ pub fn (a &FollowAnimator[T]) value() T {
 	return a.value
 }
 
-fn (fa &FollowAnimator[T]) step(dt f64) {
-	mut a := unsafe { fa } // BUG: workaround mutable generic interfaces
-
+fn (mut a FollowAnimator[T]) step(dt f64) {
 	value := a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.multiply)
 	// value := utils.remap(a.t, 0, 1.0, a.from, a.to)
 	lerp_value := utils.lerp(value, a.prev_value, dt)
