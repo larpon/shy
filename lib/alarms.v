@@ -136,6 +136,7 @@ fn (s &Shy) cancel_alarm(alarm_id AlarmID) {
 
 fn (mut a Alarms) p_new_alarm(config AlarmConfig) &Alarm {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	a.shy.vet_issue(.notice, .hot_code, '${@STRUCT}.${@FN}', 'use `-d shy_analyse` to see how many core resources are allocated vs used')
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	mut alarm := &Alarm{
 		shy: a.shy

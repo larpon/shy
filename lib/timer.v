@@ -128,7 +128,8 @@ pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 }
 
 fn (mut t Timers) p_new_timer(config TimerConfig) &Timer {
-	t.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	t.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data')
+	t.shy.vet_issue(.notice, .hot_code, '${@STRUCT}.${@FN}', 'use `-d shy_analyse` to see how many core resources are allocated vs used')
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
 	t.ids++
 	mut timer := &Timer{

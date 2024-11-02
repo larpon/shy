@@ -159,6 +159,7 @@ pub fn (mut s Shy) new_follow_animator[T](config FollowAnimatorConfig) &FollowAn
 
 fn (mut a Anims) p_new_animator[T](config AnimatorConfig) &Animator[T] {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	a.shy.vet_issue(.notice, .hot_code, '${@STRUCT}.${@FN}', 'use `-d shy_analyse` to see how many core resources are allocated vs used')
 	$if shy_analyse ? {
 		t := T{}
 		analyse.count('${@MOD}.${@STRUCT}.${@FN}[${typeof(t).name}]', 1)
@@ -173,6 +174,7 @@ fn (mut a Anims) p_new_animator[T](config AnimatorConfig) &Animator[T] {
 
 fn (mut a Anims) p_new_follow_animator[T](config FollowAnimatorConfig) &FollowAnimator[T] {
 	a.shy.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'memory fragmentation happens when allocating in hot code paths. It is, in general, better to pre-load data.')
+	a.shy.vet_issue(.notice, .hot_code, '${@STRUCT}.${@FN}', 'use `-d shy_analyse` to see how many core resources are allocated vs used')
 	$if shy_analyse ? {
 		t := T{}
 		analyse.count('${@MOD}.${@STRUCT}.${@FN}[${typeof(t).name}]', 1)

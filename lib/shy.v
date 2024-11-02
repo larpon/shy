@@ -216,6 +216,7 @@ pub fn (s Shy) assert_api_shutdown() {
 
 pub enum VetCategory {
 	warn
+	notice
 }
 
 pub enum VetArea {
@@ -247,11 +248,23 @@ pub fn (s &Shy) vet_issue(c VetCategory, area VetArea, caller string, msg string
 			match area {
 				.hot_code {
 					if s.state.in_hot_code {
-						s.log.gwarn('${vet_tag} ' + prefix, msg)
+						s.log.gwarn('${vet_tag} ${prefix}', msg)
 					}
 				}
 				else {
-					s.log.gwarn('${vet_tag} ' + prefix, msg)
+					s.log.gwarn('${vet_tag} ${prefix}', msg)
+				}
+			}
+		}
+		.notice {
+			match area {
+				.hot_code {
+					if s.state.in_hot_code {
+						s.log.gnotice('${vet_tag} ${prefix}', msg)
+					}
+				}
+				else {
+					s.log.gnotice('${vet_tag} ${prefix}', msg)
 				}
 			}
 		}
