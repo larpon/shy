@@ -5,6 +5,8 @@ module lib
 
 import shy.analyse
 
+pub const preallocate_timers = int($d('shy:timers:prealloc', 10))
+
 type TimerEventFn = fn (TimerEvent)
 
 pub type TimerFn = fn (&Timer)
@@ -26,14 +28,13 @@ mut:
 	ids u32
 	// running bool
 	paused bool
-	active []&Timer = []&Timer{cap: 1000} // Should match prealloc
-	pool   []&Timer = []&Timer{cap: 1000} // Should match prealloc
+	active []&Timer = []&Timer{cap: preallocate_timers} // Should match prealloc
+	pool   []&Timer = []&Timer{cap: preallocate_timers} // Should match prealloc
 }
 
 pub fn (mut t Timers) init() ! {
 	// t.shy.assert_api_init() // TODO: fix for multi-window
-	// TODO: make configurable
-	prealloc := 1000
+	prealloc := preallocate_timers
 	unsafe { t.active.flags.set(.noslices | .noshrink) }
 	unsafe { t.pool.flags.set(.noslices | .noshrink) }
 	// unsafe { t.f64_pool.flags.set(.noslices | .noshrink) }

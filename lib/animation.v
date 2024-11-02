@@ -8,6 +8,9 @@ import shy.ease
 import shy.analyse
 import mth
 
+pub const preallocate_f32_animators = int($d('shy:animators:f32:prealloc', 100))
+pub const preallocate_f64_animators = int($d('shy:animators:f64:prealloc', 50))
+
 pub const infinite = -1
 
 pub enum AnimatorKind {
@@ -34,22 +37,23 @@ pub struct Anims {
 mut:
 	// running bool
 	paused  bool
-	active  []&IAnimator     = []&IAnimator{cap: 1000}     // Should match prealloc
-	f32pool []&Animator[f32] = []&Animator[f32]{cap: 1000} // Should match prealloc
-	// f64_pool    []&Animator<f64>
+	active  []&IAnimator     = []&IAnimator{cap: preallocate_f32_animators + preallocate_f64_animators} // NOTE: Should match sum of preallocs
+	f32pool []&Animator[f32] = []&Animator[f32]{cap: preallocate_f32_animators}                         // Should match type prealloc
+	f64pool []&Animator[f64] = []&Animator[f64]{cap: preallocate_f64_animators}                         // Should match type prealloc
 }
 
 pub fn (mut a Anims) init() ! {
 	// a.shy.assert_api_init() // TODO: fix for multi-window
-	// TODO: make configurable
-	prealloc := 1000
 	unsafe { a.active.flags.set(.noslices | .noshrink) }
-	// unsafe { a.bin.flags.set(.noslices | .noshrink) }
 	unsafe { a.f32pool.flags.set(.noslices | .noshrink) }
-	// unsafe { a.f64_pool.flags.set(.noslices | .noshrink) }
-	for i := 0; i < prealloc; i++ {
+	unsafe { a.f64pool.flags.set(.noslices | .noshrink) }
+	prealloc_f32 := preallocate_f32_animators
+	for i := 0; i < prealloc_f32; i++ {
 		a.f32pool << a.p_new_animator[f32]()
-		// a.f64_pool << a.p_new_animator<f64>()
+	}
+	prealloc_f64 := preallocate_f64_animators
+	for i := 0; i < prealloc_f64; i++ {
+		a.f64pool << a.p_new_animator[f64]()
 	}
 }
 
@@ -86,6 +90,15 @@ pub fn (mut a Anims) shutdown() ! {
 			shy_free(anim)
 		}
 	}
+	for anim in a.f64pool {
+		unsafe {
+			if isnil(anim) {
+				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO: V memory bug ${a.f64pool.len}')
+				return
+			}
+			shy_free(anim)
+		}
+	}
 }
 
 pub fn (mut a Anims) update(dt f64) {
@@ -105,7 +118,6 @@ pub fn (mut a Anims) update(dt f64) {
 		if animator.kind == .follow {
 			animator.touch()
 		}
-		// for animator in a.active {
 		if !animator.running && !animator.recycle {
 			// TODO: move to inactive pool - measure if this is even all worth it.
 			// Doing this has some implications when the anim is restarted:
@@ -115,6 +127,9 @@ pub fn (mut a Anims) update(dt f64) {
 			// Let's try with a recycle flag:
 			if mut animator is Animator[f32] {
 				a.f32pool << animator
+				a.active.delete(i)
+			} else if mut animator is Animator[f64] {
+				a.f64pool << animator
 				a.active.delete(i)
 			}
 			continue
@@ -176,6 +191,14 @@ pub fn (mut a Anims) new_animator[T](config AnimatorConfig) &Animator[T] {
 	$if T.typ is f32 {
 		if a.f32pool.len > 0 {
 			animator = a.f32pool.pop()
+			animator.reset()
+			animator.config_update(config)
+		} else {
+			animator = a.p_new_animator[T](config)
+		}
+	} $else $if T.typ is f64 {
+		if a.f64pool.len > 0 {
+			animator = a.f64pool.pop()
 			animator.reset()
 			animator.config_update(config)
 		} else {

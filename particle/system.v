@@ -24,7 +24,8 @@ pub fn new_system(sc SystemConfig) &System {
 	return s
 }
 
-@[heap; noinit]
+@[noinit: 'new_system/1']
+@[heap]
 pub struct System {
 	shy.Rect
 mut:
@@ -149,7 +150,7 @@ pub fn (mut s System) update(dt f64) {
 	for i := 0; i < s.emitters.len; i++ {
 		s.emitters[i].update(dt)
 	}
-	analyse.max('${@MOD}.${@STRUCT}.pool.len', s.pool.len)
+	analyse.max('${@MOD}.${@STRUCT}.max_in_use', s.pool.len)
 	// Run through the pool of currently active particles
 	mut p := &Particle(unsafe { nil })
 	for i := 0; i < s.pool.len; i++ {
@@ -215,8 +216,8 @@ pub fn (s System) draw(f_dt f64) {
 }
 
 pub fn (mut s System) reset() {
-	eprintln(@MOD + '.' + @STRUCT + '::' + @FN)
-	eprintln('Resetting ${s.pool.len} from pool ${s.bin.len}')
+	// eprintln(@MOD + '.' + @STRUCT + '::' + @FN)
+	// eprintln('Resetting ${s.pool.len} from pool ${s.bin.len}')
 	for p in s.pool {
 		mut pm := unsafe { p }
 		pm.reset()

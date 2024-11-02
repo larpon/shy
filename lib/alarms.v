@@ -5,6 +5,8 @@ module lib
 
 import shy.analyse
 
+pub const preallocate_alarms = int($d('shy:alarms:prealloc', 10))
+
 type AlarmID = u32
 type AlarmFn = fn (voidptr, AlarmEvent)
 
@@ -22,13 +24,12 @@ mut:
 	// running bool
 	paused bool
 	ids    u32
-	active []&Alarm = []&Alarm{cap: 2000} // Should match prealloc
-	pool   []&Alarm = []&Alarm{cap: 2000} // Should match prealloc
+	active []&Alarm = []&Alarm{cap: preallocate_alarms} // Should match prealloc
+	pool   []&Alarm = []&Alarm{cap: preallocate_alarms} // Should match prealloc
 }
 
 fn (mut a Alarms) init() ! {
-	// TODO: make configurable
-	prealloc := 2000
+	prealloc := preallocate_alarms
 	unsafe { a.active.flags.set(.noslices | .noshrink) }
 	unsafe { a.pool.flags.set(.noslices | .noshrink) }
 	// unsafe { a.f64_pool.flags.set(.noslices | .noshrink) }
@@ -92,6 +93,7 @@ pub fn (mut a Alarms) update() {
 	if a.paused {
 		return
 	}
+	analyse.max('${@MOD}.${@STRUCT}.max_in_use', a.active.len)
 	for i := 0; i < a.active.len; i++ {
 		mut alarm := a.active[i]
 		if alarm.paused {
@@ -157,7 +159,6 @@ fn (mut a Alarms) new_alarm(config AlarmConfig) &Alarm {
 	a.ids++
 	alarm.id = a.ids
 	a.active << alarm
-	analyse.max('${@MOD}.${@STRUCT}.active.len', a.active.len)
 	return alarm
 }
 

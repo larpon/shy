@@ -8,6 +8,7 @@ import os.font
 import shy.wraps.sokol.gfx
 import shy.wraps.sokol.gl
 import shy.wraps.sokol.sfons
+import shy.analyse
 
 pub enum EndEnum {
 	clear
@@ -250,9 +251,13 @@ fn (mut c Context) sokol_gl_init() ! {
 
 	// create a sokol-gl context compatible with the offscreen render pass
 	// (specific color pixel format, no depth-stencil-surface, no MSAA)
+	max_vertices := int($d('shy:gfx:sgl:max_vertices', 1_000_000))
+	max_commands := int($d('shy:gfx:sgl:max_commands', 100_000))
+	analyse.max('${@MOD}.${@STRUCT}.max_vertices', max_vertices)
+	analyse.max('${@MOD}.${@STRUCT}.max_commands', max_commands)
 	gl_ctx_desc := gl.ContextDesc{
-		max_vertices: 1_000_000 // TODO: (lmp) make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
-		max_commands: 100_000   // TODO: (lmp) make configurable default 16k
+		max_vertices: max_vertices // NOTE: default 64k
+		max_commands: max_commands // NOTE: default 16k
 		color_format: .rgba8
 		depth_format: .@none
 		sample_count: offscreen_sample_count
