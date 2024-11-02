@@ -32,7 +32,7 @@ pub fn (mut m Mouse) hide() {
 
 // xy returns the mouse coordinate relative to `position_type`.
 pub fn (m Mouse) position(position_type MousePositionType) (int, int) {
-	// TODO add one that maps from window to gl drawable size?
+	// TODO: add one that maps from window to gl drawable size?
 	match position_type {
 		.global {
 			mut mx, mut my := 0, 0

@@ -43,7 +43,7 @@ mut:
 pub fn (mut e Events) init() ! {
 	unsafe {
 		e.queue.free()
-		// free(e.queue) // TODO fail when using `-gc none`
+		// free(e.queue) // TODO: fail when using `-gc none`
 	}
 	e.queue = []Event{len: 0, cap: 10000, init: empty_event}
 	unsafe { e.queue.flags.set(.noslices | .noshrink | .nogrow) }
@@ -65,7 +65,7 @@ pub fn (mut e Events) poll() ?Event {
 	mut input := unsafe { e.shy.api().input() }
 
 	if e.state == .play {
-		mut win := e.shy.wm().active_window() // TODO multi-window support
+		mut win := e.shy.wm().active_window() // TODO: multi-window support
 		if e.play_queue.len == 0 {
 			e.shy.log.ginfo('${@STRUCT}.${@FN}', 'nothing to play back, resetting and returning to normal')
 			// e.send_record_event() ???
@@ -149,13 +149,13 @@ pub fn (mut e Events) record() {
 // play_back starts play back of the current recording queue.
 pub fn (mut e Events) play_back() {
 	e.shy.reset() or { panic(err) }
-	e.send_record_event() // TODO add record event type to event like: .record_begin, .record_end, .play_back_begin, .play_back_end
-	// TODO make all this configurable, play back should support multi-window setup
+	e.send_record_event() // TODO: add record event type to event like: .record_begin, .record_end, .play_back_begin, .play_back_end
+	// TODO: make all this configurable, play back should support multi-window setup
 	mut win := e.shy.wm().active_window()
 	win.set_vsync(.off) or { panic(err) }
 	// win.state.update_rate = 10
 	e.play_queue = e.recorded.reverse()
-	e.play_queue.drop(1) // TODO delete the event that triggered this - problem is; this is currently not always triggered by an event
+	e.play_queue.drop(1) // TODO: delete the event that triggered this - problem is; this is currently not always triggered by an event
 	e.shy.log.ginfo('${@STRUCT}.${@FN}', 'starting play back of ${e.play_queue.len} events')
 	e.state = .play
 	e.play_next = e.play_queue.pop()
@@ -240,7 +240,7 @@ pub fn (mut e Events) send_int_event(id int, value int) {
 // import sdl
 // import manymouse as mm
 
-// TODO quit_requested
+// TODO: quit_requested
 // fn (mut s Shy) quit_requested() bool {
 // 	return sdl.quit_requested()
 // }

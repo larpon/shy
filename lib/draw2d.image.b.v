@@ -28,7 +28,7 @@ pub fn (mut di DrawImage) end() {
 }
 
 // image_2d returns an initialized Draw2DImage struct.
-// NOTE `image` is passed by reference because building with `-gc none` otherwise leaks.
+// NOTE: `image` is passed by reference because building with `-gc none` otherwise leaks.
 pub fn (di DrawImage) image_2d(image &Image) Draw2DImage {
 	return Draw2DImage{
 		factor: di.factor
@@ -38,8 +38,8 @@ pub fn (di DrawImage) image_2d(image &Image) Draw2DImage {
 		draw:   di.draw
 	}
 	/*
-	// TODO return small default image?
-	panic('${@STRUCT}.${@FN}: TODO use stand-in Image here instead of panicing (image $uri was not loaded/cached)')
+	// TODO: return small default image?
+	panic('${@STRUCT}.${@FN}: TODO: use stand-in Image here instead of panicing (image $uri was not loaded/cached)')
 	return Draw2DImage{}
 	*/
 }
@@ -80,7 +80,7 @@ fn workaround_match_bug(image &Image, origin Origin, dis_x f32, dis_y f32, i_x f
 	mut o_dis_y := dis_y
 	match origin {
 		Anchor {
-			// TODO(lmp): this offset circus should be able to use *less* branching
+			// TODO: (lmp) this offset circus should be able to use *less* branching
 			if origin in [.top_left, .top_center, .top_right, .bottom_left, .bottom_center,
 				.bottom_right] {
 				if image.width > image.height {
@@ -344,7 +344,7 @@ pub fn (i Draw2DImage) draw_region(src Rect, dst Rect) {
 	}
 
 	// eprintln('image: ${w}x${h}\nsrc: ${src} dst: ${dst}')
-	// TODO division by zero can probably happen here...
+	// TODO: division by zero can probably happen here...
 	dw := mth.min(used_dst.width, w) / mth.max(used_dst.width, w)
 	dh := mth.min(used_dst.height, h) / mth.max(used_dst.height, h)
 	if dw != 1 || dh != 1 {

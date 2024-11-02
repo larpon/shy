@@ -20,7 +20,7 @@ pub:
 	id u64 = 1
 mut:
 	ui &UI = unsafe { nil }
-	// NOTE The `unsafe { nil }` assignment once resulted in several V bugs: https://github.com/vlang/v/issues/16882
+	// NOTE: The `unsafe { nil }` assignment once resulted in several V bugs: https://github.com/vlang/v/issues/16882
 	// ... which was quickly fixed but one of them couldn't be made as an MRE (minimal reproducible example) - so it's
 	// a target of regression: https://github.com/vlang/v/commit/2119a24 <- this commit has the fix.
 	parent   &Node = unsafe { nil }
@@ -38,8 +38,8 @@ pub mut:
 
 // init initialize this `Item` and it's children.
 pub fn (mut i Item) init(ui &UI) ! {
-	// TODO V BUG #20220 (https://github.com/vlang/v/issues/20220)
-	// TODO V BUG #20229 (https://github.com/vlang/v/issues/20229)
+	// TODO: V BUG #20220 (https://github.com/vlang/v/issues/20220)
+	// TODO: V BUG #20229 (https://github.com/vlang/v/issues/20229)
 	// assert i != unsafe { nil }
 	i.ui = ui
 	for mut child in i.body {
@@ -89,7 +89,7 @@ pub fn (i &Item) visual_state() VisualState {
 	// assert i != unsafe { nil }
 	p := i.parent //()
 	if !isnil(p) && p.id != 0 {
-		// TODO switch to matricies and actually do the needed transformation math here
+		// TODO: switch to matricies and actually do the needed transformation math here
 		p_vs := p.visual_state()
 
 		// scale := p_vs.scale * i.scale

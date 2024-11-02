@@ -40,7 +40,7 @@ pub fn (mut a Assets) init() ! {
 			eprintln('Pass `-cg -d shy_debug_assets` to enable asset debug output')
 		}
 	}
-	a.sb.ensure_cap(1024) // NOTE TODO(lmp): this needs attention if no GC is used
+	a.sb.ensure_cap(1024) // TODO: (lmp) this needs attention if no GC is used
 	a.loader.init()!
 	a.load_error_assets()!
 }
@@ -49,7 +49,10 @@ pub fn (mut a Assets) shutdown() ! {
 	a.async_load_queue.clear()
 	a.loader.shutdown()!
 
-	// BUG: there's invalid memory access upon Assets.shutdown() if too many of the same asset has been unloaded and loaded again for some reason, see Assets.unload that may, or may not, be the function that causes it
+	// BUG: there's invalid memory access upon Assets.shutdown() if too many of the
+	// same asset has been unloaded and loaded again for some reason,
+	// see Assets.unload that may, or may not, be the function that causes it.
+	// It could be also just the `-d sdl_memory_no_gc` horrorshow.
 	// keys := a.ass.keys()
 	// values := a.ass.values()
 	// println('Keys ${keys} ${keys.len} vs ${values.len}')
@@ -61,7 +64,7 @@ pub fn (mut a Assets) shutdown() ! {
 		}
 		asset.shutdown()!
 	}
-	// BUG: the `free(asset)` can not be done in the function above
+	// BUG: the `free(asset)` can not be done in the function above for unknown reasons
 	for _, asset in a.ass {
 		unsafe { free(asset) }
 	}
@@ -202,7 +205,7 @@ pub fn (mut a Assets) load(alo AssetLoadOptions) !&Asset {
 		return error('${@STRUCT}.${@FN}:${@LINE}: error loaded <= 0 bytes from "${source.str()}"')
 	}
 
-	// PERFORMANCE: TODO preallocated asset pool??
+	// PERFORMANCE: TODO: preallocated asset pool??
 	asset := &Asset{
 		shy:    a.shy
 		data:   bytes
@@ -575,7 +578,7 @@ mut:
 pub:
 	lo AssetLoadOptions
 pub mut:
-	status AssetStatus // TODO(lmp): should be pub read-only to the outside world if V ever gets that access modifier
+	status AssetStatus // TODO: (lmp) should be pub read-only to the outside world if V ever gets that access modifier
 }
 
 @[manualfree]
@@ -724,7 +727,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		height:  stb_img.height
 		mipmaps: opt.mipmaps
 		ready:   stb_img.ok
-		kind:    .png // TODO stb_img.ext
+		kind:    .png // TODO: stb_img.ext
 		//
 		channels: stb_img.use_channels
 	}
@@ -734,7 +737,7 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	mut img_desc := gfx.ImageDesc{
 		width:       image.width
 		height:      image.height
-		num_mipmaps: 0 // TODO image.mipmaps
+		num_mipmaps: 0 // TODO: image.mipmaps
 		// label: &u8(0)
 		pixel_format: .rgba8
 	}
@@ -901,7 +904,7 @@ pub fn (ifm ImageFillMode) prev() ImageFillMode {
 pub struct Blob {
 	opt BlobOptions
 pub:
-	asset &Asset = null // TODO removing this results in compiler warnings a few places
+	asset &Asset = null // TODO: removing this results in compiler warnings a few places
 }
 
 @[params]
@@ -933,7 +936,7 @@ pub fn (b &Blob) source() AssetSource {
 pub struct Image {
 	opt ImageOptions
 pub:
-	asset  &Asset = null // TODO removing this results in compiler warnings a few places
+	asset  &Asset = null // TODO: removing this results in compiler warnings a few places
 	width  int
 	height int
 mut:
@@ -997,7 +1000,7 @@ pub:
 @[heap; noinit]
 pub struct Sound {
 pub:
-	asset  &Asset = null // TODO removing this results in compiler warnings a few places
+	asset  &Asset = null // TODO: removing this results in compiler warnings a few places
 	opt    SoundOptions
 	id     u16
 	id_end u16
@@ -1115,7 +1118,7 @@ pub fn (s &Sound) pause(pause bool) {
 	}
 	engine := s.engine()
 
-	// TODO doesn't work as expected currently
+	// TODO: doesn't work as expected currently
 	// since all this shit is on the stack maybe check where the cursor is instead?
 	already_paused := s.paused
 	// This check prevents double fires.

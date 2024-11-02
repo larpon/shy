@@ -25,7 +25,7 @@ mut:
 }
 
 pub fn (wc WrenClass) str() string {
-	return 'WrenClass{}' // TODO to allow compiling with `$dbg`
+	return 'WrenClass{}' // TODO: to allow compiling with `$dbg`
 }
 
 fn (w WrenVM) on_frame(dt f64) {
@@ -62,7 +62,7 @@ pub fn (mut w WrenVM) init() ! {
 	wren.set_user_data(vm, voidptr(w))
 	w.vm = vm
 
-	// TODO TEST ONLY
+	// TODO: TEST ONLY
 	w.eval('shy', shy_in_wren) or { return error('${@STRUCT}.${@FN}: ${err}') }
 
 	// Register handle for the Shy.frame method
@@ -116,7 +116,7 @@ pub fn (mut w WrenVM) register_class[T](fn_name string, fn_ptr wren.ForeignMetho
 	class_name := T.name
 
 	/*
-	TODO not currently possible
+	TODO: not currently possible
 	fn_ptr := fn (vm &wren.VM) {
 		s := &Shy(vm.get_user_data())
 		assert !isnil(s), 'Shy is nil'
@@ -222,7 +222,7 @@ fn wren_fn_user_call(vm &wren.VM) {
 }
 
 /*
-// TODO needs plenty of love we need to be able to register as a foreign class
+// TODO: needs plenty of love we need to be able to register as a foreign class
 // and do all the V -> C -> Wren and vice versa.
 // https://wren.io/embedding/calling-wren-from-c.html
 // https://wren.io/embedding/calling-c-from-wren.html
@@ -232,7 +232,7 @@ pub struct WrenConvertConfig {
 }
 
 pub fn (mut w WrenVM) to_wren_code<T>() string {
-	// TODO hotcode / shutdown guard
+	// TODO: hotcode / shutdown guard
 	// mut _ := T{}
 
 	mut code := ''
@@ -242,7 +242,7 @@ pub fn (mut w WrenVM) to_wren_code<T>() string {
 
 	mut f_get_set := ''
 
-	// TODO embedded structs and reference fields???
+	// TODO: embedded structs and reference fields???
 	// $for field in T.fields {
 	// 	f_get_set += '\t$field.name { _$field.name }\n'
 	// 	f_get_set += '\t$field.name=(value){ _$field.name = value }\n'
@@ -260,11 +260,11 @@ pub fn (mut w WrenVM) to_wren_code<T>() string {
 		methods += args.trim_right(',') + ')\n'
 	}
 	return code + '\n' + f_get_set + methods + '}'
-	// println(wren_class.classes) // NOTE CRASH
+	// println(wren_class.classes) // NOTE: CRASH
 }
 
 pub fn (mut w WrenVM) to_wren<T>(config WrenConvertConfig) ! {
-	// TODO hotcode / shutdown guard
+	// TODO: hotcode / shutdown guard
 	// mut _ := T{}
 
 	name := T.name
@@ -292,7 +292,7 @@ pub fn (mut w WrenVM) to_wren<T>(config WrenConvertConfig) ! {
 		wren_sig := method.name+'('+'_,'.repeat(method.args.len).trim_right(',') + ')'
 		wren_class.methods[method.name] = w.vm.make_call_handle(wren_sig)
 	}
-	// println(wren_class.methods) // NOTE CRASH
+	// println(wren_class.methods) // NOTE: CRASH
 }
 */
 

@@ -10,7 +10,7 @@ import sdl
 // @[inline]
 // pub fn (s &Shy) data_dir() !string {
 // 	// TODO:
-// 	return error('${@STRUCT}.${@FN}:${@LINE}: TODO data dir not implemented yet')
+// 	return error('${@STRUCT}.${@FN}:${@LINE}: TODO: data dir not implemented yet')
 // }
 
 // config_dir returns the path to the user configuration directory (depending on the platform).

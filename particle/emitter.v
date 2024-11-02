@@ -152,7 +152,7 @@ fn (mut e Emitter) emit() {
 					p.position.from(e.position)
 				}
 				// .ellipse {
-				// 	panic('TODO implement this')
+				// 	panic('TODO: implement this')
 				// }
 				.rectangle {
 					area := shy.rect(e.position.x, e.position.y, e.size.width, e.size.height).displaced_from(shy.Anchor.center)

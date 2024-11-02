@@ -33,7 +33,7 @@ mut:
 // parent returns this node's parent `&Node`.
 pub fn (n &Node) parent() &Node {
 	//assert n != unsafe { nil }
-	// TODO not possible currently: if isnil(n.parent) { return none }
+	// TODO: not possible currently: if isnil(n.parent) { return none }
 	return n.parent
 }
 */

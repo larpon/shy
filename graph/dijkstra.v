@@ -58,7 +58,7 @@ pub fn (g DijkstraStringKeyGraph) is_valid() bool {
 // find_shortest_path returns an array containing the shortest path between `nodes[0]` to `nodes[nodes.len-1]`, using
 // `DijkstraStringKeyGraph.paths` as the source of all possible routes determined by weights.
 //
-// TODO optimize, memory allocations makes it not-so-suitable for a game. Most could probably be
+// TODO: optimize, memory allocations makes it not-so-suitable for a game. Most could probably be
 // calculated when the sequences are sat/change the first time.
 //
 // Dijkstra's algorithm

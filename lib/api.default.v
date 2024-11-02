@@ -55,7 +55,7 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 
 	/*
 	$if !wasm32_emscripten {
-		// NOTE When targeting WASM/emscripten graphics needs to be initialized
+		// NOTE: When targeting WASM/emscripten graphics needs to be initialized
 		// after the first GL context is set. This could arguably be structured
 		// more optimal. Instead the windowing system will initialize the gfx
 		// when needed. See Window.init() method.
@@ -93,7 +93,7 @@ pub fn (mut a ShyAPI) init(shy_instance &Shy) ! {
 pub fn (mut a ShyAPI) reset() ! {
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
 	a.wm.reset()!
-	// TODO reset all otehr sub systems
+	// TODO: reset all otehr sub systems
 }
 
 pub fn (mut a ShyAPI) shutdown() ! {

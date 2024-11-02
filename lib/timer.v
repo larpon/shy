@@ -31,8 +31,8 @@ mut:
 }
 
 pub fn (mut t Timers) init() ! {
-	// t.shy.assert_api_init() // TODO fix for multi-window
-	// TODO make configurable
+	// t.shy.assert_api_init() // TODO: fix for multi-window
+	// TODO: make configurable
 	prealloc := 1000
 	unsafe { t.active.flags.set(.noslices | .noshrink) }
 	unsafe { t.pool.flags.set(.noslices | .noshrink) }
@@ -83,7 +83,7 @@ pub fn (mut t Timers) update(dt f64) {
 			continue
 		}
 		if !timer.running {
-			// TODO see if this is all worth it
+			// TODO: see if this is all worth it
 			t.pool << timer
 			t.active.delete(i)
 			continue
@@ -101,7 +101,7 @@ pub fn (mut s Shy) new_timer(config TimerConfig) &Timer {
 }
 
 // once executes `callback` when `delay` milliseconds has passed.
-// NOTE the timer system is not accurate.
+// NOTE: the timer system is not accurate.
 pub fn (mut s Shy) once(callback TimerFn, delay u64) {
 	s.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'Starting a timer in the frame call (usually called 60 times per second) is usually a bad idea')
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)
@@ -113,7 +113,7 @@ pub fn (mut s Shy) once(callback TimerFn, delay u64) {
 }
 
 // once executes `callback` `loops` times, when `delay` milliseconds has passed.
-// NOTE the timer system depends on the refresh rate, so it is not accurate.
+// NOTE: the timer system depends on the refresh rate, so it is not accurate.
 pub fn (mut s Shy) every(callback TimerFn, delay u64, loops i64) {
 	s.vet_issue(.warn, .hot_code, '${@STRUCT}.${@FN}', 'Starting a timer in the frame call (usually called 60 times per second) is usually a bad idea')
 	analyse.count('${@MOD}.${@STRUCT}.${@FN}', 1)

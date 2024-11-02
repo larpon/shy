@@ -74,7 +74,7 @@ pub fn (mut g GFX) init() ! {
 	mut s := g.shy
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
-	// TODO(lmp): do a better / non-inline logger fn
+	// TODO: (lmp) do a better / non-inline logger fn
 	mut logger := gfx.Logger{
 		func: fn (const_tag &char, log_level u32, log_item_id u32, message_or_null &char, line_nr u32, filename_or_null &char, user_data voidptr) {
 			mut output := ''
@@ -105,8 +105,8 @@ pub fn (mut g GFX) init() ! {
 		environment: env
 		// image_pool_size
 		// sampler_pool_size
-		shader_pool_size:   4 * 512  // default 32, NOTE this number affects the prealloc_contexts in fonts.b.v...
-		pipeline_pool_size: 4 * 1024 // default 64, NOTE this number affects the prealloc_contexts in fonts.b.v...
+		shader_pool_size:   4 * 512  // default 32, NOTE: this number affects the prealloc_contexts in fonts.b.v...
+		pipeline_pool_size: 4 * 1024 // default 64, NOTE: this number affects the prealloc_contexts in fonts.b.v...
 		logger:             logger
 	}
 	gfx.setup(&gfx_desc)
@@ -121,7 +121,7 @@ pub fn (mut g GFX) shutdown() ! {
 	g.ready = false
 
 	g.fonts.shutdown()!
-	// TODO horrible workaround some sokol assertion (bug?) caused by sokol_gl, when using >1 sokol_gfx contexts:
+	// TODO: horrible workaround some sokol assertion (bug?) caused by sokol_gl, when using >1 sokol_gfx contexts:
 	// _sg_uninit_buffer: active context mismatch (must be same as for creation)
 	// .../sokol_gfx.h:16213: sg_destroy_buffer: Assertion `buf->slot.state == SG_RESOURCESTATE_ALLOC' failed.
 	/*
@@ -131,7 +131,7 @@ pub fn (mut g GFX) shutdown() ! {
 	gfx.setup(&gfx_desc)
 
 	gl.set_context(gl.default_context)
-	gl.shutdown() // NOTE this is currently a mystery, we may leak something here - but we get context mismatch errors otherwise :(
+	gl.shutdown() // NOTE: this is currently a mystery, we may leak something here - but we get context mismatch errors otherwise :(
 	*/
 	gfx.shutdown()
 }
@@ -186,7 +186,7 @@ pub fn (mut c Context) init() ! {
 	gl_ctx := offscreen.gl_ctx
 	gl.set_context(gl_ctx)
 
-	// TODO Initialize font drawing sub system
+	// TODO: Initialize font drawing sub system
 	mut preload_fonts := map[string]string{}
 	$if !wasm32_emscripten {
 		preload_fonts['system'] = font.default()
@@ -216,8 +216,8 @@ fn (mut c Context) sokol_gl_init() ! {
 	gl_desc := &gl.Desc{
 		// max_vertices: 1_000_000
 		// max_commands: 100_000
-		context_pool_size:  2 * 512  // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
-		pipeline_pool_size: 2 * 1024 // TODO default 4, note this number affects the prealloc_contexts in fonts.b.v...
+		context_pool_size:  2 * 512  // TODO: default 4, note this number affects the prealloc_contexts in fonts.b.v...
+		pipeline_pool_size: 2 * 1024 // TODO: default 4, note this number affects the prealloc_contexts in fonts.b.v...
 		sample_count:       sample_count
 	}
 	gl.setup(gl_desc)
@@ -251,8 +251,8 @@ fn (mut c Context) sokol_gl_init() ! {
 	// create a sokol-gl context compatible with the offscreen render pass
 	// (specific color pixel format, no depth-stencil-surface, no MSAA)
 	gl_ctx_desc := gl.ContextDesc{
-		max_vertices: 1_000_000 // TODO(lmp): make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
-		max_commands: 100_000   // TODO(lmp): make configurable default 16k
+		max_vertices: 1_000_000 // TODO: (lmp) make configurable default 64k (also maybe bump x2 when in debug mode, since this usually implies more visual output?)
+		max_commands: 100_000   // TODO: (lmp) make configurable default 16k
 		color_format: .rgba8
 		depth_format: .@none
 		sample_count: offscreen_sample_count
@@ -365,7 +365,7 @@ pub fn (mut c Context) shutdown() ! {
 
 pub fn (g GFX) commit() {
 	gfx.commit()
-	// TODO multi-window support gfx.reset_state_cache()
+	// TODO: multi-window support gfx.reset_state_cache()
 }
 
 pub fn (mut g GFX) begin_easy_frame() {
@@ -374,7 +374,7 @@ pub fn (mut g GFX) begin_easy_frame() {
 	gl.set_context(off.gl_ctx)
 
 	// Reinit offscreen pass if necessary
-	// TODO make nicer
+	// TODO: make nicer
 	win := g.shy.active_window()
 	w, h := win.canvas().wh()
 	if off.width != w || off.height != h {

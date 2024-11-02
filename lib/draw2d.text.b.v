@@ -132,7 +132,7 @@ pub mut:
 	font     string    = defaults.font.name
 	color    Color     = defaults.font.color
 	origin   Origin    = Anchor.top_left
-	align    TextAlign = .baseline | .left // TODO V BUG lib.defaults.font.align
+	align    TextAlign = .baseline | .left // TODO: V BUG lib.defaults.font.align
 	size     f32       = defaults.font.size
 	scale    f32       = 1.0
 	fills    Fill      = .body | .stroke
@@ -206,7 +206,7 @@ pub fn (t Draw2DText) draw() {
 	// println('${@FN} ${t.color}')
 	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
 	font_context.set_color(color)
-	font_size := f32(int(text_size)) // TODO rendering errors/artefacts on (some) float values?
+	font_size := f32(int(text_size)) // TODO: rendering errors/artefacts on (some) float values?
 	font_context.set_size(font_size)
 	// eprintln('${@STRUCT}.${@FN} ${font_size}')
 	unsafe {
@@ -382,7 +382,7 @@ pub fn (t Draw2DText) bounds(s string) Rect {
 	}
 	color := sfons.rgba(t.color.r, t.color.g, t.color.b, t.color.a)
 	font_context.set_color(color)
-	font_size := f32(int(t.size)) // TODO rendering errors/artefacts on (some) float values?
+	font_size := f32(int(t.size)) // TODO: rendering errors/artefacts on (some) float values?
 	font_context.set_size(font_size)
 	// eprintln('${@STRUCT}.${@FN} ${font_size}')
 	if t.blur > 0 {

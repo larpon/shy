@@ -56,8 +56,8 @@ pub mut:
 pub fn (ps &ParticleSystem) draw() {
 	// draw := ps.shy.draw()
 
-	// TODO transforms on the whole system
-	ps.system.draw(1.0) // NOTE doesn't support frame deltas yet, it's not a problem so far
+	// TODO: transforms on the whole system
+	ps.system.draw(1.0) // NOTE: doesn't support frame deltas yet, it's not a problem so far
 }
 
 @[inline]

@@ -27,7 +27,7 @@ mut:
 }
 
 fn (mut a Alarms) init() ! {
-	// TODO make configurable
+	// TODO: make configurable
 	prealloc := 2000
 	unsafe { a.active.flags.set(.noslices | .noshrink) }
 	unsafe { a.pool.flags.set(.noslices | .noshrink) }
@@ -98,7 +98,7 @@ pub fn (mut a Alarms) update() {
 			continue
 		}
 		if !alarm.running {
-			// TODO see if this is all worth it
+			// TODO: see if this is all worth it
 			a.pool << alarm
 			a.active.delete(i)
 			analyse.max('${@MOD}.${@STRUCT}.pool.len', a.pool.len)
@@ -167,7 +167,7 @@ pub mut:
 	running   bool = true
 	paused    bool
 	callback  ?AlarmFn
-	check     ?AlarmCheckFn // [required] TODO BUG
+	check     ?AlarmCheckFn // [required] TODO: BUG
 	user_data voidptr
 }
 

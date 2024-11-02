@@ -71,7 +71,7 @@ pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
 
 	// Load the Shy default font
-	// TODO use *.shy.assets() to cache the data?
+	// TODO: use *.shy.assets() to cache the data?
 	mut preload := config.preload.clone()
 	$if wasm32_emscripten {
 		// NOTE:	#flag --embed-file @VMODROOT/fonts@/fonts // #flag --embed-file @VMODROOT/examples/assets@/
@@ -100,14 +100,14 @@ pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	gl_context_desc := gl.ContextDesc{
 		sample_count: sample_count
 	}*/
-	// TODO apply values for max_vertices etc.
+	// TODO: apply values for max_vertices etc.
 
 	//{
 	// for _ in 0 .. config.prealloc_contexts {
-	// TODO configurable size:
+	// TODO: configurable size:
 
 	fons_desc := sfons.Desc{
-		width:  4 * 1024 // NOTE 256 is definitely too small
+		width:  4 * 1024 // NOTE: 256 is definitely too small
 		height: 4 * 1024
 	}
 	fons_context := sfons.create(&fons_desc)
@@ -118,7 +118,7 @@ pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 		// sgl: sgl_context
 	}
 
-	// TODO use *.shy.assets() to cache the data
+	// TODO: use *.shy.assets() to cache the data
 	for font_name, _ in preload {
 		if bytes := fs.font_data[font_name] {
 			context.fonts[font_name] = fons_context.add_font_mem(font_name, bytes, false)
@@ -178,7 +178,7 @@ pub fn (mut fs Fonts) get_context() &FontContext {
 	/*
 	return &FontContext{
 		fsc: unsafe { nil }
-	} // NOTE dummy return to please the V compiler...
+	} // NOTE: dummy return to please the V compiler...
 	*/
 }
 */

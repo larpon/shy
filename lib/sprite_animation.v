@@ -36,7 +36,7 @@ pub fn FrameAnimator.make(config FrameAnimatorConfig) !FrameAnimator {
 		fa.add_sequence(sequence)
 	}
 
-	// TODO validate start, goal, and config.to
+	// TODO: validate start, goal, and config.to
 
 	if config.start != '' {
 		fa.set_sequence(fa.sequences[config.start])
@@ -101,7 +101,7 @@ pub fn (mut fa FrameAnimator) add_sequence(sequence FrameSequence) {
 	}
 	seq.to_total_weight = total_weight
 	fa.sequences[seq.tag] = seq
-	// TODO if goal sequence is sat and not '', re-calc the goal sequence
+	// TODO: if goal sequence is sat and not '', re-calc the goal sequence
 }
 
 pub fn (mut fa FrameAnimator) set_sequence(sequence FrameSequence) {
@@ -150,7 +150,7 @@ pub fn (mut fa FrameAnimator) update(dt f64) {
 		}
 	}
 
-	// TODO Move forward via goal sequence
+	// TODO: Move forward via goal sequence
 }
 
 fn (mut fa FrameAnimator) update_frame() {
@@ -183,7 +183,7 @@ pub fn (mut fa FrameAnimator) set_goal_sequence(goal string) {
         var nodes = {}
 
         // Convert sequence items to nodes format with all costs set to 1
-        // NOTE see aid.js for implementation and format
+        // NOTE: see aid.js for implementation and format
         for(var i in sequences) {
             var s = sequences[i]
             var sto = Aid.clone(s.to)
@@ -206,7 +206,7 @@ pub fn (mut fa FrameAnimator) set_goal_sequence(goal string) {
             route.shift()
         }
 
-        /* // TODO This is fucking up situations where goalSequence is set during initialization
+        /* // TODO: This is fucking up situations where goalSequence is set during initialization
         if(route.length > 0 && route[0] === goalSequence) {
             Qak.info('ItemAnimation','already at goalSequence',goalSequence)
             goalSequenceReached()
@@ -255,7 +255,7 @@ pub fn Graph.make(nodes map[string]map[string]f32) Graph {
 // find_shortest_path returns an array containing the shortest path between `nodes[0]` to `nodes[nodes.len-1]`, using
 // `Graph.paths` as the source of all possible routes determined by weights.
 //
-// TODO optimize and test
+// TODO: optimize and test
 // Dijkstra's algorithm
 // https://github.com/andrewhayward/dijkstra
 // https://raw.githubusercontent.com/andrewhayward/dijkstra/master/graph.js

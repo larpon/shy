@@ -51,7 +51,7 @@ pub fn (mut a App) frame(dt f64) {
 	/*
 	a.quick.triangle(
 		a: center
-		b: center + shy.vec2(f32(50), -50) // TODO origin bug
+		b: center + shy.vec2(f32(50), -50) // TODO: origin bug
 		c: center + shy.vec2(f32(100), 0)
 		origin: shy.Anchor.center
 	)*/
@@ -62,7 +62,7 @@ pub fn (mut a App) frame(dt f64) {
 	mut tri_q1 := a.easy.triangle(
 		a:        center
 		b:        center + shy.vec2(f32(-100), -10)
-		c:        center + shy.vec2(f32(-50), -150) // TODO origin bug
+		c:        center + shy.vec2(f32(-50), -150) // TODO: origin bug
 		origin:   origin
 		rotation: rotation
 		color:    shy.rgba(0, 127, 0, 127)
@@ -77,7 +77,7 @@ pub fn (mut a App) frame(dt f64) {
 	mut tri_q2 := a.easy.triangle(
 		a:        center
 		b:        center + shy.vec2(f32(100), -10)
-		c:        center + shy.vec2(f32(50), -150) // TODO origin bug
+		c:        center + shy.vec2(f32(50), -150) // TODO: origin bug
 		origin:   origin
 		rotation: rotation
 		color:    shy.rgba(0, 0, 127, 127)
@@ -91,7 +91,7 @@ pub fn (mut a App) frame(dt f64) {
 	mut tri_q3 := a.easy.triangle(
 		a:        center
 		b:        center + shy.vec2(f32(100), 10)
-		c:        center + shy.vec2(f32(50), 150) // TODO origin bug
+		c:        center + shy.vec2(f32(50), 150) // TODO: origin bug
 		color:    shy.rgba(127, 0, 0, 127)
 		rotation: rotation
 		// scale: 0.4
@@ -108,7 +108,7 @@ pub fn (mut a App) frame(dt f64) {
 	mut tri_q4 := a.easy.triangle(
 		c:        center
 		a:        center + shy.vec2(f32(-100), 10)
-		b:        center + shy.vec2(f32(-50), 150) // TODO origin bug
+		b:        center + shy.vec2(f32(-50), 150) // TODO: origin bug
 		origin:   origin
 		rotation: rotation
 		color:    shy.rgba(127, 0, 127, 127)

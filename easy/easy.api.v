@@ -17,7 +17,7 @@ import shy.particle
 //[noinit]
 pub struct Quick {
 pub mut:
-	// TODO error: field ... is not public - make this just "pub" to callers - and mut to internal system
+	// TODO: error: field ... is not public - make this just "pub" to callers - and mut to internal system
 	easy &Easy = shy.null
 }
 
@@ -33,7 +33,7 @@ mut:
 pub fn (mut e Easy) init() ! {
 	e.quick.easy = e
 	e.audio_engine = e.shy.audio().engine(0)!
-	// e.particle_systems TODO init a limited amount of systems
+	// e.particle_systems TODO: init a limited amount of systems
 }
 
 @[manualfree]
@@ -354,7 +354,7 @@ pub fn (el &Line) draw() {
 		// point a should always be the left-most point
 		nl.ensure_a_left_b_right()
 		w, h := el.shy.active_window().canvas().wh()
-		// TODO do something less wasteful here?
+		// TODO: do something less wasteful here?
 		grow := mth.max(w, h) * 2
 		nl.grow_a(-grow)
 		nl.grow_b(grow)
@@ -419,7 +419,7 @@ pub fn (ec &Circle) draw() {
 	draw := ec.shy.draw()
 	mut d := draw.shape_2d()
 	d.begin()
-	mut c := d.circle(radius: ec.radius) // NOTE this is here to let radius_to_segments have an effect
+	mut c := d.circle(radius: ec.radius) // NOTE: this is here to let radius_to_segments have an effect
 	c.x = ec.x
 	c.y = ec.y
 	// c.radius = ec.radius
@@ -552,7 +552,7 @@ pub fn (q &Quick) play(opt SoundPlayOptions) {
 
 	sound.pitch = opt.pitch
 	sound.volume = opt.volume
-	// TODO sounds.loop = true - but the counter needs state?
+	// TODO: sounds.loop = true - but the counter needs state?
 	// sound.loops
 	sound.play()
 }
@@ -678,7 +678,7 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 		r.width = if eic.width < 0 { f32(image.width) } else { eic.width }
 		r.height = if eic.height < 0 { f32(image.height) } else { eic.height }
 
-		// TODO WORKAROUND "...eic" spread does not work
+		// TODO: WORKAROUND "...eic" spread does not work
 		// with the ImageConfigRect, which is there because we can't initialize the embedded shy.Rect with other values :(
 		return Image{
 			shy:           e.shy
@@ -726,7 +726,7 @@ pub fn (e &Easy) image(eic ImageConfig) Image {
 		}
 	}
 
-	// TODO decide if we should have a strict mode of some sort??
+	// TODO: decide if we should have a strict mode of some sort??
 	// panic('${@STRUCT}.${@FN}: "${eic.source}" not found in cache, please load it')
 }
 
@@ -739,7 +739,7 @@ pub fn (q &Quick) image(eic ImageConfig) {
 // Assets
 
 // load returns a reference to a `shy.Asset`.
-// NOTE The asset may not be fully loaded depending on the load options passed.
+// NOTE: The asset may not be fully loaded depending on the load options passed.
 pub fn (e &Easy) load(alo shy.AssetLoadOptions) !&shy.Asset {
 	mut assets := e.shy.assets()
 	return assets.load(alo)!
@@ -752,7 +752,7 @@ pub fn (e &Easy) unload(auo shy.AssetUnloadOptions) ! {
 }
 
 // get returns a reference to a `shy.Asset`.
-// NOTE The asset may not be fully loaded depending on the load options passed.
+// NOTE: The asset may not be fully loaded depending on the load options passed.
 @[inline]
 pub fn (e &Easy) get(source shy.AssetSource) !&shy.Asset {
 	asset, status := e.shy.assets().get[shy.AssetRef](source)
@@ -763,7 +763,7 @@ pub fn (e &Easy) get(source shy.AssetSource) !&shy.Asset {
 }
 
 // get returns a reference to a `shy.Asset`.
-// NOTE The asset may not be fully loaded depending on the load options passed.
+// NOTE: The asset may not be fully loaded depending on the load options passed.
 @[inline]
 pub fn (q &Quick) get(source shy.AssetSource) !&shy.Asset {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
@@ -781,7 +781,7 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 			return
 		}
 		shy.ImageOptions {
-			// TODO e.shy.assets.is_cached(...) ???
+			// TODO: e.shy.assets.is_cached(...) ???
 			_, status := assets.get[shy.Image](ao.source)
 			if status == .ok {
 				return
@@ -794,7 +794,7 @@ pub fn (q &Quick) load(ao shy.AssetOptions) ! {
 			return
 		}
 	}
-	return error('${@STRUCT}.${@FN}: TODO ${ao} type not implemented yet')
+	return error('${@STRUCT}.${@FN}: TODO: ${ao} type not implemented yet')
 }
 
 @[inline]

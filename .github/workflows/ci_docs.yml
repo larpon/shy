@@ -29,7 +29,7 @@ jobs:
 
     - name: Check markdown line length & code examples
       run: v check-md -hide-warnings shy/README.md
-      ## TODO exclude dirs: run: v check-md -hide-warnings shy
+      ## TODO: exclude dirs: run: v check-md -hide-warnings shy
       ## NB: -hide-warnings is used here, so that the output is less noisy,
       ## thus real errors are easier to spot.
 

@@ -41,10 +41,10 @@ pub mut:
 }
 
 fn (mut s System) init(sc SystemConfig) {
-	// OPTIMISATIONS
+	// NOTE: OPTIMISATIONS
 	// .noslices - tells the compiler that we're 100% sure that
 	//  the pool array is *never* sliced (E.g. ps := s.pool[2..6])
-	//
+	// ... and
 	// .noshrink - tells the compiler that we do not want
 	//  delete operations on the array to reallocate memory - this breaks the idea of using a pool in the first place
 	unsafe { s.pool.flags.set(.noslices | .noshrink) }
@@ -107,7 +107,7 @@ pub fn (mut s System) remove_painter_at(index int) {
 pub fn (s &System) emitter_at(index int) ?&Emitter {
 	unsafe {
 		if mut emitter := s.emitters[index] {
-			// TODO println('ggg${ptr_str(emitter)}')
+			// TODO: println('ggg${ptr_str(emitter)}')
 			return &emitter
 		}
 	}
@@ -193,7 +193,7 @@ pub fn (mut s System) update(dt f64) {
 			s.pool.delete(i)
 			continue
 		}
-		// TODO could be optimized so particle pool is only only traversed once??
+		// TODO: could be optimized so particle pool is only traversed once??
 		// Draw call would be here... remove other draw calls
 	}
 }

@@ -66,7 +66,7 @@ pub fn (mut a EasyApp) init() ! {
 	}
 	a.draw = a.shy.draw()
 	a.window = api.wm().active_window()
-	// TODO figure out if we want to let the Draw backend do the scaling or
+	// TODO: figure out if we want to let the Draw backend do the scaling or
 	// if we should report the actual size of the pixel buffer here (larger on Retina screens)
 	a.set_canvas(a.window.canvas())
 

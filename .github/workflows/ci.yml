@@ -37,7 +37,7 @@ jobs:
         cd shy
         v test-fmt
 
-    # TODO this makes formatting checks fail?
+    # TODO: this makes formatting checks fail?
     #- name: Simulate "v install shy"
     #  run: mv shy ~/.vmodules
 
@@ -53,7 +53,7 @@ jobs:
     - name: Symlink shy command
       run: sudo ln -s ~/.vmodules/shy/shy /usr/local/bin/shy
 
-    # TODO broken with $embed_file
+    # TODO: broken with $embed_file
     #- name: Test clean shy code
     #  run: |
     #    shy test-cleancode ~/.vmodules/shy

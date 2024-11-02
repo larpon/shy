@@ -31,11 +31,11 @@ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
 	// SDL 2.0.5 introduced SDL_CreateRGBSurfaceWithFormatFrom() and SDL_PIXELFORMAT_RGBA32
 	// which makes this code much simpler.
 
-	// TODO everything is loaded to fit sokol's rgba8 pixel format
+	// TODO: everything is loaded to fit sokol's rgba8 pixel format
 	// So vlib's stbi format is currently always C.STBI_rgb_alpha
 	format := unsafe { u32(sdl.Format.rgba32) }
 	// format := if image.pixel_format == .rgba { sdl.Format.rgb24 } else { sdl.Format.rgba32 }
-	stb_img_format := int(C.STBI_rgb_alpha) // TODO *YUK*
+	stb_img_format := int(C.STBI_rgb_alpha) // TODO: *YUK*
 	depth := stb_img_format * 8
 	pitch := stb_img_format * stb_img.width
 
@@ -72,7 +72,7 @@ fn (mut a Asset) to_sdl_surface(opt ImageOptions) !&sdl.Surface {
 		mipmaps: opt.mipmaps
 		ready: stb_img.ok
 		// data: stb_img.data
-		kind: .png // TODO stb_img.ext
+		kind: .png // TODO: stb_img.ext
 	}*/
 
 	// 	if opt.io.has(.cache) {

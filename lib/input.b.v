@@ -6,7 +6,7 @@ module lib
 import sdl
 // import manymouse as mm
 
-// TODO move
+// TODO: move
 // scan scans for new input devices.
 pub fn (mut ip Input) scan() ! {
 	// TODO
@@ -33,7 +33,7 @@ pub fn (mut ip Input) init() ! {
 	// 			mm.quit()
 	// 			s.log.gerror('${@STRUCT}.${@FN}', 'no mice detected.')
 	// 		} else {
-	// 			// TODO expose ManyMouse max (default is 256)!
+	// 			// TODO: expose ManyMouse max (default is 256)!
 	// 			for i := u8(0); i < available_mice; i++ {
 	// 				device_name := unsafe { cstring_to_vstring(mm.device_name(i)) }
 	// 				s.log.gdebug('${@STRUCT}.${@FN}', 'ManyMouse device $i / $device_name')
@@ -42,7 +42,7 @@ pub fn (mut ip Input) init() ! {
 	// 					id: i
 	// 				}
 	// 				mouse.init()!
-	// 				ip.mice[i] = mouse // TODO NOTE see process_events also
+	// 				ip.mice[i] = mouse // TODO: see process_events also
 	// 			}
 	// 		}
 	// 	}
@@ -52,17 +52,17 @@ pub fn (mut ip Input) init() ! {
 		id:  default_mouse_id
 	}
 	mouse.init()!
-	ip.mice[default_mouse_id] = mouse // TODO NOTE see process_events also
+	ip.mice[default_mouse_id] = mouse // TODO: see process_events also
 	// }
 
-	// NOTE multiple keyboards is apparently a near impossible thing??
+	// NOTE: multiple keyboards is apparently a near impossible thing??
 	// It's problems rooted deep in the underlying OS layers and device driver levels:
 	// https://discourse.libsdl.org/t/sdl-x-org-and-multiple-mice/12298/15
 	mut keyboard := &Keyboard{
 		shy: s
 	}
 	keyboard.init()!
-	ip.keyboards[0] = keyboard // TODO NOTE see process_events also
+	ip.keyboards[0] = keyboard // TODO: see process_events also
 
 	ip.init_input()!
 }
@@ -359,7 +359,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 					}
 				}
 				else {
-					// TODO(lmp): panic('${@STRUCT}.${@FN} TODO implement ${wevid}')
+					// TODO: (lmp) panic('${@STRUCT}.${@FN} TODO: implement ${wevid}')
 				}
 			}
 		}
@@ -373,7 +373,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
 			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.key.windowID)
 			shy_event = KeyEvent{
-				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
+				// which: default_keyboard_id NOTE: multiple keyboards and SDL is a story in itself
 				timestamp: timestamp
 				window_id: shy_window_id
 				state:     .up
@@ -384,7 +384,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_key_code := map_sdl_to_shy_keycode(sdl_event.key.keysym.sym)
 			shy_window_id := Window.map_sdl_window_id_to_shy_window_id(sdl_event.key.windowID)
 			shy_event = KeyEvent{
-				// which: default_keyboard_id NOTE multiple keyboards and SDL is a story in itself
+				// which: default_keyboard_id NOTE: multiple keyboards and SDL is a story in itself
 				timestamp: timestamp
 				window_id: shy_window_id
 				state:     .down
@@ -404,7 +404,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = MouseMotionEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				which:     which // sdl_event.motion.which // TODO use own ID system??
+				which:     which // sdl_event.motion.which // TODO: use own ID system??
 				buttons:   buttons
 				x:         sdl_event.motion.x
 				y:         sdl_event.motion.y
@@ -422,7 +422,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = MouseButtonEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				which:     default_mouse_id // sdl_event.button.which // TODO use own ID system??
+				which:     default_mouse_id // sdl_event.button.which // TODO: use own ID system??
 				button:    button
 				state:     state
 				clicks:    sdl_event.button.clicks
@@ -444,7 +444,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			shy_event = MouseWheelEvent{
 				timestamp: timestamp
 				window_id: shy_window_id
-				which:     default_mouse_id // sdl_event.wheel.which // TODO use own ID system??
+				which:     default_mouse_id // sdl_event.wheel.which // TODO: use own ID system??
 				x:         mouse.x
 				y:         mouse.y
 				scroll_x:  sdl_event.wheel.x
@@ -473,7 +473,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			dropped_path := sdl_event.drop.file
 			path := unsafe { cstring_to_vstring(dropped_path) }
 			defer {
-				// 	sdl.free(dropped_path) // TODO Crashes?!
+				// 	sdl.free(dropped_path) // TODO: Crashes?!
 				unsafe { shy_free(dropped_path) }
 			}
 			shy_event = DropFileEvent{
@@ -490,7 +490,7 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 
 			text := unsafe { cstring_to_vstring(dropped_text) }
 			defer {
-				// sdl.free(dropped_text) // TODO Crashes?!
+				// sdl.free(dropped_text) // TODO: Crashes?!
 				unsafe { shy_free(dropped_text) }
 			}
 			shy_event = DropTextEvent{
@@ -514,10 +514,10 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 
 // poll_event polls the next event from the OS event queue.
 fn (mut ip Input) poll_event() ?Event {
-	// TODO set mouse positions in each mouse in input.mice
+	// TODO: set mouse positions in each mouse in input.mice
 	// is_multi_mice := s.api.input.mice.len > 1
 
-	// TODO(lmp): memory leak around here with Option / Result type :(. See https://github.com/vlang/v/issues/19454
+	// TODO: (lmp) memory leak around here with Option / Result type :(. See https://github.com/vlang/v/issues/19454
 	mut shy_event := Event(UnkownEvent{
 		timestamp: ip.shy.ticks()
 		window_id: no_window
@@ -552,7 +552,7 @@ fn (mut ip Input) poll_event() ?Event {
 		}
 		else {}
 	}
-	// TODO find out what coordinate positions that ManyMouse actually uses?
+	// TODO: find out what coordinate positions that ManyMouse actually uses?
 	/*
 	if is_multi_mice {
 		mut event := mm.Event{}
@@ -575,7 +575,7 @@ fn (mut ip Input) poll_event() ?Event {
 					win := s.active_window()
 					return MouseMotionEvent{
 						timestamp: timestamp
-						window_id: win.id // TODO multi-window support
+						window_id: win.id // TODO: multi-window support
 						which: which
 						// buttons: buttons
 						x: mouse.x
@@ -603,8 +603,8 @@ fn (mut ip Input) poll_event() ?Event {
 					}
 					return MouseMotionEvent{
 						timestamp: timestamp
-						window_id: win.id // TODO multi-window support
-						which: which // sdl_event.motion.which // TODO use own ID system??
+						window_id: win.id // TODO: multi-window support
+						which: which // sdl_event.motion.which // TODO: use own ID system??
 						// buttons: buttons
 						x: mouse.x //if event.item == 0 {event.value } else {0}
 						y: mouse.y //if event.item != 0 {event.value } else {0}
@@ -623,7 +623,7 @@ fn (mut ip Input) poll_event() ?Event {
 					return MouseButtonEvent{
 						timestamp: timestamp
 						window_id: win.id // TODO
-						which: u16(event.device) // sdl_event.button.which // TODO use own ID system??
+						which: u16(event.device) // sdl_event.button.which // TODO: use own ID system??
 						// button: button
 						state: state
 						//clicks: sdl_event.button.clicks
@@ -914,7 +914,7 @@ fn map_sdl_to_shy_keycode(kc sdl.Keycode) KeyCode {
 		.app2 { .app2 }
 		.audiorewind { .audiorewind }
 		// .audiofastforward { .audiofastforward }
-		// TODO Done this way to be able to compile for newer SDL versions
+		// TODO: Done this way to be able to compile for newer SDL versions
 		// that adds to this enum, V will complain it's not exhaustive
 		else { .audiofastforward }
 	}

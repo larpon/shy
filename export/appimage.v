@@ -234,7 +234,7 @@ pub fn appimage(opt AppImageOptions) !Result {
 
 	// Create an AppDir structure, that the appimagetool can work on.
 	//
-	// NOTE Please keep this list in "growing" order so the longest paths in
+	// NOTE: Please keep this list in "growing" order so the longest paths in
 	// each root/sub-dir will come first if looped in reverse order.
 	//
 	// By *growing* we mean that the longest possible path in a directory path
@@ -277,11 +277,11 @@ Name=${app_name}
 Exec=${app_name}
 Icon=${app_name}
 Type=Application
-Categories=Game;' // TODO for term apps Terminal=true
+Categories=Game;' // TODO: for term apps Terminal=true
 
 	os.write_file(desktop_path, desktop_contents)!
 
-	// TODO desktop-file-validate your.desktop ??
+	// TODO: desktop-file-validate your.desktop ??
 
 	// Copy icon TODO
 	shy_icon := os.join_path(@VMODROOT, 'shy.svg')
@@ -365,7 +365,7 @@ exec "${EXEC}" "$@"'
 	mut included_asset_paths := []string{}
 
 	/*
-	NOTE kept for debugging purposes
+	NOTE: kept for debugging purposes
 	test_asset := os.join_path(assets_path, 'test.txt')
 	os.rm(test_asset)
 	mut fh := open_file(test_asset, 'w+', 0o755) or { panic(err) }
@@ -654,7 +654,7 @@ fn resolve_dependencies_recursively(mut deps map[string]string, config ResolveDe
 			continue
 		}
 		if line.contains('not found') {
-			// TODO ?? - give error here? add an option to continue?
+			// TODO: ?? - give error here? add an option to continue?
 			continue
 		}
 		parts := line.split(' ')

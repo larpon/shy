@@ -1,7 +1,7 @@
 module mth
 
 import math // TODO
-// TODO v module BUG prevents calling this "math"?!, also consider "manmade math"
+// TODO: v module BUG prevents calling this "math"?!, also consider "manmade math"
 
 pub const pi_div_2 = pi / 2
 pub const deg2rad = f32((pi * 2) / 360)

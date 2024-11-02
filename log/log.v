@@ -65,7 +65,7 @@ fn no_color_fn(msg string) string {
 	return msg
 }
 
-// TODO use shy colors?
+// TODO: use shy colors?
 pub fn (l &Log) colorize(color string, msg string) string {
 	mut colorized_msg := ''
 	$if wasm32_emscripten {

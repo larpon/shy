@@ -359,7 +359,7 @@ pub fn (mut v Vec4[T]) abs() {
 	}
 }
 
-// NOTE a few of the following functions was adapted and/or inspired from Dario Deleddas excellent
+// NOTE: a few of the following functions was adapted and/or inspired from Dario Deleddas excellent
 // work on the `gg.m4` vlib module. Here's the Copyright/license text covering that code:
 //
 // Copyright (c) 2021 Dario Deledda. All rights reserved.

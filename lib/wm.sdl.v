@@ -41,7 +41,7 @@ pub fn (mut wm WM) init() ! {
 	}
 
 	$if windows {
-		// NOTE Set the following to '0' if you run AND debug with .NET
+		// NOTE: Set the following to '0' if you run AND debug with .NET
 		// We disable it since it trips end users more than it helps the majority.
 		// Also note that it can be switched with the ENV var:
 		// SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING=0

@@ -8,7 +8,7 @@ module particle
 pub enum Shape {
 	point
 	rectangle
-	// TODO ellipse
+	// TODO: ellipse
 }
 
 /*

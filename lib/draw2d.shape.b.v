@@ -224,7 +224,7 @@ pub fn (r DrawShape2DRect) origin_displacement() (f32, f32) {
 
 @[inline]
 pub fn (r &DrawShape2DRect) draw() {
-	// NOTE the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
+	// NOTE: the int(...) casts and 0.5/1.0 values here is to ensure pixel-perfect results
 	// this could/should maybe someday be switchable by a flag...?
 	scale_factor := r.factor
 	x := r.x * scale_factor
@@ -287,13 +287,13 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 		if stroke_width <= 0 {
 			// Do nothing
 		} else if stroke_width > 1 {
-			// TODO fix anchor rendering overflows
+			// TODO: fix anchor rendering overflows
 			if stroke_width > width {
 				stroke_width = width
 				stroke_width_0_5 := stroke_width * 0.5
 
-				// TODO this is only for .butt Cap
-				// TODO this could probably be done in *one* block of begin/end calls
+				// TODO: this is only for .butt Cap
+				// TODO: this could probably be done in *one* block of begin/end calls
 
 				// top left triangle
 				gl.begin_triangles()
@@ -367,7 +367,7 @@ fn (r DrawShape2DRect) draw_rectangle(x f32, y f32, width f32, height f32) {
 				r.draw_anchor(m41x, m41y, sx, sy, m12x, m12y)
 			}
 		} else {
-			// NOTE pixel-perfect lines ... ouch
+			// NOTE: pixel-perfect lines ... ouch
 			// More on pixel-perfect here: https://stackoverflow.com/a/10041050/1904615
 			// See also: tests/visual/pixel-perfect_rectangles.v
 			gl.begin_line_strip()
@@ -407,7 +407,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 	scale_factor := r.factor
 	mut radius := r.radius * scale_factor
 
-	assert radius > 0, '${@LOCATION}, rectangle radius should be > 0' // TODO(lmp): decide if undefined behaviour is ok here, if it should be checked in higher level API layers? hmm...
+	assert radius > 0, '${@LOCATION}, rectangle radius should be > 0' // TODO: (lmp) decide if undefined behaviour is ok here, if it should be checked in higher level API layers? hmm...
 
 	if w >= h && radius > h / 2 {
 		radius = h / 2
@@ -417,7 +417,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 	sx := f32(0.0)
 	sy := f32(0.0)
 
-	// TODO this does not work???: segments := radius_to_segments(radius)
+	// TODO: this does not work???: segments := radius_to_segments(radius)
 	segments := u16(31 * scale_factor)
 
 	// circle center coordinates
@@ -434,12 +434,12 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 	mut dx := f32(0)
 	mut dy := f32(0)
 
-	// NOTE the separate begin/end drawing is to prevent transparent color overlap
+	// NOTE: the separate begin/end drawing is to prevent transparent color overlap
 	if r.fills.has(.body) {
 		color := r.color
 		gl.c4b(color.r, color.g, color.b, color.a)
 
-		// TODO(lmp): the 0 .. X range should change on small radii
+		// TODO: (lmp) the 0 .. X range should change on small radii
 
 		// left top quarter
 		gl.begin_triangle_strip()
@@ -514,7 +514,7 @@ fn (r DrawShape2DRect) draw_rounded(x f32, y f32, width f32, height f32) {
 		if stroke_width > radius * 2 {
 			stroke_width = radius * 2
 		}
-		// TODO still a lot of edgecases
+		// TODO: still a lot of edgecases
 		color := r.stroke.color
 		gl.c4b(color.r, color.g, color.b, color.a)
 		if stroke_width <= 0 {
@@ -871,7 +871,7 @@ pub mut:
 	segments u32 // a value of 0 to 2 here will default to 3, use DrawShape2D.radius_to_segments() for automatic calculation
 	color    Color
 	stroke   Stroke
-	rotation f32 // TODO decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
+	rotation f32 // TODO: decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
 	scale    f32  = 1.0
 	fills    Fill = .body | .stroke
 	offset   Vec2[f32]
@@ -1108,7 +1108,7 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 		gl.end()
 
 		/*
-		// NOTE Adding this will also end up in .miter
+		// NOTE: Adding this will also end up in .miter
 		// gl.v2f(at_x, at_y)
 		// gl.v2f(vp_x, vp_y)
 		// gl.v2f(bt_x, bt_y)
@@ -1127,7 +1127,7 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 		}
 
 		/*
-		TODO port this
+		TODO: port this
 
 		gl.begin_triangle_strip()
 		plot.arc(vpp_x, vpp_y, line_segment_length(vpp_x, vpp_y, at_x, at_y), start_angle,
@@ -1144,7 +1144,7 @@ fn draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, config DrawAnchor
 		gl.v2f(t0r_x, t0r_y)
 		gl.v2f(t0_x, t0_y)
 
-		// TODO arc_points
+		// TODO: arc_points
 		// sgl.v2f(at_x, at_y)
 		// sgl.v2f(bt_x, bt_y)
 		// sgl.v2f(vpp_x, vpp_y)

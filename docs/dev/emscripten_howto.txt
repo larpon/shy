@@ -1,3 +1,5 @@
+# Loose and confusing notes dropped while getting the wasm32_emscripten compile to work...
+
 cd shy
 mkdir /tmp/shyem/
 v -skip-unused -gc none -os wasm32_emscripten -o /tmp/shyem/vc_src.c examples/animation

@@ -34,7 +34,7 @@ pub mut:
 	fixed_delta_time      f64
 	desired_frametime     i64
 	vsync_maxerror        i64
-	time_averager         [4]i64 // NOTE should be same cap as time_history_count
+	time_averager         [4]i64 // TODO: should be configurable via $d() and same cap as time_history_count
 	// time_history_count u8 = 4
 	prev_frame_time   i64
 	frame_accumulator i64
@@ -232,7 +232,7 @@ pub fn (mut w Window) set_title(title string) {
 
 // set_icon sets the icon of window.
 pub fn (mut w Window) set_icon(source AssetSource) ! {
-	// TODO https://caedesnotes.wordpress.com/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/
+	// TODO: https://caedesnotes.wordpress.com/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/
 
 	// stbi -> SDL2 surface loading see:
 	// https://github.com/DanielGibson/Snippets/blob/master/SDL_stbimage.h#L248
@@ -250,7 +250,7 @@ pub fn (mut w Window) set_icon(source AssetSource) ! {
 		source: source
 	})!*/
 
-	// TODO surface should be freed when program ends... :( ...
+	// TODO: surface should be freed when program ends... :( ...
 	// That's a bit yuk if we want to keep Assets agnostic from SDL2
 	mut surf := asset.to_sdl_surface(ImageOptions{
 		source: source
@@ -395,7 +395,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 
 	fixed_delta_time := w.state.fixed_delta_time
 
-	// TODO the rendering internals is messy, should be cleaned up
+	// TODO: the rendering internals is messy, should be cleaned up
 	// It is also here the rendering is decoupled from the game ticks
 	// via the opportunity to call `fixed_update` and `variable_update`
 	// at what ever intervals one wishes. Manual control of this process
@@ -441,7 +441,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 
 			if w.refresh_config.sleep > 0 {
 				w.state.in_frame_call = true
-				s.scripts().on_frame(1.0) // TODO remove me again
+				s.scripts().on_frame(1.0) // TODO: remove me again
 				ctx.frame(1.0)
 				ctx.frame_end()
 				w.end_frame()
@@ -451,14 +451,14 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 
 		if w.refresh_config.sleep == 0 {
 			w.state.in_frame_call = true
-			s.scripts().on_frame(1.0) // TODO remove me again
+			s.scripts().on_frame(1.0) // TODO: remove me again
 			ctx.frame(1.0)
 			ctx.frame_end()
 			w.end_frame()
 		}
 
 		if w.refresh_config.sleep > 0 {
-			time.sleep(w.refresh_config.sleep) // TODO ??
+			time.sleep(w.refresh_config.sleep) // TODO: ??
 		}
 	} else {
 		w.begin_frame()
@@ -494,7 +494,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 				f_dt := f64(w.state.frame_accumulator) / desired_frametime
 				// eprintln('(unlocked) ctx.frame( $f_dt )')
 				w.state.in_frame_call = true
-				s.scripts().on_frame(f_dt) // TODO remove me again
+				s.scripts().on_frame(f_dt) // TODO: remove me again
 				ctx.frame(f_dt)
 			} else { // LOCKED FRAMERATE, NO INTERPOLATION
 				for w.state.frame_accumulator >= desired_frametime * w.state.update_multiplicity {
@@ -512,7 +512,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 
 				// eprintln('(locked) ctx.frame( 1.0 )')
 				w.state.in_frame_call = true
-				s.scripts().on_frame(1.0) // TODO remove me again
+				s.scripts().on_frame(1.0) // TODO: remove me again
 				ctx.frame(1.0)
 			}
 		} else {
@@ -525,7 +525,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 				// rate_sim_sleep := i64((fixed_dt * 1000 * 1000) / (w.children.len + 1))
 
 				if w.stepper.step > 0 {
-					// time.sleep(rate_sim_sleep * time.microsecond) // TODO ??
+					// time.sleep(rate_sim_sleep * time.microsecond) // TODO: ??
 
 					w.stepper.step--
 					w.state.frame++
@@ -536,7 +536,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 					ctx.variable_update(fixed_dt)
 				}
 				w.state.in_frame_call = true
-				s.scripts().on_frame(1.0) // TODO remove me again
+				s.scripts().on_frame(1.0) // TODO: remove me again
 				ctx.frame(1.0)
 			}
 		}
@@ -562,7 +562,7 @@ fn (mut w Window) variable_update(dt f64) {
 fn (mut w Window) fixed_update(dt f64) {}
 
 pub fn (mut w Window) end_frame() {
-	w.record_frame() // NOTE Compiled out unless using `-d shy_record`
+	w.record_frame() // NOTE: Compiled out unless using `-d shy_record`
 	w.state.in_frame_call = false
 
 	w.shy.api.gfx.commit()
@@ -722,7 +722,7 @@ pub fn (mut w Window) shutdown() ! {
 
 	w.shy.api.gfx.shutdown_context(w.gfx)!
 
-	// NOTE Last window shuts down the graphics module
+	// NOTE: Last window shuts down the graphics module
 	if w.id == root_window_id {
 		w.shy.api.gfx.shutdown()!
 	}
@@ -894,7 +894,7 @@ pub fn (w &Window) canvas() Canvas {
 	// mut linked_version := sdl.Version{}
 	// sdl.get_version(mut linked_version)
 	// if linked_version.minor_version >= 26 {
-	// TODO on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
+	// TODO: on SDL2 >= 2.26.0 void SDL_GetWindowSizeInPixels(SDL_Window * window, int *w, int *h);
 	//	sdl.get_window_size_in_pixels(w.handle, &width, &height);
 	//} else {
 	// $if opengl ? {

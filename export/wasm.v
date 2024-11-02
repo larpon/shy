@@ -240,7 +240,7 @@ pub fn wasm(opt WasmOptions) !Result {
 
 	cflags << ['-Wno-unused-parameter'] // sokol_app.h
 
-	// TODO V compile warnings - here to make the compiler(s) shut up :/
+	// TODO: V compile warnings - here to make the compiler(s) shut up :/
 	cflags << ['-Wno-unused-variable', '-Wno-unused-result', '-Wno-unused-function',
 		'-Wno-unused-label']
 	cflags << ['-Wno-missing-braces', '-Werror=implicit-function-declaration']

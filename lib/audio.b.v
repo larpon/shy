@@ -22,10 +22,10 @@ mut:
 pub fn (mut a Audio) init() ! {
 	a.shy.assert_api_init()
 	a.shy.log.gdebug('${@STRUCT}.${@FN}', '')
-	// NOTE V BUG / Regression renaming the `mini_audio_engine` variable to just `ma_engine` results in a compile error
+	// NOTE: V BUG / Regression renaming the `mini_audio_engine` variable to just `ma_engine` results in a compile error
 	// Initialize default playback engine
 	mini_audio_engine := &ma.Engine{}
-	// TODO with gc_boehm the following output:
+	// TODO: with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
 	//    May lead to memory leak and poor performance
 	if ma.engine_init(ma.null, mini_audio_engine) != .success {
@@ -48,7 +48,7 @@ pub fn (mut a Audio) new_engine() !&AudioEngine {
 		}
 	}
 	mini_audio_engine := &ma.Engine{}
-	// TODO with gc_boehm the following output:
+	// TODO: with gc_boehm the following output:
 	// GC Warning: Repeated allocation of very large block (appr. size 397312):
 	//    May lead to memory leak and poor performance
 	if ma.engine_init(ma.null, mini_audio_engine) != .success {
@@ -93,7 +93,7 @@ mut:
 }
 
 pub fn (ae AudioEngine) str() string {
-	return 'AudioEngine{}' // TODO to allow compiling with `$dbg`
+	return 'AudioEngine{}' // TODO: to allow compiling with `$dbg`
 }
 
 pub fn (mut e AudioEngine) shutdown() ! {
@@ -164,7 +164,7 @@ fn (mut ae AudioEngine) load_bytes(bytes []u8) !&ma.Sound {
 	if ma.sound_init_from_data_source(ae.e, voidptr(decoder), 0, ma.null, sound) != .success {
 		return error('${@STRUCT}.${@FN} failed to load sound from memory buffer')
 	}
-	// NOTE this is a bit hazardous since the sound id is handed out after this function
+	// NOTE: this is a bit hazardous since the sound id is handed out after this function
 	ae.decoders[ae.sound_id + 1] = decoder
 	return sound
 }
@@ -273,7 +273,7 @@ pub fn (ae &AudioEngine) seek_to_pcm_frame(id u16, frame u64) {
 	if sound := ae.sounds[sound_id] {
 		ae.shy.log.gdebug('${@STRUCT}.${@FN}', 'seek to PCM frame ${frame} on sound ${sound_id} in engine ${ae.id}')
 		_ := ma.sound_seek_to_pcm_frame(sound, frame)
-		// TODO check result?
+		// TODO: check result?
 	}
 }
 

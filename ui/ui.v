@@ -119,7 +119,7 @@ fn (u &UI) find[T](n_id u64) ?&T {
 	if u.root == unsafe { nil } {
 		return none
 	}
-	// TODO this can be made faster, e.g. lookup from cache
+	// TODO: this can be made faster, e.g. lookup from cache
 	nodes := u.collect(fn [n_id] (n &Node) bool {
 		// println('${@FN}@${n.id} == ${n_id}?')
 		if n.id == n_id {
@@ -139,7 +139,7 @@ fn (u &UI) find[T](n_id u64) ?&T {
 
 // shutdown shutdown the UI.
 pub fn (mut u UI) shutdown() ! {
-	// TODO memory leak en-masse
+	// TODO: memory leak en-masse
 	// u.root.free()
 	// unsafe { free(u.root) }
 }
@@ -154,7 +154,7 @@ pub fn (mut u UI) draw(dt f64) {
 	unsafe {
 		u.dt = dt
 	}
-	// TODO surround in a separate render pass?
+	// TODO: surround in a separate render pass?
 	u.root.draw()
 }
 

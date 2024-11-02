@@ -89,6 +89,7 @@ pub:
 pub fn (mut l Loader) init() ! {
 	// l.threads := []thread{cap: c_max_threads}
 	$if wasm32_emscripten {
+		// TODO: use emscripten network features
 		// l.threads << spawn l.worker(0, l.ch_in, l.ch_out)
 	} $else {
 		for t in 0 .. c_max_threads {
@@ -169,7 +170,7 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 		url := job.config.url
 		// println('Loader #${thread_id} worker took ${url}')
 		mut bytes := []u8{}
-		// TODO enable network fetching etc.
+		// TODO: enable network fetching etc.
 		source := url.all_after('://')
 		if url.starts_with('file://') {
 			$if android && !termux {
@@ -243,7 +244,7 @@ fn (mut l Loader) worker(thread_id int, ch_in chan LoadJob, ch_out chan JobStatu
 							size:  size
 						}
 					}
-					unsafe { bytes.free() } // TODO -autofree ??
+					unsafe { bytes.free() } // TODO: -autofree ??
 					break
 				}
 				// println('Loader #${thread_id} sending data ${url}')

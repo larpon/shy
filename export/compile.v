@@ -363,7 +363,7 @@ pub fn compile_v_c_dependencies(opt VCCompileOptions) !VImportCDeps {
 	// 	}
 	// 	defines << '-DGC_BUILTIN_ATOMIC=1'
 	// 	defines << '-D_REENTRANT'
-	// 	// NOTE it's currently a little unclear why this is needed.
+	// 	// NOTE: it's currently a little unclear why this is needed.
 	// 	// V UI can crash and with when the gc is built into the exe and started *without* GC_INIT() the error would occur:
 	// 	defines << '-DUSE_MMAP' // Will otherwise crash with a message with a path to the lib in GC_unix_mmap_get_mem+528
 	//

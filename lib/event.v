@@ -86,8 +86,8 @@ fn (ip Input) serialize_event[T](e Event, config EventSerializeConfig) !T {
 		}
 		t = s
 	} $else $if T.typ is u32 {
-		// TODO reserved for more compact format
-		return error('${@STRUCT}.${@FN} TODO implement me :)') // TODO
+		// TODO: reserved for more compact format
+		return error('${@STRUCT}.${@FN} TODO: implement me :)') // TODO
 	} $else {
 		return error('${@STRUCT}.${@FN} serializing as "${T.name}" is not supported')
 	}
@@ -95,7 +95,7 @@ fn (ip Input) serialize_event[T](e Event, config EventSerializeConfig) !T {
 }
 
 // deserialize_event_from_string deserialize a string serialized by
-// TODO this way of storing and replaying recorded events is *slow* and memory
+// TODO: this way of storing and replaying recorded events is *slow* and memory
 // intensive - it can all be made much smarter, but for now it is good enough
 fn (ip Input) deserialize_event_from_string(serialized_string string, format EventStringSerializeFormat) Event {
 	split := serialized_string.split(',')
@@ -275,7 +275,7 @@ fn (e IntEvent) serialize_as_playback_string() string {
 pub struct KeyEvent {
 	ShyEvent
 pub:
-	which    u8 // The keyboard id, NOTE SDL doesn't really support multiple keyboards. Long story
+	which    u8 // The keyboard id, NOTE: SDL doesn't really support multiple keyboards. Long story
 	state    ButtonState
 	key_code KeyCode
 }

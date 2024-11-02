@@ -40,8 +40,8 @@ mut:
 }
 
 pub fn (mut a Anims) init() ! {
-	// a.shy.assert_api_init() // TODO fix for multi-window
-	// TODO make configurable
+	// a.shy.assert_api_init() // TODO: fix for multi-window
+	// TODO: make configurable
 	prealloc := 1000
 	unsafe { a.active.flags.set(.noslices | .noshrink) }
 	// unsafe { a.bin.flags.set(.noslices | .noshrink) }
@@ -71,7 +71,7 @@ pub fn (mut a Anims) shutdown() ! {
 	for anim in a.active {
 		unsafe {
 			if isnil(anim) {
-				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.active.len}')
+				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO: V memory bug ${a.active.len}')
 				return
 			}
 			shy_free(anim)
@@ -80,7 +80,7 @@ pub fn (mut a Anims) shutdown() ! {
 	for anim in a.f32pool {
 		unsafe {
 			if isnil(anim) {
-				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.f32pool.len}')
+				a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO: V memory bug ${a.f32pool.len}')
 				return
 			}
 			shy_free(anim)
@@ -98,7 +98,7 @@ pub fn (mut a Anims) update(dt f64) {
 		// NOTE: (lmp) workaround weird crash/behavior with `-d shy_analyse` here?!?
 		// Turns out the culprit was actually the garbage collector and SDL2, leave check for now
 		if isnil(animator) {
-			a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO V memory bug ${a.active.len}')
+			a.shy.log.gerror('${@MOD}.${@STRUCT}', 'TODO: V memory bug ${a.active.len}')
 			return
 		}
 

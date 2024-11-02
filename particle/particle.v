@@ -173,6 +173,6 @@ pub fn (mut p Particle) free() {
 		free(p.init)
 		free(p.end)
 		free(p)
-		// p = &Particle(0) // NOTE this stopped working
+		// p = &Particle(0) // NOTE: this stopped working
 	}
 }

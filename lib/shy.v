@@ -27,7 +27,7 @@ mut:
 // all sub-systems of the Shy struct.
 struct ShyStruct {
 pub mut:
-	// TODO error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
+	// TODO: error: field `App.shy` is not public - make this just "pub" to callers - and mut to internal system
 	shy &Shy = null
 }
 

@@ -45,7 +45,7 @@ pub fn options_from_env(defaults Options) !Options {
 // found in any `.shy` config files.
 pub fn (mut opt Options) extend_from_dot_shy() ! {
 	// Look up values in input .shy file next to input if no flags or defaults was set
-	// TODO use TOML format here
+	// TODO: use TOML format here
 	// dot_shy_file := dot_shy_path(opt.input)
 	// dot_shy := os.read_file(dot_shy_file) or { '' }
 }
@@ -174,7 +174,7 @@ pub fn (opt &Options) shy_v() ! {
 			v_meta_dump := v_dump_meta(v_compile_opt)!
 			imported_modules := v_meta_dump.imports
 
-			// TODO if is_windows_running_in_virtual_box() // copy the mesa opengl32.dll
+			// TODO: if is_windows_running_in_virtual_box() // copy the mesa opengl32.dll
 			if 'sdl' in imported_modules {
 				// Use sdl libs in `thirdparty` if user has followed the install instructions already.
 				sdl_mod_thirdparty_path := os.join_path(vxt.vmodules()!, 'sdl', 'thirdparty')

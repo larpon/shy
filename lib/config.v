@@ -30,7 +30,7 @@ pub:
 		name  string = 'default'
 		size  f32    = 20
 		color Color  = Color{255, 255, 255, 255} // BUG: is really 0,0,0,0 :(
-		// align TextAlign = .baseline | .left // TODO V BUG
+		// align TextAlign = .baseline | .left // TODO: V BUG
 	}
 
 	audio struct {
@@ -46,7 +46,7 @@ pub:
 	window struct {
 	pub:
 		title      string = 'Shy Window'
-		fullscreen bool   = os.getenv('SHY_FULLSCREEN').len > 0 // default: false. Window open in fullscreen, can be toggled at run time. NOTE the specialcase for Shy's visual tests
+		fullscreen bool   = os.getenv('SHY_FULLSCREEN').len > 0 // default: false. Window open in fullscreen, can be toggled at run time. NOTE: the specialcase for Shy's visual tests
 		resizable  bool   = true            // Window is resizable and can be toggled at run time
 		color      Color  = Color{0, 0, 0, 255} // Default background color of the root window
 	}
@@ -96,7 +96,7 @@ pub:
 	fullscreen bool   = defaults.window.fullscreen
 	visible    bool   = true
 	color      Color  = defaults.window.color
-	// TODO ? flags WindowFlag
+	// TODO: ? flags WindowFlag
 	render RenderConfig
 }
 

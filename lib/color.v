@@ -6,7 +6,7 @@ module lib
 import shy.utils
 import shy.mth
 import rand
-import math // TODO
+import math // TODO: should use internal
 
 pub const colors = BaseColors{}
 
@@ -64,7 +64,7 @@ pub fn (cv ColorVariation) has_variation() bool {
 }
 
 // ShyColors holds the official project colors,
-// changing these will affect examples and visual tests
+// NOTE: changing these will affect examples and visual tests
 pub struct ShyColors {
 pub:
 	red    Color = rgb(185, 25, 25) // Same red as used in the shy logo
@@ -248,7 +248,7 @@ pub fn (c &Color) a_as[T]() T {
 	panic('A shy TODO :)')
 }
 
-// TODO does not work as expected in regards to values generated from hex codes via 0xXXXXXX
+// TODO: does not work as expected in regards to values generated from hex codes via 0xXXXXXX
 pub fn (c &Color) to[T]() T {
 	u32_res := ((u32(c.r) & 0xff) << 24) + ((u32(c.g) & 0xff) << 16) + ((u32(c.b) & 0xff) << 8) +
 		(u32(c.a) & 0xff)
