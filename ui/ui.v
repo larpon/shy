@@ -33,7 +33,8 @@ pub:
 // making up *one complete User Interface* for *one application*.
 // It holds the pointer to the root node of the tree/scene graph making
 // up the UI, from which any other node can be visited.
-@[heap; noinit]
+@[noinit: 'new/1']
+@[heap]
 pub struct UI {
 	shy.ShyStruct
 mut:
@@ -50,7 +51,7 @@ mut:
 // init initializes the UI.
 fn (mut u UI) init() ! {
 	u.root.parent = shy.null
-	eprintln('[WIP] UI module is still subject to change, use at own risk :)')
+	u.shy.log.gwarn('WIP', 'UI module is still subject to change, use at own risk :)')
 	// Traverse the tree, root to leaves, set all `parent` fields.
 	u.modify(fn (mut n Node) {
 		for mut node in n.body {
