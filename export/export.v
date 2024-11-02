@@ -40,7 +40,8 @@ pub fn (eo &ExportOptions) verbose(verbosity_level int, msg string) {
 }
 
 pub fn (opt ExportOptions) is_debug_build() bool {
-	return opt.supported_v_flags.v_debug || opt.supported_v_flags.c_debug || '-cg' in opt.v_flags || '-g' in opt.v_flags
+	return opt.supported_v_flags.v_debug || opt.supported_v_flags.c_debug || '-cg' in opt.v_flags
+		|| '-g' in opt.v_flags
 }
 
 pub struct Result {
