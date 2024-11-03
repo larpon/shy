@@ -67,10 +67,10 @@ pub fn (cv ColorVariation) has_variation() bool {
 // NOTE: changing these will affect examples and visual tests
 pub struct ShyColors {
 pub:
-	red    Color = rgb(185, 25, 25) // Same red as used in the shy logo
-	green  Color = rgb(55, 150, 55)
-	blue   Color = rgb(15, 75, 215)
-	yellow Color = rgb(210, 200, 15)
+	red    Color = rgb(185, 25, 25) // Same red as used in the shy logo #b91919
+	green  Color = rgb(55, 150, 55) // #379637
+	blue   Color = rgb(15, 75, 215) // #0f4bd7
+	yellow Color = rgb(210, 200, 15) // #d2c80f
 	white  Color = rgb(255, 255, 255) // Same white as used in the logo
 	black  Color = rgb(0, 0, 0) // Back in black
 }

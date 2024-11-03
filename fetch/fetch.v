@@ -7,13 +7,12 @@ import runtime
 import os
 import sdl // TODO: only for loading asset paths on Android FIXME
 
-const c_max_jobs = if $env('V_FETCH_MAX_JOBS') != '' { $env('V_FETCH_MAX_JOBS').u32() } else { 128 }
-const c_max_threads = if $env('V_FETCH_MAX_THREADS') != '' {
-	$env('V_FETCH_MAX_THREADS').u32()
-} else {
-	u32(max(runtime.nr_cpus() - 1, 1))
-}
+#flag wasm32_emscripten -pthread
+// #flag wasm32_emscripten -sPROXY_TO_PTHREAD=1
+#flag wasm32_emscripten -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8
 
+const c_max_threads = resolve_max_threads()
+const c_max_jobs = if $env('V_FETCH_MAX_JOBS') != '' { $env('V_FETCH_MAX_JOBS').u32() } else { 128 }
 const c_chunk_size = u16(4 * 1024)
 
 // const c_chunk_size = if $env('V_FETCH_CHUNK_SIZE') != '' {
@@ -21,6 +20,18 @@ const c_chunk_size = u16(4 * 1024)
 // } else {
 // 	u16(1024)
 // }
+
+fn resolve_max_threads() int {
+	$if wasm32_emscripten {
+		return 8 // match PTHREAD_POOL_SIZE above
+	}
+
+	return if $env('V_FETCH_MAX_THREADS') != '' {
+		$env('V_FETCH_MAX_THREADS').u32()
+	} else {
+		u32(max(runtime.nr_cpus() - 1, 1))
+	}
+}
 
 @[flag]
 pub enum LoadFlags {
@@ -88,13 +99,8 @@ pub:
 
 pub fn (mut l Loader) init() ! {
 	// l.threads := []thread{cap: c_max_threads}
-	$if wasm32_emscripten {
-		// TODO: use emscripten network features
-		// l.threads << spawn l.worker(0, l.ch_in, l.ch_out)
-	} $else {
-		for t in 0 .. c_max_threads {
-			l.threads << spawn l.worker(t, l.ch_in, l.ch_out)
-		}
+	for t in 0 .. c_max_threads {
+		l.threads << spawn l.worker(t, l.ch_in, l.ch_out)
 	}
 }
 

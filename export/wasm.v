@@ -7,6 +7,7 @@ import os
 import flag
 import shy.paths
 import shy.cli
+import shy.vxt
 
 pub const wasm_exporter_version = '0.0.1'
 pub const wasm_fn_description = 'shy export wasm
@@ -124,9 +125,47 @@ pub fn wasm(opt WasmOptions) !Result {
 		})
 	}
 
+	mut cflags := opt.c_flags.clone()
+	mut sflags := opt.s_flags.clone()
+	mut includes := []string{}
+	mut defines := []string{}
+	mut ldflags := []string{}
+
 	v_cflags := v_meta_dump.c_flags
 	imported_modules := v_meta_dump.imports
 
+	// Grab any external C flags
+	mut todo_v_c_flags := []string{}
+	for line in v_cflags {
+		if line.contains('.tmp.c') || line.ends_with('.o"') || line.starts_with('-o ') {
+			continue
+		}
+		if line.starts_with('-D') {
+			defines << line
+			todo_v_c_flags << line
+		} else if line.starts_with('-I') {
+			if line.contains('/usr/') {
+				continue
+			}
+			includes << line
+			todo_v_c_flags << line
+		} else if line.starts_with('-l') {
+			if line.contains('-lgc') {
+				// not used / compiled in
+				continue
+			}
+			if line.contains('-lSDL') {
+				// different via -sUSE_SDL=X
+				continue
+			}
+			ldflags << line
+			todo_v_c_flags << line
+		} else {
+			todo_v_c_flags << line
+		}
+	}
+
+	dump(todo_v_c_flags)
 	// v_thirdparty_dir := os.join_path(vxt.home(), 'thirdparty')
 	//
 	// uses_gc := opt.uses_gc()
@@ -142,9 +181,9 @@ pub fn wasm(opt WasmOptions) !Result {
 		parallel:  opt.parallel
 		is_prod:   opt.supported_v_flags.prod
 		cc:        'emcc'
-		// c_flags:   v_cflags
-		work_dir: v_c_deps
-		v_meta:   v_meta_dump
+		c_flags:   todo_v_c_flags
+		work_dir:  v_c_deps
+		v_meta:    v_meta_dump
 	}
 
 	vicd := compile_v_c_dependencies(v_c_c_opt) or {
@@ -158,41 +197,10 @@ pub fn wasm(opt WasmOptions) !Result {
 
 	dump(o_files)
 
-	mut cflags := opt.c_flags.clone()
-	mut sflags := opt.s_flags.clone()
-	mut includes := []string{}
-	mut defines := []string{}
-	mut ldflags := []string{}
-
-	// Grab any external C flags
-	for line in v_cflags {
-		if line.contains('.tmp.c') || line.ends_with('.o"') {
-			continue
-		}
-		if line.starts_with('-D') {
-			defines << line
-		}
-		if line.starts_with('-I') {
-			if line.contains('/usr/') {
-				continue
-			}
-			includes << line
-		}
-		if line.starts_with('-l') {
-			if line.contains('-lgc') {
-				// not used / compiled in
-				continue
-			}
-			if line.contains('-lSDL') {
-				// different via -sUSE_SDL=X
-				continue
-			}
-			ldflags << line
-		}
-	}
-
+	// TODO: emcc: warning: -pthread + ALLOW_MEMORY_GROWTH may run non-wasm code slowly, see https://github.com/WebAssembly/design/issues/1271 [-Wpthreads-mem-growth]
+	//
 	// sflags << '-sEXPORTED_FUNCTIONS="[\'_malloc\', \'_main\']" -sSTACK_SIZE=1mb -sERROR_ON_UNDEFINED_SYMBOLS=0 -sASSERTIONS=1 -sUSE_WEBGL2=1 -sNO_EXIT_RUNTIME=1 -sALLOW_MEMORY_GROWTH=1'
-	sflags << ['-sEXPORTED_FUNCTIONS="[\'_malloc\',\'_main\']"', '-sSTACK_SIZE=1mb',
+	sflags << ['-sEXPORTED_FUNCTIONS="[\'_malloc\',\'_main\']"', '-sSTACK_SIZE=2mb',
 		'-sERROR_ON_UNDEFINED_SYMBOLS=0', '-sASSERTIONS=1', '-sUSE_WEBGL2=1', '-sNO_EXIT_RUNTIME=1',
 		'-sALLOW_MEMORY_GROWTH=1']
 	// sflags << ['-sWASM=1']
@@ -200,13 +208,20 @@ pub fn wasm(opt WasmOptions) !Result {
 		sflags << '-sUSE_SDL=2'
 	}
 
-	sflags << '--preload-file ${input}/assets@/' // TODO:
-	sflags << '--preload-file /home/lmp/Projects/vdev/shy/assets@/' // TODO:
+	// TODO: these from `fetch` module??
+	sflags << '-pthread' // -sPROXY_TO_PTHREAD=1'
+	// sflags << '-sPTHREAD_POOL_SIZE_STRICT=2'
+	sflags << '-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8'
 
-	custom_shell_file := os.join_path(os.home_dir(), '.vmodules', 'shy', 'platforms',
-		'wasm', 'emscripten', 'shell_minimal.html')
-	if os.is_file(custom_shell_file) {
-		sflags << '--shell-file ${custom_shell_file}'
+	shy_assets := os.join_path(vxt.vmodules()!, 'shy', 'assets@/')
+
+	sflags << '--preload-file ${input}/assets@/' // TODO:
+	sflags << '--preload-file ${shy_assets}' // TODO:
+
+	default_shell_file := os.join_path(vxt.vmodules()!, 'shy', 'platforms', 'wasm', 'emscripten',
+		'index.html')
+	if os.is_file(default_shell_file) {
+		sflags << '--shell-file ${default_shell_file}'
 	}
 
 	ldflags << '-ldl' // TODO:

@@ -3,14 +3,18 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Emscripten-Generated Code</title>
+    <title>Shy Emscripten-Generated Code</title>
     <style>
+      .shy.bg { background-color: #b91919; }
+      #logo.shy { width: 100px; height: 100px; padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
       .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
-      textarea.emscripten { font-family: monospace; width: 80%; }
       div.emscripten { text-align: center; }
-      div.emscripten_border { border: 1px solid black; }
+      /* div.emscripten_border { border: 1px solid black; } */
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; background-color: black; }
+      canvas.emscripten {
+        width: 640px; height: 320px; border: 0px none; background-color: black;
+      }
+      textarea.emscripten { width: 640px; font-family: monospace; }
 
       .spinner {
         height: 50px;
@@ -46,17 +50,24 @@
 
     </style>
   </head>
-  <body>
-    <hr/>
-    <figure style="overflow:visible;" id="spinner"><div class="spinner"></div><center style="margin-top:0.5em"><strong>emscripten</strong></center></figure>
-    <div class="emscripten" id="status">Downloading...</div>
-    <div class="emscripten">
-      <progress value="0" max="100" id="progress" hidden=1></progress>
+  <body class="shy bg">
+    <div id="logo" class="shy">
+      <svg viewBox="0 0 270.9 270.9" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#b91919" d="M0 0h271v271H0Z" color="#000" overflow="visible" />
+        <path fill="#fff" d="M79.3 185.8c2-4.1 7-9.2 8.2-8.4 1 .7-3 7.3-4.3 10-13.4 29.2 28 44.4 52.4 44.5 22.4.1 50.9-10.3 50.3-33-.3-14.5-9.4-22.8-40.7-28.3-40.2-7-107.5-8.7-105.3-62.8 2.1-52.3 59.5-76.6 99-78.7 59-3.2 112 46.6 76.8 100.7-3.5 5.4-10.5 7.9-15.2 5.5-5.3-2.7-7.3-10.5-5.3-14.8 22.5-48.4-33.9-70.9-67.6-66.7-29.7 3.6-61.3 20.6-67.3 43-13.5 50 51 49.2 78.4 51.8 37.5 3.7 74.5 14.3 72.5 48.1-1.6 29.7-38.3 44.6-68.8 45.2-37 .7-79.8-22-63.1-56.1z" />
+        <path overflow="visible" fill="#fff" d="M172.8 204.6c-4.7 12.3-22.4 17.4-39.7 17.4-17.1 0-34.7-4.2-40.2-15.6-5-10.4 1.4-19 9.7-21.7 10.9-3.5 31.3 4.3 22.4 16.4-10.3 14.2 6.2 16.4 14.3 16.4 9.6 0 25-2.1 33.5-12.9zm-99-98.4c2.6-21.5 24-34 46.4-37.9 22-3.9 46-.7 56.5 17 9.4 16.2 3.6 32-6.4 38.3-13 8.2-41.7-.1-33.7-22.3 9.3-26-12.7-25.8-23.2-24-12.4 2.2-31.6 9-39.6 28.9z" />
+      </svg>
     </div>
     <div class="emscripten_border">
-      <canvas width="600" height="300" class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
     </div>
-    <hr/>
+    <div>
+      <figure style="overflow:visible;" id="spinner"><div class="spinner"></div><center style="margin-top:0.5em"><strong>emscripten</strong></center></figure>
+      <div class="emscripten" id="status">Downloading...</div>
+      <div class="emscripten">
+        <progress value="0" max="100" id="progress" hidden=1></progress>
+      </div>
+    </div>
     <!--
     <div class="emscripten">
       <input type="checkbox" id="resize">Resize canvas
@@ -69,7 +80,7 @@
     -->
 
     <textarea class="emscripten" id="output" rows="8"></textarea>
-    <hr>
+
     <script type='text/javascript'>
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
@@ -128,7 +139,7 @@
         totalDependencies: 0,
         monitorRunDependencies: (left) => {
           this.totalDependencies = Math.max(this.totalDependencies, left);
-          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+          Module.setStatus(left ? 'Preparing... (' + parseInt(this.totalDependencies - left) + '/' + parseInt(this.totalDependencies) + ')' : 'All downloads complete.');
         }
       };
       Module.setStatus('Downloading...');
