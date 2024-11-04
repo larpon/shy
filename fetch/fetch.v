@@ -7,9 +7,10 @@ import runtime
 import os
 import sdl // TODO: only for loading asset paths on Android FIXME
 
-#flag wasm32_emscripten -pthread
-// #flag wasm32_emscripten -sPROXY_TO_PTHREAD=1
-#flag wasm32_emscripten -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8
+// NOTE: currently `shy export wasm ...` will detect `sync.threads` and define `-pthread -sUSE_PTHREADS=1`,
+// it will however *not* define how many threads to use since it should match pretty precise, otherwise
+// the app will crash at runtime if not enough threads can be allocated.. $d() currently does not work here (-dump-flags fails)
+#flag wasm32_emscripten -sPTHREAD_POOL_SIZE=8
 
 const c_max_threads = resolve_max_threads()
 const c_max_jobs = if $env('V_FETCH_MAX_JOBS') != '' { $env('V_FETCH_MAX_JOBS').u32() } else { 128 }

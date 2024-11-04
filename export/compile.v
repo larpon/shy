@@ -218,22 +218,10 @@ pub fn (opt CCompileOptions) cmd() []string {
 }
 
 // compile_v_to_c compiles V sources to their compatible C counterpart.
-pub fn compile_v_to_c(opt VCompileOptions) !VMetaInfo {
+pub fn compile_v_to_c(opt VCompileOptions) ! {
 	work_dir := os.dir(opt.output)
 	paths.ensure(work_dir)!
 
-	v_dump_opt := VDumpOptions{
-		VCompileOptions: opt
-		//...opt.VCompileOptions
-		work_dir: os.join_path(work_dir, 'dump')
-	}
-
-	v_meta_dump := v_dump_meta(v_dump_opt)!
-	imported_modules := v_meta_dump.imports
-
-	if imported_modules.len == 0 {
-		return error('${@MOD}.${@FN}: empty module dump')
-	}
 	opt.verbose(1, 'Compiling V to C' + if opt.v_flags.len > 0 {
 		'. V flags: `${opt.v_flags}`'
 	} else {
@@ -247,10 +235,8 @@ pub fn compile_v_to_c(opt VCompileOptions) !VMetaInfo {
 	v_cmd := opt.cmd()
 
 	opt.verbose(3, 'Running "${v_cmd.join(' ')}"...')
-	v_dump_res := cli.run_or_error(v_cmd)!
-	opt.verbose(3, v_dump_res)
-
-	return v_meta_dump
+	v_cmd_res := cli.run_or_error(v_cmd)!
+	opt.verbose(3, v_cmd_res)
 }
 
 struct VImportCDeps {
@@ -394,6 +380,7 @@ pub fn compile_v_c_dependencies(opt VCCompileOptions) !VImportCDeps {
 	// to be added specially here. It should probably be supported as compile options from commandline...
 	for module_name, mod_compile_lines in v_module_o_files {
 		opt.verbose(2, 'Compiling .o files from module ${module_name}...')
+		opt.verbose(3, 'Lines ${mod_compile_lines}')
 
 		for compile_line in mod_compile_lines {
 			index_o_arg := compile_line.index('-o') + 1
@@ -417,15 +404,22 @@ pub fn compile_v_c_dependencies(opt VCCompileOptions) !VImportCDeps {
 
 			opt.verbose(2, 'Compiling "${o_file}" from module ${module_name}...')
 
-			// Dafuq??
-			opt.verbose(3, 'Running "${build_cmd.join(' ')}"...')
+			// Dafuq vab ??
+			// opt.verbose(3, 'Running "${build_cmd.join(' ')}"...')
 			// o_res := cli.run_or_error(build_cmd)!
 			// opt.verbose(3, o_res)
 
 			o_files << o_file
 
 			jobs << utils.ShellJob{
-				cmd: build_cmd
+				message: utils.ShellJobMessage{
+					std_err: if opt.verbosity > 2 {
+						'Running "${build_cmd.join(' ')}"...'
+					} else {
+						''
+					}
+				}
+				cmd:     build_cmd
 			}
 		}
 	}
