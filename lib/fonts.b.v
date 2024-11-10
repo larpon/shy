@@ -60,10 +60,6 @@ pub fn (mut fs Fonts) load_font(name string, path string) ! {
 	}
 }
 
-// $if wasm32_emscripten {
-//	#flag --embed-file @VMODROOT/fonts@/fonts
-// }
-
 // pub fn (mut fs Fonts) init(config FontsConfig) !&FontContext {
 pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	fs.shy = config.shy

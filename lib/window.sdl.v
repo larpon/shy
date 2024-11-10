@@ -809,7 +809,7 @@ pub fn (mut w Window) toggle_fullscreen() {
 		sdl.set_window_fullscreen(w.handle, 0)
 	} else {
 		mut window_flags := u32(0)
-		$if linux {
+		$if wasm32_emscripten || linux {
 			window_flags = u32(sdl.WindowFlags.fullscreen_desktop)
 		} $else {
 			window_flags = u32(sdl.WindowFlags.fullscreen)
@@ -873,23 +873,6 @@ pub fn (w &Window) width() int {
 pub fn (w &Window) canvas() Canvas {
 	mut width := 0
 	mut height := 0
-
-	// $if wasm32_emscripten ? {
-	// 	if w.state.frame % 100 == 0
-	// 		&& C.emscripten_get_canvas_element_size(c'#canvas', &width, &height) == .success {
-	// 		println('WH: ${w.wh()}')
-	// 		//sdl.set_window_size(w.handle, width, height)
-	// 		// sdl.gl_delete_context(w.gl_context)
-	// 		// gl_context := sdl.gl_create_context(w.handle)
-	// 		// if gl_context == sdl.null {
-	// 		// 	sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
-	// 		// 	w.shy.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
-	// 		// 	panic('Could not create OpenGL context, SDL says:\n${sdl_error_msg}')
-	// 		// }
-	// 		// mut mw := unsafe{ w}
-	// 		// mw.gl_context = gl_context
-	// 	}
-	// }
 
 	// mut linked_version := sdl.Version{}
 	// sdl.get_version(mut linked_version)

@@ -113,7 +113,7 @@ pub fn wasm(opt WasmOptions) !Result {
 	v_c_file := os.join_path(opt.work_dir, 'v', 'wasm.c')
 
 	mut v_flags := opt.v_flags.clone()
-	v_flags << ['-skip-unused', '-gc none', '-d wasm32_emscripten']
+	v_flags << ['-skip-unused', '-gc none']
 	v_to_c_opt := VCompileOptions{
 		verbosity: opt.verbosity
 		cache:     opt.cache
@@ -308,7 +308,8 @@ pub fn wasm(opt WasmOptions) !Result {
 
 	opt.verbose(1, 'Compiling C output' + if opt.parallel { ' in parallel' } else { '' })
 
-	o_file := os.join_path(output, '${output}.html') // TODO: html?
+	o_file_name := os.file_name(input)
+	o_file := os.join_path(output, '${o_file_name}.html') // TODO: html?
 	// Compile .o
 	cco := CCompileOptions{
 		verbosity: opt.verbosity
@@ -379,6 +380,7 @@ fn (opt WasmOptions) resolve_output(input string) !string {
 			return error('${@MOD}.${@FN}: output "${opt.output}" should *exist* and be a directory')
 		}
 		output_dir = os.join_path(opt.output.trim_right(os.path_separator), '', default_dir_name)
+		// dump(output_dir)
 	} else {
 		output_dir = default_dir_name
 	}

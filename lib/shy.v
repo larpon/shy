@@ -100,11 +100,13 @@ pub fn (mut s Shy) init() ! {
 		s.log.set(.debug)
 	}
 	s.log.gdebug('${@STRUCT}.${@FN}', '')
+	$if wasm32_emscripten {
+		emscripten_init()!
+	}
 	$if !shy_no_determinism ? {
 		s.log.gdebug('${@STRUCT}.${@FN}', 'enable determinism')
 		rand.seed([u32(0x4b1d), 0xbaadf00d])
 	}
-
 	s.alarms = &Alarms{
 		shy: s
 	}
@@ -147,6 +149,7 @@ pub fn run[T](mut ctx T, config Config) ! {
 	mut shy_instance := new(config)!
 	shy_instance.app = voidptr(ctx)
 	ctx.shy = shy_instance
+
 	ctx.init()!
 
 	shy_instance.api.main[T](mut ctx, mut shy_instance)!

@@ -42,7 +42,7 @@ $if ios {
 	#flag -framework Foundation -framework Metal -framework MetalKit -framework UIKit
 }
 
-$if emscripten ? {
+$if wasm32_emscripten {
 	#flag -DSOKOL_GLES3
 	#flag -DSOKOL_NO_ENTRY
 	#flag -s ERROR_ON_UNDEFINED_SYMBOLS=0

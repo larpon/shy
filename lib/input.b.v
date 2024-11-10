@@ -147,7 +147,9 @@ pub fn (mut ip Input) remove_gamepad(n i32) {
 // be translated.
 fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 	s := ip.shy
-
+	$if shy_debug_events ? {
+		eprintln('${@STRUCT}.${@FN} SDL event ${sdl_event.@type}')
+	}
 	timestamp := s.ticks()
 	// Map sdl window id to shy window here, right now we use the same values as SDL
 	// if an SDL event does not have a window id associated we use the id of the root window
@@ -261,6 +263,9 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 		}
 
 		if shy_event !is UnkownEvent {
+			$if shy_debug_events ? {
+				eprintln('${@STRUCT}.${@FN} Shy event ${shy_event}')
+			}
 			return shy_event
 		}
 	}
@@ -500,14 +505,14 @@ fn (ip Input) sdl_to_shy_event(sdl_event sdl.Event) Event {
 			}
 		}
 		else {
-			$if shy_debug_sdl_events ? {
-				eprintln('${@STRUCT}.${@FN} Unknown SDL event ${sdl_event.@type}.')
-			}
 			shy_event = UnkownEvent{
 				timestamp: timestamp
 				window_id: no_window
 			}
 		}
+	}
+	$if shy_debug_events ? {
+		eprintln('${@STRUCT}.${@FN} Shy event ${shy_event}')
 	}
 	return shy_event
 }

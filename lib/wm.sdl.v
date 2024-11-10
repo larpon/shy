@@ -49,10 +49,11 @@ pub fn (mut wm WM) init() ! {
 	}
 
 	mut init_flags := u32(sdl.init_video)
-	$if wasm32_emscripten {
+	$if shy_gamepad ? {
 		init_flags = init_flags | u32(sdl.init_gamecontroller)
-	} $else {
-		init_flags = init_flags | u32(sdl.init_gamecontroller | sdl.init_haptic)
+	}
+	$if !wasm32_emscripten {
+		init_flags = init_flags | u32(sdl.init_haptic)
 	}
 	// init_flags := u32(sdl.init_everything)
 	res := sdl.init(init_flags)
@@ -156,7 +157,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		win_y = 0
 	}
 
-	$if wasm32_emscripten ? {
+	$if wasm32_emscripten {
 		win_w = emscripten_get_canvas_width()
 		win_h = emscripten_get_canvas_height()
 		win_x = 0
