@@ -402,44 +402,39 @@ pub fn (mut a Assets) update() {
 	if a.async_load_queue.len > 0 {
 		alo := a.async_load_queue.pop()
 		source := alo.source
-		path := match source {
+		mut path := ''
+		match source {
 			string {
 				$if android && !termux {
 					if !source.starts_with('/') {
-						'file://${source}'
+						path = 'file://${source}'
 					} else {
 						eprintln('${@STRUCT}.${@FN}: error converting "${source}" (Android) to `fetch` compatible source"')
-						''
 					}
 				} $else {
 					if os.is_file(source) {
-						'file://${source}'
+						path = 'file://${source}'
 					} else {
 						eprintln('${@STRUCT}.${@FN}: error converting "${source}" to `fetch` compatible source"')
-						''
 					}
 				}
 			}
 			TaggedSource {
 				$if android && !termux {
 					if !source.str().starts_with('/') {
-						'file://${source.str()}'
+						path = 'file://${source.str()}'
 					} else {
 						eprintln('${@STRUCT}.${@FN}: error converting "${source.str()}" (Android) to `fetch` compatible source"')
-						''
 					}
 				} $else {
 					if os.is_file(source.str()) {
-						'file://${source.str()}'
+						path = 'file://${source.str()}'
 					} else {
 						eprintln('${@STRUCT}.${@FN}: error converting "${source.str()}" to `fetch` compatible source"')
-						''
 					}
 				}
 			}
-			else {
-				''
-			}
+			else {}
 		}
 		if path != '' {
 			// println('loading ${path}')
