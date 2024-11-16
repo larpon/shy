@@ -32,7 +32,7 @@ jobs:
         repository: vlang/v
 
     - name: Build local v
-      run: make && sudo ./v symlink
+      run: make && ./v symlink
 
     - name: Install dependencies
       run: |

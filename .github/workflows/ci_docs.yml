@@ -17,7 +17,7 @@ jobs:
         repository: vlang/v
 
     - name: Build local v
-      run: make -j4 && sudo ./v symlink
+      run: make && ./v symlink
 
     - name: Checkout shy
       uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
           repository: vlang/v
 
       - name: Build local v
-        run: make -j4 && sudo ./v symlink
+        run: make && ./v symlink
 
       - name: Checkout shy
         uses: actions/checkout@v4
