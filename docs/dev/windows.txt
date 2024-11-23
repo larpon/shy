@@ -1,8 +1,9 @@
 # From linux (cross-compile)
 
+
 ```bash
-v -cflags "-static" -os windows -subsystem windows -fast-math -no-bounds-checking -d shy_gamepad -d sdl_memory_no_gc -skip-unused ./puzzle_vibes
-# Copy libSDL.dll to folder then
+v -cflags "-static" -prod -os windows -subsystem windows -fast-math -no-bounds-checking -d shy_gamepad -d sdl_memory_no_gc -skip-unused ./puzzle_vibes
+# Copy SDL2.dll (remember it should match the version built against...) to folder then
 wine ./puzzle_vibes/puzzle_vibes.exe # much WOW
 ```
 
