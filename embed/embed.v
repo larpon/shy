@@ -114,7 +114,9 @@ pub fn (mut a EasyApp) variable_update(dt f64) {
 pub fn (mut a EasyApp) event(e shy.Event) {
 	match e {
 		shy.QuitEvent {
-			a.shy.shutdown = true
+			$if !wasm32_emscripten {
+				a.shy.shutdown = true
+			}
 		}
 		shy.WindowCloseEvent {
 			a.shy.shutdown = true
