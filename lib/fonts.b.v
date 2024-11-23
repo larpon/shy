@@ -71,16 +71,16 @@ pub fn (mut fs Fonts) new_context(config FontsConfig) !&FontContext {
 	mut preload := config.preload.clone()
 	$if wasm32_emscripten {
 		// NOTE:	#flag --embed-file @VMODROOT/fonts@/fonts // #flag --embed-file @VMODROOT/examples/assets@/
-		preload['default'] = 'fonts/Allerta/Allerta-Regular.ttf'
+		preload[defaults.font.name] = 'fonts/Allerta/Allerta-Regular.ttf'
 	} $else {
 		mut default_font := $embed_file('../assets/fonts/Allerta/Allerta-Regular.ttf')
 		fs.font_data[defaults.font.name] = default_font.to_bytes()
-		fs.shy.log.gdebug(@STRUCT, 'loaded default: "${default_font.path}"')
+		fs.shy.log.gdebug(@STRUCT, 'loaded "${defaults.font.name}": "${default_font.path}"')
 	}
 
 	for font_name, font_path in preload {
 		fs.load_font(font_name, font_path) or {
-			s.log.gerror(@STRUCT, ' pre-loading "${font_name}" failed: ${err.msg()}')
+			s.log.gerror(@STRUCT, 'pre-loading "${font_name}" failed: ${err.msg()}')
 		}
 	}
 

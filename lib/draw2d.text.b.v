@@ -198,6 +198,7 @@ pub fn (t Draw2DText) draw() {
 	font_context.set_spacing(5.0)
 	*/
 
+	// println('Drawing "${t.text}" with font "${t.font}"')
 	if t.font != defaults.font.name {
 		font_id := fc.fonts[t.font]
 		font_context.set_font(font_id)
