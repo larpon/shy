@@ -172,6 +172,7 @@ pub fn (mut wm WM) init_root_window() !&Window {
 		height: win_h
 	}
 	win := wm.new_window(window_config)!
+	assert win.id == root_window_id
 	wm.root = win
 	return wm.root
 }
