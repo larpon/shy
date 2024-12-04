@@ -12,7 +12,7 @@ pub struct ExportOptions {
 pub:
 	// These fields would make little sense to change during a run
 	verbosity int    @[short: v; xdoc: 'Verbosity level 1-3']
-	work_dir  string = os.join_path(paths.tmp_work(), 'export', 'appimage') @[ignore]
+	work_dir  string = os.join_path(paths.shy(.temp), 'export', 'appimage') @[ignore]
 	//
 	run      bool @[ignore]
 	parallel bool = true @[long: 'no-parallel'; xdoc: 'Do not run tasks in parallel.']
@@ -91,7 +91,7 @@ fn (svf &SupportedVFlags) as_v_flags() []string {
 }
 
 pub fn ensure_cache_dir() !string {
-	dir := os.join_path(paths.cache(), 'export')
+	dir := os.join_path(paths.shy(.cache), 'export')
 	paths.ensure(dir)!
 	return dir
 }

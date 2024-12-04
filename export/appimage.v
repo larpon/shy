@@ -34,7 +34,7 @@ pub fn (aif AppImageFormat) ext() string {
 pub struct AppImageOptions {
 	ExportOptions
 pub:
-	work_dir string = os.join_path(paths.tmp_work(), 'export', 'appimage') @[ignore]
+	work_dir string = os.join_path(paths.shy(.temp), 'export', 'appimage') @[ignore]
 	compress bool   @[xdoc: 'Compress executable with `upx` if available']
 	strip    bool   @[xdoc: 'Strip executable symbols with `strip` if available']
 	format   AppImageFormat = .app_image

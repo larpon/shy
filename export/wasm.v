@@ -21,7 +21,7 @@ pub enum WasmFormat {
 pub struct WasmOptions {
 	ExportOptions
 pub:
-	work_dir string     = os.join_path(paths.tmp_work(), 'export', 'wasm') @[ignore]
+	work_dir string     = os.join_path(paths.shy(.temp), 'export', 'wasm') @[ignore]
 	format   WasmFormat = .emscripten
 	s_flags  []string
 }
@@ -221,7 +221,7 @@ pub fn wasm(opt WasmOptions) !Result {
 	// TODO: cache check?
 	//
 	// TODO: Remove any previous builds??
-	v_c_deps := os.join_path(paths.tmp_work(), 'export', 'v', 'cdeps')
+	v_c_deps := os.join_path(paths.shy(.temp), 'export', 'v', 'cdeps')
 	v_c_c_opt := VCCompileOptions{
 		verbosity: opt.verbosity
 		cache:     opt.cache

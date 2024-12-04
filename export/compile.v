@@ -124,7 +124,7 @@ pub fn (opt VCompileOptions) uses_gc() bool {
 pub struct VDumpOptions {
 	VCompileOptions
 pub:
-	work_dir string = os.join_path(paths.tmp_work(), 'export', 'v', 'dump') // temporary work directory
+	work_dir string = os.join_path(paths.shy(.temp), 'export', 'v', 'dump') // temporary work directory
 }
 
 pub struct VMetaInfo {
@@ -253,7 +253,7 @@ pub:
 	is_prod   bool
 	cc        string @[required]
 	c_flags   []string // flags to pass to the C compiler(s)
-	work_dir  string = os.join_path(paths.tmp_work(), 'export', 'v', 'cdeps') // temporary work directory
+	work_dir  string = os.join_path(paths.shy(.temp), 'export', 'v', 'cdeps') // temporary work directory
 	v_meta    VMetaInfo
 }
 
