@@ -30,6 +30,8 @@ Sub-commands:
   doctor                    Display useful info about the system'
 
 pub const exe_git_hash = shy_commit_hash()
+
+@[markused]
 pub const work_directory = shy_tmp_work_dir()
 pub const cache_directory = shy_cache_dir()
 pub const rip_vflags = ['-autofree', '-gc', '-g', '-cg', '-prod', 'run', '-showcc']
