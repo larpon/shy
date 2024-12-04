@@ -28,9 +28,9 @@ fn resolve_max_threads() int {
 	}
 
 	return if $env('V_FETCH_MAX_THREADS') != '' {
-		$env('V_FETCH_MAX_THREADS').u32()
+		$env('V_FETCH_MAX_THREADS').int()
 	} else {
-		u32(max(runtime.nr_cpus() - 1, 1))
+		int(max(runtime.nr_cpus() - 1, 1))
 	}
 }
 
