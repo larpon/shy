@@ -30,7 +30,7 @@ pub mut:
 	update_multiplicity   u8  = defaults.render.update_multiplicity
 	lock_framerate        bool
 	performance_frequency u64
-	snap_frequencies      [5]i64
+	snap_frequencies      [7]i64
 	fixed_delta_time      f64
 	desired_frametime     i64
 	vsync_maxerror        i64
@@ -270,8 +270,8 @@ pub fn (mut w Window) render_init() {
 
 	w.state.fps_timer = u64(0)
 	render_config := w.config.render
-	// update_rate         = f64(59.95) // TODO
-	// update_rate         = f64(120)
+	// update_rate         := f64(59.95) // TODO
+	// update_rate        := f64(120)
 	update_rate := render_config.update_rate // f64(60)
 	w.state.update_rate = update_rate // f64(60)
 	w.state.update_multiplicity = render_config.update_multiplicity // int(1)
@@ -298,6 +298,8 @@ pub fn (mut w Window) render_init() {
 		time_60hz * 3, // 20fps
 		time_60hz * 4, // 15fps
 		(time_60hz + 1) / 2, // 120fps
+		(time_60hz + 2) / 3, // 180fps
+		(time_60hz + 3) / 4, // 240fps
 		/*
 		//120hz, 240hz, or higher need to round up, so that adding 120hz twice guaranteed is at least the same as adding time_60hz once
 		// (time_60hz+2)/3,  //180fps //that's where the +1 and +2 come from in those equations
@@ -359,7 +361,7 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 	// vsync time snapping
 	for snap in w.state.snap_frequencies {
 		if mth.abs(delta_time - snap) < w.state.vsync_maxerror {
-			// eprintln('Snaping at $i')
+			// eprintln('Snap at ${snap}')
 			delta_time = snap
 			break
 		}
