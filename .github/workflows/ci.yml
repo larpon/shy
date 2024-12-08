@@ -285,7 +285,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install --quiet -y mesa-common-dev
+        sudo apt-get install --quiet -y mesa-common-dev libxext-dev
         curl -L https://www.libsdl.org/release/SDL2-${{ matrix.sdl-version }}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
@@ -357,7 +357,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install --quiet -y mesa-common-dev
+        sudo apt-get install --quiet -y mesa-common-dev libxext-dev
         curl -L https://www.libsdl.org/release/SDL2-${{ matrix.sdl-version }}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
