@@ -14,10 +14,10 @@ pub:
 	pub:
 		update_rate         f64 = 60.0
 		update_multiplicity u8  = 1
-		lock_framerate      bool
-		time_history_count  u8 = 4
-		vsync               VSync
-		msaa                int = 4
+		lock_framerate      bool // false
+		time_history_count  u8    = 4
+		vsync               VSync = .on
+		msaa                int   = 4
 	}
 
 	fonts struct {

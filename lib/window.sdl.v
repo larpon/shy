@@ -272,6 +272,7 @@ pub fn (mut w Window) render_init() {
 	render_config := w.config.render
 	// update_rate         := f64(59.95) // TODO
 	// update_rate        := f64(120)
+	// update_rate        := f64(240)
 	update_rate := render_config.update_rate // f64(60)
 	w.state.update_rate = update_rate // f64(60)
 	w.state.update_multiplicity = render_config.update_multiplicity // int(1)
