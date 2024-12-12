@@ -365,7 +365,9 @@ pub fn (c &ColorHSV) as_rgb() Color {
 		else {}
 	}
 
-	// println('RGB: ${r} ${g} ${b} RGB*255: ${r * 255} ${g * 255} ${b * 255} ')
+	// println(utils.remap(f32(c.h), 0, 360, 0, 1))
+	// println('HSV: ${h} ${s} ${v} I ${i} FPQT: ${f} ${p} ${q} ${t}')
+	// println('RGBA: ${r} ${g} ${b} ${a} RGB*255(A): ${r * 255} ${g * 255} ${b * 255} (${a})')
 
 	return Color{
 		r: u8(r * 255)
