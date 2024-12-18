@@ -11,40 +11,37 @@ pub const stdout_is_a_pipe = (os.is_atty(1) == 0)
 
 @[inline]
 pub fn remap[T](value T, min T, max T, new_min T, new_max T) T {
-	// BUG: This is carefully crafted like this because 2 hours of debugging led to this obscure corner case
-	// I think it is a "regression" (maybe not) with V's generics (cgen?, cast?, parenthesis?)
+	// NOTE: This is carefully crafted like this because 2 hours of debugging led to an obscure corner case.
+	// I thought it was a "regression" (maybe not) with V's generics (cgen?, cast?, parenthesis?)
 	// `return (((value - min) * (new_max - new_min)) / (max - min)) + new_min` <- this version, incl. return T(...)
 	// consistently returned "0.0" until the temp var `r` was used... and I could NOT reduce the scenario.
 	// It was discovered while rewriting a function to procedurally generate shade colors (HSV -> RGB) for some bushes...
-	// The nasty thought is that something using T *elsewhere* can someday do the same in some unrelated context... nightmare
-	r := T((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
-	return r
+	// The nasty thought is that something using T *elsewhere* can someday do the same in some unrelated context... nightmare.
+	// The fix, however, was simply to cast to `f64` because arguments may be inferred as integer although a float was expected.
+	return T((((f64(value) - f64(min)) * (f64(new_max) - f64(new_min))) / (f64(max) - f64(min))) +
+		f64(new_min))
 	// return (((value - min) * (new_max - new_min)) / (max - min)) + new_min
 	// The above yields red bushes in small_world with just `v run`...
 }
 
 @[inline]
 pub fn remap_u8_to_f32(value u8, min u8, max u8, new_min f32, new_max f32) f32 {
-	r := f32((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
-	return r
+	return f32((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
 }
 
 @[inline]
 pub fn remap_f32_to_u8(value f32, min f32, max f32, new_min u8, new_max u8) u8 {
-	r := u8((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
-	return r
+	return u8((((value - min) * (new_max - new_min)) / (max - min)) + new_min)
 }
 
 @[inline]
 pub fn lerp[T](x T, y T, s T) T {
-	r := T(x + s * (y - x))
-	return r
+	return T(f64(x) + f64(s) * (f64(y) - f64(x)))
 }
 
 @[inline]
 pub fn clamp[T](val T, min T, max T) T {
-	r := T(mth.min(mth.max(val, min), max))
-	return r
+	return T(mth.min(mth.max(val, min), max))
 }
 
 // loop_f32 loops a continious `value` in the range `from`,`to`.
@@ -102,5 +99,6 @@ pub fn oscillate_f32(value f32, min f32, max f32) f32 {
 
 // manhattan_distance returns the "manhattan" distance between 2 points.
 pub fn manhattan_distance[T](ax T, ay T, bx T, by T) T {
-	return mth.abs(ax - bx) + mth.abs(ay - by)
+	r := T(mth.abs(ax - bx) + mth.abs(ay - by))
+	return r
 }
