@@ -14,7 +14,10 @@ import sdl // TODO: only for loading asset paths on Android FIXME
 
 const c_max_threads = resolve_max_threads()
 const c_max_jobs = if $env('V_FETCH_MAX_JOBS') != '' { $env('V_FETCH_MAX_JOBS').u32() } else { 128 }
-const c_chunk_size = u16(4 * 1024)
+
+// NOTE: So... the chunk size has *a lot* to say when compiling with `-prod`.
+// Slow loading of assets in almost all `-Ox` cases. Increasing it here for `-prod` works at least on Linux
+const c_chunk_size = $if prod { u16(16 * 1024) } $else { u16(4 * 1024) }
 
 // const c_chunk_size = if $env('V_FETCH_CHUNK_SIZE') != '' {
 // 	$env('V_FETCH_CHUNK_SIZE').u16()
