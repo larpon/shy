@@ -326,7 +326,7 @@ pub fn (r &Rect) displaced_from(origin Origin) Rect {
 }
 
 @[inline]
-pub fn (r Rect) point_at(anchor Anchor) (f32, f32) {
+pub fn (r &Rect) point_at(anchor Anchor) (f32, f32) {
 	x, y := anchor.pos_wh(r.width, r.height)
 	return r.x + x, r.y + y
 }
@@ -676,6 +676,7 @@ pub enum Anchor {
 	bottom_right
 }
 
+// TODO: find better naming scheme for multi returns.. maybe: "xy_from_wh_displacement"?? Ouch..
 pub fn (a Anchor) pos_wh[T](w T, h T) (T, T) {
 	mut x, mut y := T(0), T(0)
 	match a {
