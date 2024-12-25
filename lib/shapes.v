@@ -303,6 +303,15 @@ pub fn (mut r Rect) displace_from(origin Origin) {
 }
 
 @[inline]
+pub fn (r &Rect) grow(left f32, top f32, right f32, bottom f32) Rect {
+	nx := r.x - left
+	ny := r.y - top
+	nw := r.width + right + left
+	nh := r.height + top + bottom
+	return Rect{nx, ny, nw, nh}
+}
+
+@[inline]
 pub fn (r &Rect) displaced_from(origin Origin) Rect {
 	return match origin {
 		Anchor {
@@ -348,6 +357,14 @@ pub fn (r &Rect) scale_at(origin_x f32, origin_y f32, factor_x f32, factor_y f32
 		y:      origin_y + (r.y - origin_y) * factor_y
 		width:  r.width * factor_x
 		height: r.height * factor_y
+	}
+}
+
+@[inline]
+pub fn (r &Rect) size() Size {
+	return Size{
+		width:  r.width
+		height: r.height
 	}
 }
 
