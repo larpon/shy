@@ -276,6 +276,12 @@ pub mut:
 	height f32 = 100
 }
 
+// pos_as_vec2 returns `x` and `y` fields as a `vec.Vec2[f32]`
+@[inline]
+pub fn (r &Rect) pos_as_vec2[T]() Vec2[T] {
+	return Vec2[T]{T(r.x), T(r.y)}
+}
+
 // contains returns `true` if `Rect` contains the point given by `x` and `y`.
 @[inline]
 pub fn (r &Rect) contains(x f32, y f32) bool {
