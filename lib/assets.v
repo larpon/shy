@@ -980,6 +980,9 @@ pub fn (i &Image) source() AssetSource {
 	return i.asset.lo.source
 }
 
+// TODO: rewrite this mess ASAP if you want to support declarative updates (e.g.: s.volume = x)
+// sounds should probably go on the heap etc. there needs to be taken some design decisions.
+
 @[markused]
 pub const no_sound = Sound{}
 
@@ -1082,13 +1085,19 @@ pub fn (s &Sound) play() {
 // See also: `AudioEngine.set_master_volume`.
 pub fn (s &Sound) set_volume(volume f32) {
 	engine := s.engine()
-	engine.set_volume(s.id, volume)
+	unsafe {
+		s.volume = volume
+	}
+	engine.set_volume(s.id, s.volume)
 }
 
 // set_pitch sets the pitch for the `Sound`.
 pub fn (s &Sound) set_pitch(pitch f32) {
 	engine := s.engine()
-	engine.set_pitch(s.id, pitch)
+	unsafe {
+		s.pitch = pitch
+	}
+	engine.set_pitch(s.id, s.pitch)
 }
 
 // is_paused returns true if the sound is paused.
