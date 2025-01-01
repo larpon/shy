@@ -31,7 +31,6 @@ mut:
 	clip_viewport bool
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -107,7 +106,6 @@ pub fn (mut a App) update_grid_config(config ingrid.Config2D) {
 	a.grid.warp_anchor(a.warp_to, a.warp_anchor)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	mut fbf := a.configs[a.config].fill_multiply
@@ -237,7 +235,6 @@ pub fn (mut a App) event(e shy.Event) {
 	}
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	canvas_width := a.window.canvas().width
 	canvas_height := a.window.canvas().height
