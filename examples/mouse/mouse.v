@@ -16,7 +16,6 @@ pub struct App {
 	embed.ExampleApp
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	mx := a.mouse.x
 	my := a.mouse.y

@@ -30,12 +30,10 @@ mut:
 	dim_index u16 = 2 // index of "256" in dimensions
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.TestApp.init()!
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.live_frame(dt)
 }
@@ -127,7 +125,6 @@ Dimensions ${a.dimension}x${a.dimension}'
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.TestApp.event(e)
 	match e {

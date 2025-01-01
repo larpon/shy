@@ -18,7 +18,6 @@ struct App {
 
 const image_path = 'images/shy.png'
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.TestApp.init()!
 
@@ -27,7 +26,6 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	win_size := a.window.size()
 	win_w := f32(win_size.width)

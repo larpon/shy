@@ -18,7 +18,6 @@ mut:
 	sound shy.Sound = shy.no_sound
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -30,7 +29,6 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	is_looping_str := if a.sound.is_looping() { 'looping' } else { 'not looping' }
 	is_playing_str := if a.sound.is_playing() { 'playing' } else { 'not playing' }
@@ -39,7 +37,6 @@ pub fn (mut a App) frame(dt f64) {
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

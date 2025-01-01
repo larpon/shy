@@ -19,7 +19,6 @@ mut:
 	a_r &shy.Animator[f32] = shy.null
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -35,7 +34,6 @@ pub fn (mut a App) init() ! {
 	a.window.mode = .ui
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x:        shy.half * a.window.width
@@ -60,7 +58,6 @@ FPS: ${win.fps()}'
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	a.window.refresh()

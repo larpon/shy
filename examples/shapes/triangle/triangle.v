@@ -16,7 +16,6 @@ pub struct App {
 	embed.ExampleApp
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	center := shy.vec2((shy.half * a.window.width), (shy.half * a.window.height))
 	half := shy.vec2(f32(50), 50)
