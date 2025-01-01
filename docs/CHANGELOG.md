@@ -8,6 +8,9 @@
 * **WIP** Rewrite `shy export` internals
   - Exporting to an `AppImage` on Linux now works via `shy export appimage ...`
   - Exporting to the Web (via `emcc`) now works via `shy export wasm ...`
+* Due to V's switch to using `-skip-unused` per default, `@[markused]` is no longer required
+  when overriding `init/0`, `fixed_update/1`, `variable_update/1`, `frame/1`, `event/1` and `shutdown/0`
+  application embedded methods from the `embed` module.
 
 #### Breaking changes
 
