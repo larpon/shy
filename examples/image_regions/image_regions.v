@@ -16,7 +16,6 @@ pub struct App {
 	embed.ExampleApp
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -25,7 +24,6 @@ pub fn (mut a App) init() ! {
 	})!
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	cx := shy.half * a.window.width
 	cy := shy.half * a.window.height

@@ -20,7 +20,6 @@ mut:
 	eps &easy.ParticleSystem = shy.null
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -51,12 +50,10 @@ pub fn (mut a App) init() ! {
 	))
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.eps.draw()
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

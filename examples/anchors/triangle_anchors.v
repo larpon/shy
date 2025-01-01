@@ -20,7 +20,6 @@ mut:
 	origin shy.Anchor         = .center
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -43,7 +42,6 @@ pub fn (mut a App) init() ! {
 	}
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	center := shy.vec2((shy.half * a.window.width), (shy.half * a.window.height))
 
@@ -78,7 +76,6 @@ Rotation: ${rotation * shy.rad2deg:.1f}°'
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	match e {

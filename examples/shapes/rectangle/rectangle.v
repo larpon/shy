@@ -16,7 +16,6 @@ pub struct App {
 	embed.ExampleApp
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	// Draws a square at the center of the window
 	a.quick.rect(

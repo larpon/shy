@@ -16,12 +16,10 @@ pub struct App {
 	embed.ExampleApp
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	mut win := a.shy.active_window()
 	win_size := win.size()
@@ -46,7 +44,6 @@ pub fn (mut a App) frame(dt f64) {
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 	match e {

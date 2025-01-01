@@ -16,7 +16,6 @@ pub struct App {
 	embed.ExampleApp
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	win_w := f32(a.window.width)
 	win_h := f32(a.window.height)

@@ -20,7 +20,6 @@ mut:
 	align  shy.TextAlign = .baseline | .left
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	a.quick.rect(
 		x:      shy.half * a.window.width
@@ -92,7 +91,6 @@ line 3'
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 

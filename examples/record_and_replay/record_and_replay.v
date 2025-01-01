@@ -25,7 +25,6 @@ mut:
 	text  string
 }
 
-@[markused]
 pub fn (mut a App) init() ! {
 	a.ExampleApp.init()!
 
@@ -57,7 +56,6 @@ pub fn (mut a App) init() ! {
 	}
 }
 
-@[markused]
 pub fn (mut a App) frame(dt f64) {
 	mouse := a.mouse
 
@@ -85,7 +83,6 @@ rect.y ${a.fa_y.value}'
 	)
 }
 
-@[markused]
 pub fn (mut a App) event(e shy.Event) {
 	a.ExampleApp.event(e)
 
