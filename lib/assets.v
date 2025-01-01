@@ -550,7 +550,8 @@ pub enum AssetIOHints {
 
 pub struct AssetLoadOptions {
 pub:
-	source AssetSource // BUG: @[required]
+	// BUG: @[required] does not work, we use a cue string so we show something more meaningful than a crash in a runtime assert message instead...
+	source AssetSource  = 'BUG: the `source` field is @required'
 	io     AssetIOHints = .cache
 }
 
@@ -670,21 +671,24 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 	analyse.count[u64]('${@MOD}.${@STRUCT}.${@FN}()', 1)
 	assert !isnil(a.shy), 'Asset struct is not initialized'
 
+	source := opt.AssetLoadOptions.source // important to be able to use tagged source variants of images. e.g. the ones in tests/visual/image_fill_modes.v
+	assert a.lo.source.str() == source.str(), 'the `source` field of the asset and the ImageOptions must be the same'
+
 	if opt.io.has(.cache) {
-		image, status := a.shy.assets().get[Image](a.lo.source)
+		image, status := a.shy.assets().get[Image](source)
 		if status == .ok {
 			return image
 		}
 	}
+
 	assert a.status == .loaded, '${@STRUCT}.${@FN} Asset is not loaded'
 	assert a.data.len > 0, '${@STRUCT}.${@FN} Asset.data appears empty'
 
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${a.lo.source}" to image')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converting asset "${source}" to image')
 	mut stb_img := stbi.load_from_memory(a.data.data, a.data.len) or {
-		return error('${@STRUCT}.${@FN}' +
-			': stbi failed loading asset "${a.lo.source}". Error: ${err}')
+		return error('${@STRUCT}.${@FN}' + ': stbi failed loading asset "${source}". Error: ${err}')
 	}
-	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded asset "${a.lo.source}" via stbi')
+	a.shy.log.gdebug('${@STRUCT}.${@FN}', 'loaded asset "${source}" via stbi')
 
 	mut new_width := int(stb_img.width)
 	mut new_height := int(stb_img.height)
@@ -704,10 +708,10 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		}
 	}
 	if new_width != stb_img.width || new_height != stb_img.height {
-		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'resizing image "${a.lo.source}" from ${stb_img.width}x${stb_img.height} to ${new_width}x${new_height}')
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'resizing image "${source}" from ${stb_img.width}x${stb_img.height} to ${new_width}x${new_height}')
 		scaled_stb_img := stbi.resize_uint8(&stb_img, new_width, new_height) or {
 			return error('${@STRUCT}.${@FN}' +
-				': stbi failed to resize loaded asset "${a.lo.source}". Error: ${err}')
+				': stbi failed to resize loaded asset "${source}". Error: ${err}')
 		}
 		assert scaled_stb_img.width > 0, 'Asset.to_image resized image width <= 0'
 		assert scaled_stb_img.height > 0, 'Asset.to_image resized image height <= 0'
@@ -760,12 +764,12 @@ fn (mut a Asset) to_image(opt ImageOptions) !Image {
 		unsafe {
 			mut assets := a.shy.assets()
 			// assets.cache[Image](image)! // TODO
-			assets.image_cache[a.lo.source.cache_key(mut assets.sb)] = image
+			assets.image_cache[source.cache_key(mut assets.sb)] = image
 		}
 	}
 
 	$if shy_debug_assets ? {
-		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converted Asset ("${a.lo.source}") to Image')
+		a.shy.log.gdebug('${@STRUCT}.${@FN}', 'converted Asset ("${source}") to Image')
 	}
 
 	return image
