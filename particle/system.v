@@ -7,7 +7,7 @@ import shy.analyse
 
 const rad_pi_div_180 = f32(0.017453292520444443) // ~ pi/180 in radians
 
-type Component = Affector | Emitter
+pub type Component = Affector | Emitter
 
 // System
 pub struct SystemConfig {
