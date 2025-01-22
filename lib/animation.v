@@ -384,7 +384,7 @@ fn (mut a Animator[T]) step(dt f64) {
 	// a.t = ease.in_curve(a.t)
 	// a.t = ease.out_curve(a.t)
 	value := utils.remap(a.t, 0, 1.0, a.from, a.to)
-	lerp_value := utils.lerp(value, a.prev_value, dt)
+	lerp_value := utils.lerp(f64(value), a.prev_value, dt)
 	// println('v: $value pv: $a.prev_value lv: $lerp_value')
 	a.value = T(lerp_value)
 	a.prev_value = a.value
@@ -464,7 +464,7 @@ pub fn (a &FollowAnimator[T]) value() T {
 fn (mut a FollowAnimator[T]) step(dt f64) {
 	value := a.value + ((a.target - a.value) * 0.1 * (dt * (dt * 1000)) * a.multiply)
 	// value := utils.remap(a.t, 0, 1.0, a.from, a.to)
-	lerp_value := utils.lerp(value, a.prev_value, dt)
+	lerp_value := utils.lerp(f64(value), a.prev_value, dt)
 	a.value = T(lerp_value)
 
 	// round_to_even() ?? (Banker's round)
