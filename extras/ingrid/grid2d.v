@@ -12,6 +12,12 @@ fn epln(str string) {
 	eprintln(str)
 }
 
+// Cell2D represents a 2D cell in a `Grid2D`.
+// `grid_id` is the id of the Grid2D.config.id this cell belongs to.
+// `grid_id` can be helpful if several grids are used in the same codebase.
+// The `ixy` field is a unique coordinate "index" of the cell that can be used as a seed for a random number generator.
+// `ixy` is used to *uniquely* identify each cell in the grid.
+// The `pos` field represents the position of this cell in 2D graphics space. (top-left 0,0)
 pub struct Cell2D {
 pub:
 	grid_id u32
@@ -19,6 +25,7 @@ pub:
 	pos     vec.Vec2[f32]
 }
 
+// Bookmark2D represents an, immutable, exact position in the grid that can be restored via `load_bookmark`.
 pub struct Bookmark2D {
 pub:
 	config Config2D
@@ -26,6 +33,7 @@ pub:
 	pos    vec.Vec2[f32]
 }
 
+// Config2D represents a configuration for a `Grid2D` grid.
 @[params]
 pub struct Config2D {
 pub:
@@ -36,6 +44,7 @@ pub:
 	dimensions    shy.Size
 }
 
+// Grid2D represents and hold the state of an "infinite" 2 dimensional grid of cells.
 pub struct Grid2D {
 pub:
 	config Config2D // [required]
@@ -49,12 +58,14 @@ mut:
 	cols int
 }
 
+// make_2d returns an initialized `Grid2D` from a `Config2D`.
 pub fn make_2d(config Config2D) Grid2D {
 	return Grid2D{
 		config: config
 	}
 }
 
+// origin returns the "origin" cell (the top-left most cell in the grid).
 pub fn (g &Grid2D) origin() Cell2D {
 	return g.origin
 }
@@ -74,10 +85,13 @@ pub fn (g &Grid2D) rows() int {
 	return g.rows
 }
 
+// count_cells returns the amount of cells in the grid.
 pub fn (g &Grid2D) count_cells() int {
 	return g.cols * g.rows
 }
 
+// fill returns the 2D rectangle that are the bounds of which the grid should always keep filled
+// with cells. The fill is calculated based on factors supplied via the grid's configuration.
 pub fn (g &Grid2D) fill() shy.Rect {
 	return shy.Rect{
 		x:      g.fill.x
@@ -87,6 +101,7 @@ pub fn (g &Grid2D) fill() shy.Rect {
 	}
 }
 
+// bounds returns the rectangle used for collision detection for when a cells leaves/enters the grid.
 pub fn (g &Grid2D) bounds() shy.Rect {
 	return shy.Rect{
 		x:      g.bounds.x
@@ -106,6 +121,7 @@ pub fn (mut g Grid2D) init() {
 // shutdown shuts down the grid.
 pub fn (mut g Grid2D) shutdown() {}
 
+// reset_origin resets the grid's "origin" (top-left most) cell.
 pub fn (mut g Grid2D) reset_origin() {
 	g.origin = Cell2D{
 		grid_id: g.config.id
@@ -114,6 +130,8 @@ pub fn (mut g Grid2D) reset_origin() {
 	}
 }
 
+// cell_at_index_safe returns the `Cell2D` at the given `index`.
+// If `index` is out of bounds, the index is clamped to be within a valid range.
 pub fn (g &Grid2D) cell_at_index_safe(index int) Cell2D {
 	mut i := index
 	if i >= g.count_cells() {
@@ -135,6 +153,8 @@ pub fn (g &Grid2D) cell_at_index_safe(index int) Cell2D {
 	}
 }
 
+// cell_at_index returns the `Cell2D` located at `index` in the grid.
+// cell_at_index can be used to iterate the grid cells as if they where a 1 dimensional array.
 pub fn (g &Grid2D) cell_at_index(index int) Cell2D {
 	$if !no_bounds_checking {
 		if index < 0 || index >= g.count_cells() {
