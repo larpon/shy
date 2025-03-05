@@ -105,7 +105,7 @@ pub fn (mut g GFX) init() ! {
 	mut gfx_desc := gfx.Desc{
 		environment: env
 		// image_pool_size
-		// sampler_pool_size
+		sampler_pool_size:  128      // default: 64
 		shader_pool_size:   4 * 512  // default 32, NOTE: this number affects the prealloc_contexts in fonts.b.v...
 		pipeline_pool_size: 4 * 1024 // default 64, NOTE: this number affects the prealloc_contexts in fonts.b.v...
 		logger:             logger
