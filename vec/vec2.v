@@ -263,6 +263,23 @@ pub fn (v Vec2[T]) project(u Vec2[T]) Vec2[T] {
 	return u.mul_scalar(percent)
 }
 
+// rotate_around_cw returns the vector `v` rotated *clockwise* `radians` around an origin vector `o` in Cartesian space.
+pub fn (v Vec2[T]) rotate_around_cw(o Vec2[T], radians f64) Vec2[T] {
+	return v.rotate_around_ccw(o, -radians)
+}
+
+// rotate_around_ccw returns the vector `v` rotated *counter-clockwise* `radians` around an origin vector `o` in Cartesian space.
+pub fn (v Vec2[T]) rotate_around_ccw(o Vec2[T], radians f64) Vec2[T] {
+	s := math.sin(radians)
+	c := math.cos(radians)
+	dx := v.x - o.x
+	dy := v.y - o.y
+	return Vec2[T]{
+		x: T(c * dx - s * dy + o.x)
+		y: T(s * dx + c * dy + o.y)
+	}
+}
+
 // eq returns a bool indicating if the two vectors are equal.
 @[inline]
 pub fn (v Vec2[T]) eq(u Vec2[T]) bool {
@@ -365,9 +382,20 @@ pub fn (v Vec2[T]) manhattan_distance(u Vec2[T]) T {
 // angle_between returns the angle in radians to the vector `u`.
 pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 	$if T is f64 {
-		return math.atan2((v.y - u.y), (v.x - u.x))
+		return math.atan2(v.cross(u), v.dot(u))
 	} $else {
-		return T(math.atan2(f64(v.y - u.y), f64(v.x - u.x)))
+		return T(math.atan2(f64(v.cross(u)), f64(v.dot(u))))
+	}
+}
+
+// angle_towards returns the angle in radians between the horizontal axis,
+// and a line passing through the first and second point, as if the first point
+// was at the center of the coordinate system.
+pub fn (p1 Vec2[T]) angle_towards(p2 Vec2[T]) T {
+	$if T is f64 {
+		return math.atan2(p2.y - p1.y, p2.x - p1.x)
+	} $else {
+		return T(math.atan2(f64(p2.y) - f64(p1.y), f64(p2.x) - f64(p1.x)))
 	}
 }
 
