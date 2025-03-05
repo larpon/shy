@@ -17,6 +17,13 @@ fn test_vec2_int() {
 	assert v3.y == 2
 }
 
+fn test_vec2_middle() {
+	mut v1 := shy.vec2(10, 10)
+	mut v2 := shy.vec2(20, 20)
+	v3 := v1.middle(v2)
+	assert v3 == shy.vec2(15, 15)
+}
+
 fn test_vec2_f32() {
 	mut v1 := shy.vec2(f32(0), 0)
 	mut v2 := shy.vec2(f32(0), 0)

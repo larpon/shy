@@ -379,6 +379,12 @@ pub fn (v Vec2[T]) manhattan_distance(u Vec2[T]) T {
 	return math.abs(v.x - u.x) + math.abs(v.y - u.y)
 }
 
+// middle returns the middle / center vector between `v` and `u`.
+pub fn (v Vec2[T]) middle(u Vec2[T]) Vec2[T] {
+	sub := v + u
+	return Vec2[T]{T(f64(sub.x) * 0.5), T(f64(sub.y) * 0.5)}
+}
+
 // angle_between returns the angle in radians to the vector `u`.
 pub fn (v Vec2[T]) angle_between(u Vec2[T]) T {
 	$if T is f64 {
