@@ -150,6 +150,7 @@ pub fn run[T](mut ctx T, config Config) ! {
 	shy_instance.app = voidptr(ctx)
 	ctx.shy = shy_instance
 
+	shy_instance.log.gdebug('${@MOD}.${@FN}', 'calling `init/0` on user struct T')
 	ctx.init()!
 
 	shy_instance.api.main[T](mut ctx, mut shy_instance)!
