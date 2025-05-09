@@ -67,7 +67,8 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt update && sudo apt upgrade
+        sudo apt update
+        sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libegl1-mesa-dev libgl-dev
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
@@ -142,7 +143,8 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt update && sudo apt upgrade
+        sudo apt update
+        sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libegl1-mesa-dev libgl-dev
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
