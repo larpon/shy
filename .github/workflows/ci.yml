@@ -59,16 +59,15 @@ jobs:
     #    shy test-cleancode ~/.vmodules/shy
 
   ubuntu-latest-bootstrap:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.9
+      SDL2_VERSION: 2.32.0
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install --quiet libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
+        sudo apt update && sudo apt upgrade
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
@@ -135,16 +134,15 @@ jobs:
         v ~/.vmodules/shy/examples/hello_world
 
   ubuntu-latest-shy-can-live-anywhere:
-    runs-on: ubuntu-20.04 # use 20.04 for now
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       VFLAGS: -cc tcc -no-retry-compilation
-      SDL2_VERSION: 2.0.9
+      SDL2_VERSION: 2.32.0
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install --quiet -y libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
+        sudo apt update && sudo apt upgrade
         curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
         tar -zxvf SDL2.tar.gz
 
