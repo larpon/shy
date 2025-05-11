@@ -1081,6 +1081,7 @@ pub fn (p &DrawShape2DPath) draw() {
 			// TODO:
 			bs0 := p.get_segment(0)
 			mut end_of_last_segment := bs0.points[0]
+			_ := end_of_last_segment // TODO: only here to shut up a wrong compiler warning
 			for si := 0; si < p.len; si++ {
 				bezier := p.get_segment(si)
 				points := bezier.points
