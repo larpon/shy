@@ -547,6 +547,7 @@ pub mut:
 	// origin   shy.Origin = shy.Anchor.top_left
 }
 
+// draw draws a `Path` on screen.
 @[inline]
 pub fn (ep &Path) draw() {
 	draw := ep.shy.draw()
@@ -566,15 +567,17 @@ pub fn (ep &Path) draw() {
 	d.end()
 }
 
+// path returns a `Path` with `pc` set as `PathConfig`.
 @[inline]
-pub fn (e &Easy) path(erc PathConfig) Path {
+pub fn (e &Easy) path(pc PathConfig) Path {
 	assert !isnil(e.shy), 'Easy struct is not initialized'
 	return Path{
-		...erc
+		...pc
 		shy: e.shy
 	}
 }
 
+// path returns a `Path` with `pc` set as `PathConfig`.
 @[inline]
 pub fn (q &Quick) path(erc PathConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'

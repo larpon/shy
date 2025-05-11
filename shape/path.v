@@ -26,38 +26,48 @@ pub mut:
 	points [4]vec.Vec2[f32]
 }
 
+// p1 returns the point at `.points[0]` as a `vec.Vec2`.
 pub fn (b Bezier) p1() vec.Vec2[f32] {
 	return b.points[0]
 }
 
+// p2 returns the point at `.points[1]` as a `vec.Vec2`.
 pub fn (b Bezier) p2() vec.Vec2[f32] {
 	return b.points[1]
 }
 
+// p3 returns the point at `.points[2]` as a `vec.Vec2`.
 pub fn (b Bezier) p3() vec.Vec2[f32] {
 	return b.points[2]
 }
 
+// p4 returns the point at `.points[3]` as a `vec.Vec2`.
 pub fn (b Bezier) p4() vec.Vec2[f32] {
 	return b.points[3]
 }
 
+// set_p1 sets the point at `.points[0]` to the value of the `vec.Vec2` `v`.
 pub fn (mut b Bezier) set_p1(v vec.Vec2[f32]) {
 	b.points[0] = v
 }
 
+// set_p2 sets the point at `.points[1]` to the value of the `vec.Vec2` `v`.
 pub fn (mut b Bezier) set_p2(v vec.Vec2[f32]) {
 	b.points[1] = v
 }
 
+// set_p3 sets the point at `.points[2]` to the value of the `vec.Vec2` `v`.
 pub fn (mut b Bezier) set_p3(v vec.Vec2[f32]) {
 	b.points[2] = v
 }
 
+// set_p4 sets the point at `.points[3]` to the value of the `vec.Vec2` `v`.
 pub fn (mut b Bezier) set_p4(v vec.Vec2[f32]) {
 	b.points[3] = v
 }
 
+// make_4_points returns a fixed size [4] array of `vec.Vec2`. Each `x`,`y` pair in the argument list
+// is assigned to the respective index in the array. `x1`,`y1` is thus the vector at index = 0.
 pub fn make_4_points(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32, x4 f32, y4 f32) [4]vec.Vec2[f32] {
 	return [vec.Vec2[f32]{x1, x2}, vec.Vec2[f32]{x2, y2}, vec.Vec2[f32]{x3, y3},
 		vec.Vec2[f32]{x4, y4}]!
@@ -70,6 +80,7 @@ pub mut:
 	len int // should be read-only
 }
 
+// last_segment returns the last `Bezier` in `Path`.
 @[inline]
 pub fn (p &Path) last_segment() Bezier {
 	assert p.len > 0

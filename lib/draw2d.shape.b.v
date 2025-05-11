@@ -69,6 +69,7 @@ pub fn (d2d &DrawShape2D) circle(config DrawShape2DUniformPolygon) DrawShape2DUn
 	}
 }
 
+// uniform_poly returns a `DrawShape2DUniformPolygon` with `config` set as `DrawShape2DUniformPolygon`.
 pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
 	segments := if config.segments <= 2 { u32(3) } else { config.segments }
 	return DrawShape2DUniformPolygon{
@@ -78,6 +79,7 @@ pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawSha
 	}
 }
 
+// path returns a `DrawShape2DPath` with `config` set as `DrawShape2DPath`.
 pub fn (d2d &DrawShape2D) path(config DrawShape2DPath) DrawShape2DPath {
 	return DrawShape2DPath{
 		...config
@@ -1029,12 +1031,14 @@ pub mut:
 	// origin   Origin = Anchor.center
 }
 
+// bbox returns the bounding box `Rect` of the `DrawShape2DPath`.
 @[inline]
 pub fn (p &DrawShape2DPath) bbox() Rect {
 	panic('TODO: not implemented yet')
 	return Rect{0, 0, 0, 0} // up.Circle.bbox().mul_scalar(up.factor)
 }
 
+// draw draws the `DrawShape2DPath` on screen.
 @[inline]
 pub fn (p &DrawShape2DPath) draw() {
 	if p.len <= 0 {
