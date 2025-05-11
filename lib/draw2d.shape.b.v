@@ -6,6 +6,7 @@ module lib
 import shy.analyse
 import shy.vec { Vec2 }
 import shy.mth
+import shy.shape
 import math
 import shy.wraps.sokol.gl
 
@@ -68,12 +69,21 @@ pub fn (d2d &DrawShape2D) circle(config DrawShape2DUniformPolygon) DrawShape2DUn
 	}
 }
 
+// uniform_poly returns a `DrawShape2DUniformPolygon` with `config` set as `DrawShape2DUniformPolygon`.
 pub fn (d2d &DrawShape2D) uniform_poly(config DrawShape2DUniformPolygon) DrawShape2DUniformPolygon {
 	segments := if config.segments <= 2 { u32(3) } else { config.segments }
 	return DrawShape2DUniformPolygon{
 		...config
 		factor:   d2d.factor
 		segments: segments
+	}
+}
+
+// path returns a `DrawShape2DPath` with `config` set as `DrawShape2DPath`.
+pub fn (d2d &DrawShape2D) path(config DrawShape2DPath) DrawShape2DPath {
+	return DrawShape2DPath{
+		...config
+		factor: d2d.factor
 	}
 }
 
@@ -1002,6 +1012,180 @@ fn (up &DrawShape2DUniformPolygon) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x
 	draw_anchor_config := DrawAnchorConfig{
 		...up.stroke
 		width: up.stroke.width * up.factor
+	}
+	draw_anchor(x1, y1, x2, y2, x3, y3, draw_anchor_config)
+}
+
+@[params]
+pub struct DrawShape2DPath {
+	shape.Path
+	factor f32 = 1.0
+pub mut:
+	visible bool = true
+	color   Color
+	stroke  Stroke
+	// rotation f32 // TODO: decide if we should leave this here for consistency, segmented drawing allow for a visual difference when setting a rotation
+	// scale    f32  = 1.0
+	fills  Fill = .body | .stroke
+	offset Vec2[f32]
+	// origin   Origin = Anchor.center
+}
+
+// bbox returns the bounding box `Rect` of the `DrawShape2DPath`.
+@[inline]
+pub fn (p &DrawShape2DPath) bbox() Rect {
+	panic('TODO: not implemented yet')
+	return Rect{0, 0, 0, 0} // up.Circle.bbox().mul_scalar(up.factor)
+}
+
+// draw draws the `DrawShape2DPath` on screen.
+@[inline]
+pub fn (p &DrawShape2DPath) draw() {
+	if p.len <= 0 {
+		return
+	}
+	steps := 13
+	// r := p.bbox()
+	// // A sane default is to let uniform polygons (e.g. circles)
+	// // draw from their origin, we compensate for that here
+	// x := p.x * p.factor + r.width * 0.5
+	// y := p.y * p.factor + r.height * 0.5
+	// offset := p.offset.mul_scalar(p.factor)
+	// radius := p.radius * p.factor
+	// sx := 0 // x //* scale_factor
+	// sy := 0 // y //* scale_factor
+	// o_dis_x, o_dis_y := p.origin_displacement()
+	//
+	gl.push_matrix()
+
+	// gl.translate(o_dis_x, o_dis_y, 0)
+	// gl.translate(x + offset.x, y + offset.y, 0)
+	//
+	// if p.rotation != 0 {
+	// 	gl.translate(-o_dis_x, -o_dis_y, 0)
+	// 	gl.rotate(p.rotation, 0, 0, 1.0)
+	// 	gl.translate(o_dis_x, o_dis_y, 0)
+	// }
+	// if p.scale != 1 {
+	// 	gl.translate(-o_dis_x, -o_dis_y, 0)
+	// 	gl.scale(p.scale, p.scale, 1)
+	// 	gl.translate(o_dis_x, o_dis_y, 0)
+	// }
+	//
+
+	if p.fills.has(.body) {
+		// TODO:
+	}
+	if p.fills.has(.stroke) {
+		if p.stroke.width * p.factor > 1 {
+			// TODO:
+			bs0 := p.get_segment(0)
+			mut end_of_last_segment := bs0.points[0]
+			_ := end_of_last_segment // TODO: only here to shut up a wrong compiler warning
+			for si := 0; si < p.len; si++ {
+				bezier := p.get_segment(si)
+				points := bezier.points
+
+				p1_x, p1_y := points[0].x, points[0].y
+				p2_x, p2_y := points[3].x, points[3].y
+
+				ctrl_p1_x, ctrl_p1_y := points[1].x, points[1].y
+				ctrl_p2_x, ctrl_p2_y := points[2].x, points[2].y
+
+				// The constant 3 below is `points.len() - 1`
+
+				step := f32(1) / steps
+				// gl.v2f(p1_x, p1_y)
+				mut i := 0
+				mut last_two := [2]Vec2[f32]{}
+				for u := f32(0); u <= f32(1); u += step {
+					pow_2_u := u * u
+					pow_3_u := pow_2_u * u
+
+					x := pow_3_u * (p2_x + 3 * (ctrl_p1_x - ctrl_p2_x) - p1_x) +
+						3 * pow_2_u * (p1_x - 2 * ctrl_p1_x + ctrl_p2_x) +
+						3 * u * (ctrl_p1_x - p1_x) + p1_x
+
+					y := pow_3_u * (p2_y + 3 * (ctrl_p1_y - ctrl_p2_y) - p1_y) +
+						3 * pow_2_u * (p1_y - 2 * ctrl_p1_y + ctrl_p2_y) +
+						3 * u * (ctrl_p1_y - p1_y) + p1_y
+
+					if i % 4 == 0 {
+						x1, y1 := last_two[0].x, last_two[0].y
+						x2, y2 := last_two[1].x, last_two[1].y
+						x3, y3 := x, y
+						m12x, m12y := midpoint(x1, y1, x2, y2)
+						m23x, m23y := midpoint(x2, y2, x3, y3)
+						p.draw_anchor(m12x, m12y, x2, y2, m23x, m23y)
+					} else {
+						if i % 2 == 0 {
+							last_two[0] = Vec2[f32]{
+								x: x
+								y: y
+							}
+						} else {
+							last_two[1] = Vec2[f32]{
+								x: x
+								y: y
+							}
+						}
+					}
+
+					// gl.v2f(x, y)
+					i++
+				}
+				end_of_last_segment = points[3]
+				// gl.v2f(p2_x, p2_y)
+			}
+		} else {
+			color := p.stroke.color
+			gl.c4b(color.r, color.g, color.b, color.a)
+
+			gl.begin_line_strip()
+			for si := 0; si < p.len; si++ {
+				bezier := p.get_segment(si)
+				points := bezier.points
+
+				p1_x, p1_y := points[0].x, points[0].y
+				p2_x, p2_y := points[3].x, points[3].y
+
+				ctrl_p1_x, ctrl_p1_y := points[1].x, points[1].y
+				ctrl_p2_x, ctrl_p2_y := points[2].x, points[2].y
+
+				// The constant 3 below is `points.len() - 1`
+
+				step := f32(1) / steps
+				gl.v2f(p1_x, p1_y)
+				for u := f32(0); u <= f32(1); u += step {
+					pow_2_u := u * u
+					pow_3_u := pow_2_u * u
+
+					x := pow_3_u * (p2_x + 3 * (ctrl_p1_x - ctrl_p2_x) - p1_x) +
+						3 * pow_2_u * (p1_x - 2 * ctrl_p1_x + ctrl_p2_x) +
+						3 * u * (ctrl_p1_x - p1_x) + p1_x
+
+					y := pow_3_u * (p2_y + 3 * (ctrl_p1_y - ctrl_p2_y) - p1_y) +
+						3 * pow_2_u * (p1_y - 2 * ctrl_p1_y + ctrl_p2_y) +
+						3 * u * (ctrl_p1_y - p1_y) + p1_y
+
+					gl.v2f(x, y)
+				}
+				gl.v2f(p2_x, p2_y)
+			}
+			analyse.count_and_sum[u64]('${@MOD}.${@STRUCT}.${@FN}@vertices2D', u64((2 + steps) * p.len))
+			gl.end()
+		}
+	}
+
+	// gl.translate(-f32(x), -f32(y), 0)
+	gl.pop_matrix()
+}
+
+@[inline]
+fn (p &DrawShape2DPath) draw_anchor(x1 f32, y1 f32, x2 f32, y2 f32, x3 f32, y3 f32) {
+	draw_anchor_config := DrawAnchorConfig{
+		...p.stroke
+		width: p.stroke.width * p.factor
 	}
 	draw_anchor(x1, y1, x2, y2, x3, y3, draw_anchor_config)
 }

@@ -6,6 +6,7 @@ module easy
 import shy.lib as shy
 import shy.vec
 import shy.mth
+import shy.shape
 import shy.particle
 // High-level as-easy-as-it-gets API
 
@@ -513,6 +514,74 @@ pub fn (e &Easy) uniform_poly(eupc UniformPolyConfig) UniformPoly {
 pub fn (q &Quick) uniform_poly(eupc UniformPolyConfig) {
 	assert !isnil(q.easy), 'Easy struct is not initialized'
 	q.easy.uniform_poly(eupc).draw()
+}
+
+// Path
+
+@[params]
+pub struct PathConfig {
+	shape.Path
+pub mut:
+	stroke shy.Stroke
+	// rotation f32
+	// radius   f32 // for rounded corners
+	// scale    f32       = 1.0
+	color  shy.Color = shy.colors.shy.red
+	fills  shy.Fill  = .body | .stroke
+	offset vec.Vec2[f32]
+	// origin   shy.Origin = shy.Anchor.top_left
+}
+
+@[noinit]
+pub struct Path {
+	shy.ShyStruct
+	shape.Path
+pub mut:
+	stroke shy.Stroke
+	// rotation f32
+	// radius   f32 // for rounded corners
+	// scale    f32       = 1.0
+	color  shy.Color = shy.colors.shy.red
+	fills  shy.Fill  = .body | .stroke
+	offset vec.Vec2[f32]
+	// origin   shy.Origin = shy.Anchor.top_left
+}
+
+// draw draws a `Path` on screen.
+@[inline]
+pub fn (ep &Path) draw() {
+	draw := ep.shy.draw()
+	mut d := draw.shape_2d()
+	d.begin()
+	mut p := d.path()
+	p.Path = ep.Path
+	p.stroke = ep.stroke
+	// p.rotation = ep.rotation
+	// p.radius = ep.radius
+	// p.scale = ep.scale
+	p.color = ep.color
+	p.fills = ep.fills
+	p.offset = ep.offset
+	// p.origin = ep.origin
+	p.draw()
+	d.end()
+}
+
+// path returns a `Path` with `pc` set as `PathConfig`.
+@[inline]
+pub fn (e &Easy) path(pc PathConfig) Path {
+	assert !isnil(e.shy), 'Easy struct is not initialized'
+	return Path{
+		...pc
+		shy: e.shy
+	}
+}
+
+// path returns a `Path` with `pc` set as `PathConfig`.
+@[inline]
+pub fn (q &Quick) path(erc PathConfig) {
+	assert !isnil(q.easy), 'Easy struct is not initialized'
+	q.easy.path(erc).draw()
 }
 
 // Audio sub-system
