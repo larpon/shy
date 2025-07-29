@@ -490,12 +490,14 @@ pub fn (mut w Window) tick_and_render[T](mut ctx T) {
 				}
 
 				c_dt := f64(consumed_delta_time) / s.performance_frequency()
-				// eprintln('(unlocked) 2 ctx.variable_update( $c_dt )')
+				// eprintln('(unlocked) 2 ctx.variable_update( ${c_dt:.5f} )')
 				w.variable_update(c_dt)
 				ctx.variable_update(c_dt)
 
 				f_dt := f64(w.state.frame_accumulator) / desired_frametime
-				// eprintln('(unlocked) ctx.frame( $f_dt )')
+				// eprintln('(unlocked) frame_accumulator: ${w.state.frame_accumulator}')
+				// eprintln('(unlocked) desired_frametime: ${desired_frametime}')
+				// eprintln('(unlocked) ctx.frame( ${f_dt:.5f} )')
 				w.state.in_frame_call = true
 				s.scripts().on_frame(f_dt) // TODO: remove me again
 				ctx.frame(f_dt)
