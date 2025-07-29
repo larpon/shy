@@ -309,7 +309,7 @@ fn max(x int, y int) int {
 fn sdl_read_bytes_from_apk(source string) ![]u8 {
 	$if android && !termux {
 		// TODO: FIXME, this is a little messy
-		rw := sdl.rw_from_file(source.str, 'rb'.str)
+		rw := sdl.rw_from_file(source.str, c'rb')
 		if rw == sdl.null {
 			error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 			return error('${@FN}:${@LINE}: "${source}" could not be opened via sdl.rw_from_file. SDL2 says: ${error_msg}')

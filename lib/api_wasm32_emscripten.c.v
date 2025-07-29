@@ -109,10 +109,10 @@ fn emscripten_get_canvas_height() int {
 }
 
 fn emscripten_init() ! {
-	C.emscripten_run_script('Module.Shy = {
+	C.emscripten_run_script(c'Module.Shy = {
 	debug: function(){let a = Array.prototype.slice.call(arguments);a.unshift("shy");console.debug.apply(console,a);},
 	error: function(){let a = Array.prototype.slice.call(arguments);a.unshift("shy");console.error.apply(console,a);}
-};'.str)
+};')
 	emscripten_fs_init()!
 }
 

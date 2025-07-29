@@ -33,7 +33,7 @@ pub fn (mut wm WM) init() ! {
 		// sdl.set_hint(sdl.hint_video_highdpi_disabled.str, '0'.str)
 		//
 		// Stop the big "blackout/flash" on Linux desktops
-		if !sdl.set_hint(sdl.hint_video_x11_net_wm_bypass_compositor.str, '0'.str) {
+		if !sdl.set_hint(sdl.hint_video_x11_net_wm_bypass_compositor.str, c'0') {
 			sdl_error_msg := unsafe { cstring_to_vstring(sdl.get_error()) }
 			s.log.gerror('${@STRUCT}.${@FN}', 'SDL: ${sdl_error_msg}')
 			return error('SDL could not bypass compositor, SDL says:\n${sdl_error_msg}')
@@ -45,7 +45,7 @@ pub fn (mut wm WM) init() ! {
 		// We disable it since it trips end users more than it helps the majority.
 		// Also note that it can be switched with the ENV var:
 		// SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING=0
-		sdl.set_hint(sdl.hint_windows_disable_thread_naming.str, '1'.str)
+		sdl.set_hint(sdl.hint_windows_disable_thread_naming.str, c'1')
 	}
 
 	mut init_flags := u32(sdl.init_video)
