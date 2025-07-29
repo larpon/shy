@@ -4,6 +4,7 @@
 module utils
 
 import mth
+import math
 import os
 
 pub const stdin_is_a_pipe = (os.is_atty(0) == 0)
@@ -37,6 +38,16 @@ pub fn remap_f32_to_u8(value f32, min f32, max f32, new_min u8, new_max u8) u8 {
 @[inline]
 pub fn lerp[T](x T, y T, s T) T {
 	return T(f64(x) + f64(s) * (f64(y) - f64(x)))
+}
+
+// exp_decay returns a frame independent exponential decay value between `a` and `b` using `delta_time_seconds`.
+// `decay` is supposed to be useful in the range 1.0 to 25.0. From slow to fast.
+// The function is a frame rate independent (approximation) of the well-known `lerp` (linear interpolation) function.
+// It is ported to V from the pseudo code shown towards the end of the video https://youtu.be/LSNQuFEDOyQ?t=2977
+// NOTE: Thanks to Freya Holmér for the function and the work done in this field.
+@[inline]
+pub fn exp_decay[T](a T, b T, decay f64, delta_time_seconds f64) T {
+	return T(f64(b) + (f64(a) - f64(b)) * math.exp(-decay * delta_time_seconds))
 }
 
 @[inline]
