@@ -188,7 +188,7 @@ pub fn (i Draw2DImage) draw() {
 			assert image.opt.wrap_u == .clamp_to_edge, 'Images used for fill_mode: .${i.fill_mode}, must be loaded with wrap_u: .clamp_to_edge'
 			assert image.opt.wrap_v == .repeat, 'Images used for fill_mode: .${i.fill_mode}, must be loaded with wrap_v: .repeat'
 			v1 = utils.remap[f32](h, 0, image.height, 0, 1)
-			x1 = image.width
+			x1 = f32(image.width)
 			y1 = h
 			if x1 > w {
 				scissor_rect = i.draw.scissor_rect
@@ -207,7 +207,7 @@ pub fn (i Draw2DImage) draw() {
 			assert image.opt.wrap_v == .clamp_to_edge, 'Images used for fill_mode: .${i.fill_mode}, must be loaded with wrap_v: .clamp_to_edge'
 			u1 = utils.remap[f32](w, 0, image.width, 0, 1)
 			x1 = w
-			y1 = image.height
+			y1 = f32(image.height)
 			if y1 > h {
 				scissor_rect = i.draw.scissor_rect
 				mut scissor := Rect{
@@ -221,8 +221,8 @@ pub fn (i Draw2DImage) draw() {
 			}
 		}
 		.pad {
-			x1 = i.image.width
-			y1 = i.image.height
+			x1 = f32(i.image.width)
+			y1 = f32(i.image.height)
 			if x1 > w || y1 > h {
 				scissor_rect = i.draw.scissor_rect
 				mut scissor := Rect{

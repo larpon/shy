@@ -128,8 +128,8 @@ pub fn (t &DrawShape2DTriangle) draw() {
 
 	mut o_dis_x, mut o_dis_y := t.origin_displacement()
 
-	o_dis_x = int(o_dis_x)
-	o_dis_y = int(o_dis_y)
+	o_dis_x = f32(int(o_dis_x))
+	o_dis_y = f32(int(o_dis_y))
 
 	gl.push_matrix()
 	gl.translate(o_dis_x, o_dis_y, 0)
@@ -243,8 +243,8 @@ pub fn (r &DrawShape2DRect) draw() {
 	h := r.height * scale_factor
 
 	mut o_dis_x, mut o_dis_y := r.origin_displacement()
-	o_dis_x = int(o_dis_x)
-	o_dis_y = int(o_dis_y)
+	o_dis_x = f32(int(o_dis_x))
+	o_dis_y = f32(int(o_dis_y))
 
 	gl.push_matrix()
 	gl.translate(o_dis_x, o_dis_y, 0)
