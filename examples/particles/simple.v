@@ -59,7 +59,7 @@ pub fn (mut a App) event(e shy.Event) {
 
 	mut emitters := a.eps.emitters()
 	for mut em in emitters {
-		em.position.x = a.mouse.x
-		em.position.y = a.mouse.y
+		em.position.x = f32(a.mouse.x)
+		em.position.y = f32(a.mouse.y)
 	}
 }
