@@ -61,8 +61,8 @@ pub fn (mut a App) frame(dt f64) {
 
 	rotation := f32(a.a_r.value()) * shy.deg2rad
 
-	a.fa_x.target = mouse.x
-	a.fa_y.target = mouse.y
+	a.fa_x.target = f32(mouse.x)
+	a.fa_y.target = f32(mouse.y)
 
 	text := a.text + '
 rect.x ${a.fa_x.value}
