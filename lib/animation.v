@@ -414,9 +414,9 @@ pub mut:
 	user        voidptr
 	on_event_fn ?AnimEventFn
 	prev_value  T
+	target      T
 mut:
-	target T
-	value  T
+	value T
 }
 
 fn (mut a FollowAnimator[T]) touch() {

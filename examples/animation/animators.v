@@ -53,8 +53,8 @@ pub fn (mut a App) frame(dt f64) {
 	mouse := a.mouse
 	mut text := a.easy.text()
 
-	a.fa_x.target = mouse.x
-	a.fa_y.target = mouse.y
+	a.fa_x.target = f32(mouse.x)
+	a.fa_y.target = f32(mouse.y)
 
 	text.x = a.a_x.value() + a.fa_x.value() + 10
 	text.y = a.a_y.value() + a.fa_y.value() + 10
