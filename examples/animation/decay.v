@@ -28,8 +28,8 @@ pub fn (mut a App) frame(dt f64) {
 	mouse := a.mouse
 
 	mut text_mouse := a.easy.text()
-	text_mouse.x = mouse.x - 20
-	text_mouse.y = mouse.y - 20
+	text_mouse.x = f32(mouse.x - 20)
+	text_mouse.y = f32(mouse.y - 20)
 	text_mouse.text = '${text_mouse.x},${text_mouse.y}'
 	text_mouse.draw()
 
