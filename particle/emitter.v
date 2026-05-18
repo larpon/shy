@@ -110,9 +110,9 @@ fn (mut e Emitter) emit() {
 		analyse.max('${@MOD}.${@STRUCT}.burst_amount', e.burst_amount)
 		bursting = true
 		if s.bin.len >= e.burst_amount {
-			reserve = e.burst_amount
+			reserve = f32(e.burst_amount)
 		} else {
-			reserve = s.bin.len
+			reserve = f32(s.bin.len)
 		}
 		e.burst_amount -= int(reserve)
 	}

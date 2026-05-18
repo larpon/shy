@@ -687,8 +687,12 @@ pub fn (mut w Window) init() ! {
 
 	w.render_init()
 
-	w.Rect.x, w.Rect.y = w.position()
-	w.Rect.width, w.Rect.height = w.wh()
+	wx, wy := w.position()
+	ww, wh := w.wh()
+	w.Rect.x = f32(wx)
+	w.Rect.y = f32(wy)
+	w.Rect.width = f32(ww)
+	w.Rect.height = f32(wh)
 
 	// NOTE: pure function `on_window_event` used instead of closure (w.on_event) for better support on platforms that does not support closures
 	w.shy.api.events.on_event(on_window_event)
@@ -771,8 +775,8 @@ fn (mut w Window) on_event(e Event) bool {
 		}
 		WindowMoveEvent {
 			if e.window_id == w.id {
-				w.Rect.x = e.x
-				w.Rect.y = e.y
+				w.Rect.x = f32(e.x)
+				w.Rect.y = f32(e.y)
 			}
 			return false
 		}
